@@ -75,7 +75,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__record_solo = False
         self.__count_in_bars__ = 1
         self.__global_fx_knob_value__ = 50
-        self.clips_to_record = []
         self.__display_scene_buttons = False
         self.__recording_source = "internal-track"
         self.__recording_channel = "*"
@@ -193,21 +192,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     clipToRecord = Property(QObject, get_clip_to_record, set_clip_to_record, notify=clipToRecordChanged)
     ### END Property clipToRecord
-
-    ### Property clipsToRecord
-    def get_clips_to_record(self):
-        return self.clips_to_record
-
-    def set_clips_to_record(self, clips):
-        if clips != self.clips_to_record:
-            self.clips_to_record = clips
-            self.clipsToRecordChanged.emit()
-
-    clipsToRecordChanged = Signal()
-
-    # This property is used by recording popup to determine which additional clips should also have the recorded clip
-    clipsToRecord = Property('QVariantList', get_clips_to_record, set_clips_to_record, notify=clipsToRecordChanged)
-    ### END Property clipsToRecord
 
     ### Property isRecording
     def get_isRecording(self):
@@ -870,7 +854,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.screens["layers_for_channel"].do_activate_midich_layer()
         channel = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         layers_snapshot = self.zynqtgui.layer.generate_snapshot(channel)
-        self.set_clip_to_record(clip)
 
         if clip.isChannelSample:
             Path(clip.clipChannel.bankDir).mkdir(parents=True, exist_ok=True)
@@ -879,18 +862,17 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         if self.recordingSource.startswith('internal'):
             # If source is internal and there are no layers, show error and return.
-            if layers_snapshot is None or "layers" not in layers_snapshot or len(layers_snapshot["layers"]) <= 0:
-                self.zynqtgui.showMessageDialog.emit("Track has no synths. Cannot start recording", 3000)
+            if channel.occupiedSlotsCount == 0 and channel.occupiedSampleSlotsCount == 0:
+                self.zynqtgui.showMessageDialog.emit("The source track has no sound. Cannot start recording", 3000)
                 return False
 
             try:
+                # FIXME This gets weird if there is only samples, or if there is more than one synth engine
                 preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
             except:
                 preset_name = ""
         else:
             preset_name = "external"
-
-        count = 0
 
         if clip.isChannelSample:
             base_recording_dir = clip.clipChannel.bankDir
@@ -900,14 +882,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         base_filename = f"{Zynthbox.Plugin.instance().currentTimestamp()}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
 
         # Check if file exists otherwise append count
-
+        count = 0
         while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.sketch.wav").exists():
             count += 1
 
         self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.sketch.wav"
-
-        if do_countin:
-            self.ongoingCountIn = self.countInBars + 1
 
         if self.recordingType == "audio":
             if self.recordingSource.startswith('internal'):
@@ -922,6 +901,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     recording_ports = channel.channelSoundRecordingPorts
                 else:
                     self.zynqtgui.showMessageDialog.emit("Invalid recording source", 3000)
+                    # As we're bailing, clear this for side effect reduction
+                    self.clip_to_record_path = ""
                     return False
             else:
                 # TODO : Port external recording to AudioLevels recorder
@@ -943,7 +924,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                         1: ["system:capture_2"]
                     }
 
-            logging.debug(f"Queueing clip({self.clip_to_record}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
+            logging.debug(f"Queueing clip({clip}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
 
             Zynthbox.AudioLevels.instance().setShouldRecordPorts(True)
             Zynthbox.AudioLevels.instance().setRecordPortsFilenamePrefix(self.clip_to_record_path)
@@ -953,6 +934,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 for port in recording_ports[channel]:
                     logging.debug(f"Adding record port : port({port}), channel({channel})")
                     Zynthbox.AudioLevels.instance().addRecordPort(port, channel)
+
+        # These are done at the end, to ensure that if we bail out early, we don't leave some kind of nasty state behind
+        self.set_clip_to_record(clip)
+        if do_countin:
+            self.ongoingCountIn = self.countInBars + 1
 
         self.isRecording = True
         return True
@@ -981,8 +967,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     self.clip_to_record_path = None
                     self.__last_recording_type__ = ""
 
-                    self.clips_to_record.clear()
-                    self.clipsToRecordChanged.emit()
                     self.isRecording = False
                     self.longOperationDecrement()
                     QTimer.singleShot(300, self.zynqtgui.end_long_task)
@@ -1031,19 +1015,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.zynqtgui.currentTaskMessage = "Loading recording to clip"
                 self.clip_to_record.set_path(self.clip_to_record_path, should_copy=False)
                 self.clip_to_record.enabled = True
-                # Set same recorded clip to other additional clips
-                for clip in self.clips_to_record:
-                    # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
-                    # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
-                    if clip != self.clip_to_record:
-                        clip.enabled = True
-                        # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
-                        clip.set_path(self.clip_to_record_path, should_copy=False)
-                    ### Save clip metadata
-                    # When processing a sample, do not write sound metadata. It does not need to have sound metadata
-                    # When processing a skit, do write sound metadata. Sound metadata is not saved unless explicitly asked for. It is a potentially heavy task as it needs to write a lot of data
-                    ###
-                    clip.metadata.write(writeSoundMetadata=not clip.is_channel_sample)
+                ### Save clip metadata
+                # When processing a sample, do not write sound metadata. It does not need to have sound metadata
+                # When processing a skit, do write sound metadata. Sound metadata is not saved unless explicitly asked for. It is a potentially heavy task as it needs to write a lot of data
+                ###
+                self.clip_to_record.metadata.write(writeSoundMetadata=not self.clip_to_record.is_channel_sample)
                 if self.clip_to_record.isChannelSample:
                     # logging.info("Recorded clip is a sample")
                     self.clip_to_record.channel.samples_changed.emit()
@@ -1080,15 +1056,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Property(bool, notify=metronome_running_changed)
     def isMetronomeRunning(self):
         return Zynthbox.SyncTimer.instance().timerRunning()
-
-    @Slot(QObject)
-    def toggleFromClipsToRecord(self, clip):
-        if clip in self.clips_to_record:
-            self.clips_to_record.remove(clip)
-        else:
-            self.clips_to_record.append(clip)
-
-        self.clipsToRecordChanged.emit()
 
     cannotRecordEmptyLayer = Signal()
     newSketchpadLoaded = Signal()

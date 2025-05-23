@@ -136,6 +136,12 @@ Zynthian.Popup {
                             }
                         }
                         returnValue = true;
+                    } else if (zynqtgui.sketchpad.recordingType === "audio") {
+                        // We want to make sure we set the recording clip to the one for our selected slot, otherwise we'll be recording to the wrong place
+                        if (zynqtgui.sketchpad.isRecording === false) {
+                            zynqtgui.clipToRecord = _private.selectedClip;
+                        }
+                        // But *don't* return true, because we still want this handled by the core event handler
                     }
                     break;
             }
@@ -1138,10 +1144,6 @@ Zynthian.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 18
                     icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                     onClicked: {
-                        // If we asking to start recording, and want to record audio, let's ensure we record into the correct thing
-                        if (recordingTypeSettingsStack.currentIndex === 0 && zynqtgui.sketchpad.isRecording === false) {
-                            zynqtgui.clipToRecord = _private.selectedClip;
-                        }
                         zynqtgui.callable_ui_action_simple("SWITCH_RECORD");
                     }
                 }

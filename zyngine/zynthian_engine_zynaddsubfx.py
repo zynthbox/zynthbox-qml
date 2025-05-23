@@ -107,7 +107,7 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
         super().__init__(plugin_info, zynqtgui)
         self.name = "ZynAddSubFX"
         self.nickname = "ZY"
-        self.jackname = "zynaddsubfx"
+        self.jackname = self.get_next_jackname("zynaddsubfx").replace("zynaddsubfx-", "zynaddsubfx_")
 
         self.options['drop_pc']=True
 
@@ -125,10 +125,11 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
             logging.error(e)
             self.bs = 256
 
+        # zynaddsubfx only accepts a postfix for the jack client name
         if self.config_remote_display():
-            self.command = "zynaddsubfx -r {} -b {} -O jack-multi -I jack -P {} -a".format(self.sr, self.bs, self.osc_target_port)
+            self.command = "zynaddsubfx -r {} -b {} -O jack-multi -I jack -P {} -a -N {}".format(self.sr, self.bs, self.osc_target_port, self.jackname.replace("zynaddsubfx_", ""))
         else:
-            self.command = "zynaddsubfx -r {} -b {} -O jack-multi -I jack -P {} -a -U".format(self.sr, self.bs, self.osc_target_port)
+            self.command = "zynaddsubfx -r {} -b {} -O jack-multi -I jack -P {} -a -U -N {}".format(self.sr, self.bs, self.osc_target_port, self.jackname.replace("zynaddsubfx_", ""))
 
         self.command_prompt = "\n[INFO] Main Loop..."
 

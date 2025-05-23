@@ -300,6 +300,8 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
+                                    maximumLineCount: 2
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     text: model.metadata && model.metadata.description ? model.metadata.description : ""
                                     font.pointSize: 10
                                     opacity: 0.7

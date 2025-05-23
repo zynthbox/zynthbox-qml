@@ -2110,12 +2110,8 @@ class zynthian_gui(QObject):
                     if self.clipToRecord is None:
                         self.clipToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId).getClipToRecord()
 
-                    # Ensure the track also knows which slip we're recording (there can be multiple here, but
-                    # that's more of a side effect of some internal detail, just set it to the single entry)
-                    zl.clipsToRecord = [self.clipToRecord]
-
                     logging.info(f"Recording Clip : {self.clipToRecord}")
-                    if self.clipToRecord.queueRecording():
+                    if self.clipToRecord.queueRecording(do_countin=(True if zl.countInBars > 0 else False)):
                         self.run_start_metronome_and_playback.emit()
                     else:
                         logging.error("Error while trying to queue clip to record")

@@ -27,6 +27,7 @@ import re
 import glob
 import logging
 import shutil
+from pathlib import Path
 from subprocess import check_output
 
 from . import zynthian_engine
@@ -64,9 +65,7 @@ class zynthian_engine_sfizz(zynthian_engine):
     # ---------------------------------------------------------------------------
 
     bank_dirs = [
-        ('ExSFZ', zynthian_engine.ex_data_dir + "/soundfonts/sfz"),
-        ('MySFZ', zynthian_engine.my_data_dir + "/soundfonts/sfz"),
-        ('SFZ', zynthian_engine.data_dir + "/soundfonts/sfz")
+        ('MySFZ', zynthian_engine.my_data_dir + "/soundfonts/sfz")
     ]
 
     # ---------------------------------------------------------------------------
@@ -83,7 +82,7 @@ class zynthian_engine_sfizz(zynthian_engine):
         self.num_voices = 40
         self.sfzpath = None
 
-        self.command = "sfizz_jack --client_name '{}' --preload_size {} --num_voices {}".format(self.jackname, self.preload_size, self.num_voices, self.sfzpath)
+        self.command = f"sfizz_jack --client_name '{self.jackname}' --preload_size {self.preload_size} --num_voices {self.num_voices}"
         self.command_prompt = "\n> "
         self.proc.setCommandPrompt(self.command_prompt)
 
@@ -110,8 +109,20 @@ class zynthian_engine_sfizz(zynthian_engine):
     # ---------------------------------------------------------------------------
 
     def get_bank_list(self, layer=None):
-        return self.get_dirlist(self.bank_dirs)
+        # Sfizz banks are dirs listed in the format : `[<string: dir path>, <int: index>, <string: display name>, <string: 'MySFZ' for files in my-data and 'SFZ' for system>, <string: dir name>]`
+        # Sort list after gathering all sfz dirs from both plugins json and my-data
+        banks_list = []
+        index = 0
 
+        # Add banks from plugins json
+        for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_type["soundfont"].items():
+            if plugin.format.lower() in ["sfz"]:
+                banks_list.append([plugin.path, index, f"SFZ/{plugin.name.replace('_', ' ')}", "SFZ", Path(plugin.path).name])
+                index += 1
+        # Add banks from my-data
+        banks_list += self.get_dirlist(self.bank_dirs, sort=False, start_index=len(banks_list))
+
+        return sorted(banks_list, key=lambda e: e[0].casefold())
 
     def set_bank(self, layer, bank):
         return True

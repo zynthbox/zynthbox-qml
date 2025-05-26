@@ -344,15 +344,19 @@ class zynthian_engine(zynthian_basic_engine):
 
 
     @staticmethod
-    def get_dirlist(dpath, exclude_empty=True):
+    def get_dirlist(dpath, exclude_empty=True, sort=True, start_index=0):
         res=[]
         if isinstance(dpath, str): dpath=[('_', dpath)]
-        i=0
+        i=start_index
         for dpd in dpath:
             dp=dpd[1]
             dn=dpd[0]
             try:
-                for f in sorted(os.listdir(dp)):
+                if sort:
+                    files = sorted(os.listdir(dp))
+                else:
+                    files = os.listdir(dp)
+                for f in files:
                     if exclude_empty and next(os.scandir(join(dp,f)), None) is None:
                         continue
                     if not f.startswith('.') and isdir(join(dp,f)):

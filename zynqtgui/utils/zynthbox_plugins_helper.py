@@ -186,6 +186,7 @@ class zynthbox_plugins_helper(QObject):
             # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...` : FIXME Make it generic for handling sf3 files
             # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2` : FIXME Make it generic for handling sf3 files
             plugin_name = Path(snapshot["bank_info"][0]).stem
+            plugin = None
             if f"sf2/{plugin_name}" in self.plugins_by_name:
                 plugin = self.plugins_by_name[f"sf2/{plugin_name}"]
             elif f"sf3/{plugin_name}" in self.plugins_by_name:

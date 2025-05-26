@@ -316,12 +316,12 @@ class zynthian_engine(zynthian_basic_engine):
     # ---------------------------------------------------------------------------
 
     @staticmethod
-    def get_filelist(dpath, fext, sort=True):
+    def get_filelist(dpath, fext, sort=True, start_index=0):
         res=[]
         if isinstance(dpath, str): dpath=[('_', dpath)]
         fext='.'+fext
         xlen=len(fext)
-        i=0
+        i=start_index
         for dpd in dpath:
             dp=dpd[1]
             dn=dpd[0]

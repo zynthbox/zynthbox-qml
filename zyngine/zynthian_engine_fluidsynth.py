@@ -27,11 +27,9 @@ import re
 import copy
 import shutil
 import logging
-import random
-import string
+from pathlib import Path
 from subprocess import check_output
 from . import zynthian_engine
-from . import zynthian_controller
 
 #------------------------------------------------------------------------------
 # FluidSynth Engine Class
@@ -73,10 +71,9 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     fs_options = "-o synth.midi-bank-select=mma -o synth.cpu-cores=3 -o synth.polyphony=64 -o audio.jack.multi='yes'"
 
+    # Only list soundfont from my-data. System soundfonts are listed from plugins json
     soundfont_dirs=[
-        ('EX', zynthian_engine.ex_data_dir + "/soundfonts/sf2"),
-        ('MY', zynthian_engine.my_data_dir + "/soundfonts/sf2"),
-        ('_', zynthian_engine.data_dir + "/soundfonts/sf2")
+        ('MY', zynthian_engine.my_data_dir + "/soundfonts/sf2")
     ]
 
     # ---------------------------------------------------------------------------
@@ -154,8 +151,21 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     # ---------------------------------------------------------------------------
 
     def get_bank_list(self, layer=None):
-        # Sort files after getting both sf2 and sf3 lists
-        return sorted(self.get_filelist(self.soundfont_dirs, "sf2", sort=False) + self.get_filelist(self.soundfont_dirs, "sf3", sort=False), key=lambda e: e[0].casefold())
+        # Fluidsynth banks are simply the sf2 and sf3 files listed in the format : `[<string: sf2/sf3 file path>, <int: index>, <string: display name>, <string: 'MY' for files in my-data and '_' for others>, <string: file name with extension>]`
+        # Sort list after gathering all sf2/sf3 files from both plugins json and my-data
+        plugins_list = []
+        index = 0
+        # Add plugins from plugins json
+        for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_type["soundfont"].items():
+            if plugin.format.lower() in ["sf2", "sf3"]:
+                plugins_list.append([plugin.path, index, plugin.name.replace("_", " "), "_", Path(plugin.path).name])
+                index += 1
+        # Append sf2 from soundfont_dirs
+        plugins_list += self.get_filelist(self.soundfont_dirs, "sf2", sort=False, start_index=len(plugins_list))
+        # Append sf3 from soundfont_dirs
+        plugins_list += self.get_filelist(self.soundfont_dirs, "sf3", sort=False, start_index=len(plugins_list))
+        # Return plugins list sorted by name (case-insensitive)
+        return sorted(plugins_list, key=lambda e: e[0].casefold())
 
 
     def set_bank(self, layer, bank):

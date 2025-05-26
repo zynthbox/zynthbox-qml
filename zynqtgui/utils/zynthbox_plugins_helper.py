@@ -94,6 +94,11 @@ class zynthbox_plugins_helper(QObject):
 
         self.plugins_by_name = {}
         self.plugins_by_id = {}
+        self.plugins_by_type = {
+            "synth": {},
+            "soundfont": {},
+            "audioFx": {}
+        }
         self.old_plugins_by_name = {}
         self.old_plugins_by_id = {}
 
@@ -107,14 +112,17 @@ class zynthbox_plugins_helper(QObject):
             plugin = zynthbox_plugin(key, plugins_json["synth"][key], "MIDI Synth", self)
             self.plugins_by_id[key] = plugin
             self.plugins_by_name[f"{plugins_json['synth'][key]['format'].lower()}/{plugins_json['synth'][key]['name']}"] = plugin
+            self.plugins_by_type["synth"][key] = plugin
         for key in plugins_json["audioFx"]:
             plugin = zynthbox_plugin(key, plugins_json["audioFx"][key], "Audio Effect", self)
             self.plugins_by_id[key] = plugin
             self.plugins_by_name[f"{plugins_json['audioFx'][key]['format'].lower()}/{plugins_json['audioFx'][key]['name']}"] = plugin
+            self.plugins_by_type["audioFx"][key] = plugin
         for key in plugins_json["soundfont"]:
             plugin = zynthbox_plugin(key, plugins_json["soundfont"][key], "MIDI Synth", self)
             self.plugins_by_id[key] = plugin
             self.plugins_by_name[f"{plugins_json['soundfont'][key]['format'].lower()}/{plugins_json['soundfont'][key]['name']}"] = plugin
+            self.plugins_by_type["soundfont"][key] = plugin
 
         for key in old_plugins_json:
             # type parameter in old json used to store the plugin format.

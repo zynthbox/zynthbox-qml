@@ -1748,7 +1748,7 @@ class sketchpad_channel(QObject):
                         layer_index = self.zynqtgui.layer.layers.index(self.__chained_sketch_fx[fxSlotIndex])
                         self.zynqtgui.layer.remove_layer(layer_index)
                         self.__chained_sketch_fx[fxSlotIndex] = None
-                        self.__routingData__["sketchfx"][slot_row].clear()
+                        self.__routingData__["sketchfx"][fxSlotIndex].clear()
                         # Ensure we clear the passthrough (or it'll retain its value)
                         passthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][fxSlotIndex]
                         self.__song__.clearPassthroughClient(passthroughClient)

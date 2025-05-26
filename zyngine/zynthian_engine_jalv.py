@@ -162,10 +162,12 @@ class zynthian_engine_jalv(zynthian_engine):
             self.proc.setCommandPrompt(self.command_prompt)
             self.start()
 
+            # TODO : We probably do not need it anymore as the core issues with ProcessWrapper has been fixed and works like a charm
+            #        Still keeping this commented for a few days and monitor if this an issue
             # Run presets command explicitly after starting otherwise loading a preset does not work
-            transaction = self.proc.call("presets")
+            # transaction = self.proc.call("presets")
             # logging.debug(f"--- presets command output BEGIN\n{transaction.standardOutput()}\n--- presets command output END")
-            transaction.release()
+            # transaction.release()
             # if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
                 # pass
             # else:

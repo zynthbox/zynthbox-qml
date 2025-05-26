@@ -193,9 +193,9 @@ class zynthian_engine_setbfree(zynthian_engine):
 
         #Process command ...
         if self.config_remote_display():
-            self.command = "setBfree -p \"{}\" -c \"{}\"".format(self.presets_fpath, self.config_autogen_fpath)
+            self.command = f"{plugin_info.path} -p {self.presets_fpath} -c {self.config_autogen_fpath}"
         else:
-            self.command = "setBfree -p \"{}\" -c \"{}\"".format(self.presets_fpath, self.config_autogen_fpath)
+            self.command = f"{plugin_info.path} -p {self.presets_fpath} -c {self.config_autogen_fpath}"
 
         self.command_prompt = "\nAll systems go. press CTRL-C, or send SIGINT or SIGHUP to terminate\n"
         self.proc.setCommandPrompt(self.command_prompt)

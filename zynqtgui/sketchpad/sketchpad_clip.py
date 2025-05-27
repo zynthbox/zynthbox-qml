@@ -435,7 +435,7 @@ class sketchpad_clip_metadata(QObject):
             tags["ZYNTHBOX_VELOCITY_MINIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMinimum())]
             tags["ZYNTHBOX_VELOCITY_MAXIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMaximum())]
             tags["ZYNTHBOX_PAN"] = [str(self.clip.audioSource.rootSlice().pan())]
-            tags["ZYNTHBOX_GAIN"] = [str(self.clip.audioSource.rootSlice().gainHandler().gainAbsolute())]
+            tags["ZYNTHBOX_GAIN"] = [str(self.clip.audioSource.rootSlice().gainHandler().gainDb())]
             tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.clip.audioSource.rootSlice().adsrAttack())]
             tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.clip.audioSource.rootSlice().adsrDecay())]
             tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.clip.audioSource.rootSlice().adsrRelease())]
@@ -509,7 +509,7 @@ class sketchpad_clip_metadata(QObject):
             self.clip.audioSource.rootSlice().setADSRDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)))
             self.clip.audioSource.rootSlice().setADSRSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)))
             self.clip.audioSource.rootSlice().setADSRRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)))
-            self.clip.audioSource.rootSlice().gainHandler().setGainAbsolute(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)))
+            self.clip.audioSource.rootSlice().gainHandler().setGainDb(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)))
             self.clip.audioSource.rootSlice().setGrainInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)))
             self.clip.audioSource.rootSlice().setGrainIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)))
             self.clip.audioSource.rootSlice().setGrainPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)))
@@ -600,7 +600,7 @@ class sketchpad_clip(QObject):
         self.__initial_pitch__ = 0
         self.__initial_speed_ratio = 1
         self.__speed_ratio__ = self.__initial_speed_ratio
-        self.__initial_gain__ = 0.50 # This represents a gainAbsolute value which is roughly equivalent to 0dB
+        self.__initial_gain__ = 0 # This is the default adjustment in dB (so, no adjustment)
         self.__progress__ = 0.0
         self.audioSource = None
         self.recording_basepath = song.sketchpad_folder

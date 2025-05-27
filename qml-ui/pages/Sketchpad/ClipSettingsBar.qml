@@ -174,7 +174,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.clipAudioSource.selectedSliceObject.gainHandler.gainAbsolute = root.controlObj.initialGain;
+                root.clipAudioSource.selectedSliceObject.gainHandler.gainDb = root.controlObj.initialGain;
             }
         }
 

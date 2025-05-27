@@ -426,7 +426,7 @@ Item {
 
                         onDoubleClicked: {
                             if (component.cppClipObject) {
-                                component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
+                                component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainDb = 0;
                             }
                         }
                     }

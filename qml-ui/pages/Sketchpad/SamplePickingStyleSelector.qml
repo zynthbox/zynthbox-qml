@@ -52,7 +52,7 @@ Zynthian.DialogQuestion {
     width: Kirigami.Units.gridUnit * 35
     rejectText: qsTr("Cancel")
     acceptText: qsTr("OK")
-    title: qsTr("Choose Sample Picking Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+    title: qsTr("Choose Slot Picking Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
 
     additionalButtons: _private.newPickingStyle === "same" ? [styleButtonSame, styleButtonFirst, styleButtonAll, sameButtonUntrust, sameButtonTrust] :  [styleButtonSame, styleButtonFirst, styleButtonAll]
     property var cuiaCallback: function(cuia) {
@@ -105,7 +105,7 @@ Zynthian.DialogQuestion {
             Layout.fillHeight: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 4
             wrapMode: Text.Wrap
-            text: qsTr("When using samples for musical playback, the specific samples that get picked for playing by SamplerSynth when a note arrives from playing a Clip's pattern steps or from a midi controller are selected in one of a few possible ways.")
+            text: qsTr("When using samples for musical playback, the specific synths and samples that get picked for playing when a note arrives from playing a Clip's pattern steps or from a midi controller are selected in one of a few possible ways.")
         }
         RowLayout {
             Layout.fillHeight: true
@@ -164,11 +164,11 @@ Zynthian.DialogQuestion {
             wrapMode: Text.Wrap
             text: {
                 if (_private.newPickingStyle === "same") {
-                    return qsTr("This style only considers the sample in the same slot as the clip being played (for example, Clip b will look in slot 3, and Clip a will look in slot 1). If no sample is set in that slot, no sound will be made.\nThis is particularly useful for separating out things like a drum beat into its individual stems, so you have for example a snare part in one slot, and hihat part in another. It does reduce the amount of Clips available to each of those sounds, and removes the ability to handle the samples using MPE, but it allows for per-step tuning of the instruments (set Key Split to the default Off to achieve this).\nTo individual slots using an external device, use the Input MIDI Channels Match Slot, otherwise all input from external MIDI controllers is sent to the current clip's slot");
+                    return qsTr("This style only considers the instrument in the same slot as the clip being played (for example, Clip b will look in slot 3, and Clip a will look in slot 1). If no instrument is set in that slot, no sound will be made.\nThis is particularly useful for separating out things like a drum beat into its individual stems, so you have for example a snare part in one slot, and hihat part in another. It does reduce the amount of Clips available to each of those sounds, and removes the ability to handle the instrument using MPE, but it allows for per-step tuning of the instruments (set Key Split to the default Off to achieve this).\nTo individual slots using an external device, use the Input MIDI Channels Match Slot, otherwise all input from external MIDI controllers is sent to the current clip's slot");
                 } else if (_private.newPickingStyle === "first") {
-                    return qsTr("This style will look at all the sample slots in order, and the first sample which has a key zone setup matching the incoming note will be selected.\nThis is particularly useful for wide-split key zone setups, where you have a sample set in each slot, but have them split across areas of the note range, but still allowing chromatic playback within that two octave split for all five slots.");
+                    return qsTr("This style will look at all the instrument slots in order, and the first instrument which has a key zone setup matching the incoming note will be selected.\nThis is particularly useful for wide-split key zone setups, where you have a instrument set in each slot, but have them split across areas of the note range, but still allowing chromatic playback within that two octave split for all five slots.");
                 } else if (_private.newPickingStyle === "all") {
-                    return qsTr("This style will look at all sample slots, and all samples which match the incoming note will be selected.\nThis is particularly useful if you simply want to layer multiple samples when you play notes, or if you are doing more intricate sound design work. This goes well with either setting Key Split to the default Off, or manually setting up your key zones.");
+                    return qsTr("This style will look at all instrument slots, and all instrument which match the incoming note will be selected.\nThis is particularly useful if you simply want to layer multiple instrument when you play notes, or if you are doing more intricate sound design work. This goes well with either setting Key Split to the default Off, or manually setting up your key zones.");
                 }
                 return "";
             }

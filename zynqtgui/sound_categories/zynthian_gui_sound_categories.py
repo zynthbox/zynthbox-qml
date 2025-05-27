@@ -108,6 +108,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         def task():
             selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             sound = zynthbox_sndfile(self, self.zynqtgui, name, "my-sounds")
+            sound.metadata.trackStyleSnapshot = selectedTrack.getTrackStyleSnapshot()
             sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshot()
             sound.metadata.sampleSnapshot = selectedTrack.getChannelSampleSnapshot()
             sound.metadata.category = category
@@ -134,6 +135,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     def forceLoadSoundOnTrack(self, sound: Zynthbox.SndFileInfo, track):
         def task():
             self.zynqtgui.show_modal("sketchpad")
+            track.setTrackStyleFromSnapshot(sound.trackStyleSnapshot())
             track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
             track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
             self.zynqtgui.end_long_task()

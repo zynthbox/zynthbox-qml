@@ -42,6 +42,7 @@ class zynthbox_sndfile_metadata(QObject):
         self.__wavMetadata = None
 
         # Sound metadata
+        self.__trackStyleSnapshot = None
         self.__synthFxSnapshot = None
         self.__sampleSnapshot = None
         self.__category = None
@@ -49,6 +50,7 @@ class zynthbox_sndfile_metadata(QObject):
         self.__sampleSlotsData = None
         self.__fxSlotsData = None
 
+    def get_trackStyleSnapshot(self): return self.__trackStyleSnapshot
     def get_synthFxSnapshot(self): return self.__synthFxSnapshot
     def get_sampleSnapshot(self): return self.__sampleSnapshot
     def get_category(self): return self.__category
@@ -56,6 +58,10 @@ class zynthbox_sndfile_metadata(QObject):
     def get_sampleSlotsData(self): return self.__sampleSlotsData
     def get_fxSlotsData(self): return self.__fxSlotsData
 
+    def set_trackStyleSnapshot(self, value, force=False):
+        if value != self.__trackStyleSnapshot or force:
+            self.__trackStyleSnapshot = value
+            self.trackStyleSnapshotChanged.emit()
     def set_synthFxSnapshot(self, value, force=False):
         if value != self.__synthFxSnapshot or force:
             self.__synthFxSnapshot = value
@@ -81,6 +87,7 @@ class zynthbox_sndfile_metadata(QObject):
             self.__fxSlotsData = value
             self.fxSlotsDataChanged.emit()
 
+    trackStyleSnapshotChanged = Signal()
     synthFxSnapshotChanged = Signal()
     sampleSnapshotChanged = Signal()
     categoryChanged = Signal()
@@ -88,6 +95,7 @@ class zynthbox_sndfile_metadata(QObject):
     sampleSlotsDataChanged = Signal()
     fxSlotsDataChanged = Signal()
 
+    trackStyleSnapshot = Property(str, get_trackStyleSnapshot, set_trackStyleSnapshot, notify=trackStyleSnapshotChanged)
     synthFxSnapshot = Property(str, get_synthFxSnapshot, set_synthFxSnapshot, notify=synthFxSnapshotChanged)
     sampleSnapshot = Property(str, get_sampleSnapshot, set_sampleSnapshot, notify=sampleSnapshotChanged)
     category = Property(int, get_category, set_category, notify=categoryChanged)
@@ -119,6 +127,7 @@ class zynthbox_sndfile_metadata(QObject):
                 logging.error(f"Error reading metadata from sound {self.sound.path} : {str(e)}")
 
             # TODO Probably have some fault safety here, in case there's bunk metadata?
+            self.set_trackStyleSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_TRACK_STYLE_SNAPSHOT", None)), force=True)
             self.set_synthFxSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT", None)), force=True)
             self.set_sampleSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT", None)), force=True)
             self.set_category(int(self.getMetadataProperty("ZYNTHBOX_SOUND_CATEGORY", 0)), force=True)
@@ -129,6 +138,7 @@ class zynthbox_sndfile_metadata(QObject):
     def write(self):
         if self.sound.exists():
             tags = {}
+            tags["ZYNTHBOX_SOUND_TRACK_STYLE_SNAPSHOT"] = str(self.__trackStyleSnapshot)
             tags["ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT"] = str(self.__synthFxSnapshot)
             tags["ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT"] = str(self.__sampleSnapshot)
             tags["ZYNTHBOX_SOUND_CATEGORY"] = str(self.__category)
@@ -146,6 +156,7 @@ class zynthbox_sndfile_metadata(QObject):
                 logging.exception(f"Error writing metadata : {str(e)}")
 
     def clear(self):
+        self.set_trackStyleSnapshot("", write=False, force=True)
         self.set_synthFxSnapshot(None, write=False, force=True)
         self.set_sampleSnapshot(None, write=False, force=True)
         self.set_category(None, write=False, force=True)

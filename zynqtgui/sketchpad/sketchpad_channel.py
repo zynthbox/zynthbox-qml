@@ -316,6 +316,8 @@ class sketchpad_channel(QObject):
         self.zynqtgui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
         self.__samples__ = []
+        self.__trackStyle__ = "everything"
+        self.trackStyleChanged.connect(self.handleTrackStyleChanged)
         self.__sample_picking_style__ = "all"
         self.__trustExternalDeviceChannels__ = False
         self.__keyzone_mode__ = "all-full"
@@ -814,6 +816,7 @@ class sketchpad_channel(QObject):
                 "connectedPattern": self.__connected_pattern__,
                 "chainedSounds": self.__chained_sounds__,
                 "allowMulticlip": self.__allowMulticlip__,
+                "trackStyle": self.__trackStyle__,
                 "trackType": self.__track_type__,
                 "trackRoutingStyle": self.__track_routing_style__,
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
@@ -864,6 +867,11 @@ class sketchpad_channel(QObject):
                 self.set_allowMulticlip(obj["allowMulticlip"], True)
             else:
                 self.set_allowMulticlip(False, True)
+
+            if "trackStyle" in obj:
+                self.set_trackStyle(obj["trackStyle"])
+            else:
+                self.set_trackStyle("everything")
 
             # TODO : `channelAudioType` key is deprecated and has been renamed to `trackType`. Remove this fallback later
             if "channelAudioType" in obj:
@@ -1878,6 +1886,47 @@ class sketchpad_channel(QObject):
 
     allowMulticlip = Property(bool, get_allowMulticlip, set_allowMulticlip, notify=allowMulticlipChanged)
     ### END Property allowMulticlip
+
+    ### BEGIN Property trackStyle
+    # Possible values: "everything", "one-to-one", "drums", "2-low-3-high", "manual"
+    # Default value: "everything"
+    # Only everything and one-to-one are currently exposed in the UI, done as a simple toggle
+    # Intent notes:
+    # - Manual will allow users to edit everything themselves, and other styles are pre-packaged
+    # - In any other style than manual, we hide the routing style, slot matching, and keyzone options in the UI
+    # - Switching between the styles other than manual will force the settings to be applied
+    # - Switching the settings for any of the dependents do not force this to manual (since those settings really should not be available anyway at that point)
+    def handleTrackStyleChanged(self):
+        # Nothing needs doing for "manual", as that will retain the settings of whatever you most recently did
+        if self.__trackStyle__ == "everything":
+            self.set_samplePickingStyle("all")
+            self.set_track_routing_style("standard")
+            self.set_keyZoneMode("all-full")
+        elif self.__trackStyle__ == "one-to-one":
+            self.set_samplePickingStyle("same")
+            self.set_track_routing_style("one-to-one")
+            self.set_keyZoneMode("all-full")
+        elif self.__trackStyle__ == "drums":
+            self.set_samplePickingStyle("same")
+            self.set_track_routing_style("one-to-one")
+            self.set_keyZoneMode("split-narrow")
+        elif self.__trackStyle__ == "2-low-3-high":
+            self.set_samplePickingStyle("all")
+            self.set_track_routing_style("standard")
+            self.set_keyZoneMode("2-low-3-high")
+
+    def get_trackStyle(self):
+        return self.__trackStyle__
+
+    def set_trackStyle(self, trackStyle):
+        if self.__trackStyle__ != trackStyle:
+            self.__trackStyle__ = trackStyle
+            self.trackStyleChanged.emit()
+
+    trackStyleChanged = Signal()
+
+    trackStyle = Property(str, get_trackStyle, set_trackStyle, notify=trackStyleChanged)
+    ### END Property trackStyle
 
     ### BEGIN Property trackType
     # Possible values : "synth", "sample-loop", "sample-trig", "external"
@@ -3076,6 +3125,72 @@ class sketchpad_channel(QObject):
             return self.getClipsModelById(self.selectedSlot.value).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
         else:
             return self.samples[self.selectedSlot.value]
+
+    @Slot(str)
+    def setTrackStyleFromSnapshot(self, snapshot: str):
+        def task():
+            try:
+                obj = json.loads(snapshot)
+                if "trackStyle" in obj:
+                    self.set_trackStyle(obj["trackStyle"])
+                else:
+                    self.set_trackStyle("everything")
+                if "trackRoutingStyle" in obj:
+                    self.set_track_routing_style(obj["trackRoutingStyle"], True)
+                else:
+                    self.set_track_routing_style("standard", True)
+                if "sketchFxRoutingData" in obj:
+                    for slotIndex, routingData in enumerate(obj["sketchFxRoutingData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: sketchFxRoutingData has too many entries")
+                            break
+                        self.__routingData__["sketchfx"][slotIndex].deserialize(routingData)
+                self.sketchFxRoutingDataChanged.emit()
+                if "fxRoutingData" in obj:
+                    for slotIndex, routingData in enumerate(obj["fxRoutingData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: fxRoutingData has too many entries")
+                            break
+                        self.__routingData__["fx"][slotIndex].deserialize(routingData)
+                self.fxRoutingDataChanged.emit()
+                if "synthRoutingData" in obj:
+                    for slotIndex, routingData in enumerate(obj["synthRoutingData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: synthRoutingData has too many entries")
+                            break
+                        self.__routingData__["synth"][slotIndex].deserialize(routingData)
+                self.synthRoutingDataChanged.emit()
+                if "synthKeyzoneData" in obj:
+                    for slotIndex, keyzoneData in enumerate(obj["synthKeyzoneData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: synthKeyzoneData has too many entries")
+                            break
+                        self.__chained_sounds_keyzones__[slotIndex].deserialize(keyzoneData)
+                else:
+                    for entry in self.__chained_sounds_keyzones__:
+                        entry.clear()
+                self.chainedSoundsKeyzonesChanged.emit()
+                if "keyzone_mode" in obj:
+                    self.__keyzone_mode__ = obj["keyzone_mode"]
+                    self.keyZoneModeChanged.emit();
+            except Exception as e:
+                logging.error(f"Failed to load track style data, with the following error: {e}")
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, "Loading track style data")
+
+    @Slot(result=str)
+    def getTrackStyleSnapshot(self):
+        snapshot = {
+            "trackRoutingStyle": self.__track_routing_style__,
+            "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
+            "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
+            "sketchFxRoutingData": [entry.serialize() for entry in self.__routingData__["sketchfx"]],
+            "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
+            "sample_picking_style": self.__sample_picking_style__,
+            "trustExternalDeviceChannels": self.__trustExternalDeviceChannels__,
+            "keyzone_mode": self.__keyzone_mode__
+        }
+        return json.dumps(snapshot)
 
     @Slot(str)
     def setChannelSamplesFromSnapshot(self, snapshot: str):

@@ -55,6 +55,7 @@ class zynthbox_plugin(QObject):
         self.cutoffControl = ""
         self.resonanceControl = ""
         self.description = ""
+        self.enabled = True
 
         if "version" in plugin_details:
             self.version = plugin_details["version"]
@@ -78,6 +79,8 @@ class zynthbox_plugin(QObject):
             self.resonanceControl = plugin_details["resonanceControl"]
         if "description" in plugin_details:
             self.description = plugin_details["description"]
+        if "enabled" in plugin_details:
+            self.enabled = plugin_details["enabled"]
 
         for key in plugin_details:
             self.substitution_map[f"{self.id}_{key}"] = plugin_details[key]

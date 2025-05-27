@@ -127,9 +127,9 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 
         # zynaddsubfx only accepts a postfix for the jack client name
         if self.config_remote_display():
-            self.command = "{plugin_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -N {self.jackname.replace('zynaddsubfx_', '')}"
+            self.command = f"{plugin_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -N {self.jackname.replace('zynaddsubfx_', '')}"
         else:
-            self.command = "{plugin_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -U -N {self.jackname.replace('zynaddsubfx_', '')}"
+            self.command = f"{plugin_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -U -N {self.jackname.replace('zynaddsubfx_', '')}"
 
         self.command_prompt = "\n[INFO] Main Loop..."
 

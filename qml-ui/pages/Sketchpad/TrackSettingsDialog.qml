@@ -154,7 +154,7 @@ Zynthian.DialogQuestion {
         }
         QQC2.Button {
             id: trackRoutingStyleField
-            visible: _private.selectedTrack && _private.selectedTrack.trackStyle === "manual"
+            visible: _private.selectedTrack ? _private.selectedTrack.trackStyle === "manual" : false
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             implicitWidth: Kirigami.Units.gridUnit * 5

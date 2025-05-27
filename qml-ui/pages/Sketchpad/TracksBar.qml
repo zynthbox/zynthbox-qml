@@ -892,12 +892,43 @@ Rectangle {
                                         Layout.fillHeight: true
                                         visible: root.selectedChannel.trackType == "synth"
 
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: root.selectedChannel ? trackStyleName(root.selectedChannel.trackStyle) : ""
+                                            function trackStyleName(trackStyle) {
+                                                switch (trackStyle) {
+                                                    case "everything":
+                                                        return qsTr("Everything");
+                                                    case "one-to-one":
+                                                        return qsTr("One-to-One");
+                                                    case "drums":
+                                                        return qsTr("Drums");
+                                                    case "2-low-3-high":
+                                                        return qsTr("2 low/3 high");
+                                                    default:
+                                                        return qsTr("Manual");
+                                                }
+                                            }
+                                            onClicked: {
+                                                if (root.selectedChannel.trackStyle === "everything") {
+                                                    root.selectedChannel.trackStyle = "one-to-one";
+                                                } else {
+                                                    root.selectedChannel.trackStyle = "everything";
+                                                }
+                                                // This will want switching out for a slot picking style selector when we
+                                                // introduce more of them (for now we just switch between everything and
+                                                // one-to-one, so no reason to spend time on that just yet)
+                                            }
+                                        }
+
                                         QQC2.Label {
                                             Layout.fillHeight: true
-                                            text: qsTr("Selection:")
+                                            visible: root.selectedChannel ? root.selectedChannel.trackStyle === "manual" : false
+                                            text: qsTr("Slot Selection:")
                                         }
                                         QQC2.Button {
                                             Layout.fillHeight: true
+                                            visible: root.selectedChannel ? root.selectedChannel.trackStyle === "manual" : false
                                             onClicked: {
                                                 samplePickingStyleSelector.pickSamplePickingStyle(root.selectedChannel);
                                             }
@@ -917,42 +948,11 @@ Rectangle {
                                             }
                                         }
 
-                                        QQC2.Label {
-                                            Layout.fillHeight: true
-                                            text: "Key Split"
-                                        }
-                                        RowLayout {
-                                            Layout.fillHeight: true
-                                            spacing: 0
-                                            QQC2.Button {
-                                                Layout.fillHeight: true
-                                                text: "Off"
-                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "all-full"
-                                                onClicked: {
-                                                    root.selectedChannel.keyZoneMode = "all-full";
-                                                }
-                                            }
-//                                            QQC2.Button {
-//                                                Layout.fillHeight: true
-//                                                text: "Auto"
-//                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "split-full"
-//                                                onClicked: {
-//                                                    root.selectedChannel.keyZoneMode = "split-full";
-//                                                }
-//                                            }
-                                            QQC2.Button {
-                                                Layout.fillHeight: true
-                                                text: "Narrow"
-                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "split-narrow"
-                                                onClicked: {
-                                                    root.selectedChannel.keyZoneMode = "split-narrow";
-                                                }
-                                            }
-                                        }
                                         QQC2.Button {
                                             Layout.fillHeight: true
                                             icon.name: "timeline-use-zone-on"
-                                            visible: root.selectedChannel && root.selectedChannel.samplePickingStyle !== "same-or-first"
+                                            text: qsTr("Key Zones")
+                                            visible: root.selectedChannel ? root.selectedChannel.trackStyle === "manual" : false
                                             onClicked: {
                                                 bottomStack.slotsBar.requestChannelKeyZoneSetup();
                                             }

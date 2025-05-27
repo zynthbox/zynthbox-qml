@@ -60,23 +60,24 @@ class zynthian_gui_engine(zynthian_gui_selector):
         engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other", None)}
         for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id.items():
             try:
-                eng = ""
+                if plugin.enabled:
+                    eng = ""
 
-                if plugin.engineType == "aeolus":
-                    eng = "AE"
-                elif plugin.engineType == "fluidsynth":
-                    eng = "FS"
-                elif plugin.engineType == "setbfree":
-                    eng = "BF"
-                elif plugin.engineType == "sfizz":
-                    eng = "SF"
-                elif plugin.engineType == "zynaddsubfx":
-                    eng = "ZY"
-                elif plugin.engineType == "jalv":
-                    eng = 'JV/{}'.format(plugin.name)
+                    if plugin.engineType == "aeolus":
+                        eng = "AE"
+                    elif plugin.engineType == "fluidsynth":
+                        eng = "FS"
+                    elif plugin.engineType == "setbfree":
+                        eng = "BF"
+                    elif plugin.engineType == "sfizz":
+                        eng = "SF"
+                    elif plugin.engineType == "zynaddsubfx":
+                        eng = "ZY"
+                    elif plugin.engineType == "jalv":
+                        eng = 'JV/{}'.format(plugin.name)
 
-                if eng != "":
-                    engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format, plugin)
+                    if eng != "":
+                        engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format, plugin)
             except Exception as e:
                 logging.error(f"Error while trying to parse plugin details : {str(e)}")
 

@@ -984,7 +984,7 @@ Rectangle {
             QQC2.Action {
                 text: qsTr("Record...")
                 onTriggered: {
-                    zynqtgui.callable_ui_action_simple("SWITCH_RECORD");
+                    applicationWindow().recordAudio();
                 }
             },
             QQC2.Action {

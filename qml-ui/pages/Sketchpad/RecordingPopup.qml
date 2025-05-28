@@ -186,18 +186,21 @@ Zynthian.Popup {
         // Update selected track dropdown
         channelCombo.currentIndex = root.selectedChannel.id
     }
+    function requestAudioRecording() {
+        _private.recordAudio = true;
+        root.open();
+    }
     onOpened: {
         zynqtgui.recordingPopupActive = true
 
         let currentTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
         if (zynqtgui.sketchpad.isRecording === false) {
-            if (currentTrack.trackType !== "sample-loop" && zynqtgui.current_screen_id === "playgrid" && applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item.isSequencer) {
-                // If we're on the playgrid, and the current module is a sequencer, show the midi recorder
-                // but, also, only if we're not in sketch mode (at which point we should record the loop, not a pattern)
-                zynqtgui.sketchpad.recordingType = "midi";
-            } else {
-                // Otherwise assume the audio recorder's what's wanted
+            if (_private.recordAudio) {
+                // Only display the recording dialogue in audio mode if explicitly requested to do so
                 zynqtgui.sketchpad.recordingType = "audio";
+            } else {
+                // Otherwise do midi recording
+                zynqtgui.sketchpad.recordingType = "midi";
             }
             // If we're not already recording, take a snapshot of our current state, so we can keep that stable when changing settings
             root.selectedChannel = currentTrack;
@@ -232,6 +235,7 @@ Zynthian.Popup {
             }
             // Clear out the known most-recent clip, because otherwise it'll be kept there forever and ever and ever, and we don't want that...
             _private.mostRecentlyRecordedClip = null;
+            _private.recordAudio = false;
         }
         zynqtgui.recordingPopupActive = false
     }
@@ -244,12 +248,15 @@ Zynthian.Popup {
             Layout.leftMargin: root.spacing
             Layout.topMargin: root.spacing
             text: root.selectedChannel
-                ? _private.recordingIntoSketch
-                    ? qsTr("Record into Sketch Slot %1 on Track %2").arg(root.selectedSlotIndex + 1).arg(root.selectedChannel.name)
-                    : qsTr("Record into Sample Slot %1 on Track %2").arg(root.selectedSlotIndex + 1).arg(root.selectedChannel.name)
+                ? zynqtgui.sketchpad.recordingType === "audio"
+                    ? _private.recordingIntoSketch
+                        ? qsTr("Record into Sketch Slot %1 on Track %2").arg(root.selectedSlotIndex + 1).arg(root.selectedChannel.name)
+                        : qsTr("Record into Sample Slot %1 on Track %2").arg(root.selectedSlotIndex + 1).arg(root.selectedChannel.name)
+                    : qsTr("Recording into Clip %1%2 on Track %3").arg(root.selectedChannel.id + 1).arg(_private.selectedPattern.clipName).arg(root.selectedChannel.name)
                 : ""
             QtObject {
                 id: _private
+                property bool recordAudio: false
                 readonly property double preferredRowHeight: Kirigami.Units.gridUnit * 2.3
                 readonly property bool recordingIntoSketch: ["TracksBar_sketchslot", "sketch"].includes(root.selectedSlotType)
                 readonly property QtObject selectedClip: root.selectedChannel
@@ -575,28 +582,28 @@ Zynthian.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 10
                     Layout.topMargin: root.spacing
 
-                    RowLayout {
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                            Layout.preferredHeight: _private.preferredRowHeight
-                            checked: zynqtgui.sketchpad.recordingType === "audio"
-                            text: qsTr("Record Audio")
-                            onClicked: {
-                                zynqtgui.sketchpad.recordingType = "audio"
-                            }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                            Layout.preferredHeight: _private.preferredRowHeight
-                            checked: zynqtgui.sketchpad.recordingType === "midi"
-                            text: qsTr("Record Midi")
-                            onClicked: {
-                                zynqtgui.sketchpad.recordingType = "midi"
-                            }
-                        }
-                    }
+                    // RowLayout {
+                    //     QQC2.Button {
+                    //         Layout.fillWidth: true
+                    //         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    //         Layout.preferredHeight: _private.preferredRowHeight
+                    //         checked: zynqtgui.sketchpad.recordingType === "audio"
+                    //         text: qsTr("Record Audio")
+                    //         onClicked: {
+                    //             zynqtgui.sketchpad.recordingType = "audio"
+                    //         }
+                    //     }
+                    //     QQC2.Button {
+                    //         Layout.fillWidth: true
+                    //         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    //         Layout.preferredHeight: _private.preferredRowHeight
+                    //         checked: zynqtgui.sketchpad.recordingType === "midi"
+                    //         text: qsTr("Record Midi")
+                    //         onClicked: {
+                    //             zynqtgui.sketchpad.recordingType = "midi"
+                    //         }
+                    //     }
+                    // }
                     StackLayout {
                         id: recordingTypeSettingsStack
                         Layout.fillWidth: true

@@ -976,21 +976,21 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick recording...")
+                text: qsTr("Edit Sample...")
                 onTriggered: {
-                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "recording");
+                    zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Record...")
+                onTriggered: {
+                    zynqtgui.callable_ui_action_simple("SWITCH_RECORD");
                 }
             },
             QQC2.Action {
                 text: qsTr("Pick sample...")
                 onTriggered: {
-                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "sample");
-                }
-            },
-            QQC2.Action {
-                text: qsTr("Pick sketch...")
-                onTriggered: {
-                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "sketch");
+                    zynqtgui.callable_ui_action_simple("SCREEN_PRESET");
                 }
             },
             QQC2.Action {

@@ -425,7 +425,7 @@ Zynthian.Dialog {
                         ? conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save")
                         : qsTr("Load")
                     enabled: root.saveMode
-                        ? root.selectedFile !== null
+                        ? root.selectedFile !== null && root.fileNameToSave !== ""
                         : filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isFile
                     onClicked: {
                         root.fileSelected(root.selectedFile);

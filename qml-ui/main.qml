@@ -1286,6 +1286,7 @@ Kirigami.AbstractApplicationWindow {
 
     Sketchpad.RecordingPopup {
         id: recordingPopup
+        z: confirmClearPatternDialog.opened || confirmClearClipDialog.opened ? -1 : 0
     }
     function recordAudio() {
         recordingPopup.requestAudioRecording();

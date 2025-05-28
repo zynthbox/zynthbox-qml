@@ -3181,6 +3181,7 @@ class sketchpad_channel(QObject):
     @Slot(result=str)
     def getTrackStyleSnapshot(self):
         snapshot = {
+            "trackStyle": self.__trackStyle__,
             "trackRoutingStyle": self.__track_routing_style__,
             "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
             "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],

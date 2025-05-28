@@ -30,7 +30,7 @@
       "version": "",
       "engineType": "jalv",
       "zynthboxVersionAdded": "1",
-      "enabled": false,
+      "enabled": true,
       "description": "4-oscillator subtractive synthesizer emulator of Minimoog"
     },
     "ZBP_1003": {

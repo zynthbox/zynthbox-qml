@@ -517,7 +517,7 @@ Zynthian.ScreenPage {
             enabled: true
             text: qsTr("Pick Sample")
             onTriggered: {
-                applicationWindow().requestSamplePicker();
+                zynqtgui.callable_ui_action_simple("SCREEN_PRESET");
             }
         },
         Kirigami.Action {

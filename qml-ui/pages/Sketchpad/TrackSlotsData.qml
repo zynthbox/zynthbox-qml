@@ -360,7 +360,7 @@ RowLayout {
                             if (control.slotType === "synth" && control.slotData[index] != null) {
                                 return control.slotData[index]
                             } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop") && control.slotData[index] && control.slotData[index].path) {
-                                return control.slotData[index].path.split("/").pop()
+                                return control.slotData[index].title
                             } else if (control.slotType === "external" && index < 3) {
                                 return control.slotData[index]
                             } else if (control.slotType === "fx" && control.slotData[index] != null ) {

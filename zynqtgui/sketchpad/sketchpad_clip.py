@@ -592,6 +592,7 @@ class sketchpad_clip(QObject):
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__id__ = id
+        self.__title__ = ""
         self.__path__ = None
         self.__filename__ = ""
         self.__song__ = song
@@ -858,6 +859,32 @@ class sketchpad_clip(QObject):
         return f"{self.get_channel_name()}-{self.get_clip_name()}"
     name = Property(str, name, constant=True)
 
+
+    # BEGIN Property title
+    # The user-defined title for this clip (or the filename if there isn't one set)
+    def get_title(self):
+        if self.__title__ == "":
+            # Return the filename, but without .sketch.wav, .clip.wav, or .wav
+            if self.__filename__.endswith(".sketch.wav"):
+                return self.__filename__[:-11]
+            elif self.__filename__.endswith(".clip.wav"):
+                return self.__filename__[:-9]
+            elif self.__filename__.endswith(".wav"):
+                return self.__filename__[:-4]
+            else:
+                return self.__filename__
+        else:
+            return self.__title__
+
+    def set_title(self, title):
+        if self.__title__ != title:
+            self.__title__ = title
+            self.titleChanged.emit()
+
+    titleChanged = Signal()
+
+    title = Property(str, get_title, set_title, notify=titleChanged)
+    # END Property title
 
     def get_clip_name(self):
         return chr(self.__col_index__+65)

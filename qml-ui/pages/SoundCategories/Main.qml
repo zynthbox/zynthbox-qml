@@ -586,6 +586,51 @@ Zynthian.ScreenPage {
             Kirigami.Separator {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 2
+                Zynthian.ActionPickerPopup {
+                    id: slotsActionPicker
+                    property string slotType: "synth"
+                    readonly property string slotTypeName: slotType === "synth"
+                        ? "Synth"
+                        : slotType === "fx"
+                            ? "FX"
+                            : slotType === "sample"
+                                ? "Sample"
+                                : slotType
+                    property int slotIndex: 0
+                    rows: 5
+                    function loadIntoSlot(destinationIndex) {
+                        if (slotsActionPicker.slotType === "sample") {
+                            root.selectedChannel.setChannelSampleFromSnapshotSlot(soundButtonGroup.checkedButton.soundObj.sampleSnapshot, destinationIndex, slotsActionPicker.slotIndex)
+                        } else if (["synth", "fx"].includes(slotsActionPicker.slotType)) {
+                            root.selectedChannel.setChannelSoundFromSnapshotSlot(soundButtonGroup.checkedButton.soundObj.synthFxSnapshot, slotsActionPicker.slotType, destinationIndex, slotsActionPicker.slotIndex);
+                        } else {
+                            console.log("Unknown slot type, what in the world is a", slotsActionPicker.slotType);
+                        }
+                    }
+                    actions: [
+                        QQC2.Action {
+                            property int destinationIndex: 0
+                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
+                        }, QQC2.Action {
+                            property int destinationIndex: 1
+                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
+                        }, QQC2.Action {
+                            property int destinationIndex: 2
+                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
+                        }, QQC2.Action {
+                            property int destinationIndex: 3
+                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
+                        }, QQC2.Action {
+                            property int destinationIndex: 4
+                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
+                        }
+                    ]
+                }
             }
 
             Sketchpad.TrackSlotsData {
@@ -599,6 +644,15 @@ Zynthian.ScreenPage {
                             : "synth"
                 showSlotTypeLabel: true
                 slotTypeLabel: "Synths :"
+                performSlotInteractions: !soundDetails.displaySelectedSoundData
+                highlightCurrentlySelectedSlot: !soundDetails.displaySelectedSoundData
+                onSlotClicked: {
+                    if (soundDetails.displaySelectedSoundData && soundButtonGroup.checkedButton.soundObj.synthSlotsData[index] !== "") {
+                        slotsActionPicker.slotType = "synth";
+                        slotsActionPicker.slotIndex = index;
+                        slotsActionPicker.open();
+                    }
+                }
             }
 
             Sketchpad.TrackSlotsData {
@@ -612,6 +666,15 @@ Zynthian.ScreenPage {
                             : "sample-trig"
                 showSlotTypeLabel: true
                 slotTypeLabel: "Samples :"
+                performSlotInteractions: !soundDetails.displaySelectedSoundData
+                highlightCurrentlySelectedSlot: !soundDetails.displaySelectedSoundData
+                onSlotClicked: {
+                    if (soundDetails.displaySelectedSoundData && soundButtonGroup.checkedButton.soundObj.sampleSlotsData[index] !== "") {
+                        slotsActionPicker.slotType = "sample";
+                        slotsActionPicker.slotIndex = index;
+                        slotsActionPicker.open();
+                    }
+                }
             }
 
             Sketchpad.TrackSlotsData {
@@ -625,6 +688,15 @@ Zynthian.ScreenPage {
                             : "fx"
                 showSlotTypeLabel: true
                 slotTypeLabel: "FX :"
+                performSlotInteractions: !soundDetails.displaySelectedSoundData
+                highlightCurrentlySelectedSlot: !soundDetails.displaySelectedSoundData
+                onSlotClicked: {
+                    if (soundDetails.displaySelectedSoundData && soundButtonGroup.checkedButton.soundObj.fxSlotsData[index] !== "") {
+                        slotsActionPicker.slotType = "fx";
+                        slotsActionPicker.slotIndex = index;
+                        slotsActionPicker.open();
+                    }
+                }
             }
         }
     }

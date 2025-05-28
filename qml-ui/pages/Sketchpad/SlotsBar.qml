@@ -771,6 +771,12 @@ Rectangle {
                 samplePickerDialog.folderModel.nameFilters = ["*.wav"];
             }
             samplePickerDialog.open();
+            if (samplePickerDialog.saveMode) {
+                // Use the clip's title - it will usually be the same as the
+                // filename, but also we add the suffix later, and it looks
+                // more "normal" if you then also use auto-name
+                samplePickerDialog.fileNameToSave = samplePickerDialog.clipToSave.title;
+            }
         }
         property int sampleSlot: -1
 
@@ -828,6 +834,12 @@ Rectangle {
                 loopPickerDialog.thingToPick = qsTr("Recording");
             }
             loopPickerDialog.open();
+            if (samplePickerDialog.saveMode) {
+                // Use the clip's title - it will usually be the same as the
+                // filename, but also we add the suffix later, and it looks
+                // more "normal" if you then also use auto-name
+                loopPickerDialog.fileNameToSave = loopPickerDialog.clipToSave.title;
+            }
         }
         property QtObject theClip: null
 

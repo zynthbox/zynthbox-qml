@@ -894,7 +894,8 @@ Rectangle {
 
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: root.selectedChannel ? trackStyleName(root.selectedChannel.trackStyle) : ""
+                                            text: qsTr("%1 One-to-One").arg(root.selectedChannel && root.selectedChannel.trackStyle === "one-to-one" ? "☐" : "☑")
+                                            // text: root.selectedChannel ? trackStyleName(root.selectedChannel.trackStyle) : ""
                                             function trackStyleName(trackStyle) {
                                                 switch (trackStyle) {
                                                     case "everything":

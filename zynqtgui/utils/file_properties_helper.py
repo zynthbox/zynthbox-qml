@@ -275,7 +275,7 @@ class file_properties_helper(QObject):
                     self.preview_clip = None
             if self.preview_clip is None:
                 self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), -1, 0, False, False, self)
-                self.preview_clip.setLaneAffinity(1)
+                self.preview_clip.setLaneAffinity(0)
                 self.preview_clip_changed.emit()
 
             self.preview_clip.play(False)

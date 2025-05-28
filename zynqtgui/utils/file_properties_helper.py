@@ -127,7 +127,7 @@ class file_properties_helper(QObject):
             subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
         return subdirectories
 
-    # Returns an ordered list of subdirectories for the given pathname, containing objects with the keys path, subpath and name
+    # Returns an ordered list of subdirectories for the given pathname, containing objects with the keys path, subpath, and name
     # The list does not include the given path itself, only subdirectories
     # path contains the fill file system path of the entry
     # subpath contains the last part of the path, *excluding* the search path's last directory
@@ -141,6 +141,16 @@ class file_properties_helper(QObject):
             if afterFirstDir:
                 subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
             afterFirstDir = True
+        return subdirectories
+
+    # Returns an ordered list of subdirectories for the given paths, containing objects with the keys path, subpath, and name
+    # This is equivalent to simply calling getOnlySubdirectoryList on all entries in the paths list and concatenating the resulting lists
+    @Slot('QVariantList', result='QVariantList')
+    def getOnlySubdirectoriesList(self, paths):
+        subdirectories = []
+        if isinstance(paths, list):
+            for path in paths:
+                subdirectories.extend(self.getOnlySubdirectoryList(path))
         return subdirectories
 
     @Slot(str, 'QVariantMap')

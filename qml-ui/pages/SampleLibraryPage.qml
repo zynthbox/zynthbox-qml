@@ -612,8 +612,8 @@ Zynthian.ScreenPage {
                         margins: Kirigami.Units.smallSpacing
                     }
                     model: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                        ? _private.filePropertiesHelper.getOnlySubdirectoryList("/zynthian/zynthian-my-data/sketches")
-                        : _private.filePropertiesHelper.getOnlySubdirectoryList("/zynthian/zynthian-my-data/samples")
+                        ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"])
+                        : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"])
                     onModelChanged: {
                         currentIndex = 0;
                     }

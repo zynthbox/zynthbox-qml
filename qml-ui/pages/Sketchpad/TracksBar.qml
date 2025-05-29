@@ -1129,8 +1129,13 @@ Rectangle {
                                         Layout.fillHeight: false
                                         font.pointSize: 9
                                         opacity: waveformContainer.showWaveform ? 1 : 0
-                                        text: waveformContainer.clip ? qsTr("Wave : %1").arg(waveformContainer.clip.filename) : ""
+                                        text: waveformContainer.clip
+                                            ? progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false
+                                                ? qsTr("Missing Wave: %1").arg(waveformContainer.clip.filename)
+                                                : qsTr("Wave : %1").arg(waveformContainer.clip.filename)
+                                            : ""
                                         elide: Text.ElideMiddle
+                                        color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                                     }
 
                                     Rectangle {

@@ -377,7 +377,11 @@ RowLayout {
                             if (control.slotType === "synth") {
                                 return control.slotData[index]
                             } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop")) {
-                                return control.slotData[index].title ? control.slotData[index].title : ""
+                                if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false) {
+                                    return "Missing: %1".arg(control.slotData[index].title ? control.slotData[index].title : "");
+                                } else {
+                                    return control.slotData[index].title ? control.slotData[index].title : ""
+                                }
                             } else if (control.slotType === "external") {
                                 return index < 3 ? control.slotData[index] : ""
                             } else if (control.slotType === "fx") {
@@ -397,7 +401,8 @@ RowLayout {
                             return ""
                         }
                     }
-                    elide: control.slotType === "sample-trig" ? Text.ElideLeft : Text.ElideRight
+                    elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
+                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                 }
 
                 MouseArea {

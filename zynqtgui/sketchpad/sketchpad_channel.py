@@ -977,8 +977,7 @@ class sketchpad_channel(QObject):
                     if clip is None:
                         self.__samples__[i].clear()
                     else:
-                        if (bank_dir / clip["path"]).exists():
-                            self.__samples__[i].deserialize(clip)
+                        self.__samples__[i].deserialize(clip)
                 self.samples_changed.emit()
             if "clips" in obj:
                 for clipId, clip_model in enumerate(self.__clips_model__):

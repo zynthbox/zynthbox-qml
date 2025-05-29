@@ -3314,12 +3314,13 @@ class sketchpad_channel(QObject):
                     # Populate new chained sounds and update channel
                     limitedSnapshot = {"layers": []}
                     for index, snapshotEntry in enumerate(snapshot_obj["layers"]):
-                        if snapshotEntry["slot_index"] == slotIndex:
+                        if snapshotEntry["slot_index"] == snapshotIndex:
                             snapshotEntry["track_index"] = self.id
+                            snapshotEntry["slot_index"] = slotIndex
                             if slotType == "synth":
                                 # Repopulate after removing current channel layers
                                 free_layers = self.getFreeLayers()
-                                new_chained_sounds = self.chained_sounds
+                                new_chained_sounds = self.chainedSounds
                                 new_chained_sounds[slotIndex] = free_layers[0]
                                 snapshotEntry["midi_chan"] = free_layers[index]
                             limitedSnapshot["layers"].append(snapshotEntry)
@@ -3331,7 +3332,7 @@ class sketchpad_channel(QObject):
                         # Run autoconnect after completing loading sounds
                         self.zynqtgui.zynautoconnect()
                     else:
-                        logging.error(f"There is nothing to restore from the slot we were asked to restore from")
+                        logging.error(f"There is nothing to restore from the slot we were asked to restore from. The snapshot is: {snapshot}")
                 self.zynqtgui.end_long_task()
             # Reset preset view to show all presets
             self.zynqtgui.preset.show_only_favorites = False

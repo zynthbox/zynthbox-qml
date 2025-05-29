@@ -373,19 +373,23 @@ RowLayout {
                     }
                     horizontalAlignment: Text.AlignLeft
                     text: {
-                        if (control.slotData) {
-                            if (control.slotType === "synth" && control.slotData[index] != null) {
+                        if (control.slotData && control.slotData[index] != null) {
+                            if (control.slotType === "synth") {
                                 return control.slotData[index]
                             } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop")) {
-                                return control.slotData[index] && control.slotData[index].title ? control.slotData[index].title : ""
-                            } else if (control.slotType === "external" && index < 3) {
+                                return control.slotData[index].title ? control.slotData[index].title : ""
+                            } else if (control.slotType === "external") {
+                                return index < 3 ? control.slotData[index] : ""
+                            } else if (control.slotType === "fx") {
                                 return control.slotData[index]
-                            } else if (control.slotType === "fx" && control.slotData[index] != null ) {
+                            } else if (control.slotType === "sketch-fx") {
                                 return control.slotData[index]
-                            } else if (control.slotType === "sketch-fx" && control.slotData[index] != null ) {
-                                return control.slotData[index]
-                            } else if (control.slotType === "text" && control.slotData[index] != null ) {
-                                return control.slotData[index]
+                            } else if (control.slotType === "text") {
+                                if (typeof control.slotData[index] === "string") {
+                                    return control.slotData[index]
+                                } else {
+                                    return control.slotData[index].toString();
+                                }
                             } else {
                                 return ""
                             }

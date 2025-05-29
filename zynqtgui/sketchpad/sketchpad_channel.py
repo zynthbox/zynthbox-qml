@@ -2215,7 +2215,8 @@ class sketchpad_channel(QObject):
                 if clip:
                     clip.rootSlice().setKeyZoneStart(slotSettings[i][0])
                     clip.rootSlice().setKeyZoneEnd(slotSettings[i][1])
-                    clip.rootSlice().setRootNote(60 + slotSettings[i][2])
+                    # This one's awkward - we really want to be able to just let this one happen (otherwise we can't set sample root pitch by transposing... and we may very well also want this for synth slots as well, because otherwise we can't transpose those either)
+                    # clip.rootSlice().setRootNote(60 + slotSettings[i][2])
 
     def get_keyZoneMode(self):
         return self.__keyzone_mode__

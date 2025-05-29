@@ -730,9 +730,9 @@ class sketchpad_clip(QObject):
                     self.__path__ = None
                 else:
                     if self.is_channel_sample:
-                        self.set_path(str(self.bank_path / obj["path"]), False)
+                        self.set_path(str(self.bank_path / obj["path"]), should_copy=False, read_metadata=False)
                     else:
-                        self.set_path(str(self.wav_path / obj["path"]), False)
+                        self.set_path(str(self.wav_path / obj["path"]), should_copy=False, read_metadata=False)
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
                 self.set_enabled(self.__enabled__, True)
@@ -949,7 +949,7 @@ class sketchpad_clip(QObject):
     #                   when first selecting a wav for a clip.
     #                   If we copy, we also store the original path into the metadata for the slot
     # Arg read_metadata : Whether or not to read the metadata from the original file
-    @Slot(str,bool)
+    @Slot(str,bool,bool)
     def set_path(self, path, should_copy=True, read_metadata=False):
         logging.debug(f"Load {path}, should copy: {should_copy}, read metadata: {read_metadata}")
         if path is not None:

@@ -3302,6 +3302,8 @@ class sketchpad_channel(QObject):
             return
 
         def task():
+            # Reset the favourites display to everything when loading from a snapshot
+            self.zynqtgui.preset.show_only_favorites = False
             snapshot_obj = json.loads(snapshot)
             source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)
 
@@ -3333,8 +3335,6 @@ class sketchpad_channel(QObject):
                     else:
                         logging.error(f"There is nothing to restore from the slot we were asked to restore from. The snapshot is: {snapshot}")
                 self.zynqtgui.end_long_task()
-            # Reset preset view to show all presets
-            self.zynqtgui.preset.show_only_favorites = False
             if self.chainedSounds[slotIndex] > -1:
                 self.remove_and_unchain_sound(self.chainedSounds[slotIndex], post_removal_task)
             else:
@@ -3344,6 +3344,8 @@ class sketchpad_channel(QObject):
     @Slot(str, result=None)
     def setChannelSoundFromSnapshot(self, snapshot):
         def task():
+            # Reset the favourites display to everything when loading from a snapshot
+            self.zynqtgui.preset.show_only_favorites = False
             snapshot_obj = json.loads(snapshot)
             source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)
             free_layers = self.getFreeLayers()
@@ -3421,8 +3423,6 @@ class sketchpad_channel(QObject):
                         # Update curlayer by selected slot type
                         self.setCurlayerByType(self.selectedSlot.className)
 
-                # Reset preset view to show all presets
-                self.zynqtgui.preset.show_only_favorites = False
                 if len(used_layers) > 0:
                     # Remove all current sounds from channel
                     for i in used_layers:

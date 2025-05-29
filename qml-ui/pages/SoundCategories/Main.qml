@@ -254,10 +254,12 @@ Zynthian.ScreenPage {
         onCurrent_screen_idChanged: {
             // Refresh sounds model on page open
             if (zynqtgui.current_screen_id === root.screenId) {
-                Zynthbox.SndLibrary.setOriginFilter(Zynthbox.SndLibrary.originFilter)
+                let previousOriginFilter = Zynthbox.SndLibrary.originFilter;
+                Zynthbox.SndLibrary.originFilter = previousOriginFilter === "" ? "." : "";
+                Zynthbox.SndLibrary.originFilter = previousOriginFilter;
 
                 if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
-                    soundButtonGroup.checkedButton.checked = false
+                    soundButtonGroup.checkedButton.checked = false;
                 }
             }
         }
@@ -610,23 +612,23 @@ Zynthian.ScreenPage {
                     actions: [
                         QQC2.Action {
                             property int destinationIndex: 0
-                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 1
-                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            text: "Load the Sound's %1 %2\ninto to Track T%3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 2
-                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 3
-                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 4
-                            text: "Load Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.name).arg(destinationIndex + 1)
+                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }
                     ]

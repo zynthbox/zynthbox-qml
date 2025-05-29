@@ -30,7 +30,6 @@
       "version": "",
       "engineType": "jalv",
       "zynthboxVersionAdded": "1",
-      "enabled": true,
       "description": "4-oscillator subtractive synthesizer emulator of Minimoog"
     },
     "ZBP_1003": {
@@ -96,6 +95,20 @@
       "cutoffControl": "DCF1_CUTOFF",
       "resonanceControl": "DCF1_RESO",
       "description": "An old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx"
+    },
+    "ZBP_1008_1": {
+      "name": "synthv1-1.3.2",
+      "format": "LV2",
+      "url": "http://synthv1.sourceforge.net/lv2/1.3.2",
+      "path": "/usr/lib/lv2/synthv1-1.3.2.lv2/",
+      "version": "",
+      "engineType": "jalv",
+      "zynthboxVersionAdded": "1",
+      "volumeControls": ["OUT1_VOLUME", "OUT2_VOLUME"],
+      "cutoffControl": "DCF1_CUTOFF",
+      "resonanceControl": "DCF1_RESO",
+      "description": "An old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx",
+      "visible": false
     },
     "ZBP_1009": {
       "name": "Helm",

@@ -60,7 +60,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
         engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other", None)}
         for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id.items():
             try:
-                if plugin.enabled:
+                if plugin.visible:
                     eng = ""
 
                     if plugin.engineType == "aeolus":

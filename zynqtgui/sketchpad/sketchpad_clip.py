@@ -936,6 +936,7 @@ class sketchpad_clip(QObject):
                 # than updating it with whatever we have in the track this is attached to, and if it is not there, we
                 # don't want to add it in. And this function will leave it alone if it's already there.
                 self.metadata.write(writeSoundMetadata=False, path=path)
+                result = True
             else:
                 logging.error(f"Failed to create a copy of the clip {self.__path__} to {path}")
         else:

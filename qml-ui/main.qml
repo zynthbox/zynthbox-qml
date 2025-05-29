@@ -271,12 +271,14 @@ Kirigami.AbstractApplicationWindow {
                 case "SCREEN_EDIT_CONTEXTUAL":
                     // In case the global popup is open, hide it when switching to the context editor
                     zynqtgui.globalPopupOpened = false;
+                    // Ensure we have at least something selected before we attempt to switch
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot(false);
                     if (root.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value];
                         if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
                             zynqtgui.show_screen("control");
                         } else {
-                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
+                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: All slots are empty"), 2000);
                         }
                     } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot") {
                         zynqtgui.show_modal("channel_wave_editor");
@@ -288,13 +290,13 @@ Kirigami.AbstractApplicationWindow {
                         if (root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value] != null) {
                             zynqtgui.show_screen("control");
                         } else {
-                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
+                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: All slots are empty"), 2000);
                         }
                     } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
                         if (root.selectedChannel.chainedSketchFx[root.selectedChannel.selectedSlot.value] != null) {
                             zynqtgui.show_screen("control");
                         } else {
-                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
+                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: All slots are empty"), 2000);
                         }
                     } else {
                         if (root.selectedChannel.trackType.startsWith("sample-")) {
@@ -324,7 +326,7 @@ Kirigami.AbstractApplicationWindow {
                                 }
                             }
                             if (foundASound === false) {
-                                applicationWindow().showMessageDialog(qsTr("Cannot open edit page: No sounds defined"), 2000);
+                                applicationWindow().showMessageDialog(qsTr("Cannot open edit page: All slots are empty"), 2000);
                             }
                         } else if (root.selectedChannel.trackType === "external") {
                             // If we are in external mode, just load up the external setup page

@@ -1293,14 +1293,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
             # Fill global_fx only if generating full snapshot
             if track is None:
                 snapshot["global_fx"] = [
-                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[0][2].get_snapshot()),
-                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[1][2].get_snapshot())
+                    self.zynqtgui.global_fx_engines[0][2].get_snapshot(),
+                    self.zynqtgui.global_fx_engines[1][2].get_snapshot()
                 ]
 
             #Layers info
             for layer in self.layers:
                 if track is None or (track is not None and layer.track_index == track.id):
-                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(layer.get_snapshot())
+                    layer_snapshot = layer.get_snapshot()
                     # Add the slot mixer and equalizer settings into the snapshot
                     mixer_settings = {}
                     equalizer_settings = {}

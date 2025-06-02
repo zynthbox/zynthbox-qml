@@ -58,26 +58,26 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
         # [<short name>, (<long name>, <description>, <plugin type>, <plugin category>, <plugin class>, <enabled>, <plugin format>, <plugin object>)]
         engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other", None)}
-        for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id.items():
+        for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id.items():
             try:
-                if plugin.visible:
+                if plugin_info.visible:
                     eng = ""
 
-                    if plugin.engineType == "aeolus":
+                    if plugin_info.engineType == "aeolus":
                         eng = "AE"
-                    elif plugin.engineType == "fluidsynth":
+                    elif plugin_info.engineType == "fluidsynth":
                         eng = "FS"
-                    elif plugin.engineType == "setbfree":
+                    elif plugin_info.engineType == "setbfree":
                         eng = "BF"
-                    elif plugin.engineType == "sfizz":
+                    elif plugin_info.engineType == "sfizz":
                         eng = "SF"
-                    elif plugin.engineType == "zynaddsubfx":
+                    elif plugin_info.engineType == "zynaddsubfx":
                         eng = "ZY"
-                    elif plugin.engineType == "jalv":
-                        eng = 'JV/{}'.format(plugin.name)
+                    elif plugin_info.engineType == "jalv":
+                        eng = 'JV/{}'.format(plugin_info.name)
 
                     if eng != "":
-                        engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format, plugin)
+                        engine_info[eng] = (plugin_info.name, plugin_info.name, plugin_info.type, plugin_info.category, globals()[f"zynthian_engine_{plugin_info.engineType}"], True, plugin_info.format, plugin)
             except Exception as e:
                 logging.error(f"Error while trying to parse plugin details : {str(e)}")
 
@@ -149,11 +149,11 @@ class zynthian_gui_engine(zynthian_gui_selector):
             for engine_short_name, engine_info in self.engine_info.items():
                 eng_type = engine_info[2]
                 enabled = engine_info[5]
-                plugin = engine_info[7]
+                plugin_info = engine_info[7]
                 if enabled and (eng_type == self.engine_type or self.engine_type is None) and engine_short_name not in self.zyngines:
                     metadata = {}
-                    if plugin.description != "":
-                        metadata["description"] = plugin.description
+                    if plugin_info.description != "":
+                        metadata["description"] = plugin_info.description
                     elif engine_info[1] is not None and engine_info[0] != engine_info[1]:
                         # Do not set description text if the synth name and description text is the same
                         metadata["description"] = engine_info[1]
@@ -190,11 +190,11 @@ class zynthian_gui_engine(zynthian_gui_selector):
                     # Add engines on this category...
                     for eng, info in infos.items():
                         metadata = {}
-                        plugin = info[7]
+                        plugin_info = info[7]
                         cat_entries.append((eng,len(self.list_data),info[1],info[0]))
 
-                        if plugin.description != "":
-                            metadata["description"] = plugin.description
+                        if plugin_info.description != "":
+                            metadata["description"] = plugin_info.description
                         elif info[1] is not None and not info[0] == info[1]:
                             # Do not set description text if the synth name and description text is the same
                             metadata["description"] = info[1]

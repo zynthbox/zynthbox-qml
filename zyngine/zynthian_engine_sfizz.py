@@ -115,9 +115,9 @@ class zynthian_engine_sfizz(zynthian_engine):
         index = 0
 
         # Add banks from plugins json
-        for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_type["soundfont"].items():
-            if plugin.format.lower() in ["sfz"]:
-                banks_list.append([plugin.path, index, f"SFZ/{plugin.name.replace('_', ' ')}", "SFZ", Path(plugin.path).name])
+        for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.plugins_by_type["soundfont"].items():
+            if plugin_info.format.lower() in ["sfz"]:
+                banks_list.append([plugin_info.path, index, f"SFZ/{plugin_info.name.replace('_', ' ')}", "SFZ", Path(plugin_info.path).name])
                 index += 1
         # Add banks from my-data
         banks_list += self.get_dirlist(self.bank_dirs, sort=False, start_index=len(banks_list))

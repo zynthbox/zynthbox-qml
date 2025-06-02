@@ -32,11 +32,11 @@ from PySide2.QtCore import QTimer
 
 from . import zynthian_engine
 from . import zynthian_controller
-from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin_info
 
 
 class zynthian_engine_jucy(zynthian_engine):
-    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+    def __init__(self, plugin_info, zynqtgui=None):
         super().__init__(plugin_info, zynqtgui)
 
         self.type = plugin_info.type

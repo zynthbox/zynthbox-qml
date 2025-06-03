@@ -134,15 +134,10 @@ class zynthbox_plugins_helper(QObject):
         if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
             plugin_id = snapshot["plugin_id"]
 
-            # Check if the plugin id is <1000
-            # If < 1000, then the snapshot is saved with the old plugin json. Use the correct plugins json accordingly
+            # If a snapshot needs id to name translation, it is from old plugins.
+            # New plugins json logic do not need conversion.
             try:
-                plugin_id_integer = int(re.findall("\\d+", plugin_id)[0])
-
-                if plugin_id_integer < 1000 and plugin_id in self.old_plugins_by_id:
-                    plugin_info = self.old_plugins_by_id[plugin_id]
-                elif plugin_id in self.plugins_by_id:
-                    plugin_info = self.plugins_by_id[plugin_id]
+                plugin_info = self.old_plugins_by_id[plugin_id]
 
                 if plugin_info is not None:
                     # Handle Plugin Name substitution for engines

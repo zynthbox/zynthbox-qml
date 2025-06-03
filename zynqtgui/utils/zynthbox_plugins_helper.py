@@ -111,19 +111,19 @@ class zynthbox_plugins_helper(QObject):
 
         for key in plugins_json["synth"]:
             plugin_info = zynthbox_plugin_info(key, plugins_json["synth"][key], "MIDI Synth", self)
-            self.plugins_by_type["synth"][key] = plugin
+            self.plugins_by_type["synth"][key] = plugin_info
         for key in plugins_json["audioFx"]:
             plugin_info = zynthbox_plugin_info(key, plugins_json["audioFx"][key], "Audio Effect", self)
-            self.plugins_by_type["audioFx"][key] = plugin
+            self.plugins_by_type["audioFx"][key] = plugin_info
         for key in plugins_json["soundfont"]:
             plugin_info = zynthbox_plugin_info(key, plugins_json["soundfont"][key], "MIDI Synth", self)
-            self.plugins_by_type["soundfont"][key] = plugin
+            self.plugins_by_type["soundfont"][key] = plugin_info
 
         for key in old_plugins_json:
             # type parameter in old json used to store the plugin format.
             plugin_info = zynthbox_plugin_info(key, old_plugins_json[key], "", self)
-            self.old_plugins_by_id[key] = plugin
-            self.old_plugins_by_name[f"{old_plugins_json[key]['type']}/{old_plugins_json[key]['name']}"] = plugin
+            self.old_plugins_by_id[key] = plugin_info
+            self.old_plugins_by_name[f"{old_plugins_json[key]['type']}/{old_plugins_json[key]['name']}"] = plugin_info
 
     def update_layer_snapshot_plugin_id_to_name(self, source_snapshot):
         """

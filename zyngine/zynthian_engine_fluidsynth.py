@@ -159,7 +159,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("soundfont").items():
             for _, version_info in plugin_info.versions.items():
                 if version_info.visible and version_info.format.lower() in ["sf2", "sf3"]:
-                    plugins_list.append([version_info.path, index, version_info.pluginName.replace("_", " "), "_", Path(version_info.path).name])
+                    plugins_list.append([version_info.path, index, version_info.pluginName.replace("_", " "), "_", Path(version_info.path).name, version_info.plugin_info.id, version_info.version])
                     index += 1
         # Append sf2 from soundfont_dirs
         plugins_list += self.get_filelist(self.soundfont_dirs, "sf2", sort=False, start_index=len(plugins_list))

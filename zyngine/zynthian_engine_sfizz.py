@@ -118,7 +118,7 @@ class zynthian_engine_sfizz(zynthian_engine):
         for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("soundfont").items():
             for _, version_info in plugin_info.versions.items():
                 if version_info.visible and version_info.format.lower() in ["sfz"]:
-                    banks_list.append([version_info.path, index, f"SFZ/{version_info.pluginName.replace('_', ' ')}", "SFZ", Path(version_info.path).name])
+                    banks_list.append([version_info.path, index, f"SFZ/{version_info.pluginName.replace('_', ' ')}", "SFZ", Path(version_info.path).name, version_info.plugin_info.id, version_info.version])
                     index += 1
         # Add banks from my-data
         banks_list += self.get_dirlist(self.bank_dirs, sort=False, start_index=len(banks_list))

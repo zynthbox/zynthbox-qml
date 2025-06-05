@@ -151,8 +151,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
                 # Check if engine config contains list of custom volume controllers and use them
                 # Otherwise check for default volume controllers
-                if len(layer.engine.plugin_info.volumeControls) > 0:
-                    volume_controls = layer.engine.plugin_info.volumeControls
+                if len(layer.engine.version_info.volumeControls) > 0:
+                    volume_controls = layer.engine.version_info.volumeControls
                     for ctrl in volume_controls:
                         if ctrl in synth_controllers_dict:
                             self.__volume_controllers[i - self.__start_midi_chan].add_control(synth_controllers_dict[ctrl])

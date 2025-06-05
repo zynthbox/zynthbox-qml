@@ -173,10 +173,10 @@ class zynthian_engine(zynthian_basic_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, plugin_info, zynqtgui=None):
+    def __init__(self, version_info, zynqtgui=None):
         super().__init__(zynqtgui=zynqtgui)
 
-        self.plugin_info = plugin_info
+        self.version_info = version_info
         self.zynqtgui=zynqtgui
         self.type = "MIDI Synth"
         self.nickname = ""

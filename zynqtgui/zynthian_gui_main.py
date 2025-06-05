@@ -85,20 +85,20 @@ class zynthian_gui_main(zynthian_gui_selector):
 
         if self.visibleCategory == "modules":
             # Main Apps
-            self.list_data.append((self.sketchpad, 0, "Tracks & Clips"))
+            self.list_data.append((self.sketchpad, 0, "Sketches"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/clipsview.svg"})
+
+            self.list_data.append((self.layers, 0, "Library"))
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/library.svg"})
+
+            self.list_data.append((self.sound_editor, 0, "Editor"))
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/engines.svg"})
 
             self.list_data.append((self.playgrid, 0, "Playground"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/playground.svg"})
 
             self.list_data.append((self.song_manager, 0, "Song Manager"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/song-player.svg"})
-
-            self.list_data.append((self.layers, 0, "Sounds"))
-            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/library.svg"})
-
-            self.list_data.append((self.sound_editor, 0, "Editor"))
-            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/library.svg"})
 
             self.list_data.append((self.admin, 0, "Settings"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/settings.svg"})
@@ -336,7 +336,8 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def sound_editor(self):
         logging.info("Sound Editor")
-        self.zynqtgui.show_screen("sound_categories")
+        # self.zynqtgui.show_screen("control")
+        self.zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL")
 
     def load_snapshot(self):
         logging.info("Load Snapshot")

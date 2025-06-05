@@ -840,9 +840,10 @@ class sketchpad_channel(QObject):
                 "keyzone_mode": self.__keyzone_mode__,
                 "routeThroughGlobalFX": self.route_through_global_fx,
                 "synthSlotsData": self.synthSlotsData, # synthSlotsData is a list of strings. Just what we need
-                "sampleSlotsData": [Path(f.path if f.path is not None else "").name for f in self.sampleSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
-                "sketchSlotsData": [Path(f.path if f.path is not None else "").name for f in self.sketchSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
+                "sampleSlotsData": [Path(f.title if f.title is not None else "").name for f in self.sampleSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
                 "fxSlotsData": self.fxSlotsData, # fxSlotsData is a list of strings. Just what we need
+                "sketchSlotsData": [Path(f.title if f.title is not None else "").name for f in self.sketchSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
+                "sketchFxSlotsData": self.sketchFxSlotsData, # sketchFxSlotsData is a list of strings. Just what we need
                 "externalSlotsData": self.externalSlotsData} # externalSlotsData is a list of strings. Just what we need
 
     def deserialize(self, obj, load_autosave=True):

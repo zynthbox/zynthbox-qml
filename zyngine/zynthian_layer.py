@@ -579,8 +579,8 @@ class zynthian_layer(QObject):
 
     def get_snapshot(self):
         snapshot={
-            'plugin_id': self.engine.plugin_info.id,
-            'plugin_version': self.engine.plugin_info.version,
+            'plugin_id': self.engine.version_info.plugin_info.id,
+            'plugin_version': self.engine.version_info.version,
             'engine_name': self.engine.name,
             'engine_nick': self.engine.nickname,
             'engine_type': self.engine.type,

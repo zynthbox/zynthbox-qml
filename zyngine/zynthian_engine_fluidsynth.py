@@ -80,8 +80,8 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, plugin_info, zynqtgui=None):
-        super().__init__(plugin_info, zynqtgui)
+    def __init__(self, version_info, zynqtgui=None):
+        super().__init__(version_info, zynqtgui)
         self.__most_recent_preset_transaction__ = None
 
         self.name = "FluidSynth"
@@ -156,10 +156,11 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         plugins_list = []
         index = 0
         # Add plugins from plugins json
-        for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.plugins_by_type["soundfont"].items():
-            if plugin_info.format.lower() in ["sf2", "sf3"]:
-                plugins_list.append([plugin_info.path, index, plugin_info.name.replace("_", " "), "_", Path(plugin_info.path).name])
-                index += 1
+        for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("soundfont").items():
+            for _, version_info in plugin_info.versions.items():
+                if version_info.visible and version_info.format.lower() in ["sf2", "sf3"]:
+                    plugins_list.append([version_info.path, index, version_info.pluginName.replace("_", " "), "_", Path(version_info.path).name])
+                    index += 1
         # Append sf2 from soundfont_dirs
         plugins_list += self.get_filelist(self.soundfont_dirs, "sf2", sort=False, start_index=len(plugins_list))
         # Append sf3 from soundfont_dirs

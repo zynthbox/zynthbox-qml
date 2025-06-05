@@ -129,24 +129,24 @@ class zynthian_engine_jalv(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, plugin_info, zynqtgui=None, dryrun=False):
-        super().__init__(plugin_info, zynqtgui)
+    def __init__(self, version_info, zynqtgui=None, dryrun=False):
+        super().__init__(version_info, zynqtgui)
 
-        self.type = plugin_info.type
-        self.name = "Jalv/" + plugin_info.name
-        self.nickname = "JV/" + plugin_info.name
-        self.plugin_name = plugin_info.name
-        self.plugin_url = plugin_info.url
+        self.type = version_info.plugin_info.type
+        self.name = "Jalv/" + version_info.pluginName
+        self.nickname = "JV/" + version_info.pluginName
+        self.plugin_name = version_info.pluginName
+        self.plugin_url = version_info.url
         self.jackname = self.get_jalv_jackname()
 
         self.ui = False
         # if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
         #     self.ui = self.plugins_dict[plugin_name]['UI']
 
-        if plugin_info.type=="MIDI Tool":
+        if version_info.plugin_info.type=="MIDI Tool":
             self.options['midi_route'] = True
             self.options['audio_route'] = False
-        elif plugin_info.type=="Audio Effect":
+        elif version_info.plugin_info.type=="Audio Effect":
             self.options['audio_capture'] = True
             self.options['note_range'] = False
 

@@ -169,8 +169,8 @@ class zynthian_engine_aeolus(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, plugin_info, zynqtgui=None):
-        super().__init__(plugin_info, zynqtgui)
+    def __init__(self, version_info, zynqtgui=None):
+        super().__init__(version_info, zynqtgui)
         self.name = "Aeolus"
         self.nickname = "AE"
         self.jackname = self.get_next_jackname("aeolus")
@@ -183,10 +183,10 @@ class zynthian_engine_aeolus(zynthian_engine):
         if self.config_remote_display():
             self.proc_start_sleep = 3
             self.command_prompt = None
-            self.command = f"{plugin_info.path} -N {self.jackname}"
+            self.command = f"{version_info.path} -N {self.jackname}"
         else:
             self.command_prompt = "\nAeolus> "
-            self.command = f"{plugin_info.path} -t -N {self.jackname}"
+            self.command = f"{version_info.path} -t -N {self.jackname}"
         self.proc.setCommandPrompt(self.command_prompt)
 
         self.get_current_config()

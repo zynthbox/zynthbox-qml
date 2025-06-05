@@ -179,8 +179,8 @@ class zynthian_engine_setbfree(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, plugin_info, zynqtgui=None):
-        super().__init__(plugin_info, zynqtgui)
+    def __init__(self, version_info, zynqtgui=None):
+        super().__init__(version_info, zynqtgui)
         self.name = "setBfree"
         self.nickname = "BF"
         self.jackname = "setBfree"
@@ -193,9 +193,9 @@ class zynthian_engine_setbfree(zynthian_engine):
 
         #Process command ...
         if self.config_remote_display():
-            self.command = f"{plugin_info.path} -p {self.presets_fpath} -c {self.config_autogen_fpath}"
+            self.command = f"{version_info.path} -p {self.presets_fpath} -c {self.config_autogen_fpath}"
         else:
-            self.command = f"{plugin_info.path} -p {self.presets_fpath} -c {self.config_autogen_fpath}"
+            self.command = f"{version_info.path} -p {self.presets_fpath} -c {self.config_autogen_fpath}"
 
         self.command_prompt = "\nAll systems go. press CTRL-C, or send SIGINT or SIGHUP to terminate\n"
         self.proc.setCommandPrompt(self.command_prompt)

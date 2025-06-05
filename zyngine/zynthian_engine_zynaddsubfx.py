@@ -103,8 +103,8 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, plugin_info, zynqtgui=None):
-        super().__init__(plugin_info, zynqtgui)
+    def __init__(self, version_info, zynqtgui=None):
+        super().__init__(version_info, zynqtgui)
         self.name = "ZynAddSubFX"
         self.nickname = "ZY"
         self.jackname = self.get_next_jackname("zynaddsubfx").replace("zynaddsubfx-", "zynaddsubfx_")
@@ -127,9 +127,9 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 
         # zynaddsubfx only accepts a postfix for the jack client name
         if self.config_remote_display():
-            self.command = f"{plugin_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -N {self.jackname.replace('zynaddsubfx_', '')}"
+            self.command = f"{version_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -N {self.jackname.replace('zynaddsubfx_', '')}"
         else:
-            self.command = f"{plugin_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -U -N {self.jackname.replace('zynaddsubfx_', '')}"
+            self.command = f"{version_info.path} -r {self.sr} -b {self.bs} -O jack-multi -I jack -P {self.osc_target_port} -a -U -N {self.jackname.replace('zynaddsubfx_', '')}"
 
         self.command_prompt = "\n[INFO] Main Loop..."
 

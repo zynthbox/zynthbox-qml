@@ -72,8 +72,8 @@ class zynthian_engine_sfizz(zynthian_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, plugin_info, zynqtgui=None):
-        super().__init__(plugin_info, zynqtgui)
+    def __init__(self, version_info, zynqtgui=None):
+        super().__init__(version_info, zynqtgui)
         self.name = "Sfizz"
         self.nickname = "SF"
         self.jackname = self.get_next_jackname("sfizz")
@@ -115,10 +115,11 @@ class zynthian_engine_sfizz(zynthian_engine):
         index = 0
 
         # Add banks from plugins json
-        for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.plugins_by_type["soundfont"].items():
-            if plugin_info.format.lower() in ["sfz"]:
-                banks_list.append([plugin_info.path, index, f"SFZ/{plugin_info.name.replace('_', ' ')}", "SFZ", Path(plugin_info.path).name])
-                index += 1
+        for plugin_id, plugin_info in self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("soundfont").items():
+            for _, version_info in plugin_info.versions.items():
+                if version_info.visible and version_info.format.lower() in ["sfz"]:
+                    banks_list.append([version_info.path, index, f"SFZ/{version_info.pluginName.replace('_', ' ')}", "SFZ", Path(version_info.path).name])
+                    index += 1
         # Add banks from my-data
         banks_list += self.get_dirlist(self.bank_dirs, sort=False, start_index=len(banks_list))
 

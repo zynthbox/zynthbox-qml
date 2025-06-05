@@ -36,15 +36,15 @@ from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin_info
 
 
 class zynthian_engine_jucy(zynthian_engine):
-    def __init__(self, plugin_info, zynqtgui=None):
-        super().__init__(plugin_info, zynqtgui)
+    def __init__(self, version_info, zynqtgui=None):
+        super().__init__(version_info, zynqtgui)
 
-        self.type = plugin_info.type
-        self.name = "Jucy/" + plugin_info.name
-        self.nickname = "JY/" + plugin_info.name
-        self.plugin_name = plugin_info.name
+        self.type = version_info.plugin_info.type
+        self.name = "Jucy/" + version_info.pluginName
+        self.nickname = "JY/" + version_info.pluginName
+        self.plugin_name = version_info.pluginName
         # # TODO : Populate plugins dict
-        self.plugin_url = plugin_info.url
+        self.plugin_url = version_info.url
         self.jackname = self.get_jucy_jackname()
         self.jucy_pluginhost = Jucy.VST3PluginHost(self.plugin_url, self.jackname, self)
         self._ctrl_screens = []

@@ -33,12 +33,84 @@ from pathlib import Path
 from PySide2.QtCore import QObject
 
 
+class zynthbox_plugin_version_info(QObject):
+    """
+    A Class that represents a zynthbox plugin version and stores its details like plugin name, format, path, category, etc as defined on plugins json
+    """
+    def __init__(self, version, version_details, plugin_info):
+        super(zynthbox_plugin_version_info, self).__init__(plugin_info)
+
+        self.version = version
+        self.plugin_info = plugin_info
+        self.pluginName = version_details["pluginName"]
+        self.format = version_details["format"]
+        self.path = version_details["path"]
+        self.zynthboxVersionAdded = version_details["zynthboxVersionAdded"]
+        self.url = ""
+        self.engineType = None
+        self.volumeControls = [] # List of strings
+        self.cutoffControl = ""
+        self.resonanceControl = ""
+        self.visible = True
+        self.sha256sum = ""
+
+        if "url" in version_details:
+            self.url = version_details["url"]
+        if "engineType" in version_details:
+            self.engineType = version_details["engineType"]
+        if "volumeControls" in version_details:
+            self.volumeControls = version_details["volumeControls"]
+        if "cutoffControl" in version_details:
+            self.cutoffControl = version_details["cutoffControl"]
+        if "resonanceControl" in version_details:
+            self.resonanceControl = version_details["resonanceControl"]
+        if "visible" in version_details:
+            self.visible = version_details["visible"]
+        if "sha256sum" in version_details:
+            self.sha256sum = version_details["sha256sum"]
+
+
 class zynthbox_plugin_info(QObject):
     """
     A Class that represents a zynthbox plugin and stores its details like plugin id, plugin type, etc as defined on plugins json
     """
     def __init__(self, key, plugin_details, type, parent=None):
         super(zynthbox_plugin_info, self).__init__(parent)
+
+        self.id = key
+        self.type = type
+        self.displayName = plugin_details["displayName"]
+        # Stores the current version name
+        self.currentVersion = plugin_details["currentVersion"]
+        # Stores the instance of current version info
+        self.currentVersionInfo = None
+        # Stores the category of the fx. In case of synths, this is set to "Instrument"
+        self.category = ""
+        self.description = ""
+        # Stores plugin details per version. A plugin can have different version with different engineType
+        self.versions = {}
+
+        if "description" in plugin_details:
+            self.description = plugin_details["description"]
+
+        if type == "MIDI Synth":
+            self.category = "Instrument"
+        elif type != "MIDI Synth" and "category" in plugin_details:
+            self.category = plugin_details["category"]
+
+        if "versions" in plugin_details:
+            for version in plugin_details["versions"]:
+                self.versions[version] = zynthbox_plugin_version_info(version, plugin_details["versions"][version], self)
+                if version == self.currentVersion:
+                    self.currentVersionInfo = self.versions[version]
+
+
+class zynthbox_old_plugin_info(QObject):
+    """
+    A Class that represents a zynthbox plugin and stores its details like plugin id, plugin type, etc as defined on plugins json
+    """
+    def __init__(self, key, plugin_details, type, parent=None):
+        super(zynthbox_old_plugin_info, self).__init__(parent)
 
         self.id = key
         self.name = plugin_details["name"]
@@ -98,7 +170,7 @@ class zynthbox_plugins_helper(QObject):
         self.plugins_by_type = {
             "synth": {},
             "soundfont": {},
-            "audioFx": {}
+            "fx": {}
         }
         self.old_plugins_by_name = {}
         self.old_plugins_by_id = {}
@@ -112,75 +184,89 @@ class zynthbox_plugins_helper(QObject):
         for key in plugins_json["synth"]:
             plugin_info = zynthbox_plugin_info(key, plugins_json["synth"][key], "MIDI Synth", self)
             self.plugins_by_type["synth"][key] = plugin_info
-        for key in plugins_json["audioFx"]:
-            plugin_info = zynthbox_plugin_info(key, plugins_json["audioFx"][key], "Audio Effect", self)
-            self.plugins_by_type["audioFx"][key] = plugin_info
+        for key in plugins_json["fx"]:
+            plugin_info = zynthbox_plugin_info(key, plugins_json["fx"][key], "Audio Effect", self)
+            self.plugins_by_type["fx"][key] = plugin_info
         for key in plugins_json["soundfont"]:
             plugin_info = zynthbox_plugin_info(key, plugins_json["soundfont"][key], "MIDI Synth", self)
             self.plugins_by_type["soundfont"][key] = plugin_info
 
         for key in old_plugins_json:
-            # type parameter in old json used to store the plugin format.
-            plugin_info = zynthbox_plugin_info(key, old_plugins_json[key], "", self)
+            # type parameter in old-old json(plugin id < 1000) used to store the plugin format.
+            # old plugins json also contains newer plugin ids but they do not have version data in them.
+            plugin_info = zynthbox_old_plugin_info(key, old_plugins_json[key], "", self)
             self.old_plugins_by_id[key] = plugin_info
-            self.old_plugins_by_name[f"{old_plugins_json[key]['type']}/{old_plugins_json[key]['name']}"] = plugin_info
+            if "type" in old_plugins_json[key]:
+                self.old_plugins_by_name[f"{old_plugins_json[key]['type']}/{old_plugins_json[key]['name']}"] = plugin_info
+            else:
+                self.old_plugins_by_name[f"{old_plugins_json[key]['format'].lower()}/{old_plugins_json[key]['name']}"] = plugin_info
+
+    def get_plugins_by_type(self, type):
+        return self.plugins_by_type[type]
 
     def update_layer_snapshot_plugin_id_to_name(self, source_snapshot):
         """
         Translate plugin id to plugin name in the layer snapshot
         """
-        snapshot = copy.deepcopy(source_snapshot)
+        # FIXME : This is a temporary fallback logic that needs to be removed before 1.0 release
 
-        if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
-            plugin_id = snapshot["plugin_id"]
+        if "plugin_id" in source_snapshot and "plugin_version" in source_snapshot:
+            # snapshot has both plugin id and plugin version. This snapshot is the newer one and does not need translating
+            return source_snapshot
+        else:
+            # snapshot deos not have plugin version. This snapshot is the old one and needs translating
+            snapshot = copy.deepcopy(source_snapshot)
 
-            # If a snapshot needs id to name translation, it is from old plugins.
-            # New plugins json logic do not need conversion.
-            try:
-                plugin_info = self.old_plugins_by_id[plugin_id]
+            if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
+                plugin_id = snapshot["plugin_id"]
 
-                if plugin_info is not None:
-                    # Handle Plugin Name substitution for engines
-                    if snapshot["engine_nick"].startswith("JV/"):
-                        # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
-                        logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
-                        snapshot["engine_name"] = Template(snapshot["engine_name"]).substitute(plugin_info.substitution_map)
-                        snapshot["engine_nick"] = Template(snapshot["engine_nick"]).substitute(plugin_info.substitution_map)
-                    elif snapshot["engine_nick"].startswith("JY/"):
-                        # Jucy stores the plugin name in its nickname and name like `JY/<plugin name>` and `Jucy/<plugin name>`
-                        logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
-                        snapshot["engine_name"] = Template(snapshot["engine_name"]).substitute(plugin_info.substitution_map)
-                        snapshot["engine_nick"] = Template(snapshot["engine_nick"]).substitute(plugin_info.substitution_map)
-                    elif snapshot["engine_nick"] == "SF":
-                        # SFizz stores the plugin name in a few places
-                        # 1. bank_name: `SFZ/<plugin name>` or `MySFZ/<plugin name>`
-                        # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sfz/<plugin name>`
-                        # 3. bank_info[2]: same as bank_name
-                        # 4. bank_info[4]: `<plugin name>`
-                        # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
-                        logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
-                        snapshot["bank_name"] = Template(snapshot["bank_name"]).substitute(plugin_info.substitution_map)
-                        snapshot["bank_info"][0] = Template(snapshot["bank_info"][0]).substitute(plugin_info.substitution_map)
-                        snapshot["bank_info"][2] = Template(snapshot["bank_info"][2]).substitute(plugin_info.substitution_map)
-                        snapshot["bank_info"][4] = Template(snapshot["bank_info"][4]).substitute(plugin_info.substitution_map)
-                        snapshot["preset_info"][0] = Template(snapshot["preset_info"][0]).substitute(plugin_info.substitution_map)
-                    elif snapshot["engine_nick"] == "FS":
-                        # Fluidsynth stores the plugin name in a few places
-                        # 1. bank_name: `<plugin name>`
-                        # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
-                        # 3. bank_info[2]: `<plugin name>`
-                        # 4. bank_info[4]: Filename `<plugin_name>.sf2` from plugin path
-                        # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
-                        # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
-                        logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
-                        snapshot["bank_name"] = Template(snapshot["bank_name"]).substitute(plugin_info.substitution_map)
-                        snapshot["bank_info"][0] = Template(snapshot["bank_info"][0]).substitute(plugin_info.substitution_map)
-                        snapshot["bank_info"][2] = Template(snapshot["bank_info"][2]).substitute(plugin_info.substitution_map)
-                        snapshot["bank_info"][4] = Template(snapshot["bank_info"][4]).substitute(plugin_info.substitution_map)
-                        snapshot["preset_info"][0] = Template(snapshot["preset_info"][0]).substitute(plugin_info.substitution_map)
-                        snapshot["preset_info"][3] = Template(snapshot["preset_info"][3]).substitute(plugin_info.substitution_map)
-                else:
-                    logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
-            except Exception as e:
-                logging.error(f"Error while trying to translate plugin id to name : {str(e)}")
-        return snapshot
+                # If a snapshot needs id to name translation, it is from old plugins.
+                # New plugins json logic do not need conversion.
+                try:
+                    plugin_info = self.old_plugins_by_id[plugin_id]
+
+                    if plugin_info is not None:
+                        # Handle Plugin Name substitution for engines
+                        if snapshot["engine_nick"].startswith("JV/"):
+                            # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
+                            logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
+                            snapshot["engine_name"] = Template(snapshot["engine_name"]).substitute(plugin_info.substitution_map)
+                            snapshot["engine_nick"] = Template(snapshot["engine_nick"]).substitute(plugin_info.substitution_map)
+                        elif snapshot["engine_nick"].startswith("JY/"):
+                            # Jucy stores the plugin name in its nickname and name like `JY/<plugin name>` and `Jucy/<plugin name>`
+                            logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
+                            snapshot["engine_name"] = Template(snapshot["engine_name"]).substitute(plugin_info.substitution_map)
+                            snapshot["engine_nick"] = Template(snapshot["engine_nick"]).substitute(plugin_info.substitution_map)
+                        elif snapshot["engine_nick"] == "SF":
+                            # SFizz stores the plugin name in a few places
+                            # 1. bank_name: `SFZ/<plugin name>` or `MySFZ/<plugin name>`
+                            # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sfz/<plugin name>`
+                            # 3. bank_info[2]: same as bank_name
+                            # 4. bank_info[4]: `<plugin name>`
+                            # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
+                            logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
+                            snapshot["bank_name"] = Template(snapshot["bank_name"]).substitute(plugin_info.substitution_map)
+                            snapshot["bank_info"][0] = Template(snapshot["bank_info"][0]).substitute(plugin_info.substitution_map)
+                            snapshot["bank_info"][2] = Template(snapshot["bank_info"][2]).substitute(plugin_info.substitution_map)
+                            snapshot["bank_info"][4] = Template(snapshot["bank_info"][4]).substitute(plugin_info.substitution_map)
+                            snapshot["preset_info"][0] = Template(snapshot["preset_info"][0]).substitute(plugin_info.substitution_map)
+                        elif snapshot["engine_nick"] == "FS":
+                            # Fluidsynth stores the plugin name in a few places
+                            # 1. bank_name: `<plugin name>`
+                            # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
+                            # 3. bank_info[2]: `<plugin name>`
+                            # 4. bank_info[4]: Filename `<plugin_name>.sf2` from plugin path
+                            # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
+                            # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
+                            logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_info.name}")
+                            snapshot["bank_name"] = Template(snapshot["bank_name"]).substitute(plugin_info.substitution_map)
+                            snapshot["bank_info"][0] = Template(snapshot["bank_info"][0]).substitute(plugin_info.substitution_map)
+                            snapshot["bank_info"][2] = Template(snapshot["bank_info"][2]).substitute(plugin_info.substitution_map)
+                            snapshot["bank_info"][4] = Template(snapshot["bank_info"][4]).substitute(plugin_info.substitution_map)
+                            snapshot["preset_info"][0] = Template(snapshot["preset_info"][0]).substitute(plugin_info.substitution_map)
+                            snapshot["preset_info"][3] = Template(snapshot["preset_info"][3]).substitute(plugin_info.substitution_map)
+                    else:
+                        logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
+                except Exception as e:
+                    logging.error(f"Error while trying to translate plugin id to name : {str(e)}")
+            return snapshot

@@ -166,44 +166,47 @@ class zynthian_gui_preset(zynthian_gui_selector):
             sound = self.__top_sounds[self.__top_sounds_engine][min(i, len(self.__top_sounds[self.__top_sounds_engine]) - 1)]
             layer = self.get_curlayer()
             old_audio_out = None
-            if self.get_curlayer() == None:
+            # FIXME : Old logic to start engine if not already started. This is not needed anymore, as we always have a layer
+            #         We might need this again when implementing "All favorites" or "All presets" in the future
+            #         When browsing all favorites from all engines, if preset is from a different engine, we need to start it
+            # if self.get_curlayer() == None:
+            #     self.zynqtgui.start_loading()
+            #     engine_created = True
+            #     engine = self.zynqtgui.screens['engine'].start_engine(sound['engine'])
+            #     midi_chan = self.zynqtgui.screens["layers_for_channel"].list_data[self.zynqtgui.screens["layers_for_channel"].index][1]
+            #     layer = zynthian_layer(engine, midi_chan, self.zynqtgui)
+            #     self.zynqtgui.screens['layer'].layers.append(layer)
+            #     self.zynqtgui.screens['engine'].stop_unused_engines()
+            #     self.zynqtgui.set_curlayer(layer)
+            #     self.zynqtgui.screens['layer'].reset_midi_routing()
+            #     self.zynqtgui.zynautoconnect_midi(True)
+            #     self.zynqtgui.screens['layer'].reset_audio_routing()
+            #     self.zynqtgui.zynautoconnect_audio()
+            #     self.zynqtgui.screens['layer'].add_midichannel_to_channel(midi_chan, self.zynqtgui.screens["layers_for_channel"].index)
+            # else:
+            if self.get_curlayer().preset_name == sound["preset"] and self.get_curlayer().bank_name == sound["bank"]:
+                self.__select_in_progess = False
+                return
+
+            self.zynqtgui.set_curlayer(layer) # FIXME: sometimes after the event processing in self.zynqtgui.start_loading() curlayer is changed??
+            old_audio_out = layer.get_audio_out()
+
+            if self.get_curlayer().engine.nickname != sound["engine"]:
                 self.zynqtgui.start_loading()
                 engine_created = True
-                engine = self.zynqtgui.screens['engine'].start_engine(sound['engine'])
-                midi_chan = self.zynqtgui.screens["layers_for_channel"].list_data[self.zynqtgui.screens["layers_for_channel"].index][1]
-                layer = zynthian_layer(engine, midi_chan, self.zynqtgui)
-                self.zynqtgui.screens['layer'].layers.append(layer)
-                self.zynqtgui.screens['engine'].stop_unused_engines()
-                self.zynqtgui.set_curlayer(layer)
-                self.zynqtgui.screens['layer'].reset_midi_routing()
-                self.zynqtgui.zynautoconnect_midi(True)
-                self.zynqtgui.screens['layer'].reset_audio_routing()
-                self.zynqtgui.zynautoconnect_audio()
-                self.zynqtgui.screens['layer'].add_midichannel_to_channel(midi_chan, self.zynqtgui.screens["layers_for_channel"].index)
+                midi_chan = self.get_curlayer().midi_chan
+                index_to_replace = self.zynqtgui.screens['layer'].root_layers.index(layer)
+                self.zynqtgui.screens['layer'].replace_layer_index = index_to_replace
+                self.zynqtgui.screens['layer'].layer_chain_parallel = False
+                self.zynqtgui.screens['layer'].layer_index_replace_engine = index_to_replace
+                self.zynqtgui.screens['layer'].add_layer_engine(sound['engine'], midi_chan, True)
+                layer = self.get_curlayer()
             else:
-                if self.get_curlayer().preset_name == sound["preset"] and self.get_curlayer().bank_name == sound["bank"]:
-                    self.__select_in_progess = False
-                    return
-
-                self.zynqtgui.set_curlayer(layer) # FIXME: sometimes after the event processing in self.zynqtgui.start_loading() curlayer is changed??
-                old_audio_out = layer.get_audio_out()
-
-                if self.get_curlayer().engine.nickname != sound["engine"]:
-                    self.zynqtgui.start_loading()
-                    engine_created = True
-                    midi_chan = self.get_curlayer().midi_chan
-                    index_to_replace = self.zynqtgui.screens['layer'].root_layers.index(layer)
-                    self.zynqtgui.screens['layer'].replace_layer_index = index_to_replace
-                    self.zynqtgui.screens['layer'].layer_chain_parallel = False
-                    self.zynqtgui.screens['layer'].layer_index_replace_engine = index_to_replace
-                    self.zynqtgui.screens['layer'].add_layer_engine(sound['engine'], midi_chan, True)
-                    layer = self.get_curlayer()
-                else:
-                    #Workaround: make sure that layer is really selected or we risk to replace the old one
-                    for i, candidate in enumerate(self.zynqtgui.screens['layer'].root_layers):
-                        if candidate == self.get_curlayer():
-                            self.zynqtgui.screens['layer'].select_action(i)
-                            break
+                #Workaround: make sure that layer is really selected or we risk to replace the old one
+                for i, candidate in enumerate(self.zynqtgui.screens['layer'].root_layers):
+                    if candidate == self.get_curlayer():
+                        self.zynqtgui.screens['layer'].select_action(i)
+                        break
 
             layer.wait_stop_loading()
             #Load bank list and set bank

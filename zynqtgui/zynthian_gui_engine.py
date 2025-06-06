@@ -259,6 +259,11 @@ class zynthian_gui_engine(zynthian_gui_selector):
                 return
 
     def start_engine(self, eng, setTaskMessage=True, taskMessagePrefix:str=""):
+        # TODO : This start_engine method needs to accept plugin id and version and start that version of the plugin
+        #        This entire gui_engine page logic is made to work with only 1 version of an engine.
+        #        Generating engine list creates entries for multiple version with same nickname and hence will cause problems identifying
+        #        a plugin version uniquely.
+        # FIXME : Re-implement gui_engine logic to store plugin versions uniquely in self.engine_info and use that instead of mapping all versions to same nickname
         if eng not in self.zyngines:
             if setTaskMessage:
                 self.zynqtgui.currentTaskMessage = f"{taskMessagePrefix}Starting engine {eng}"

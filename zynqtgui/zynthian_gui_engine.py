@@ -265,19 +265,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
             info=self.engine_info[eng]
             zynthian_engine_class=info[4]
-            if eng[0:3]=="JV/":
-                eng="JV/{}".format(self.zyngine_counter)
-            else:
-                if eng=="AE":
-                    eng="AE/{}".format(self.zyngine_counter)
-                elif eng=="FS":
-                    eng="FS/{}".format(self.zyngine_counter)
-                elif eng=="BF":
-                    eng="BF/{}".format(self.zyngine_counter)
-                elif eng=="SF":
-                    eng="SF/{}".format(self.zyngine_counter)
-                elif eng=="ZY":
-                    eng="ZY/{}".format(self.zyngine_counter)
+            # Allow all engines to have multiple instances. Hence add counter to all engines
+            eng = f"{eng.split('/')[0]}/{self.zyngine_counter}"
             self.zyngines[eng]=zynthian_engine_class(info[7], self.zynqtgui)
 
         self.zyngine_counter+=1

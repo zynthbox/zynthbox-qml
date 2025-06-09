@@ -379,12 +379,20 @@ MouseArea {
                     applicationWindow().updateGlobalReverbFXAmount(-1);
                     result = true;
                     break;
-                case "KNOB3_UP":                    
-                    applicationWindow().updateMasterVolume(1);
+                case "KNOB3_UP":
+                    if (zynqtgui.altButtonPressed) {
+                        zynqtgui.sketchpad.metronomeVolume = Math.min(1, zynqtgui.sketchpad.metronomeVolume + 0.01);
+                    } else {
+                        applicationWindow().updateMasterVolume(1);
+                    }
                     result = true;
                     break;
                 case "KNOB3_DOWN":
-                    applicationWindow().updateMasterVolume(-1);
+                    if (zynqtgui.altButtonPressed) {
+                        zynqtgui.sketchpad.metronomeVolume = Math.max(0, zynqtgui.sketchpad.metronomeVolume - 0.01);
+                    } else {
+                        applicationWindow().updateMasterVolume(-1);
+                    }
                     result = true;
                     break;
             }
@@ -623,21 +631,26 @@ MouseArea {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit
+                    Layout.columnSpan: 2
                     contentItem: RowLayout {
                         Layout.alignment: Qt.AlignLeft
-                        QQC2.Label {
-                            text: qsTr("Click")
-                        }
-
                         QQC2.Switch {
                             Layout.alignment: Qt.AlignVCenter
-                            implicitWidth: Kirigami.Units.gridUnit * 3
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                             checked: zynqtgui.sketchpad.metronomeEnabled
+                            text: qsTr("Click")
                             onToggled: {
                                 zynqtgui.sketchpad.metronomeEnabled = checked
                             }
+                        }
+                        QQC2.Slider {
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.preferredHeight: Kirigami.Units.gridUnit
+                            Layout.fillWidth: true
+                            from: 0
+                            to: 1
+                            value: zynqtgui.sketchpad.metronomeVolume
+                            onValueChanged: zynqtgui.sketchpad.metronomeVolume = value
                         }
                         Item {
                             Layout.fillWidth: true
@@ -651,16 +664,6 @@ MouseArea {
                     Layout.preferredHeight: Kirigami.Units.gridUnit
                     text: qsTr("Stop All Notes")
                     onClicked: zynqtgui.callable_ui_action_simple("ALL_NOTES_OFF")
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit
-                    text: qsTr("Stop Playback")
-                    onClicked: {
-                        Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                    }
                 }
 
                 RowLayout {

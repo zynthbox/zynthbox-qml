@@ -209,7 +209,7 @@ Kirigami.AbstractApplicationWindow {
                     }
                     break;
                 case "KNOB3_UP":
-                    if (zynqtgui.altButtonPressed) {
+                    if (zynqtgui.altButtonPressed && zynqtgui.globalPopupOpened === false) {
                         // Allows us to use alt+mode as a modifier in stepsequencer
                         if (zynqtgui.modeButtonPressed === false) {
                             root.updateMasterVolume(1);
@@ -222,7 +222,7 @@ Kirigami.AbstractApplicationWindow {
                     }
                     break;
                 case "KNOB3_DOWN":
-                    if (zynqtgui.altButtonPressed) {
+                    if (zynqtgui.altButtonPressed && zynqtgui.globalPopupOpened === false) {
                         // Allows us to use alt+mode as a modifier in stepsequencer
                         if (zynqtgui.modeButtonPressed === false) {
                             root.updateMasterVolume(-1);

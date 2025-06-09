@@ -80,7 +80,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__recording_channel = "*"
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
-        self.__metronomeVolume = 1.0
+        self.__metronomeVolume = 0.6
         self.__channel_type_synth_color = QColor(255, 0, 0, 200)
         self.__channel_type_sketches_color = QColor(0, 255, 0, 200)
         self.__channel_type_samples_color = QColor(255, 235, 59, 200)
@@ -146,6 +146,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         else:
             # Existing sketch not found. Load default snapshot after loading sketchpad
             self.newSketchpad(base_sketchpad=None, cb=_cb, load_snapshot=False, load_last_state_snapshot=True)
+
+        storedMetronomeEnabled = self.zynqtgui.global_settings.value("Sketchpad/metronomeEnabled", None)
+        if storedMetronomeEnabled is not None:
+            self.set_metronomeEnabled(bool(storedMetronomeEnabled))
+        storedMetronomeVolume = self.zynqtgui.global_settings.value("Sketchpad/metronomeVolume", None)
+        if storedMetronomeVolume is not None:
+            self.set_metronomeVolume(float(storedMetronomeVolume))
 
     def switch_select(self, t):
         pass
@@ -296,22 +303,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     lastRecordingMidi = Property(str, get_lastRecordingMidi, set_lastRecordingMidi, notify=lastRecordingMidiChanged)
     ### END Property lastRecordingMidi
 
-    ### Property metronomeVolume
-    def get_metronomeVolume(self):
-        return self.__metronomeVolume
-
-    def set_metronomeVolume(self, volume):
-        if self.__metronomeVolume != volume:
-            self.__metronomeVolume = volume
-            self.metronome_clip_tick.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
-            self.metronome_clip_tock.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
-            self.metronomeVolumeChanged.emit()
-
-    metronomeVolumeChanged = Signal()
-
-    metronomeVolume = Property(float, get_metronomeVolume, set_metronomeVolume, notify=metronomeVolumeChanged)
-    ### END Property metronomeVolume
-
     ### BEGIN Property channelTypeSynthColor
     def get_channelTypeSynthColor(self):
         return self.__channel_type_synth_color
@@ -411,6 +402,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             selected_channel.update_jack_port()
         self.song.channelsModel.connected_sounds_count_changed.emit()
 
+    ### BEGIN Property metronomeEnabled
     @Signal
     def metronomeEnabledChanged(self):
         pass
@@ -420,8 +412,29 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     def set_metronomeEnabled(self, enabled: bool):
         Zynthbox.SyncTimer.instance().setAudibleMetronome(enabled)
+        if self.zynqtgui.isBootingComplete:
+            self.zynqtgui.global_settings.setValue("Sketchpad/metronomeEnabled", enabled)
 
     metronomeEnabled = Property(bool, get_metronomeEnabled, set_metronomeEnabled, notify=metronomeEnabledChanged)
+    ### END Property metronomeEnabled
+
+    ### BEGIN Property metronomeVolume
+    def get_metronomeVolume(self):
+        return self.__metronomeVolume
+
+    def set_metronomeVolume(self, volume):
+        if self.__metronomeVolume != volume:
+            self.__metronomeVolume = volume
+            self.metronome_clip_tick.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
+            self.metronome_clip_tock.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
+            self.metronomeVolumeChanged.emit()
+            if self.zynqtgui.isBootingComplete:
+                self.zynqtgui.global_settings.setValue("Sketchpad/metronomeVolume", volume)
+
+    metronomeVolumeChanged = Signal()
+
+    metronomeVolume = Property(float, get_metronomeVolume, set_metronomeVolume, notify=metronomeVolumeChanged)
+    ### END Property metronomeVolume
 
     def channel_layers_snapshot(self):
         snapshot = []

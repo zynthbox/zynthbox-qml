@@ -921,12 +921,6 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick Recording...")
-                onTriggered: {
-                    loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "recording");
-                }
-            },
-            QQC2.Action {
                 text: qsTr("Pick Sample...")
                 onTriggered: {
                     loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "sample");
@@ -998,7 +992,9 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Record...")
+                // TODO Return for 1.1
+                enabled: false
+                // text: qsTr("Record...")
                 onTriggered: {
                     applicationWindow().recordAudio();
                 }

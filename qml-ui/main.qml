@@ -1725,51 +1725,52 @@ Kirigami.AbstractApplicationWindow {
                         zynqtgui.close_current_window();
                     }
                 }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitWidth: 1
-                    enabled: false
-                }
-                QQC2.Button {
-                    id: recordingDestinationButton
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitWidth: 1
-                    text: qsTr("RECORDING DESTINATION")
-                    onClicked: {
-                        if (clipPickerMenu.visible) {
-                            clipPickerMenu.hide();
-                        } else {
-                            clipPickerMenu.show();
-                        }
-                    }
-                    Rectangle {
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            bottom: parent.bottom
-                            margins: Kirigami.Units.largeSpacing
-                        }
-                        parent: recordingDestinationButton.background
-                        height: Kirigami.Units.smallSpacing
-                        color: Kirigami.Theme.highlightColor
-                    }
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitWidth: 1
-                    enabled: true
-                    text: clipPickerView.isRecording ? qsTr("STOP RECORDING") : qsTr("START RECORDING")
-                    onClicked: {
-                        if (clipPickerView.isRecording) {
-                            clipPickerView.stopRecording();
-                        } else {
-                            clipPickerView.startRecording();
-                        }
-                    }
-                }
+                // TODO Return for 1.1, but also probably with more and better functionality (this is ooooold code, doesn't really match current setup)
+                // QQC2.Button {
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     implicitWidth: 1
+                //     enabled: false
+                // }
+                // QQC2.Button {
+                //     id: recordingDestinationButton
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     implicitWidth: 1
+                //     text: qsTr("RECORDING DESTINATION")
+                //     onClicked: {
+                //         if (clipPickerMenu.visible) {
+                //             clipPickerMenu.hide();
+                //         } else {
+                //             clipPickerMenu.show();
+                //         }
+                //     }
+                //     Rectangle {
+                //         anchors {
+                //             left: parent.left
+                //             right: parent.right
+                //             bottom: parent.bottom
+                //             margins: Kirigami.Units.largeSpacing
+                //         }
+                //         parent: recordingDestinationButton.background
+                //         height: Kirigami.Units.smallSpacing
+                //         color: Kirigami.Theme.highlightColor
+                //     }
+                // }
+                // QQC2.Button {
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     implicitWidth: 1
+                //     enabled: true
+                //     text: clipPickerView.isRecording ? qsTr("STOP RECORDING") : qsTr("START RECORDING")
+                //     onClicked: {
+                //         if (clipPickerView.isRecording) {
+                //             clipPickerView.stopRecording();
+                //         } else {
+                //             clipPickerView.startRecording();
+                //         }
+                //     }
+                // }
             }
         }
         onVisibleChanged: {

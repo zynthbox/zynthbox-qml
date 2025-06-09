@@ -108,31 +108,34 @@ Zynthian.Popup {
                     root.close();
                     returnValue = true;
                     break;
+                case "STOP_RECORD":
                 case "SWITCH_STOP":
                     if (zynqtgui.sketchpad.recordingType === "midi" && zynqtgui.sketchpad.isRecording) {
-                        // If stopping the recording using the stop button, don't open the dialog back up again
+                        // If stopping the recording using the stop button, don't open the dialog back up again, just stop recording
+                        // Don't reset the state to what we had before recording, as that would be disruptive, just let the user get on where they are
                         _private.selectedPattern.recordLive = false;
-                        Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         zynqtgui.sketchpad.isRecording = false;
                         returnValue = true;
                     }
+                    // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
                     break;
                 case "SWITCH_RECORD":
+                    // If user does alt+record, recording should be started immediately now, and metronome+record to do so with default countin (if done while stopped, otherwise just start recording immediately)
                     if (zynqtgui.sketchpad.recordingType === "midi") {
                         // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
                         if (zynqtgui.sketchpad.isRecording) {
-                            root.open(); // If stopping using the record button, open the dialog
-                            _private.selectedPattern.recordLive = false;
-                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                            zynqtgui.sketchpad.isRecording = false;
+                            // If we are recording and press the record button again, just open the dialog
+                            root.open();
                         } else {
                             zynqtgui.sketchpad.isRecording = true;
                             _private.selectedPattern.liveRecordingSource = Zynthbox.MidiRouter.model.midiInSources[midiSourceCombo.currentIndex].value;
                             _private.selectedPattern.recordLive = true;
-                            if (countIn.value > 0) {
-                                Zynthbox.SyncTimer.startWithCountin(countIn.value);
-                            } else {
-                                Zynthian.CommonUtils.startMetronomeAndPlayback();
+                            if (Zynthbox.SyncTimer.timerRunning == false) {
+                                if (countIn.value > 0) {
+                                    Zynthbox.SyncTimer.startWithCountin(countIn.value);
+                                } else {
+                                    Zynthian.CommonUtils.startMetronomeAndPlayback();
+                                }
                             }
                         }
                         returnValue = true;
@@ -142,6 +145,7 @@ Zynthian.Popup {
                             zynqtgui.clipToRecord = _private.selectedClip;
                         }
                         // But *don't* return true, because we still want this handled by the core event handler
+                        // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
                     }
                     break;
             }

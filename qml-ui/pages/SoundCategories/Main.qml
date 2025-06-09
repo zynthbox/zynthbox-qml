@@ -86,12 +86,6 @@ Zynthian.ScreenPage {
     onShowSaveSoundDialog: {
         saveSoundDialog.open()
     }
-    backAction: Kirigami.Action {
-        text: "Back"
-        onTriggered: {
-            zynqtgui.callable_ui_action_simple("SCREEN_PRESET");
-        }
-    }
     contextualActions: [
         Kirigami.Action {
             text: root.selectedState !== "updateCategoryMode"

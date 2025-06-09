@@ -68,7 +68,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         pass
 
     def back_action(self):
-        return "sketchpad"
+        return "preset"
 
     # def move_sound_category(self, sound, toCategory):
     #     if sound.type == "community-sounds":

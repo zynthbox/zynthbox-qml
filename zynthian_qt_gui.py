@@ -2088,6 +2088,12 @@ class zynthian_gui(QObject):
                 else:
                     self.run_start_metronome_and_playback.emit()
         elif cuia == "SWITCH_STOP":
+            if self.screns["sketchpad"].isRecording:
+                # TODO 1.1 Revisit when we re-introduce audio recording (logic should be "stop when recording stops recording, otherwise stop when playing stops playback, otherwise stop sends out all notes off")
+                # Some Clip is currently being recorded
+                logging.info("Some Clip is currently being recorded. Stopping record")
+                self.run_stop_metronome_and_playback.emit()
+                self.clipToRecord = None
             if Zynthbox.SyncTimer.instance().timerRunning():
                 self.run_stop_metronome_and_playback.emit()
             else:
@@ -2095,7 +2101,8 @@ class zynthian_gui(QObject):
 
         elif cuia == "SWITCH_RECORD":
             zl = self.screens["sketchpad"]
-            if self.recording_popup_active or self.metronomeButtonPressed:
+            # TODO 1.1 Revisit when we re-introduce audio recording (metronome button likely just wants to be "start recording now, but just midi, and also don't show the dlg), but for now, just don't
+            if self.recording_popup_active: # or self.metronomeButtonPressed:
                 if zl.isRecording:
                     # Some Clip is currently being recorded
                     logging.info("Some Clip is currently being recorded. Stopping record")

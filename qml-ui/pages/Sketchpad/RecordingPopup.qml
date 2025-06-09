@@ -42,10 +42,11 @@ Zynthian.Popup {
 
     spacing: Kirigami.Units.gridUnit * 0.5
 
+    readonly property var acceptedButtonsWhenClosed: ["STOP_RECORD", "SWITCH_STOP", "SWITCH_RECORD"]
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         // This gets called from main when the dialog is not opened, so let's be explicit about what we want in that case
-        if (root.opened || (zynqtgui.sketchpad.isRecording && ["SWITCH_STOP", "SWITCH_RECORD"].indexOf(cuia) > -1)) {
+        if (root.opened || acceptedButtonsWhenClosed.indexOf(cuia) > -1) {
             switch (cuia) {
                 case "TRACK_1":
                 case "TRACK_2":
@@ -120,23 +121,42 @@ Zynthian.Popup {
                     // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
                     break;
                 case "SWITCH_RECORD":
-                    // If user does alt+record, recording should be started immediately now, and metronome+record to do so with default countin (if done while stopped, otherwise just start recording immediately)
-                    if (zynqtgui.sketchpad.recordingType === "midi") {
+                    // If user does alt+record, recording should be started immediately, and metronome+record to do so with default countin (if done while stopped, otherwise just start recording immediately)
+                    if (zynqtgui.sketchpad.isRecording === false && (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed)) {
+                        let doCountin = false;
+                        if (zynqtgui.metronomeButtonPressed) {
+                            doCountin = true;
+                            zynqtgui.ignoreNextMetronomeButtonPress = true
+                        }
+                        let currentTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                        // Take a snapshot of our current state, so we can keep that stable when changing settings
+                        root.selectedChannel = currentTrack;
+                        root.selectedSlotIndex = root.selectedChannel.selectedSlot.value;
+                        root.selectedSlotType = root.selectedChannel.selectedSlot.className;
+                        root.selectedClip = root.selectedChannel.selectedClip;
+                        // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
+                        _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
+                        _private.updateSoloState();
+                        // Start the recording
+                        root.beginMidiRecording(doCountin);
+                        // And finally, say we consumed the event
+                        returnValue = true;
+                    } else if (zynqtgui.sketchpad.recordingType === "midi") {
                         // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
                         if (zynqtgui.sketchpad.isRecording) {
-                            // If we are recording and press the record button again, just open the dialog
+                            if (root.opened) {
+                                // If the dialog is already open, and we push the record button again, stop recording
+                                _private.selectedPattern.recordLive = false;
+                                zynqtgui.sketchpad.isRecording = false;
+                            } else {
+                                // If we are recording and press the record button again, just open the dialog
+                                root.open();
+                            }
+                        } else if (root.opened == false) {
+                            // If we are not open, and also not recording, open the dialog
                             root.open();
                         } else {
-                            zynqtgui.sketchpad.isRecording = true;
-                            _private.selectedPattern.liveRecordingSource = Zynthbox.MidiRouter.model.midiInSources[midiSourceCombo.currentIndex].value;
-                            _private.selectedPattern.recordLive = true;
-                            if (Zynthbox.SyncTimer.timerRunning == false) {
-                                if (countIn.value > 0) {
-                                    Zynthbox.SyncTimer.startWithCountin(countIn.value);
-                                } else {
-                                    Zynthian.CommonUtils.startMetronomeAndPlayback();
-                                }
-                            }
+                            root.beginMidiRecording(true);
                         }
                         returnValue = true;
                     } else if (zynqtgui.sketchpad.recordingType === "audio") {
@@ -152,6 +172,20 @@ Zynthian.Popup {
         }
 
         return returnValue;
+    }
+
+    function beginMidiRecording(startWithCountin) {
+        zynqtgui.sketchpad.recordingType = "midi";
+        zynqtgui.sketchpad.isRecording = true;
+        _private.selectedPattern.liveRecordingSource = Zynthbox.MidiRouter.model.midiInSources[midiSourceCombo.currentIndex].value;
+        _private.selectedPattern.recordLive = true;
+        if (Zynthbox.SyncTimer.timerRunning == false) {
+            if (startWithCountin && countIn.value > 0) {
+                Zynthbox.SyncTimer.startWithCountin(countIn.value);
+            } else {
+                Zynthian.CommonUtils.startMetronomeAndPlayback();
+            }
+        }
     }
 
     parent: QQC2.Overlay.overlay

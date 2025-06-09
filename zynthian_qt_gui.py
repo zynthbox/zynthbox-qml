@@ -2088,7 +2088,7 @@ class zynthian_gui(QObject):
                 else:
                     self.run_start_metronome_and_playback.emit()
         elif cuia == "SWITCH_STOP":
-            if self.screns["sketchpad"].isRecording:
+            if self.screens["sketchpad"].isRecording:
                 # TODO 1.1 Revisit when we re-introduce audio recording (logic should be "stop when recording stops recording, otherwise stop when playing stops playback, otherwise stop sends out all notes off")
                 # Some Clip is currently being recorded
                 logging.info("Some Clip is currently being recorded. Stopping record")

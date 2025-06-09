@@ -1045,9 +1045,9 @@ Kirigami.AbstractApplicationWindow {
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
             onClicked: {
                 if (zynqtgui.sketchpad.isMetronomeRunning) {
-                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                    zynqtgui.callable_ui_action_simple("SWITCH_STOP");
                 } else {
-                    Zynthian.CommonUtils.startMetronomeAndPlayback();
+                    zynqtgui.callable_ui_action_simple("SWITCH_PLAY");
                 }
             }
 

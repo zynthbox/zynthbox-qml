@@ -16,7 +16,7 @@ function startMetronomeAndPlayback() {
             if (zynqtgui.altButtonPressed === false) {
                 playInSongMode = true;
             }
-        } else if (zynqtgui.altButtonPressed) {
+        } else if (zynqtgui.altButtonPressed && zynqtgui.sketchpad.isRecording === false) {
             playInSongMode = true;
         }
 

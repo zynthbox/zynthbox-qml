@@ -111,7 +111,12 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 
         self.options['drop_pc']=True
 
-        self.osc_target_port = 6693
+        # We now allow zynaddsubfx to run multiple instances
+        # with different jack names, so we need to set the OSC target port
+        # based on the jack name. The port is calculated as 6693 + the number of
+        # zynaddsubfx jack names that are currently running.
+        # This way, each instance will have a unique OSC target port.
+        self.osc_target_port = 6693 + self.zynqtgui.screens['layer'].get_jackname_count("zynaddsubfx")
 
         try:
             self.sr = int(self.zynqtgui.get_jackd_samplerate())
@@ -215,7 +220,6 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 
 
     def set_preset(self, layer, preset, preload=False, force_immediate=False):
-        self.start_loading()
         if preset[3]=='xiz':
             self.enable_part(layer)
             liblo.send(self.osc_target, "/load-part",layer.part_i,preset[0])

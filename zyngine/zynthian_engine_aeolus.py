@@ -43,19 +43,19 @@ class zynthian_engine_aeolus(zynthian_engine):
     # Tuning temperaments
     # ---------------------------------------------------------------------------
 
-    tuning_temp_dict = {
-        "Meantone 1/4": 1,
-        "Werckmeister III": 2,
-        "Kimberger III": 3,
-        "Well Tempered": 4,
-        "Equally Tempered": 5,
-        "Vogel/Ahrend": 6,
-        "Vallotti": 7,
-        "Kellner": 8,
-        "Lehman": 9,
-        "Pure C/F/G": 10
-#        "Pythagorean": 11 => Crash!!
-    }
+#     tuning_temp_dict = {
+#         "Meantone 1/4": 1,
+#         "Werckmeister III": 2,
+#         "Kimberger III": 3,
+#         "Well Tempered": 4,
+#         "Equally Tempered": 5,
+#         "Vogel/Ahrend": 6,
+#         "Vallotti": 7,
+#         "Kellner": 8,
+#         "Lehman": 9,
+#         "Pure C/F/G": 10
+# #        "Pythagorean": 11 => Crash!!
+#     }
 
     # ---------------------------------------------------------------------------
     # Controllers & Screens
@@ -311,17 +311,20 @@ class zynthian_engine_aeolus(zynthian_engine):
 
     def get_bank_list(self, layer=None):
         res=[]
-        if not self.tuning_temp:
-            for title, i in self.tuning_temp_dict.items():
-                res.append((title, i, title))
-            self.zynqtgui.screens['bank'].index = self.current_tuning_temp-1
-        else:
-            i=-1
-            for gc in self.presets_data['group_config']:
-                if gc['bank']>i:
-                    i=gc['bank']
-                    title="Bank {0:02d}".format(i+1)
-                    res.append((title,i,title))
+        # Preset listing is not working correctly when tuning_temp is not set
+        # For now, force tuning_temp to None and generate the bank list from presets_data
+        # FIXME : This is a workaround but find a better way to handle tuning_temp
+        # if not self.tuning_temp:
+        #     for title, i in self.tuning_temp_dict.items():
+        #         res.append((title, i, title))
+        #     self.zynqtgui.screens['bank'].index = self.current_tuning_temp-1
+        # else:
+        i=-1
+        for gc in self.presets_data['group_config']:
+            if gc['bank']>i:
+                i=gc['bank']
+                title="Bank {0:02d}".format(i+1)
+                res.append((title,i,title))
         return res
 
 

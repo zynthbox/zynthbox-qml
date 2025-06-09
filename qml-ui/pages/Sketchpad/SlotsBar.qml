@@ -911,8 +911,10 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Unbounce...")
-                enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
+                // TODO Return for 1.1
+                enabled: false
+                // text: qsTr("Unbounce...")
+                // enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
                 property bool shouldUnbounce: sketchPickerPopup.sketch && sketchPickerPopup.sketch.metadata.audioType && sketchPickerPopup.sketch.metadata.audioType.length > 0
                 onTriggered: {
                     sketchUnbouncer.unbounce(sketchPickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlot.value);
@@ -980,8 +982,10 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Unbounce...")
-                enabled: (samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false) && shouldUnbounce
+                // TODO Return for 1.1
+                enabled: false
+                // text: qsTr("Unbounce...")
+                // enabled: (samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false) && shouldUnbounce
                 property bool shouldUnbounce: samplePickerPopup.sketch && samplePickerPopup.sketch.metadata.audioType && samplePickerPopup.sketch.metadata.audioType.length > 0
                 onTriggered: {
                     sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlot.value);

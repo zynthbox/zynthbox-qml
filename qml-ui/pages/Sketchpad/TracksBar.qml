@@ -849,6 +849,8 @@ Rectangle {
                                 }
                             }
                             QQC2.Button {
+                                // TODO Return for 1.1
+                                visible: false
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
@@ -894,14 +896,14 @@ Rectangle {
 
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: qsTr("%1 One-to-One").arg(root.selectedChannel && root.selectedChannel.trackStyle === "one-to-one" ? "☑" : "☐")
+                                            text: qsTr("%1 1:1").arg(root.selectedChannel && root.selectedChannel.trackStyle === "one-to-one" ? "☑" : "☐")
                                             // text: root.selectedChannel ? trackStyleName(root.selectedChannel.trackStyle) : ""
                                             function trackStyleName(trackStyle) {
                                                 switch (trackStyle) {
                                                     case "everything":
                                                         return qsTr("Everything");
                                                     case "one-to-one":
-                                                        return qsTr("One-to-One");
+                                                        return qsTr("1:1");
                                                     case "drums":
                                                         return qsTr("Drums");
                                                     case "2-low-3-high":
@@ -967,9 +969,10 @@ Rectangle {
                                     RowLayout {
                                         id: bounceButtonLayout
                                         Layout.fillHeight: true
-                                        visible: root.selectedChannel.trackType == "synth"
+                                        // TODO Return for 1.1
+                                        visible: false // root.selectedChannel.trackType == "synth"
                                         QQC2.Button {
-                                            text: qsTr("Bounce To Sketch")
+                                            text: qsTr("Bounce Sketch")
                                             icon.name: "go-next"
                                             onClicked: {
                                                 bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, -1);
@@ -1032,6 +1035,7 @@ Rectangle {
                                         anchors.fill: parent
                                         slotData: root.selectedChannel.externalSlotsData
                                         slotType: "external"
+                                        showSlotTypeLabel: true
                                         visible: root.selectedChannel.trackType == "external"
                                     }
                                 }
@@ -1066,7 +1070,7 @@ Rectangle {
                                         slotData: root.selectedChannel.fxSlotsData
                                         slotType: "fx"
                                         showSlotTypeLabel: true
-                                        visible: root.selectedChannel.trackType == "synth"
+                                        visible: root.selectedChannel.trackType == "synth" || (root.selectedChannel.trackType == "external" && root.selectedChannel.externalSettings && root.selectedChannel.externalSettings.audioSource != "")
                                     }
                                 }
                             }

@@ -136,7 +136,7 @@ RowLayout {
                     case "sample-loop":
                         return qsTr("Sketches :")
                     case "external":
-                        return qsTr("External :")
+                        return qsTr("Settings :")
                     case "fx":
                         return qsTr("FX :")
                     case "sketch-fx":

@@ -1129,6 +1129,8 @@ Kirigami.AbstractApplicationWindow {
             sequence: model.display
             context: Qt.ApplicationShortcut
             enabled: Qt.inputMethod.visible === false
+            // Don't auto-repeat, as that causes havoc in some cases (we will auto-repeat the select key if a heavy operation is done, causing ghost repeats even if the key has actually been released)
+            autoRepeat: false // If we want some to be auto-repeatable, we will need to modify the model to not be just a list of strings, and instead use a custom model which can provide us with a value for this as well as the shortcut itself
             function activateThing() {
                 zynqtgui.process_keybinding_shortcut(model.display);
             }

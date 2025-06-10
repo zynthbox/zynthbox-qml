@@ -48,9 +48,10 @@ Zynthian.Popup {
                 break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-                if (_private.currentIndex > -1 && component.actions[_private.currentIndex].enabled) {
-                    component.actions[_private.currentIndex].trigger();
+                let theIndex = _private.currentIndex;
+                if (theIndex > -1 && component.actions[theIndex].enabled) {
                     component.close();
+                    component.actions[theIndex].trigger();
                 }
                 result = true;
                 break;

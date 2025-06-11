@@ -80,7 +80,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__recording_channel = "*"
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
-        self.__metronomeVolume = 0.6
         self.__channel_type_synth_color = QColor(255, 0, 0, 200)
         self.__channel_type_sketches_color = QColor(0, 255, 0, 200)
         self.__channel_type_samples_color = QColor(255, 235, 59, 200)
@@ -101,9 +100,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__update_channel_sounds_timer = None
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", -1, 0, False, False, self)
-        self.metronome_clip_tick.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
         self.metronome_clip_tock = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tock.wav", -1, 0, False, False, self)
-        self.metronome_clip_tock.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
+        # The gain we expose is the slider position, so fetch our default of that out of the newly created thing just to make it simple (the default level being no adjustment)
+        self.__metronomeVolume = self.metronome_clip_tick.rootSlice().gainHandler().gainAbsolute()
         Zynthbox.SyncTimer.instance().setMetronomeTicks(self.metronome_clip_tick, self.metronome_clip_tock)
         Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.metronomeEnabledChanged)
         Zynthbox.SyncTimer.instance().timerRunningChanged.connect(self.metronome_running_changed)
@@ -152,7 +151,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.set_metronomeEnabled(bool(storedMetronomeEnabled))
         storedMetronomeVolume = self.zynqtgui.global_settings.value("Sketchpad/metronomeVolume", None)
         if storedMetronomeVolume is not None:
-            self.set_metronomeVolume(float(storedMetronomeVolume))
+            # First set one of the clips volume
+            self.metronome_clip_tick.rootSlice().gainHandler().setGain(float(storedMetronomeVolume))
+            # Then set the internal volume to what that volume is from 0 to 1
+            self.set_metronomeVolume(self.metronome_clip_tick.rootSlice().gainHandler().gainAbsolute())
 
     def switch_select(self, t):
         pass
@@ -429,7 +431,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.metronome_clip_tock.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
             self.metronomeVolumeChanged.emit()
             if self.zynqtgui.isBootingComplete:
-                self.zynqtgui.global_settings.setValue("Sketchpad/metronomeVolume", volume)
+                self.zynqtgui.global_settings.setValue("Sketchpad/metronomeVolume", self.metronome_clip_tick.rootSlice().gainHandler().gain())
 
     metronomeVolumeChanged = Signal()
 

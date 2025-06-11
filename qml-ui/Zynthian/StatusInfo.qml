@@ -647,6 +647,7 @@ MouseArea {
                             Layout.alignment: Qt.AlignVCenter
                             Layout.preferredHeight: Kirigami.Units.gridUnit
                             Layout.fillWidth: true
+                            enabled: zynqtgui.sketchpad.metronomeEnabled
                             from: 0
                             to: 1
                             value: zynqtgui.sketchpad.metronomeVolume

@@ -210,7 +210,7 @@ Zynthian.Dialog {
                 acceptEnabled: inputText.length > 0 && folderModel.folderPropertiesHelper.checkFileExists(newFolderDialog.newFolderPath) === false
                 rejectText: qsTr("No, Don't Create Folder")
                 readonly property string newFolderName: folderModel.folder + "/" + newFolderDialog.inputText
-                readonly property string newFolderPath: newFolderName.substring(7) // There's a file:// at the start of this string, so get rid of that before throwing it at python
+                readonly property string newFolderPath: decodeURIComponent(newFolderName.substring(7)) // There's a file:// at the start of this string, so get rid of that before throwing it at python
                 onAccepted: {
                     // console.log("Creating new folder named", newFolderDialog.newFolderName, "and then entering it");
                     folderModel.folderPropertiesHelper.makePath(newFolderDialog.newFolderPath);
@@ -491,13 +491,7 @@ Zynthian.Dialog {
                         console.log(model.fileName, model.filePath, model.index)
                         root.currentFileInfo = model;
                         if (model.fileIsDir) {
-                            var path = model.filePath;
-
-                            if (path.endsWith("/")) {
-                                path = path.slice(0, path.length - 1);
-                            }
-
-                            folderModel.folder = path;
+                            folderModel.folder = model.fileUrl;
                         } else {
                             if (root.saveMode) {
                                 namedFile.text = model.fileName;
@@ -644,7 +638,7 @@ Zynthian.Dialog {
                         }
                     }
 
-                    model: FolderListModel {
+                    model: Zynthbox.FolderListModel {
                         id: folderModel
                         caseSensitive: false
                         showDirs: true
@@ -659,7 +653,7 @@ Zynthian.Dialog {
                             }
                         }
                         readonly property var folderPropertiesHelper: Helpers.FilePropertiesHelper {
-                            filePath: folderModel.folder.toString().substring(7) // There's a file:// at the start of this string, so get rid of that before throwing it at python
+                            filePath: decodeURIComponent(folderModel.folder.toString().substring(7)) // There's a file:// at the start of this string, so get rid of that before throwing it at python
                         }
                         function describeFile(filePath) {
                             let description = "";

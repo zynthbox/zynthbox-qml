@@ -463,7 +463,7 @@ Zynthian.Dialog {
                     id: breadcrumbsRepeater
                     model: folderBreadcrumbs.folderSplitArray
                     delegate: Zynthian.BreadcrumbButton {
-                        text: modelData
+                        text: decodeURIComponent(modelData)
                         onClicked: {
                             folderModel.folder = root.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
                             filesListView.currentIndex = 0;

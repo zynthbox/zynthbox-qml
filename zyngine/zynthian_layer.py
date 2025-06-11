@@ -207,24 +207,40 @@ class zynthian_layer(QObject):
 
 
     def load_bank_list(self, force=False):
-        # Calling self.engine.get_bank_list() causes quite some file reads.
-        # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
-        # Instead of reading files every run, cache the list data.
-        # Since bank data of a synth should not change while the application is running, it should be fairly safe to cache the data
-        if len(self.bank_list_cache) == 0 or force:
-            self.bank_list_cache = self.engine.get_bank_list(self)
+        caching_failed = False
 
-        # Disable FAVS entry in bank list. Favorites are now toggled via a button on qml side
-        # if len(self.engine.get_preset_favs(self)) > 0:
-        #     self.bank_list = [["*FAVS*",0,"Favorites (%d)" % len(self.engine.get_preset_favs(self))]] + self.bank_list_cache.copy()
-        # else:
-        #     self.bank_list = self.bank_list_cache.copy()
+        if self.engine.nickname == "BF":
+            # Disable caching for setBfree engine
+            caching_failed = True
+        else:
+            try:
+                # Calling self.engine.get_bank_list() causes quite some file reads.
+                # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
+                # Instead of reading files every run, cache the list data.
+                # Since bank data of a synth should not change while the application is running, it should be fairly safe to cache the data
+                if len(self.bank_list_cache) == 0 or force:
+                    self.bank_list_cache = self.engine.get_bank_list(self)
 
-        # Explicitly call get_preset_favs to generate preset fav list. Otherwise *BOOM*
-        self.engine.get_preset_favs(self)
-        self.bank_list = self.bank_list_cache.copy()
-        self.bankCountChanged.emit()
-        # logging.debug("BANK LIST => \n%s" % str(self.bank_list))
+                # Disable FAVS entry in bank list. Favorites are now toggled via a button on qml side
+                # if len(self.engine.get_preset_favs(self)) > 0:
+                #     self.bank_list = [["*FAVS*",0,"Favorites (%d)" % len(self.engine.get_preset_favs(self))]] + self.bank_list_cache.copy()
+                # else:
+                #     self.bank_list = self.bank_list_cache.copy()
+
+                # Explicitly call get_preset_favs to generate preset fav list. Otherwise *BOOM*
+                self.engine.get_preset_favs(self)
+                self.bank_list = self.bank_list_cache.copy()
+                self.bankCountChanged.emit()
+                # logging.debug("BANK LIST => \n%s" % str(self.bank_list))
+            except Exception as e:
+                logging.exception(f"Error generating bank list from cache. Forcing call to engine.get_bank_list : {str(e)}")
+                caching_failed = True
+
+        if caching_failed:
+            # Explicitly call get_preset_favs to generate preset fav list. Otherwise *BOOM*
+            self.engine.get_preset_favs(self)
+            self.bank_list = self.engine.get_bank_list(self)
+            self.bankCountChanged.emit()
 
 
     def reset_bank(self):
@@ -300,19 +316,28 @@ class zynthian_layer(QObject):
                 preset_list.append(v[1])
 
         elif self.bank_info:
-            try:
-                bank_name = self.bank_info[2]
+            caching_failed = False
 
-                # Calling self.engine.get_preset_list() causes quite some file reads.
-                # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
-                # Instead of reading files every run, cache the list data.
-                # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
-                if bank_name not in self.preset_list_cache or force:
-                    self.preset_list_cache[bank_name] = self.engine.get_preset_list(self.bank_info)
-                preset_list = preset_list + self.preset_list_cache[bank_name].copy()
-            except Exception as e:
-                logging.exception(f"Error generating preset list : {str(e)}")
+            if self.engine.nickname == "BF":
+                # Disable caching for setBfree engine
+                caching_failed = True
+            else:
+                try:
+                    bank_name = self.bank_info[2]
 
+                    # Calling self.engine.get_preset_list() causes quite some file reads.
+                    # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
+                    # Instead of reading files every run, cache the list data.
+                    # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
+                    if bank_name not in self.preset_list_cache or force:
+                        self.preset_list_cache[bank_name] = self.engine.get_preset_list(self.bank_info)
+                    preset_list = preset_list + self.preset_list_cache[bank_name].copy()
+                except Exception as e:
+                    logging.exception(f"Error generating preset list from cache. Forcing call to engine.get_preset_list : {str(e)}")
+                    caching_failed = True
+
+            if caching_failed:
+                preset_list = preset_list + self.engine.get_preset_list(self.bank_info)
         else:
             return
 

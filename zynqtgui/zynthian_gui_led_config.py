@@ -248,10 +248,11 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         buttonColor = None
 
         if setChannelColor:
-            if self.channel.trackType == "external" or self.channel.occupiedSlotsCount > 0:
-                buttonColor = self.channelColor
-            else:
-                buttonColor = led_color_grey
+            buttonColor = self.channelColor
+            # if self.channel.trackType == "external" or self.channel.occupiedSlotsCount > 0:
+            #     buttonColor = self.channelColor
+            # else:
+            #     buttonColor = led_color_grey
         else:
             assert color is not None, "color cannot be None when setChannelColor is False"
 

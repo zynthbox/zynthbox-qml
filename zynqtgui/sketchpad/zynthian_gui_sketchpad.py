@@ -739,7 +739,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.newSketchpad(sketchpad, _cb, load_snapshot=load_snapshot, force=True)
             else:
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
-                self.zynqtgui.currentTaskMessage = "Loading Sketchpad"
+                self.zynqtgui.currentTaskMessage = f"Loading Sketchpad:<br />{str(sketchpad_path.parent.name)}"
                 self.sketchpadLoadingInProgress = True
                 if self.__song__ is not None:
                     self.__song__.to_be_deleted()

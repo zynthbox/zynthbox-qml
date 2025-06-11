@@ -619,7 +619,7 @@ Zynthian.ScreenPage {
                     }
                     onCurrentItemChanged: {
                         if (folderListView.currentItem) {
-                            folderModel.folder = folderListView.currentItem.folder;
+                            folderModel.folder = encodeURIComponent(folderListView.currentItem.folder);
                         }
                     }
                     delegate: Zynthian.BasicDelegate {
@@ -686,7 +686,7 @@ Zynthian.ScreenPage {
                         // Force set the folder to the new path, and then start the timer for re-selecting
                         // Yes, i realise we *could* wait for the signal to fire, but if it fires too rapidly,
                         // we would miss it, and this is safer... not that i like it all that much
-                        folderModel.folder = path;
+                        folderModel.folder = encodeURIComponent(path);
                         selectFileAfterLoadingTimer.selectThisFile = Qt.resolvedUrl(theFile);
                         selectFileAfterLoadingTimer.changeColumn = changeColumn;
                         selectFileAfterLoadingTimer.start();
@@ -714,7 +714,7 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
-                    model: FolderListModel {
+                    model: Zynthbox.FolderListModel {
                         id: folderModel
                         caseSensitive: false
                         showDirs: false

@@ -148,7 +148,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         storedMetronomeEnabled = self.zynqtgui.global_settings.value("Sketchpad/metronomeEnabled", None)
         if storedMetronomeEnabled is not None:
-            self.set_metronomeEnabled(bool(storedMetronomeEnabled))
+            self.set_metronomeEnabled(True if storedMetronomeEnabled == "true" else False)
         storedMetronomeVolume = self.zynqtgui.global_settings.value("Sketchpad/metronomeVolume", None)
         if storedMetronomeVolume is not None:
             # First set one of the clips volume

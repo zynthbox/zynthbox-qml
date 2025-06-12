@@ -1129,6 +1129,9 @@ class sketchpad_channel(QObject):
                         # If fx is mono, record both left and right channels from same output port
                         if len(fxPorts) == 1:
                             fxPorts.append(fxPorts[0])
+                        if len(fxPorts) == 0:
+                            engine = self.chainedFx[lastFxIndex].engine
+                            logging.error(f"ERROR : engine has no ports : Track({self.name}-S{lastFxIndex}), channel({self}), engine({engine.name}), engine_jackname({engine.jackname}), engine_state({engine.proc.state()}), engine_ports({fxPorts})")
                         for channel in range(2):
                             synth_ports[channel].append(f"FXPassthrough-lane{lastFxIndex}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
                             synth_ports[channel].append(fxPorts[channel].name)
@@ -1151,7 +1154,7 @@ class sketchpad_channel(QObject):
                                 fxPorts.append(fxPorts[0])
                             if len(fxPorts) == 0:
                                 engine = self.chainedFx[lane - 1].engine
-                                logging.error(f"ERROR : engine has no ports : Track({self.name}-S{lane}), engine({engine.name}), engine_jackname({engine.jackname}), engine_state({engine.proc.state()}), engine_ports({fxPorts})")
+                                logging.error(f"ERROR : engine has no ports : Track({self.name}-S{lane}), channel({self}), engine({engine.name}), engine_jackname({engine.jackname}), engine_state({engine.proc.state()}), engine_ports({fxPorts})")
                             for channel in range(2):
                                 synth_ports[channel].append(f"FXPassthrough-lane{lane}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
                                 synth_ports[channel].append(fxPorts[channel].name)

@@ -250,6 +250,10 @@ class zynthian_layer(QObject):
         self.bankChanged.emit()
 
 
+    def reset_bank_cache(self):
+        self.bank_list_cache = []
+
+
     def set_bank(self, i, set_engine=True):
         returnVal = False
         if i < len(self.bank_list):
@@ -352,6 +356,10 @@ class zynthian_layer(QObject):
         self.preset_name=None
         self.preset_info=None
         self.presetChanged.emit()
+
+
+    def reset_preset_cache(self):
+        self.preset_list_cache = {}
 
 
     def set_preset(self, i, set_engine=True, force_immediate=False):

@@ -480,6 +480,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
                 zyngine = self.zynqtgui.screens['engine'].start_engine(engine)
                 if self.layer_index_replace_engine != None and len(self.layers) > self.index:
+                    logging.debug("Replacing engine")
                     layer = self.root_layers[self.layer_index_replace_engine]
                     # The type of engine changed (between synth, audio effect or midi effect so audio and midi needs to be resetted
                     if layer.engine.type != zyngine.type:
@@ -487,7 +488,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         layer.reset_audio_out()
                         layer.reset_audio_in()
                     layer.set_engine(zyngine);
-                    # Update bank and preset cache since engine has changed
+                    # Reset bank and preset cache and Update since engine has changed
+                    layer.reset_bank_cache()
+                    layer.reset_preset_cache()
+                    layer.reset_bank()
+                    layer.reset_preset()
                     layer.load_bank_list(force=True)
                     layer.load_preset_list(force=True)
                     self.zynqtgui.screens['engine'].stop_unused_engines()
@@ -496,6 +501,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     if not self.zynqtgui.screens['bank'].get_show_top_sounds():
                         self.zynqtgui.screens['bank'].select_action(0)
                 else:
+                    logging.debug("!Replacing engine")
                     if zyngine.type=="Audio Effect":
                         midich = 15
 

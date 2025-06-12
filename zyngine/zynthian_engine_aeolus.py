@@ -510,7 +510,7 @@ class zynthian_engine_aeolus(zynthian_engine):
                     res=struct.unpack("H", data[pos:pos+2])
                     pos+=2
                     chan_config[num].append(res[0])
-                    logging.debug("CHAN CONFIG (NUM {0}, GROUP {1} => {2:b}".format(num,group,res[0]))
+                    # logging.debug("CHAN CONFIG (NUM {0}, GROUP {1} => {2:b}".format(num,group,res[0]))
 
             for i,group in enumerate(cls.instrument):
                 group['chan'] = chan_config[0][i] & 0xF;
@@ -526,13 +526,13 @@ class zynthian_engine_aeolus(zynthian_engine):
                     if res[1]>=cls.n_presets:
                         logging.error("FORMAT => Preset index ({}>={})".format(res[1],cls.n_presets))
                         return
-                    logging.debug("BANK {}, PRESET {} =>".format(res[0],res[1]))
+                    # logging.debug("BANK {}, PRESET {} =>".format(res[0],res[1]))
                     gconf=[]
                     for group in range(n_groups):
                         gc=struct.unpack("I", data[pos:pos+4])
                         pos+=4
                         gconf.append(gc[0])
-                        logging.debug("GROUP CONFIG {0} => {1:b}".format(group,gc[0]))
+                        # logging.debug("GROUP CONFIG {0} => {1:b}".format(group,gc[0]))
 
                     group_config.append({
                         'bank': res[0],

@@ -2909,6 +2909,10 @@ class sketchpad_channel(QObject):
                         # Aeolus engine has 4 instruments and accepts notes only on those channels 0 to 3 inclusive
                         # So set accepted channel to selected instrument
                         channels = [engine.selected_instrument]
+                    elif engine_nickname == "BF":
+                        # setBfree engine has been restricted to having only 1 layer and it only accepts notes on channel 0
+                        # So set accepted channel to 0
+                        channels = [0]
                     else:
                         channels = [layer.midi_chan for layer in engine.layers]
                 else:

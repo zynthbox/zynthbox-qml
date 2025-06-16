@@ -1,11 +1,29 @@
 {
-    "*": "All",
-    "1": "Drums",
-    "2": "Bass",
-    "3": "Leads",
-    "4": "Synth/Keys",
-    "5": "Strings/Pads",
-    "6": "Guitar/Plucks",
-    "99": "FX/Other",
-    "100": "Best Of"
+    "*": {
+        "displayName": "All"
+    },
+    "1": {
+        "displayName": "Drums"
+    },
+    "2": {
+        "displayName": "Bass"
+    },
+    "3": {
+        "displayName": "Leads"
+    },
+    "4": {
+        "displayName": "Synth/Keys"
+    },
+    "5": {
+        "displayName": "Strings/Pads"
+    },
+    "6": {
+        "displayName": "Guitar/Plucks"
+    },
+    "99": {
+        "displayName": "FX/Other"
+    },
+    "100": {
+        "displayName": "Best Of"
+    }
 }

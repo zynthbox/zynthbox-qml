@@ -38,6 +38,8 @@ QQC2.ToolButton {
     leftPadding: 0
     rightPadding: breadcrumbSeparator.width/2
     implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding + Kirigami.Units.gridUnit
+    icon.color: root.highlighted || root.pressed ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+
     background: Item {
         PlasmaCore.Svg {
             id: buttonSvg

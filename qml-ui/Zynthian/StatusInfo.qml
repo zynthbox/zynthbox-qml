@@ -67,6 +67,8 @@ QQC2.Pane
                 Layout.fillWidth: true
 
                 Item {
+                    id: bar1
+
                     Layout.fillWidth: true
                     implicitHeight: 6
                     clip: true
@@ -77,7 +79,6 @@ QQC2.Pane
                         opacity: 0.2
                         radius: 3
                     }
-
                     Rectangle {
                         id: holdSignalARect
                         anchors {
@@ -85,7 +86,7 @@ QQC2.Pane
                             bottom: parent.bottom
                         }
                         radius: 3
-                        x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackAHold / zynqtgui.status_information.rangedB), 1) * root.width)
+                        x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackAHold / zynqtgui.status_information.rangedB), 1) * bar1.width)
                         opacity: x === 0 ? 0 : 1
                         implicitWidth: Kirigami.Units.smallSpacing
                         color: Kirigami.Theme.negativeTextColor
@@ -111,7 +112,7 @@ QQC2.Pane
                         }
                         radius: 3
                         color: Kirigami.Theme.negativeTextColor
-                        width: highSignalARect.peakSignalA * root.width
+                        width: highSignalARect.peakSignalA * bar1.width
                         property double peakSignalA: Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackA / zynqtgui.status_information.rangedB), 1)
                     }
                     Rectangle {
@@ -123,7 +124,7 @@ QQC2.Pane
                         }
                         radius: 3
                         color: Kirigami.Theme.neutralTextColor
-                        width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.over) * root.width
+                        width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.over) * bar1.width
                     }
                     Rectangle {
                         id: lowSignalARect
@@ -134,11 +135,13 @@ QQC2.Pane
                         }
                         radius: 3
                         color: Kirigami.Theme.positiveTextColor
-                        width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.high) * root.width
+                        width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.high) * bar1.width
                     }
                 }
 
                 Item {
+                    id: bar2
+
                     Layout.fillWidth: true
                     implicitHeight: 6
                     clip: true
@@ -157,7 +160,7 @@ QQC2.Pane
                             bottom: parent.bottom
                         }
                         radius: 3
-                        x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackBHold / zynqtgui.status_information.rangedB), 1) * root.width)
+                        x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackBHold / zynqtgui.status_information.rangedB), 1) * bar2.width)
                         opacity: x === 0 ? 0 : 1
                         implicitWidth: Kirigami.Units.smallSpacing
                         color: Kirigami.Theme.negativeTextColor
@@ -183,7 +186,7 @@ QQC2.Pane
                         }
                         radius: 3
                         color: Kirigami.Theme.negativeTextColor
-                        width: Math.min(highSignalBRect.peakSignalB, 1) * root.width
+                        width: Math.min(highSignalBRect.peakSignalB, 1) * bar2.width
                         property double peakSignalB: Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackB / zynqtgui.status_information.rangedB), 1)
                     }
                     Rectangle {
@@ -195,7 +198,7 @@ QQC2.Pane
                         }
                         radius: 3
                         color: Kirigami.Theme.neutralTextColor
-                        width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.over) * root.width
+                        width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.over) * bar2.width
                     }
                     Rectangle {
                         id: lowSignalBRect
@@ -206,7 +209,7 @@ QQC2.Pane
                         }
                         radius: 3
                         color: Kirigami.Theme.positiveTextColor
-                        width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.high) * root.width
+                        width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.high) * bar2.width
                     }
                 }
 

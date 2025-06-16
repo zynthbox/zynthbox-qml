@@ -1,4 +1,4 @@
- /* -*- coding: utf-8 -*-
+/* -*- coding: utf-8 -*-
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
@@ -35,59 +35,66 @@ Zynthian.ScreenPage {
     backAction.visible: false
 
 
+    background: Rectangle
+    {
+        Kirigami.Theme.colorSet: Kirigami.Theme.Window
+        Kirigami.Theme.inherit: false
+        color: Kirigami.Theme.backgroundColor
+    }
+
     cuiaCallback: function(cuia) {
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
-                if (zynqtgui.main.visibleCategory === "sessions-versions") {
-                    // Mimic back to return to sketchpad folder view when versions are being displayed
-                    zynqtgui.main.visibleCategory = "sessions"
-                    return true
-                }
-                return false
-
-            case "SWITCH_SELECT_BOLD":
-                zynqtgui.admin.power_off()
-                return true
-            case "SELECT_UP":
-                mainviewGridId.moveCurrentIndexUp();
-                return true;
-            case "SELECT_DOWN":
-                if (mainviewGridId.currentIndex === -1) {
-                    mainviewGridId.currentIndex = 0;
-                } else {
-                    mainviewGridId.moveCurrentIndexDown();
-                }
-                return true;
-            case "NAVIGATE_LEFT":
-                mainviewGridId.moveCurrentIndexLeft();
-                return true;
-            case "NAVIGATE_RIGHT":
-                mainviewGridId.moveCurrentIndexRight();
-                return true;
-
-            case "TRACK_1":
-                zynqtgui.main.visibleCategory = "modules"
-                return true
-
-            case "TRACK_2":
-                zynqtgui.main.visibleCategory = "appimages"
-                return true
-
-            case "TRACK_3":
+        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_BOLD":
+            if (zynqtgui.main.visibleCategory === "sessions-versions") {
+                // Mimic back to return to sketchpad folder view when versions are being displayed
                 zynqtgui.main.visibleCategory = "sessions"
                 return true
+            }
+            return false
 
-            case "TRACK_4":
-                zynqtgui.main.visibleCategory = "templates"
-                return true
+        case "SWITCH_SELECT_BOLD":
+            zynqtgui.admin.power_off()
+            return true
+        case "SELECT_UP":
+            mainviewGridId.moveCurrentIndexUp();
+            return true;
+        case "SELECT_DOWN":
+            if (mainviewGridId.currentIndex === -1) {
+                mainviewGridId.currentIndex = 0;
+            } else {
+                mainviewGridId.moveCurrentIndexDown();
+            }
+            return true;
+        case "NAVIGATE_LEFT":
+            mainviewGridId.moveCurrentIndexLeft();
+            return true;
+        case "NAVIGATE_RIGHT":
+            mainviewGridId.moveCurrentIndexRight();
+            return true;
 
-            case "TRACK_5":
-                zynqtgui.main.visibleCategory = "discover"
-                return true
+        case "TRACK_1":
+            zynqtgui.main.visibleCategory = "modules"
+            return true
 
-            default:
-                return false;
+        case "TRACK_2":
+            zynqtgui.main.visibleCategory = "appimages"
+            return true
+
+        case "TRACK_3":
+            zynqtgui.main.visibleCategory = "sessions"
+            return true
+
+        case "TRACK_4":
+            zynqtgui.main.visibleCategory = "templates"
+            return true
+
+        case "TRACK_5":
+            zynqtgui.main.visibleCategory = "discover"
+            return true
+
+        default:
+            return false;
         }
     }
 
@@ -176,62 +183,64 @@ Zynthian.ScreenPage {
                     cellHeight:iconHeight
                     currentIndex: zynqtgui.main.current_index
                     model:zynqtgui.main.selector_list
-                    delegate: MouseArea {
+                    delegate: HomeScreenIcon {
                         width: mainviewGridId.iconWidth
                         height: mainviewGridId.iconHeight
-                        onPressed: {
-                            gridMouseArea.blocked = true
-                            mainviewGridId.currentIndex = index
-                        }
-                        onReleased: gridMouseArea.blocked = false
-                        onCanceled: gridMouseArea.blocked = false
-                        onClicked: {
-                            // activate_index will start the appimage process and open sketchpad after 5 seconds
-                            // to mimic closing of menu after opening an app like other modules in main page
-                            zynqtgui.main.activate_index(model.index);
 
-                            if (model.action_id === "appimage") {
-                                // FIXME : If currentTaskMessage is not cleared before calling start_loading, it displays a blank loading screen without any text
-                                zynqtgui.currentTaskMessage = ""
-                                zynqtgui.start_loading_with_message("Starting " + model.display);
-                                stopLoadingTimer.restart();
+                        id: delegateIconButton
+                        readonly property bool isCurrent: mainviewGridId.currentIndex === index
+
+                        imgSrc: model.icon
+                        highlighted: isCurrent || _mouseArea.containsPress
+                        onIsCurrentChanged: {
+                            if (isCurrent) {
+                                zynqtgui.main.current_index = index;
                             }
                         }
 
-                        HomeScreenIcon {
-                            id: delegateIconButton
-                            readonly property bool isCurrent: mainviewGridId.currentIndex === index
+                        text: model.display ? model.display : ""
 
+                        MouseArea {
+                            id: _mouseArea
                             anchors.fill: parent
-                            imgSrc: model.icon
-                            highlighted: isCurrent
-                            onIsCurrentChanged: {
-                                if (isCurrent) {
-                                    zynqtgui.main.current_index = index;
-                                }
-                            }
-
-                            text: model.display ? model.display : ""
-                        }
-
-                        QQC2.Button {
-                            anchors {
-                                top: parent.top
-                                right: parent.right
-                                margins: Kirigami.Units.gridUnit
-                            }
-                            width: Kirigami.Units.gridUnit * 2
-                            height: Kirigami.Units.gridUnit * 2
-                            icon.name: "delete-symbolic"
-                            // FIXME : Temporarily disable delete button. Figure out how to notify newstuffModel about app removal otherwise newstuff doesnt know that app got removed
-                            visible: false //model.action_id === "appimage" && model.metadata.path.length > 0
                             onPressed: {
                                 gridMouseArea.blocked = true
                                 mainviewGridId.currentIndex = index
                             }
                             onReleased: gridMouseArea.blocked = false
                             onCanceled: gridMouseArea.blocked = false
-                            onClicked: zynqtgui.main.unregisterAppImage(model.metadata.path)
+                            onClicked: {
+                                // activate_index will start the appimage process and open sketchpad after 5 seconds
+                                // to mimic closing of menu after opening an app like other modules in main page
+                                zynqtgui.main.activate_index(model.index);
+
+                                if (model.action_id === "appimage") {
+                                    // FIXME : If currentTaskMessage is not cleared before calling start_loading, it displays a blank loading screen without any text
+                                    zynqtgui.currentTaskMessage = ""
+                                    zynqtgui.start_loading_with_message("Starting " + model.display);
+                                    stopLoadingTimer.restart();
+                                }
+                            }
+
+                            QQC2.Button {
+                                anchors {
+                                    top: parent.top
+                                    right: parent.right
+                                    margins: Kirigami.Units.gridUnit
+                                }
+                                width: Kirigami.Units.gridUnit * 2
+                                height: Kirigami.Units.gridUnit * 2
+                                icon.name: "delete-symbolic"
+                                // FIXME : Temporarily disable delete button. Figure out how to notify newstuffModel about app removal otherwise newstuff doesnt know that app got removed
+                                visible: false //model.action_id === "appimage" && model.metadata.path.length > 0
+                                onPressed: {
+                                    gridMouseArea.blocked = true
+                                    mainviewGridId.currentIndex = index
+                                }
+                                onReleased: gridMouseArea.blocked = false
+                                onCanceled: gridMouseArea.blocked = false
+                                onClicked: zynqtgui.main.unregisterAppImage(model.metadata.path)
+                            }
                         }
                     }
                 }

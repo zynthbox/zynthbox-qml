@@ -43,6 +43,8 @@ RowLayout {
         Layout.maximumWidth: Layout.preferredWidth
         Layout.fillHeight: true
         Layout.margins: 8
+        spacing: Kirigami.Units.mediumSpacing
+
         Zynthian.PlayGridButton {
             id: settingsButton
             Layout.preferredHeight: width
@@ -194,10 +196,12 @@ RowLayout {
 
         Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             icon.name: "arrow-up"
-            Layout.preferredHeight: width
-            Layout.maximumHeight: width
+            Layout.fillWidth: true
+            // Layour.preferredHeight: width
+            icon.width: 48
+            icon.height: 48
             enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
                 if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
@@ -211,10 +215,12 @@ RowLayout {
             Layout.alignment: Qt.AlignHCenter
         }
 
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             icon.name: "arrow-down"
-            Layout.preferredHeight: width
-            Layout.maximumHeight: width
+            Layout.fillWidth: true
+            // Layour.preferredHeight: width
+            icon.width: 48
+            icon.height: 48
             enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
                 if (playGridStack.currentPlayGridItem.octave > 0) {
@@ -225,15 +231,18 @@ RowLayout {
 
         Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             text: "Hide"
-            Layout.preferredHeight: width
-            Layout.maximumHeight: width
+            Layout.fillWidth: true
+            // Layour.preferredHeight: width
+            icon.width: 64
+            implicitHeight: 64
             onClicked: {
                 zynqtgui.callable_ui_action_simple("HIDE_KEYBOARD")
             }
         }
     }
+
     QQC2.StackView {
         id: playGridStack
         z: 0

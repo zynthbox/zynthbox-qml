@@ -91,14 +91,14 @@
             "defaultDryWetMixAmount": "1"
         }
     },
-    synths: {
+    "synths": {
         "0000": {
             "displayName": "Synth",
             "image": "categories/synth.png",
             "description": ""
         }
     },
-    soundfonts: {
+    "soundfonts": {
         "0000": {
             "displayName": "Soundfont",
             "image": "categories/soundfont.png",

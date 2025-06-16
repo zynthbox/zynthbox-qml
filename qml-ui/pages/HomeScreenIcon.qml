@@ -6,43 +6,43 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-Rectangle {
-    id: rectId
+QQC2.Control {
+    id: root
     property alias imgSrc: imageId.source
     property alias text: heading.text
     property bool highlighted: false
+    padding: Kirigami.Units.smallSpacing
 
-    color: highlighted ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.3) : "transparent"
-
-    Rectangle {
+    background: Rectangle {
         id: buttonId
-        z: -1
-        anchors.fill: parent
-        anchors.margins: 2
-        radius: 2
+        radius: 4
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
-        color: Kirigami.Theme.backgroundColor
+        color: root.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+    }
 
-        Kirigami.Icon {
-            id:imageId
-            anchors.centerIn: parent
-            width:90;height:90
-            source: imgSrc
+    contentItem: ColumnLayout {
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Kirigami.Icon {
+                id:imageId
+                anchors.centerIn: parent
+                implicitHeight: 90
+                implicitWidth:90
+                source: imgSrc
+            }
         }
 
         Kirigami.Heading {
             id:heading
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.right
-                margins: Kirigami.Units.smallSpacing
-            }
+            Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
             text: "Layers"
             font.pointSize: 12
+            color: highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
         }
     }
 }

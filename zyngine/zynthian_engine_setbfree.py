@@ -262,85 +262,88 @@ class zynthian_engine_setbfree(zynthian_engine):
         # Generate a temporary custom pgm files bank list
         banks = [
             ['/zynthian/zynthian-data/setbfree/pgm-banks/lower/lower_voices.pgm', 0, 'Lower voices', '_', 'lower_voices.pgm'],
-            ['/zynthian/zynthian-data/setbfree/pgm-banks/lower/split.pgm', 1, 'Lower split', '_', 'split.pgm'],
+            # ['/zynthian/zynthian-data/setbfree/pgm-banks/lower/split.pgm', 1, 'Lower split', '_', 'split.pgm'],
             ['/zynthian/zynthian-data/setbfree/pgm-banks/pedals/pedals.pgm', 2, 'Pedals', '_', 'pedals.pgm'],
-            ['/zynthian/zynthian-data/setbfree/pgm-banks/pedals/split.pgm', 3, 'Pedals split', '_', 'split.pgm'],
+            # ['/zynthian/zynthian-data/setbfree/pgm-banks/pedals/split.pgm', 3, 'Pedals split', '_', 'split.pgm'],
             ['/zynthian/zynthian-data/setbfree/pgm-banks/upper/most_popular.pgm', 4, 'Upper most popular', '_', 'most_popular.pgm'],
-            ['/zynthian/zynthian-data/setbfree/pgm-banks/upper/split.pgm', 5, 'Upper split', '_', 'split.pgm'],
+            # ['/zynthian/zynthian-data/setbfree/pgm-banks/upper/split.pgm', 5, 'Upper split', '_', 'split.pgm'],
             ['/zynthian/zynthian-data/setbfree/pgm-banks/upper/upper_voices.pgm', 6, 'Upper voices', '_', 'upper_voices.pgm']
         ]
         return banks
 
 
     def set_bank(self, layer, bank):
-        if not self.manuals_config:
-            self.manuals_config = bank
-            self.layers[0].load_bank_list(force=True)
-            self.layers[0].reset_bank()
-            return False
+        # Always return True, as we are returning a custom bank list
+        # and not a real bank from setBfree
+        return True
+        # if not self.manuals_config:
+        #     self.manuals_config = bank
+        #     self.layers[0].load_bank_list(force=True)
+        #     self.layers[0].reset_bank()
+        #     return False
 
-        elif not self.tonewheel_model:
-            self.tonewheel_model = bank[0]
+        # elif not self.tonewheel_model:
+        #     self.tonewheel_model = bank[0]
 
-        if not self.proc:
-            ch = self.layers[0].get_midi_chan()
-            midi_chans = [ch, 15, 15]
+        # if not self.proc:
+        #     ch = self.layers[0].get_midi_chan()
+        #     midi_chans = [ch, 15, 15]
 
-            logging.info("Upper Layer in chan {}".format(midi_chans[0]))
-            i = 0
-            self.layers[i].bank_name = "Upper"
-            self.layers[i].load_bank_list(force=True)
-            self.layers[i].set_bank(0)
+        #     logging.info("Upper Layer in chan {}".format(midi_chans[0]))
+        #     i = 0
+        #     self.layers[i].bank_name = "Upper"
+        #     self.layers[i].load_bank_list(force=True)
+        #     self.layers[i].set_bank(0)
 
-            # # Extra layers
-            # if self.manuals_config[4][0]:
-            #     i += 1
-            #     if len(self.layers)==i:
-            #         try:
-            #             ch = midi_chans[1] = self.zynqtgui.screens['layer'].get_next_free_midi_chan(ch)
-            #             logging.info("Lower Manual Layer in chan {}".format(midi_chans[1]))
-            #             self.zynqtgui.screens['layer'].add_layer_midich(midi_chans[1], False)
-            #             self.layers[i].bank_name = "Lower"
-            #             self.layers[i].load_bank_list(force=True)
-            #             self.layers[i].set_bank(0)
+        #     # # Extra layers
+        #     # if self.manuals_config[4][0]:
+        #     #     i += 1
+        #     #     if len(self.layers)==i:
+        #     #         try:
+        #     #             ch = midi_chans[1] = self.zynqtgui.screens['layer'].get_next_free_midi_chan(ch)
+        #     #             logging.info("Lower Manual Layer in chan {}".format(midi_chans[1]))
+        #     #             self.zynqtgui.screens['layer'].add_layer_midich(midi_chans[1], False)
+        #     #             self.layers[i].bank_name = "Lower"
+        #     #             self.layers[i].load_bank_list(force=True)
+        #     #             self.layers[i].set_bank(0)
 
-            #         except Exception as e:
-            #             logging.error("Lower Manual Layer can't be added! => {}".format(e))
-            #     else:
-            #         midi_chans[1] = self.layers[i].midi_chan
+        #     #         except Exception as e:
+        #     #             logging.error("Lower Manual Layer can't be added! => {}".format(e))
+        #     #     else:
+        #     #         midi_chans[1] = self.layers[i].midi_chan
 
-            # if self.manuals_config[4][1]:
-            #     i += 1
-            #     if len(self.layers)==i:
-            #         try:
-            #             # Adding Pedal Layer
-            #             midi_chans[2] = self.zynqtgui.screens['layer'].get_next_free_midi_chan(ch)
-            #             logging.info("Pedal Layer in chan {}".format(midi_chans[2]))
-            #             self.zynqtgui.screens['layer'].add_layer_midich(midi_chans[2], False)
-            #             self.layers[i].bank_name = "Pedals"
-            #             self.layers[i].load_bank_list(force=True)
-            #             self.layers[i].set_bank(0)
+        #     # if self.manuals_config[4][1]:
+        #     #     i += 1
+        #     #     if len(self.layers)==i:
+        #     #         try:
+        #     #             # Adding Pedal Layer
+        #     #             midi_chans[2] = self.zynqtgui.screens['layer'].get_next_free_midi_chan(ch)
+        #     #             logging.info("Pedal Layer in chan {}".format(midi_chans[2]))
+        #     #             self.zynqtgui.screens['layer'].add_layer_midich(midi_chans[2], False)
+        #     #             self.layers[i].bank_name = "Pedals"
+        #     #             self.layers[i].load_bank_list(force=True)
+        #     #             self.layers[i].set_bank(0)
 
-            #         except Exception as e:
-            #             logging.error("Pedal Layer can't be added! => {}".format(e))
-            #     else:
-            #         midi_chans[2] = self.layers[i].midi_chan
+        #     #         except Exception as e:
+        #     #             logging.error("Pedal Layer can't be added! => {}".format(e))
+        #     #     else:
+        #     #         midi_chans[2] = self.layers[i].midi_chan
 
-            # Start engine
-            logging.debug("STARTING SETBFREE!!")
-            self.generate_config_file(midi_chans)
-            self.start()
-            # self.zynqtgui.zynautoconnect_midi(True)
-            # self.zynqtgui.zynautoconnect_audio()
+        #     # Start engine
+        #     logging.debug("STARTING SETBFREE!!")
+        #     self.generate_config_file(midi_chans)
+        #     self.start()
+        #     # self.zynqtgui.zynautoconnect_midi(True)
+        #     # self.zynqtgui.zynautoconnect_audio()
 
-            midi_prog = self.manuals_config[4][2]
-            if midi_prog and isinstance(midi_prog, int):
-                logging.debug("Loading manuals configuration program: {}".format(midi_prog))
-                self.zynqtgui.zynmidi.set_midi_prg(midi_chans[0], midi_prog)
+        #     midi_prog = self.manuals_config[4][2]
+        #     if midi_prog and isinstance(midi_prog, int):
+        #         logging.debug("Loading manuals configuration program: {}".format(midi_prog))
+        #         self.zynqtgui.zynmidi.set_midi_prg(midi_chans[0], midi_prog)
 
-            #self.zynqtgui.screens['layer'].fill_list()
+        #     #self.zynqtgui.screens['layer'].fill_list()
 
-            return True
+        #     return True
 
 
 

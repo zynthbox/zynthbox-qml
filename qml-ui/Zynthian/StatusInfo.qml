@@ -291,6 +291,11 @@ QQC2.Pane
                               : ""
                         font.pointSize: 9
                     }
+
+                    Item {
+                        Layout.fillWidth: true
+                    }
+
                     QQC2.Label {
                         Layout.alignment: Qt.AlignRight
                         visible: Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length > 0
@@ -314,6 +319,7 @@ QQC2.Pane
                     //                : ""
                     //            font.pointSize: 9
                     //        }
+
                     QQC2.Label {
                         Layout.alignment: Qt.AlignRight
                         id: metronomeLabel

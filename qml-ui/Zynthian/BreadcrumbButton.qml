@@ -30,69 +30,86 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-QQC2.ToolButton {
+QQC2.Button {
     id: root
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.Window
-    leftPadding: 0
-    rightPadding: breadcrumbSeparator.width/2
-    implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding + Kirigami.Units.gridUnit
+    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+    padding: Kirigami.Units.mediumSpacing
+    // leftPadding: 0
+    // rightPadding: breadcrumbSeparator.width/2
+    // implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding + Kirigami.Units.gridUnit
     icon.color: root.highlighted || root.pressed ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
-
-    background: Item {
-        PlasmaCore.Svg {
-            id: buttonSvg
-            imagePath: "widgets/breadcrumb"
-            Component.onCompleted: {
-                if (!buttonSvg.isValid()) {
-                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
-                }
-            }
-        }
-         Connections {
-            target: theme
-            onThemeChangedProxy: {
-                buttonSvg.imagePath = "widgets/breadcrumb"
-                if (!buttonSvg.isValid()) {
-                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
-                }
-            }
+    icon.width: 24
+    icon.height: 24
+    property bool showSeparator : true
+    background: Rectangle
+    {
+        color: root.pressed || root.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+        radius: 4
+        Kirigami.Separator
+        {
+            visible: root.showSeparator
+            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+            height: parent.height
+            anchors.left: parent.left
         }
 
-        PlasmaCore.SvgItem {
-            anchors {
-                right: parent.left
-                top: parent.top
-                bottom: parent.bottom
-            }
-            width: naturalSize.width * (height/naturalSize.height)
-            svg: buttonSvg
-            elementId: root.highlighted || root.pressed ? "focus-left" : "left"
-        }
-        PlasmaCore.SvgItem {
-            anchors {
-                left: parent.left
-                right: breadcrumbSeparator.left
-                top: parent.top
-                bottom: parent.bottom
-            }
-            svg: buttonSvg
-            elementId: root.highlighted || root.pressed ? "focus-center" : "center"
-        }
-        PlasmaCore.SvgItem {
-            id: breadcrumbSeparator
-            anchors {
-                right: parent.right
-                top: parent.top
-                bottom: parent.bottom
-            }
-            width: naturalSize.width * (height/naturalSize.height)
-            svg: buttonSvg
-            elementId: root.highlighted || root.pressed ? "focus-right" : "right"
-        }
     }
-    font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
+
+    // background: Item {
+    //     PlasmaCore.Svg {
+    //         id: buttonSvg
+    //         imagePath: "widgets/breadcrumb"
+    //         Component.onCompleted: {
+    //             if (!buttonSvg.isValid()) {
+    //                 buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
+    //             }
+    //         }
+    //     }
+    //      Connections {
+    //         target: theme
+    //         onThemeChangedProxy: {
+    //             buttonSvg.imagePath = "widgets/breadcrumb"
+    //             if (!buttonSvg.isValid()) {
+    //                 buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
+    //             }
+    //         }
+    //     }
+
+    //     PlasmaCore.SvgItem {
+    //         anchors {
+    //             right: parent.left
+    //             top: parent.top
+    //             bottom: parent.bottom
+    //         }
+    //         width: naturalSize.width * (height/naturalSize.height)
+    //         svg: buttonSvg
+    //         elementId: root.highlighted || root.pressed ? "focus-left" : "left"
+    //     }
+    //     PlasmaCore.SvgItem {
+    //         anchors {
+    //             left: parent.left
+    //             right: breadcrumbSeparator.left
+    //             top: parent.top
+    //             bottom: parent.bottom
+    //         }
+    //         svg: buttonSvg
+    //         elementId: root.highlighted || root.pressed ? "focus-center" : "center"
+    //     }
+    //     PlasmaCore.SvgItem {
+    //         id: breadcrumbSeparator
+    //         anchors {
+    //             right: parent.right
+    //             top: parent.top
+    //             bottom: parent.bottom
+    //         }
+    //         width: naturalSize.width * (height/naturalSize.height)
+    //         svg: buttonSvg
+    //         elementId: root.highlighted || root.pressed ? "focus-right" : "right"
+    //     }
+    // }
+    font.pointSize: 11
 }
 
 

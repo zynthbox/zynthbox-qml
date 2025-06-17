@@ -253,13 +253,14 @@ RowLayout {
                 property QtObject sketchFxPassthroughClient: Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
 
                 anchors.fill: parent
-                anchors.margins: 4
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 color: Kirigami.Theme.backgroundColor
-                border.color: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled ? Kirigami.Theme.highlightColor : "#ff999999"
-                border.width: 2
+                border.color: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled ? Kirigami.Theme.highlightColor : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+                border.width: 1
                 radius: 4
+                border.pixelAligned: false
+                antialiasing: true
                 // For external mode the first three slots are visible
                 // For other modes all slots are visible
                 enabled: (control.slotType !== "external") || (control.slotType === "external" && (index === 0 || index === 1 || index === 2))
@@ -276,7 +277,7 @@ RowLayout {
                     color: "transparent"
                     border {
                         width: 2
-                        color: "white"
+                        color: Kirigami.Theme.textColor
                     }
                 }
                 Item {
@@ -344,7 +345,7 @@ RowLayout {
                             leftMargin: 3 // because of the radius of the rectangles we're "inside"
                         }
                         height: 1
-                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
+                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : Kirigami.Theme.textColor
                         opacity: width > 1 ? 0.8 : 0
                         width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
                     }
@@ -356,7 +357,7 @@ RowLayout {
                             leftMargin: 3 // because of the radius of the rectangles we're "inside"
                         }
                         height: 1
-                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
+                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : Kirigami.Theme.textColor
                         opacity: width > 1 ? 0.8 : 0
                         width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
                     }

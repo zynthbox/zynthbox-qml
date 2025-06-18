@@ -1102,14 +1102,17 @@ class sketchpad_channel(QObject):
             # QTimer.singleShot(1000, self.update_jack_port)
             pass
         else:
-            self.zynqtgui.currentTaskMessage = f"Updating jack ports for Track `{self.name}`"
+            if not self.__song__.__to_be_deleted__:
+                self.zynqtgui.currentTaskMessage = f"Updating jack ports for Track `{self.name}`"
 
-            # If run_in_thread is set to False, directly call the method
-            # This will allow startup process to wait till all ports are updated before displaying splash screen
-            if run_in_thread:
-                QMetaObject.invokeMethod(self.update_jack_port_timer, "start", Qt.QueuedConnection)
+                # If run_in_thread is set to False, directly call the method
+                # This will allow startup process to wait till all ports are updated before displaying splash screen
+                if run_in_thread:
+                    QMetaObject.invokeMethod(self.update_jack_port_timer, "start", Qt.QueuedConnection)
+                else:
+                    self.do_update_jack_port(run_in_thread)
             else:
-                self.do_update_jack_port(run_in_thread)
+                logging.debug(f"!! Someone is still referencing old song/channel object. Ignore request as this object will get deleted soon : {self}")
 
     def do_update_jack_port(self, run_in_thread=True):
         def task(zynqtgui, channel):
@@ -1131,7 +1134,7 @@ class sketchpad_channel(QObject):
                             fxPorts.append(fxPorts[0])
                         if len(fxPorts) == 0:
                             engine = self.chainedFx[lastFxIndex].engine
-                            logging.error(f"ERROR : engine has no ports : Track({self.name}-S{lastFxIndex}), channel({self}), engine({engine.name}), engine_jackname({engine.jackname}), engine_state({engine.proc.state()}), engine_ports({fxPorts})")
+                            logging.error(f"ERROR : engine has no ports : Track({self.name}-S{lastFxIndex}), song({self.__song__}), channel({self}), engine({engine.name}), engine_jackname({engine.jackname}), engine_state({engine.proc.state()}), engine_ports({fxPorts}), chainedFx({self.chainedFx})")
                         for channel in range(2):
                             synth_ports[channel].append(f"FXPassthrough-lane{lastFxIndex}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
                             synth_ports[channel].append(fxPorts[channel].name)
@@ -1154,7 +1157,7 @@ class sketchpad_channel(QObject):
                                 fxPorts.append(fxPorts[0])
                             if len(fxPorts) == 0:
                                 engine = self.chainedFx[lane - 1].engine
-                                logging.error(f"ERROR : engine has no ports : Track({self.name}-S{lane}), channel({self}), engine({engine.name}), engine_jackname({engine.jackname}), engine_state({engine.proc.state()}), engine_ports({fxPorts})")
+                                logging.error(f"ERROR : engine has no ports : Track({self.name}-S{lane}), song({self.__song__}), channel({self}), engine({engine.name}), engine_jackname({engine.jackname}), engine_state({engine.proc.state()}), engine_ports({fxPorts}), chainedFx({self.chainedFx})")
                             for channel in range(2):
                                 synth_ports[channel].append(f"FXPassthrough-lane{lane}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
                                 synth_ports[channel].append(fxPorts[channel].name)
@@ -1166,14 +1169,16 @@ class sketchpad_channel(QObject):
                 logging.exception(f"Error trying to update jack port for channel {self.name} : {e}")
                 QMetaObject.invokeMethod(self.update_jack_port_timer, "start", Qt.QueuedConnection)
 
-
-        # Do the task in a thread only if run_in_thread is set to True
-        # This will allow startup process to wait till all ports are updated before displaying splash screen
-        if run_in_thread:
-            worker_thread = threading.Thread(target=task, args=(self.zynqtgui, self))
-            worker_thread.start()
+        if not self.__song__.__to_be_deleted__:
+            # Do the task in a thread only if run_in_thread is set to True
+            # This will allow startup process to wait till all ports are updated before displaying splash screen
+            if run_in_thread:
+                worker_thread = threading.Thread(target=task, args=(self.zynqtgui, self))
+                worker_thread.start()
+            else:
+                task(self.zynqtgui, self)
         else:
-            task(self.zynqtgui, self)
+            logging.debug(f"!! Someone is still referencing old song/channel object. Ignore request as this object will get deleted soon : {self}")
 
     @Slot(None)
     def clear(self):

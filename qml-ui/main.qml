@@ -43,21 +43,19 @@ Kirigami.AbstractApplicationWindow {
     readonly property QtObject osd: osd
 
     property bool headerVisible: true
-    property var channels: [
-        zynqtgui.sketchpad.song.channelsModel.getChannel(0),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(1),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(2),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(3),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(4),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(5),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(6),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(7),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(8),
-        zynqtgui.sketchpad.song.channelsModel.getChannel(9),
-    ]
-    property QtObject selectedChannel: {
-        return root.channels[0]
-    }
+    property var channels: zynqtgui.sketchpad.song != null
+                            ? [zynqtgui.sketchpad.song.channelsModel.getChannel(0),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(1),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(2),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(3),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(4),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(5),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(6),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(7),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(8),
+                               zynqtgui.sketchpad.song.channelsModel.getChannel(9)]
+                            : null
+    property QtObject selectedChannel: root.channels != null ? root.channels[0] : null
     property var cuiaCallback: function(cuia, originId, track, slot, value) {
         var result = false;
 
@@ -347,7 +345,7 @@ Kirigami.AbstractApplicationWindow {
         return result
     }
 
-    property QtObject sequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+    property QtObject sequence: zynqtgui.sketchpad.song != null ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
@@ -735,7 +733,7 @@ Kirigami.AbstractApplicationWindow {
                 minimumPointSize: 5
                 fontSizeMode: Text.Fit
                 maximumLineCount: 3
-                text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
+                text: zynqtgui.sketchpad.song != null ? qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "") : ""
             }
 
             Zynthian.Menu {
@@ -753,7 +751,7 @@ Kirigami.AbstractApplicationWindow {
                             tracksMenu.close();
                             zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = index;
                         }
-                        highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex === index
+                        highlighted: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex === index
                     }
                 }
             }
@@ -761,7 +759,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: sceneButton
             icon.color: Kirigami.Theme.textColor
-            text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
+            text: zynqtgui.sketchpad.song != null ? qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName) : ""
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
@@ -795,7 +793,7 @@ Kirigami.AbstractApplicationWindow {
                             switchTimer.index = index;
                             switchTimer.restart();
                         }
-                        highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSceneIndex === index
+                        highlighted: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.scenesModel.selectedSceneIndex === index
 //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                     }
                 }
@@ -818,7 +816,7 @@ Kirigami.AbstractApplicationWindow {
                 dim: false
                 Component.onCompleted: zynqtgui.fixed_layers.layers_count = 15;
                 Repeater {
-                    model: zynqtgui.sketchpad.song.channelsModel
+                    model: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel : []
                     delegate: QQC2.MenuItem {
                         text: qsTr("Track %1").arg(index + 1)
                         width: parent.width
@@ -851,14 +849,16 @@ Kirigami.AbstractApplicationWindow {
             }
 
             icon.color: Kirigami.Theme.textColor
-            text: qsTr("Sample %1 ˬ %2")
-                    .arg(root.selectedChannel.selectedSlotRow + 1)
-                    .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
+            text: root.selectedChannel != null
+                    ? qsTr("Sample %1 ˬ %2")
+                        .arg(root.selectedChannel.selectedSlotRow + 1)
+                        .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
+                    : ""
             Layout.maximumWidth: Kirigami.Units.gridUnit * 11
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
             onClicked: samplesMenu.visible = true
-            visible: root.selectedChannel.trackType == "sample-trig"
+            visible: root.selectedChannel != null && root.selectedChannel.trackType == "sample-trig"
 
             Zynthian.Menu {
                 id: samplesMenu
@@ -873,7 +873,7 @@ Kirigami.AbstractApplicationWindow {
                         onClicked: {
                             root.selectedChannel.selectedSlotRow = index
                         }
-                        highlighted: root.selectedChannel.selectedSlotRow === index
+                        highlighted: root.selectedChannel != null && root.selectedChannel.selectedSlotRow === index
                     }
                 }
             }
@@ -881,14 +881,14 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: sampleLoopButton
 
-            property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            property QtObject clip: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
 
             icon.color: Kirigami.Theme.textColor
             text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 10
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.trackType === "sample-loop"
+            visible: root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop"
         }
         Zynthian.BreadcrumbButton {
             id: synthButton
@@ -896,7 +896,7 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
+            visible: root.selectedChannel != null && root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
             Component.onCompleted: synthButton.updateSoundName();
             // Open preset screen on clicking this synth button
             onClicked: {
@@ -930,7 +930,7 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.trackType === "synth" && synthButton.visible
+            visible: root.selectedChannel != null && root.selectedChannel.trackType === "synth" && synthButton.visible
             onClicked: {
                 // Open synth edit page whjen preset button is clicked
                 zynqtgui.current_screen_id = "control";
@@ -1015,7 +1015,7 @@ Kirigami.AbstractApplicationWindow {
             id: globalRecordButton
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+            property QtObject currentSequence: zynqtgui.sketchpad.song != null ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
             onClicked: {
                 // handle live-recording-is-going state here, otherwise you might turn it
                 // on in the sequencer, then head out, and try and turn it off and it just
@@ -1035,9 +1035,9 @@ Kirigami.AbstractApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 source: "media-record-symbolic"
-                color: globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive
-                    ? "#ff5cf436" // A green with the same values as the red audio record colour below
-                    : zynqtgui.sketchpad.isRecording ? "#fff44336" : "white"
+                color: globalRecordButton.currentSequence != null && globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive
+                        ? "#ff5cf436" // A green with the same values as the red audio record colour below
+                        : zynqtgui.sketchpad.isRecording ? "#fff44336" : "white"
             }
         }
         QQC2.Button {
@@ -1114,7 +1114,9 @@ Kirigami.AbstractApplicationWindow {
         id: selectedChannelThrottle
         interval: 0; repeat: false; running: false;
         onTriggered: {
-            root.selectedChannel = root.channels[zynqtgui.sketchpad.selectedTrackId]
+            if (root.channels != null) {
+                root.selectedChannel = root.channels[zynqtgui.sketchpad.selectedTrackId]
+            }
         }
     }
 
@@ -1262,7 +1264,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             },
             QQC2.Action {
-                text: qsTr("Show %1 Slots").arg(root.selectedChannel.trackType === "sample-loop" ? "Loop" : "Sample")
+                text: root.selectedChannel != null ? qsTr("Show %1 Slots").arg(root.selectedChannel.trackType === "sample-loop" ? "Loop" : "Sample") : ""
                 enabled: zynqtgui.current_screen_id !== "sample_library"
                 onTriggered: {
                     pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", 0);
@@ -1498,10 +1500,10 @@ Kirigami.AbstractApplicationWindow {
                                     property int channelDelta: 0
 
                                     anchors.fill: parent
-                                    channel: zynqtgui.sketchpad.song.channelsModel.getChannel(index + channelHeaderDelegate.channelDelta)
-                                    text: channelHeaderDelegate.channel.name
+                                    channel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(index + channelHeaderDelegate.channelDelta) : null
+                                    text: channelHeaderDelegate.channel != null ? channelHeaderDelegate.channel.name : ""
                                     subText: null
-                                    subSubText: channelHeaderDelegate.channel.channelTypeDisplayName
+                                    subSubText: channelHeaderDelegate.channel != null ? channelHeaderDelegate.channel.channelTypeDisplayName : ""
                                     subSubTextSize: 7
                                     highlightColor: "white"
 
@@ -1512,16 +1514,20 @@ Kirigami.AbstractApplicationWindow {
                                         delayed: true
 
                                         value: {
-                                            if (channelHeaderDelegate.channel.trackType === "synth")
-                                                return zynqtgui.sketchpad.channelTypeSynthColor
-                                            else if (channelHeaderDelegate.channel.trackType === "sample-loop")
-                                                return zynqtgui.sketchpad.channelTypeSketchesColor
-                                            else if (channelHeaderDelegate.channel.trackType === "sample-trig")
-                                                return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.trackType === "external")
-                                                return zynqtgui.sketchpad.channelTypeExternalColor
-                                            else
-                                                return "#66888888"
+                                            if (channelHeaderDelegate.channel != null) {
+                                                if (channelHeaderDelegate.channel.trackType === "synth")
+                                                    return zynqtgui.sketchpad.channelTypeSynthColor
+                                                else if (channelHeaderDelegate.channel.trackType === "sample-loop")
+                                                    return zynqtgui.sketchpad.channelTypeSketchesColor
+                                                else if (channelHeaderDelegate.channel.trackType === "sample-trig")
+                                                    return zynqtgui.sketchpad.channelTypeSamplesColor
+                                                else if (channelHeaderDelegate.channel.trackType === "external")
+                                                    return zynqtgui.sketchpad.channelTypeExternalColor
+                                                else
+                                                    return "#66888888"
+                                            } else {
+                                                return "#00000000"
+                                            }
                                         }
                                     }
 
@@ -1575,10 +1581,10 @@ Kirigami.AbstractApplicationWindow {
                                     property int channelDelta: 5
 
                                     anchors.fill: parent
-                                    channel: zynqtgui.sketchpad.song.channelsModel.getChannel(index + channelHeaderDelegate2.channelDelta)
-                                    text: channelHeaderDelegate2.channel.name
+                                    channel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(index + channelHeaderDelegate2.channelDelta) : null
+                                    text: channelHeaderDelegate2.channel != null ? channelHeaderDelegate2.channel.name : ""
                                     subText: null
-                                    subSubText: channelHeaderDelegate2.channel.channelTypeDisplayName
+                                    subSubText: channelHeaderDelegate2.channel != null ? channelHeaderDelegate2.channel.channelTypeDisplayName : ""
                                     subSubTextSize: 7
                                     highlightColor: "white"
 
@@ -1589,16 +1595,20 @@ Kirigami.AbstractApplicationWindow {
                                         delayed: true
 
                                         value: {
-                                            if (channelHeaderDelegate2.channel.trackType === "synth")
-                                                return zynqtgui.sketchpad.channelTypeSynthColor
-                                            else if (channelHeaderDelegate2.channel.trackType === "sample-loop")
-                                                return zynqtgui.sketchpad.channelTypeSketchesColor
-                                            else if (channelHeaderDelegate2.channel.trackType === "sample-trig")
-                                                return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate2.channel.trackType === "external")
-                                                return zynqtgui.sketchpad.channelTypeExternalColor
-                                            else
-                                                return "#66888888"
+                                            if (channelHeaderDelegate2.channel != null) {
+                                                if (channelHeaderDelegate2.channel.trackType === "synth")
+                                                    return zynqtgui.sketchpad.channelTypeSynthColor
+                                                else if (channelHeaderDelegate2.channel.trackType === "sample-loop")
+                                                    return zynqtgui.sketchpad.channelTypeSketchesColor
+                                                else if (channelHeaderDelegate2.channel.trackType === "sample-trig")
+                                                    return zynqtgui.sketchpad.channelTypeSamplesColor
+                                                else if (channelHeaderDelegate2.channel.trackType === "external")
+                                                    return zynqtgui.sketchpad.channelTypeExternalColor
+                                                else
+                                                    return "#66888888"
+                                            } else {
+                                                return "#00000000"
+                                            }
                                         }
                                     }
 

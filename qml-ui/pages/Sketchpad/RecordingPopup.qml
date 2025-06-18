@@ -728,7 +728,7 @@ Zynthian.Popup {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     Layout.alignment: Qt.AlignCenter
-                                    model: zynqtgui.sketchpad.song.channelsModel
+                                    model: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel : []
                                     textRole: "name"
                                     textPrefix: "Track "
                                     currentIndex: -1 // Current index will be set by selectedChannelChanged handler

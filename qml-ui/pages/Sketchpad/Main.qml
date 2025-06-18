@@ -528,7 +528,7 @@ Zynthian.ScreenPage {
 
             Kirigami.Action {
                 // Rename Save button as Save as for temp sketchpad
-                text: root.song.isTemp ? qsTr("Save As") : qsTr("Save")
+                text: root.song != null ? root.song.isTemp ? qsTr("Save As") : qsTr("Save") : ""
                 onTriggered: {
                     if (root.song.isTemp) {
                         fileNameDialog.dialogType = "save";
@@ -541,7 +541,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Save As")
-                visible: !root.song.isTemp
+                visible: root.song != null && !root.song.isTemp
                 onTriggered: {
                     fileNameDialog.dialogType = "saveas";
                     fileNameDialog.fileName = song.name;
@@ -550,7 +550,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Clone As")
-                visible: !root.song.isTemp
+                visible: root.song != null && !root.song.isTemp
                 onTriggered: {
                     fileNameDialog.dialogType = "savecopy";
                     fileNameDialog.fileName = song.sketchpadFolderName;
@@ -1133,7 +1133,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
+                        text: root.song != null ? qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName) : ""
                         highlightOnFocus: false
                         highlighted: root.displaySceneButtons
                         onPressed: {
@@ -1156,11 +1156,11 @@ Zynthian.ScreenPage {
                     spacing: 1
 
                     // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
-                    property bool shouldShowSegmentArrows: root.song.arrangementsModel.selectedArrangement.segmentsModel.count > 10
+                    property bool shouldShowSegmentArrows: root.song != null && root.song.arrangementsModel.selectedArrangement.segmentsModel.count > 10
                     // Segment offset will determine what is the first segment to display when arrow keys are displayed
                     property int segmentOffset: 0
                     // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
-                    property int maximumSegmentOffset: root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2
+                    property int maximumSegmentOffset: root.song != null ? root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2 : 0
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -1178,7 +1178,7 @@ Zynthian.ScreenPage {
 
                             delegate: Item {
                                 id: headerDelegate
-                                property QtObject channel: root.song.channelsModel.getChannel(index)
+                                property QtObject channel: root.song != null ? root.song.channelsModel.getChannel(index) : null
                                 function switchToThisChannel() {
                                     // If song mode is not active, clicking on cells should activate that channel
                                     zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
@@ -1261,7 +1261,7 @@ Zynthian.ScreenPage {
                                         spacing: Kirigami.Units.largeSpacing
 
                                         Repeater {
-                                            model: headerDelegate.channel.occupiedSlots
+                                            model: headerDelegate.channel != null ? headerDelegate.channel.occupiedSlots : 0
                                             delegate: Rectangle {
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
@@ -1277,9 +1277,9 @@ Zynthian.ScreenPage {
                                     anchors.fill: parent
 
                                     channel: headerDelegate.channel
-                                    text: channelHeaderDelegate.channel.name
+                                    text: channelHeaderDelegate.channel != null ? channelHeaderDelegate.channel.name : ""
                                     subText: null
-                                    subSubText: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected")
+                                    subSubText: channelHeaderDelegate.channel != null ? Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected") : ""
                                     subSubTextSize: 7
 
                                     Binding {
@@ -1289,12 +1289,16 @@ Zynthian.ScreenPage {
                                         delayed: true
 
                                         value: {
-                                            if (root.copySourceObj && root.copySourceObj.value === model.channel) {
-                                                return "#ff2196f3"
-                                            } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0) {
-                                                return channelHeaderDelegate.channel.color;
+                                            if (channelHeaderDelegate.channel != null) {
+                                                if (root.copySourceObj && root.copySourceObj.value === model.channel) {
+                                                    return "#ff2196f3"
+                                                } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0) {
+                                                    return channelHeaderDelegate.channel.color;
+                                                }
+                                                return "#66888888";
+                                            } else {
+                                                return "#00000000"
                                             }
-                                            return "#66888888";
                                         }
                                     }
 
@@ -1308,7 +1312,7 @@ Zynthian.ScreenPage {
 
                                 Extras.Gauge {
                                     id: volumeGauge
-                                    visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id
+                                    visible: channelHeaderDelegate.channel != null && Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id
                                     anchors {
                                         top: parent.top
                                         bottom: parent.bottom
@@ -1319,7 +1323,7 @@ Zynthian.ScreenPage {
                                     }
                                     minimumValue: -40
                                     maximumValue: 20
-                                    value: channelHeaderDelegate.channel.volume
+                                    value: channelHeaderDelegate.channel != null ? channelHeaderDelegate.channel.volume : 0
                                     font.pointSize: 8
                                     opacity: 0.7
                                     style: GaugeStyle {
@@ -1344,7 +1348,7 @@ Zynthian.ScreenPage {
                         Repeater {
                             id: clipsRepeater
                             // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                            model: zynqtgui.isBootingComplete ? root.song.channelsModel : 0
+                            model: zynqtgui.isBootingComplete && root.song != null ? root.song.channelsModel : 0
 
                             delegate: Item {
                                 id: clipsDelegate
@@ -1398,7 +1402,7 @@ Zynthian.ScreenPage {
                                     id: sceneHeader
                                     anchors.fill: parent
                                     text: String.fromCharCode(65+index).toUpperCase()
-                                    highlighted: index === root.song.scenesModel.selectedSceneIndex
+                                    highlighted: root.song != null && index === root.song.scenesModel.selectedSceneIndex
                                     highlightOnFocus: false
                                     onPressed: {
                                             Zynthian.CommonUtils.switchToScene(index);
@@ -1437,7 +1441,7 @@ Zynthian.ScreenPage {
                                         onIsMetronomeRunningChanged: colorTimer.restart()
                                     }
                                     Connections {
-                                        target: root.song.scenesModel
+                                        target: root.song != null ? root.song.scenesModel : null
                                         onSelectedSketchpadSongIndexChanged: colorTimer.restart()
                                     }
 
@@ -1486,7 +1490,7 @@ Zynthian.ScreenPage {
                                             Layout.rightMargin: Kirigami.Units.smallSpacing
                                             inputMode: QQC2.Dial.Vertical
                                             handle: null
-                                            value: applicationWindow().channels[index].wetFx1Amount
+                                            value: applicationWindow().channels != null ? applicationWindow().channels[index].wetFx1Amount : 0
                                             stepSize: 1
                                             from: 0
                                             to: 100
@@ -1515,7 +1519,7 @@ Zynthian.ScreenPage {
                                                 Layout.rightMargin: Kirigami.Units.smallSpacing
                                                 inputMode: QQC2.Dial.Vertical
                                                 handle: null
-                                                value: applicationWindow().channels[index].wetFx2Amount
+                                                value: applicationWindow().channels != null ? applicationWindow().channels[index].wetFx2Amount : 0
                                                 stepSize: 1
                                                 from: 0
                                                 to: 100

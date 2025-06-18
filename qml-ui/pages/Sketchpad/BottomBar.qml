@@ -126,7 +126,11 @@ Rectangle {
                         let text = zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.name : "";
                         switch (zynqtgui.bottomBarControlType) {
                         case "bottombar-controltype-song":
-                            return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
+                            if (zynqtgui.bottomBarControlObj != null) {
+                                return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
+                            } else {
+                                return ""
+                            }
                         case "bottombar-controltype-clip":
                         case "bottombar-controltype-pattern":
                             return qsTr("CLIP: %1").arg(text);
@@ -201,7 +205,7 @@ Rectangle {
                     active: zynqtgui.bottomBarControlType !== "bottombar-controltype-clips" &&
                              (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable && zynqtgui.bottomBarControlObj.path
 
-                    property QtObject cppClipObject: zynqtgui.bottomBarControlObj.cppObjId > -1 ? Zynthbox.PlayGridManager.getClipById(zynqtgui.bottomBarControlObj.cppObjId) : null
+                    property QtObject cppClipObject: zynqtgui.bottomBarControlObj != null && zynqtgui.bottomBarControlObj.cppObjId > -1 ? Zynthbox.PlayGridManager.getClipById(zynqtgui.bottomBarControlObj.cppObjId) : null
                     onClicked: {
                         console.log("Click for", zynqtgui.bottomBarControlObj.path, zynqtgui.bottomBarControlObj.cppObjId, cppClipObject);
                         if (cppClipObject.isPlaying) {
@@ -260,7 +264,11 @@ Rectangle {
                             let text = zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.name : "";
                             switch (zynqtgui.bottomBarControlType) {
                             case "bottombar-controltype-song":
-                                return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
+                                if (zynqtgui.bottomBarControlObj != null) {
+                                    return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
+                                } else {
+                                    return ""
+                                }
                             case "bottombar-controltype-clip":
                             case "bottombar-controltype-pattern":
                                 return qsTr("CLIP: %1").arg(text);

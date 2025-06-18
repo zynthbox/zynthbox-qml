@@ -38,7 +38,7 @@ Rectangle {
     id: root
 
     readonly property QtObject song: zynqtgui.sketchpad.song
-    readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+    readonly property QtObject selectedChannel: root.song != null ? root.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -102,7 +102,7 @@ Rectangle {
 
             Kirigami.Heading {
                 visible: false
-                text: qsTr("Mixer : %1").arg(song.name)
+                text: root.song != null ? qsTr("Mixer : %1").arg(root.song.name) : ""
             }
 
             ColumnLayout {
@@ -149,7 +149,7 @@ Rectangle {
                         spacing: 1
 
                         Repeater {
-                            model: root.song.channelsModel
+                            model: root.song != null ? root.song.channelsModel : null
 
                             delegate: Rectangle {
                                 property bool highlighted: index === zynqtgui.sketchpad.selectedTrackId
@@ -354,7 +354,7 @@ Rectangle {
                                                 radius: 2
                                                 font.pointSize: 8
                                                 checkable: true
-                                                checked: root.song.playChannelSolo === model.channel.id
+                                                checked: root.song != null && root.song.playChannelSolo === model.channel.id
                                                 text: qsTr("S")
                                                 background: Rectangle {
                                                     radius: parent.radius
@@ -395,7 +395,7 @@ Rectangle {
                                         Layout.fillHeight: true
                                         Layout.preferredWidth: 1
                                         color: "#ff31363b"
-                                        visible: index != root.song.channelsModel.count-1 && !highlighted
+                                        visible: root.song != null && index != root.song.channelsModel.count-1 && !highlighted
                                     }
                                 }
                             }

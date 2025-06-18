@@ -42,7 +42,7 @@ Zynthian.ScreenPage {
     bottomPadding: 5
     anchors.fill: parent
 
-    property QtObject sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
+    property QtObject sequence: zynqtgui.isBootingComplete && zynqtgui.sketchpad.song != null ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
     property QtObject pattern: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePatternObject : null
 
     cuiaCallback: function(cuia) {
@@ -81,10 +81,12 @@ Zynthian.ScreenPage {
     Connections {
         target: applicationWindow()
         function onSelectedChannelChanged() {
-            for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
-                let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, applicationWindow().selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
-                if (clipActivator.nextBarState != newPlaystate) {
-                    clipActivator.nextBarState = newPlaystate;
+            if (zynqtgui.sketchpad.song != null && applicationWindow().selectedChannel != null) {
+                for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                    let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, applicationWindow().selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                    if (clipActivator.nextBarState != newPlaystate) {
+                        clipActivator.nextBarState = newPlaystate;
+                    }
                 }
             }
         }
@@ -92,7 +94,7 @@ Zynthian.ScreenPage {
     Connections {
         target: Zynthbox.PlayfieldManager
         function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
-            if (applicationWindow().selectedChannel) {
+            if (zynqtgui.sketchpad.song != null && applicationWindow().selectedChannel != null) {
                 if (sketchpadTrack === applicationWindow().selectedChannel.id && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
                     if (clipActivator.nextBarState != newPlaystate) {
                         clipActivator.nextBarState = newPlaystate;
@@ -755,7 +757,7 @@ don't want to have to dig too far...
             id: baseTrackDelegate
             property QtObject theTrack: channel
             property int trackIndex: index
-            model: baseTrackDelegate.theTrack.clips
+            model: baseTrackDelegate.theTrack != null ? baseTrackDelegate.theTrack.clips : null
             delegate: Repeater {
                 id: trackClipDelegate
                 property int clipIndex: index
@@ -801,7 +803,7 @@ don't want to have to dig too far...
     Binding {
         target: tracksRepeater
         property: "model"
-        value: zynqtgui.sketchpad.song.channelsModel
+        value: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel : null
         delayed: true
     }
 }

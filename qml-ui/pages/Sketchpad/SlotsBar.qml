@@ -287,7 +287,7 @@ Rectangle {
 
             Kirigami.Heading {
                 visible: false
-                text: qsTr("Slots : %1").arg(song.name)
+                text: root.song != null ? qsTr("Slots : %1").arg(root.song.name) : ""
             }
 
             RowLayout {
@@ -445,7 +445,7 @@ Rectangle {
                     spacing: 1
 
                     Repeater {
-                        model: root.song.channelsModel
+                        model: root.song != null ? root.song.channelsModel : null
 
                         delegate: Rectangle {
                             id: channelDelegate
@@ -609,7 +609,7 @@ Rectangle {
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: 1
                                     color: "#ff31363b"
-                                    visible: index !== root.song.channelsModel.count-1 && !highlighted
+                                    visible: root.song != null && index !== root.song.channelsModel.count-1 && !highlighted
                                 }
                             }
                         }
@@ -630,7 +630,7 @@ Rectangle {
                         font.pointSize: 14
                         text: qsTr("Ch%1-Slot%2")
                                 .arg(zynqtgui.sketchpad.selectedTrackId + 1)
-                                .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
+                                .arg(root.selectedSlotRowItem != null && root.selectedSlotRowItem.channel != null ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
@@ -711,7 +711,7 @@ Rectangle {
                     QQC2.Slider {
                         id: volumeSlider
 
-                        property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
+                        property int chainedSound: root.selectedSlotRowItem != null && root.selectedSlotRowItem.channel != null && root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
                         property QtObject synthPassthroughClient: chainedSound > -1 ? Zynthbox.Plugin.synthPassthroughClients[chainedSound] : null
 
                         orientation: Qt.Horizontal
@@ -721,8 +721,7 @@ Rectangle {
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
 
                         visible: synthsButton.checked
-                        enabled: chainedSound >= 0 &&
-                                 (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
+                        enabled: chainedSound >= 0 && (root.selectedSlotRowItem != null && root.selectedSlotRowItem.channel != null ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
                         value: synthPassthroughClient ? synthPassthroughClient.dryAmount : 0
                         stepSize: 0.01
                         from: 0
@@ -780,13 +779,15 @@ Rectangle {
         }
         property int sampleSlot: -1
 
-        headerText: saveMode
-            ? qsTr("Pick Save Location For %1-S%2")
-                .arg(root.selectedChannel.name)
-                .arg(sampleSlot + 1)
-            : qsTr("%1-S%2 : Pick a sample")
-                .arg(root.selectedChannel.name)
-                .arg(sampleSlot + 1)
+        headerText: root.selectedChannel != null
+                        ? saveMode
+                            ? qsTr("Pick Save Location For %1-S%2")
+                                .arg(root.selectedChannel.name)
+                                .arg(sampleSlot + 1)
+                            : qsTr("%1-S%2 : Pick a sample")
+                                .arg(root.selectedChannel.name)
+                                .arg(sampleSlot + 1)
+                        : ""
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
@@ -843,14 +844,16 @@ Rectangle {
         }
         property QtObject theClip: null
 
-        headerText: saveMode
-            ? qsTr("Pick Save Location For %1%2")
-                .arg(root.selectedChannel.name)
-                .arg(root.selectedChannel.selectedSlotRow + 1)
-            : qsTr("%1%2 : Pick a %3")
-                .arg(root.selectedChannel.name)
-                .arg(root.selectedChannel.selectedSlotRow + 1)
-                .arg(thingToPick)
+        headerText: root.selectedChannel != null
+                        ? saveMode
+                            ? qsTr("Pick Save Location For %1%2")
+                                .arg(root.selectedChannel.name)
+                                .arg(root.selectedChannel.selectedSlotRow + 1)
+                            : qsTr("%1%2 : Pick a %3")
+                                .arg(root.selectedChannel.name)
+                                .arg(root.selectedChannel.selectedSlotRow + 1)
+                                .arg(thingToPick)
+                        : ""
         property string thingToPick: ""
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {

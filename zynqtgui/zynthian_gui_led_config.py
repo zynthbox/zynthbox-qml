@@ -296,12 +296,10 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.sketchpad.metronomeEnabledChanged.connect(self.update_button_colors)
         self.zynqtgui.globalPopupOpenedChanged.connect(self.update_button_colors)
 
-        for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
-            self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).track_type_changed.connect(
-                self.update_button_colors)
-
-        # Reset channel as it would change when song changes
         if self.zynqtgui.sketchpad.song is not None:
+            for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
+                self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).track_type_changed.connect(self.update_button_colors)
+            # Reset channel as it would change when song changes
             self.selected_track_id_changed_handler()
 
     @Slot()

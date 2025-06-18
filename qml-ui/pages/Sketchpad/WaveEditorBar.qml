@@ -49,7 +49,7 @@ GridLayout {
     property QtObject cppClipObject: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("cppObjId")
                                         ? Zynthbox.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
                                         : null
-    property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+    property QtObject channel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
 
     property int internalMargin: Kirigami.Units.largeSpacing
 

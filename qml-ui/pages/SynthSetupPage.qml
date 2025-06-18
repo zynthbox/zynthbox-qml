@@ -37,7 +37,7 @@ Zynthian.ScreenPage {
     id: root
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
 
     onSelectedChannelChanged: {
         layerChangeThrottle.restart();
@@ -530,7 +530,7 @@ Zynthian.ScreenPage {
                         Rectangle {
                             Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryGainHandler.gainAbsolute
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                            visible: root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel)
+                            visible: root.selectedChannel != null && root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel)
                             color: Kirigami.Theme.highlightColor
                             opacity: 0.7
                         }
@@ -802,7 +802,7 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+                        visible: root.selectedChannel != null && root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
                         text: qsTr("Change preset")
                         onClicked: {
                             zynqtgui.current_screen_id = "preset"
@@ -828,12 +828,12 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+                        visible: root.selectedChannel != null && root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
                     }
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+                        visible: root.selectedChannel != null && root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
                         text: qsTr("Remove Synth")
                         onClicked: {
                             layerSetupDialog.accept();

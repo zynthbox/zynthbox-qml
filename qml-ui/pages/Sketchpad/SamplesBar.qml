@@ -10,7 +10,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 Zynthian.Card {
     id: root
 
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
     property QtObject controlObj: zynqtgui.bottomBarControlObj
 
     function cuiaCallback(cuia) {
@@ -56,7 +56,7 @@ Zynthian.Card {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                border.width: controlObj.selectedSlotRow === index ? 1 : 0
+                border.width: controlObj != null && controlObj.selectedSlotRow === index ? 1 : 0
                 border.color: Kirigami.Theme.highlightColor
                 color: "transparent"
                 radius: 4
@@ -69,7 +69,7 @@ Zynthian.Card {
                 }
 
                 RowLayout {
-                    opacity: controlObj.selectedSlotRow === index ? 1 : 0.5
+                    opacity: controlObj != null && controlObj.selectedSlotRow === index ? 1 : 0.5
                     anchors.fill: parent
 
                     QQC2.Label {
@@ -107,7 +107,7 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: controlObj.samples && !controlObj.samples[index].isEmpty
+                            text: controlObj != null && controlObj.samples && !controlObj.samples[index].isEmpty
                                     ? controlObj.samples[index].path.split("/").pop()
                                     : ""
 
@@ -134,8 +134,8 @@ Zynthian.Card {
                         Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
                         Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
 
-                        enabled: (controlObj.samples !== undefined && !zynqtgui.sketchpad.isRecording)
-                        icon.name: controlObj.samples !== undefined && zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        enabled: controlObj != null && (controlObj.samples !== undefined && !zynqtgui.sketchpad.isRecording)
+                        icon.name: controlObj != null && controlObj.samples !== undefined && zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                         onClicked: {
                             applicationWindow().openRecordingPopup()
                         }

@@ -17,7 +17,7 @@ ColumnLayout {
         visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
         Layout.maximumWidth: parent.width
-        horizontalAlignment: QQC2.Label.AlignHCenter
+        horizontalAlignment: Text.AlignHCenter
 //        elide: Text.ElideRight
         color: Kirigami.Theme.textColor
         font.pointSize: 12
@@ -29,7 +29,7 @@ ColumnLayout {
         visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
         Layout.maximumWidth: parent.width
-        horizontalAlignment: QQC2.Label.AlignHCenter
+        horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideRight
         color: Kirigami.Theme.textColor
         font.pointSize: 10
@@ -40,7 +40,7 @@ ColumnLayout {
         visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
         Layout.maximumWidth: parent.width
-        horizontalAlignment: QQC2.Label.AlignHCenter
+        horizontalAlignment: Text.AlignHCenter
         elide: Text.ElideRight
         color: Kirigami.Theme.textColor
         font.pointSize: 10

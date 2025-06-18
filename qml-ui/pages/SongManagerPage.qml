@@ -216,16 +216,16 @@ Zynthian.ScreenPage {
                 spacing: 1
 
                 // Should show arrows is True when segment count is greater than 11 and hence needs arrows to scroll
-                property bool shouldShowSegmentArrows: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > 11
+                property bool shouldShowSegmentArrows: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > 11
                 // Segment offset will determine what is the first segment to display when arrow keys are displayed
                 property int segmentOffset: 0
                 // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
-                property int maximumSegmentOffset: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count - 11 + 2
+                property int maximumSegmentOffset: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count - 11 + 2 : 0
                 // The index of the last visible segment cell (as opposed to the segment as exists in the song's segments model)
                 property int lastVisibleSegmentCellIndex: 10
 
                 Connections {
-                    target: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel
+                    target: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel : null
                     enabled: component.isVisible
                     onSelectedSegmentIndexChanged: {
                         // When selectedSegmentIndex changes (i.e. being set with Big Knob), adjust visible segments so that selected segment is brought into view
@@ -261,14 +261,14 @@ Zynthian.ScreenPage {
                                                         (segmentsLayout.shouldShowSegmentArrows ? segmentsLayout.segmentOffset : 0) + // Offset index if arrows are visible else 0
                                                         (segmentsLayout.shouldShowSegmentArrows ? -1 : 0) // if arrows are being displayed, display segment from 2nd slot onwards
                         // A little odd looking perhaps - we use the count changed signal here to ensure we refetch the segments when we add, remove, or otherwise change the model
-                        property QtObject segment: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > 0
+                        property QtObject segment: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > 0
                                                     ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.get_segment(segmentHeader.thisSegmentIndex)
                                                     : null
 
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                        text: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1
+                        text: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1
                                     ? index === 0
                                         ? "◀"
                                         : index === segmentsLayout.lastVisibleSegmentCellIndex
@@ -280,17 +280,21 @@ Zynthian.ScreenPage {
                                         ? segmentHeader.segment.name
                                         : ""
                         subText: {
-                            if (zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1 && (index === 0 || index === segmentsLayout.lastVisibleSegmentCellIndex)) {
-                                return " \n "
-                            } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
-                                return " \n "
+                            if (zynqtgui.sketchpad.song != null) {
+                                if (zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1 && (index === 0 || index === segmentsLayout.lastVisibleSegmentCellIndex)) {
+                                    return " \n "
+                                } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
+                                    return " \n "
+                                } else {
+                                    let timeInSeconds = Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * ((segmentHeader.segment.barLength * 4) + segmentHeader.segment.beatLength)).toFixed(2));
+                                    return timeInSeconds + "\n" + segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
+                                }
                             } else {
-                                let timeInSeconds = Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * ((segmentHeader.segment.barLength * 4) + segmentHeader.segment.beatLength)).toFixed(2));
-                                return timeInSeconds + "\n" + segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
+                                return ""
                             }
                         }
 
-                        textSize: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1
+                        textSize: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1
                                     ? index === 0
                                         ? 20
                                         : index === segmentsLayout.lastVisibleSegmentCellIndex
@@ -317,15 +321,19 @@ Zynthian.ScreenPage {
 
                         highlightOnFocus: false
                         highlighted: {
-                            // If song mode is active and arrow keys are visible, do not highlight arrow key cells
-                            if (segmentsLayout.shouldShowSegmentArrows && index === 0) {
-                                return false
-                            } else if (segmentsLayout.shouldShowSegmentArrows && index === segmentsLayout.lastVisibleSegmentCellIndex) {
+                            if (zynqtgui.sketchpad.song != null) {
+                                // If song mode is active and arrow keys are visible, do not highlight arrow key cells
+                                if (segmentsLayout.shouldShowSegmentArrows && index === 0) {
+                                    return false
+                                } else if (segmentsLayout.shouldShowSegmentArrows && index === segmentsLayout.lastVisibleSegmentCellIndex) {
+                                    return false
+                                }
+
+                                // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
+                                return segmentHeader.thisSegmentIndex === zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex
+                            } else {
                                 return false
                             }
-
-                            // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
-                            return segmentHeader.thisSegmentIndex === zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex
                         }
 
                         onPressed: {
@@ -377,7 +385,7 @@ Zynthian.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     Repeater {
                         id: segmentsRepeater
-                        property int totalDuration: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > 0 ? Zynthbox.SyncTimer.getMultiplier() * zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.totalBeatDuration : 0
+                        property int totalDuration: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > 0 ? Zynthbox.SyncTimer.getMultiplier() * zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.totalBeatDuration : 0
                         model: component.isVisible && totalDuration > 0 ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel : 0
                         delegate: Item {
                             id: segmentDelegate
@@ -495,7 +503,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit* 2
-                        channel: zynqtgui.sketchpad.song.channelsModel.getChannel(model.index)
+                        channel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(model.index) : null
                         songMode: true
                     }
                 }
@@ -507,7 +515,7 @@ Zynthian.ScreenPage {
             id: segmentDetails
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-            property QtObject selectedSegment: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment
+            property QtObject selectedSegment: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment : null
             onSelectedSegmentChanged: {
                 if (segmentDetails.selectedSegment) {
                     barLengthInput.text = segmentDetails.selectedSegment.barLength;
@@ -733,7 +741,7 @@ Zynthian.ScreenPage {
                     actions: [
                         QQC2.Action {
                             text: qsTr("Remove Segment,\nAdd Duration To Previous")
-                            enabled: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex > 0
+                            enabled: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex > 0
                             onTriggered: {
                                 let totalBeatDuration = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.beatLength + (zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.barLength * 4);
                                 let previousSegment = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.get_segment(zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex - 1);
@@ -753,7 +761,7 @@ Zynthian.ScreenPage {
                         },
                         QQC2.Action {
                             text: qsTr("Remove Segment,\nAdd Duration To Next")
-                            enabled: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex < zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count - 1
+                            enabled: zynqtgui.sketchpad.song != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex < zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count - 1
                             onTriggered: {
                                 let totalBeatDuration = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.beatLength + (zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.barLength * 4);
                                 let nextSegment = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.get_segment(zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegmentIndex + 1);

@@ -42,10 +42,10 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            readonly property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+            readonly property QtObject selectedChannel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
 
             text: qsTr("Clear Slot")
-            enabled: selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+            enabled: selectedChannel != null && selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
             onTriggered: {
                 selectedChannel.remove_and_unchain_sound(zynqtgui.active_midi_channel)
                 zynqtgui.show_modal("sketchpad")

@@ -451,7 +451,7 @@ MouseArea {
                             controlProperty: "selectedScaleIndex"
                             from: 0
                             to: 11
-                            text: zynqtgui.sketchpad.song.selectedScale
+                            text: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.selectedScale : ""
                         }
                         QQC2.Label {
                             text: qsTr("Scale")

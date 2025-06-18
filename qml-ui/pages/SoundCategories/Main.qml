@@ -582,9 +582,11 @@ Zynthian.ScreenPage {
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
                 font.pointSize: 16
-                text: soundDetails.displaySelectedSoundData
-                        ? soundButtonGroup.checkedButton.soundObj.name
-                        : qsTr("Track %1 Current Sound").arg(root.selectedChannel.name)
+                text: root.selectedChannel != null
+                        ? soundDetails.displaySelectedSoundData
+                            ? soundButtonGroup.checkedButton.soundObj.name
+                            : qsTr("Track %1 Current Sound").arg(root.selectedChannel.name)
+                        : ""
             }
 
             Kirigami.Separator {
@@ -614,23 +616,23 @@ Zynthian.ScreenPage {
                     actions: [
                         QQC2.Action {
                             property int destinationIndex: 0
-                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
+                            text: root.selectedChannel != null ? "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1) : ""
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 1
-                            text: "Load the Sound's %1 %2\ninto to Track T%3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
+                            text: root.selectedChannel != null ? "Load the Sound's %1 %2\ninto to Track T%3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1) : ""
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 2
-                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
+                            text: root.selectedChannel != null ? "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1) : ""
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 3
-                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
+                            text: root.selectedChannel != null ? "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1) : ""
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }, QQC2.Action {
                             property int destinationIndex: 4
-                            text: "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1)
+                            text: root.selectedChannel != null ? "Load the Sound's %1 %2\ninto to Track %3 Slot %4".arg(slotsActionPicker.slotTypeName).arg(slotsActionPicker.slotIndex + 1).arg(root.selectedChannel.id + 1).arg(destinationIndex + 1) : ""
                             onTriggered: slotsActionPicker.loadIntoSlot(destinationIndex)
                         }
                     ]
@@ -640,9 +642,11 @@ Zynthian.ScreenPage {
             Sketchpad.TrackSlotsData {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                slotData: soundDetails.displaySelectedSoundData
-                            ? soundButtonGroup.checkedButton.soundObj.synthSlotsData
-                            : root.selectedChannel.synthSlotsData
+                slotData: root.selectedChannel != null
+                            ? soundDetails.displaySelectedSoundData
+                                ? soundButtonGroup.checkedButton.soundObj.synthSlotsData
+                                : root.selectedChannel.synthSlotsData
+                            : []
                 slotType: soundDetails.displaySelectedSoundData
                             ? "text"
                             : "synth"
@@ -662,9 +666,11 @@ Zynthian.ScreenPage {
             Sketchpad.TrackSlotsData {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                slotData: soundDetails.displaySelectedSoundData
-                            ? soundButtonGroup.checkedButton.soundObj.sampleSlotsData
-                            : root.selectedChannel.sampleSlotsData
+                slotData: root.selectedChannel != null
+                            ? soundDetails.displaySelectedSoundData
+                                ? soundButtonGroup.checkedButton.soundObj.sampleSlotsData
+                                : root.selectedChannel.sampleSlotsData
+                            : []
                 slotType: soundDetails.displaySelectedSoundData
                             ? "text"
                             : "sample-trig"
@@ -684,9 +690,11 @@ Zynthian.ScreenPage {
             Sketchpad.TrackSlotsData {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                slotData: soundDetails.displaySelectedSoundData
-                            ? soundButtonGroup.checkedButton.soundObj.fxSlotsData
-                            : root.selectedChannel.fxSlotsData
+                slotData: root.selectedChannel != null
+                            ? soundDetails.displaySelectedSoundData
+                                ? soundButtonGroup.checkedButton.soundObj.fxSlotsData
+                                : root.selectedChannel.fxSlotsData
+                            : []
                 slotType: soundDetails.displaySelectedSoundData
                             ? "text"
                             : "fx"

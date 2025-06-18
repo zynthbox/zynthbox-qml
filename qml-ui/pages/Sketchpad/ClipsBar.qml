@@ -42,7 +42,7 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     property QtObject bottomBar: null
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
     property QtObject selectedClipChannel
     property QtObject selectedClipObject
     property QtObject selectedClipPattern
@@ -114,12 +114,14 @@ Rectangle {
                     Connections {
                         target: Zynthbox.PlayfieldManager
                         function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
-                            // signalCounterThing.boop();
-                            let trackDelegate = clipDelegateRepeater.itemAt(sketchpadTrack);
-                            if (trackDelegate && trackDelegate.channel && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
-                                let clipDelegate = trackDelegate.repeater.itemAt(clip);
-                                if (clipDelegate.nextBarState != newPlaystate) {
-                                    clipDelegate.nextBarState = newPlaystate;
+                            if (zynqtgui.sketchpad.song != null) {
+                                // signalCounterThing.boop();
+                                let trackDelegate = clipDelegateRepeater.itemAt(sketchpadTrack);
+                                if (trackDelegate && trackDelegate.channel && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                                    let clipDelegate = trackDelegate.repeater.itemAt(clip);
+                                    if (clipDelegate.nextBarState != newPlaystate) {
+                                        clipDelegate.nextBarState = newPlaystate;
+                                    }
                                 }
                             }
                         }
@@ -145,7 +147,7 @@ Rectangle {
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            channel: zynqtgui.sketchpad.song.channelsModel.getChannel(model.index)
+                            channel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(model.index) : null
                             onClicked: {
                                 zynqtgui.sketchpad.selectedTrackId = model.index
                                 root.selectedClipChannel = clipsBarDelegate.channel

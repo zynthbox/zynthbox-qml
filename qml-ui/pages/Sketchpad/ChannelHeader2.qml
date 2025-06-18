@@ -115,10 +115,10 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
-                        visible: root.channel.trackType == "synth"
+                        visible: root.channel != null && root.channel.trackType == "synth"
 
                         Repeater {
-                            model: root.channel && root.channel.occupiedSynthSlots
+                            model: root.channel != null ? root.channel.occupiedSynthSlots : 0
 
                             Item {
                                 Layout.fillWidth: true
@@ -139,7 +139,7 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
-                        visible: root.channel.trackType == "synth"
+                        visible: root.channel != null && root.channel.trackType == "synth"
 
                         Repeater {
                             model: root.channel && root.channel.occupiedSampleSlots
@@ -163,7 +163,7 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
-                        visible: root.channel.trackType == "synth"
+                        visible: root.channel != null && root.channel.trackType == "synth"
 
                         Repeater {
                             model: root.channel && root.channel.occupiedFxSlots
@@ -187,7 +187,7 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
-                        visible: root.channel.trackType == "sample-loop"
+                        visible: root.channel != null && root.channel.trackType == "sample-loop"
 
                         Repeater {
                             model: root.channel && root.channel.occupiedSketchSlots
@@ -211,7 +211,7 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
-                        visible: root.channel.trackType == "sample-loop"
+                        visible: root.channel != null && root.channel.trackType == "sample-loop"
 
                         Repeater {
                             model: root.channel && root.channel.occupiedSketchFxSlots
@@ -265,12 +265,12 @@ QQC2.AbstractButton {
 
                 Item {
                     anchors.fill: parent
-                    visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] != root.channel.id
+                    visible: root.channel != null && Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] != root.channel.id
                     QQC2.Label {
                         anchors.fill: parent
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
-                        text: "↪ T%1".arg(Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] + 1)
+                        text: root.channel != null ? "↪ T%1".arg(Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] + 1) : ""
                     }
                 }
 
@@ -282,8 +282,8 @@ QQC2.AbstractButton {
                     verticalAlignment: Text.AlignVCenter
                     font.pointSize: Kirigami.Units.gridUnit
                     color: Kirigami.Theme.textColor
-                    visible: root.channel.trackType === "external"
-                    text: root.channel.externalMidiChannel > -1 ? root.channel.externalMidiChannel + 1 : root.channel.id + 1
+                    visible: root.channel != null && root.channel.trackType === "external"
+                    text: root.channel != null ? root.channel.externalMidiChannel > -1 ? root.channel.externalMidiChannel + 1 : root.channel.id + 1 : ""
                 }
             }
 

@@ -128,7 +128,7 @@ ColumnLayout {
                 Binding {
                     target: delegate
                     property: "channel"
-                    value: zynqtgui.sketchpad.song.channelsModel.getChannel(index)
+                    value: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(index) : null
                     when: component.visible
                     delayed: true
                 }
@@ -228,7 +228,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 sample: component.selectedSample
-                trackType: root.selectedChannel.trackType
+                trackType: root.selectedChannel != null ? root.selectedChannel.trackType : ""
             }
         }
     }

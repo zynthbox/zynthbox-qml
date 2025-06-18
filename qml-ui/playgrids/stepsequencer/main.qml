@@ -296,7 +296,7 @@ Zynthian.BasePlayGrid {
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
         property string bankName: sequence && sequence.activePatternObject ? sequence.activePatternObject.bank : "?"
-        property string sceneName: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongName
+        property string sceneName: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongName : null
         property QtObject associatedChannel;
         property int associatedChannelIndex;
 
@@ -328,7 +328,7 @@ Zynthian.BasePlayGrid {
             }
         }
 
-        property QtObject currentChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+        property QtObject currentChannel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
         property string currentSoundName: {
             var text = "(no sound)";
             if (_private.currentChannel) {
@@ -546,7 +546,7 @@ Zynthian.BasePlayGrid {
             model.endLongOperation();
         }
         function adoptSequence() {
-            if (zynqtgui.isBootingComplete) {
+            if (zynqtgui.isBootingComplete && zynqtgui.sketchpad.song != null) {
                 console.log("Adopting the scene sequence");
                 var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
                 if (_private.sequence != sequence) {
@@ -1011,7 +1011,7 @@ Zynthian.BasePlayGrid {
                         Binding {
                             target: drumpadLoopVisualiser
                             property: "channel"
-                            value: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+                            value: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null
                             when: drumpadLoopVisualiser.visible
                             delayed: true
                             restoreMode: Binding.RestoreBinding
@@ -2270,7 +2270,7 @@ Zynthian.BasePlayGrid {
                 x: Math.round(parent.width/2 - width/2)
                 y: Math.round(parent.height/2 - height/2)
                 property int associatedChannelIndex: -1
-                property QtObject associatedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(clipPicker.associatedChannelIndex)
+                property QtObject associatedChannel: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.channelsModel.getChannel(clipPicker.associatedChannelIndex) : null
                 ColumnLayout {
                     anchors.fill: parent
                     implicitWidth: Kirigami.Units.gridUnit * 30

@@ -78,7 +78,7 @@ GridLayout {
         QQC2.ComboBox {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignCenter
-            model: zynqtgui.bottomBarControlObj.scaleModel
+            model: zynqtgui.bottomBarControlObj != null ? zynqtgui.bottomBarControlObj.scaleModel : null
             currentIndex: root.bottomBar &&
                           zynqtgui.bottomBarControlObj &&
                           zynqtgui.bottomBarControlObj.selectedScaleIndex

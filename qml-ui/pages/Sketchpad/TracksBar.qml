@@ -77,8 +77,8 @@ Rectangle {
         selectedChannelThrottle.restart();
     }
 
-    property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-    property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
+    property QtObject sequence: root.selectedChannel != null && zynqtgui.sketchpad.song != null ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
+    property QtObject pattern: root.sequence != null && root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -1117,7 +1117,7 @@ Rectangle {
                                     onSong_changed: waveformThrottle.restart()
                                 }
                                 Connections {
-                                    target: zynqtgui.sketchpad.song.scenesModel
+                                    target: zynqtgui.sketchpad.song != null ? zynqtgui.sketchpad.song.scenesModel : null
                                     onSelected_sketchpad_song_index_changed: waveformThrottle.restart()
                                 }
 
@@ -1468,7 +1468,7 @@ Rectangle {
                                     Connections {
                                         target: Zynthbox.PlayfieldManager
                                         function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
-                                            if (root.selectedChannel) {
+                                            if (zynqtgui.sketchpad.song != null && root.selectedChannel != null) {
                                                 if (sketchpadTrack === root.selectedChannel.id && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
                                                     let clipDelegate = clipBar.itemAt(clipIndex);
                                                     if (clipDelegate.nextBarState != newPlaystate) {
@@ -1492,10 +1492,10 @@ Rectangle {
                                                 text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
                                                 font.underline: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
                                                 property int clipIndex: model.index
-                                                property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
+                                                property QtObject clip: zynqtgui.sketchpad.song != null && root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
                                                 property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
                                                 property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
-                                                property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
+                                                property QtObject pattern: root.selectedChannel != null && root.sequence != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
                                                 property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
                                                 property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
                                                 MouseArea {

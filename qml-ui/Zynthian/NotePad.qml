@@ -69,7 +69,7 @@ Item {
     readonly property color foregroundColor: component.visible ? (Kirigami.Theme.backgroundColor) : ""
     readonly property color borderColor: component.visible ? (foregroundColor) : ""
 
-    readonly property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+    readonly property QtObject currentSequence: zynqtgui.sketchpad.song != null ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
     RowLayout {
         id: subnoteLayout
         visible: typeof(component.note) !== "undefined" && component.note != null && component.note.subnotes.length > 0

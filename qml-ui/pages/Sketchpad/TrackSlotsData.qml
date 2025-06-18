@@ -154,7 +154,7 @@ RowLayout {
         id: slotRepeater
 
         model: Zynthbox.Plugin.sketchpadSlotCount
-        delegate: Rectangle {
+        delegate: Item {
             id: slotDelegate
             property bool highlighted: control.selectedChannel.selectedSlotRow === index
             property int slotIndex: index
@@ -165,8 +165,6 @@ RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-            color: "transparent"
-            radius: 4
 
             function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                 if (control.performSlotInteractions) {

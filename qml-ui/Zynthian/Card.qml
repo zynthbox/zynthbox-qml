@@ -36,14 +36,23 @@ QQC2.Control {
 
     property bool highlighted: false
 
-    leftPadding: background.leftPadding
-    rightPadding: background.rightPadding
-    topPadding: background.topPadding
-    bottomPadding: background.bottomPadding
+    padding: Kirigami.Units.smallSpacing
+    // leftPadding: background.leftPadding
+    // rightPadding: background.rightPadding
+    // topPadding: background.topPadding
+    // bottomPadding: background.bottomPadding
 
     // This is done for performance reasons
-    background: CardBackground {
-        id: background
-        highlighted: root.highlighted
+    // background: CardBackground {
+    //     id: background
+    //     highlighted: root.highlighted
+    // }
+
+    background: Rectangle
+    {
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        Kirigami.Theme.inherit: false
+        color: Kirigami.Theme.backgroundColor
+        radius: 4
     }
 }

@@ -350,7 +350,7 @@ QQC2.Pane
                     implicitWidth: 16
                     source: Qt.resolvedUrl("../../img/metronome.svg")
                     color: Kirigami.Theme.textColor
-                    opacity: zynqtgui.sketchpad.metronomeEnabled ? 1.0 : 0.0
+                    opacity: zynqtgui.sketchpad.metronomeEnabled ? 1.0 : 0.2
                 }
             }
 
@@ -451,7 +451,7 @@ QQC2.Pane
             onClosed: zynqtgui.globalPopupOpened = false
             contentItem: Item {
                 GridLayout {
-                    anchors.fill: parent;
+                    anchors.fill: parent
                     columns: 3
                     Card {
                         Layout.fillWidth: true
@@ -464,7 +464,7 @@ QQC2.Pane
                                 SketchpadDial {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
-                                    Layout.margins: Kirigami.Units.gridUnit
+                                    // Layout.margins: Kirigami.Units.gridUnit
                                     id: volumeDial
                                     text: qsTr("Volume")
                                     controlObj: zynqtgui

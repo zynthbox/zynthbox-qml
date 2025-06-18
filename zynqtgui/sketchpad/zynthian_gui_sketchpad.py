@@ -37,7 +37,7 @@ import re
 from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
-from PySide2.QtCore import QMetaObject, Qt, Property, QObject, QTimer, Signal, Slot
+from PySide2.QtCore import QCoreApplication, Qt, Property, QObject, QTimer, Signal, Slot
 from PySide2.QtGui import QColor, QGuiApplication
 from .sketchpad_channel import last_selected_obj_dto
 from ..zynthian_gui_multi_controller import MultiController
@@ -537,10 +537,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             except:
                 pass
 
-            old_song = self.__song__
             # Mark old song to be deleted to not perform any operations on it
-            if old_song is not None:
-                old_song.to_be_deleted()
+            if self.__song__ is not None:
+                self.__song__.to_be_deleted()
+                self.__song__.deleteLater()
+                self.__song__ = None
+                self.song_changed.emit()
+                QCoreApplication.instance().processEvents()
 
             if (self.__sketchpad_basepath__ / 'temp').exists():
                 self.zynqtgui.currentTaskMessage = "Removing existing temp sketchpad"
@@ -601,9 +604,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.selectedTrackId = 0
                 self.newSketchpadLoaded.emit()
 
-            # Delete old song object after creating a new song instance
-            if old_song is not None:
-                old_song.deleteLater()
+            QCoreApplication.instance().processEvents()
 
             # Update volume controls
             self.zynqtgui.fixed_layers.fill_list()
@@ -650,9 +651,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.screens["playgrid"].stopMetronomeRequest()            
 
             # Mark old song to be deleted to not perform any operations on it
-            old_song = self.__song__
-            if old_song is not None:
-                old_song.to_be_deleted()
+            if self.__song__ is not None:
+                self.__song__.to_be_deleted()
+                self.__song__.deleteLater()
+                self.__song__ = None
+                self.song_changed.emit()
+                QCoreApplication.instance().processEvents()
 
             # Rename temp sketchpad folder to the user defined name
             Path(self.__sketchpad_basepath__ / 'temp').rename(self.__sketchpad_basepath__ / name)
@@ -694,10 +698,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.selectedTrackId = 0
             self.song_changed.emit()
 
-            # Delete old song object after creating a new song instance
-            if old_song is not None:
-                old_song.deleteLater()
-
+            QCoreApplication.instance().processEvents()
             self.longOperationDecrement()
             QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
@@ -757,9 +758,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.sketchpadLoadingInProgress = True
 
                 # Mark old song to be deleted to not perform any operations on it
-                old_song = self.__song__
-                if old_song is not None:
-                    old_song.to_be_deleted()
+                if self.__song__ is not None:
+                    self.__song__.to_be_deleted()
+                    self.__song__.deleteLater()
+                    self.__song__ = None
+                    self.song_changed.emit()
+                    QCoreApplication.instance().processEvents()
 
                 # TODO : Remove after a considerable amount of time or when we are sure that all the old sketchpads got updated. Or maybe before a stable release
                 self.checkOldSequencesAndApplyFallback(sketchpad_path)
@@ -789,10 +793,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.selectedTrackId = 0
                 self.song_changed.emit()
 
-                # Delete old song object after creating a new song instance
-                if old_song is not None:
-                    old_song.deleteLater()
-
+                QCoreApplication.instance().processEvents()
                 # Reset last selected item
                 self.lastSelectedObj.reset()
 

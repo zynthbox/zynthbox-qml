@@ -537,8 +537,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             except:
                 pass
 
-            if self.__song__ is not None:
-                self.__song__.to_be_deleted()
+            old_song = self.__song__
+            # Mark old song to be deleted to not perform any operations on it
+            if old_song is not None:
+                old_song.to_be_deleted()
 
             if (self.__sketchpad_basepath__ / 'temp').exists():
                 self.zynqtgui.currentTaskMessage = "Removing existing temp sketchpad"
@@ -599,6 +601,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.selectedTrackId = 0
                 self.newSketchpadLoaded.emit()
 
+            # Delete old song object after creating a new song instance
+            if old_song is not None:
+                old_song.deleteLater()
+
             # Update volume controls
             self.zynqtgui.fixed_layers.fill_list()
             # Reset last selected item
@@ -642,8 +648,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             obj = {}
             self.stopAllPlayback()
             self.zynqtgui.screens["playgrid"].stopMetronomeRequest()            
-            if self.__song__ is not None:
-                self.__song__.to_be_deleted()
+
+            # Mark old song to be deleted to not perform any operations on it
+            old_song = self.__song__
+            if old_song is not None:
+                old_song.to_be_deleted()
 
             # Rename temp sketchpad folder to the user defined name
             Path(self.__sketchpad_basepath__ / 'temp').rename(self.__sketchpad_basepath__ / name)
@@ -684,6 +693,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.__song__.save(False)
             self.selectedTrackId = 0
             self.song_changed.emit()
+
+            # Delete old song object after creating a new song instance
+            if old_song is not None:
+                old_song.deleteLater()
+
             self.longOperationDecrement()
             QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
@@ -741,8 +755,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
                 self.zynqtgui.currentTaskMessage = f"Loading Sketchpad:<br />{str(sketchpad_path.parent.name)}"
                 self.sketchpadLoadingInProgress = True
-                if self.__song__ is not None:
-                    self.__song__.to_be_deleted()
+
+                # Mark old song to be deleted to not perform any operations on it
+                old_song = self.__song__
+                if old_song is not None:
+                    old_song.to_be_deleted()
+
                 # TODO : Remove after a considerable amount of time or when we are sure that all the old sketchpads got updated. Or maybe before a stable release
                 self.checkOldSequencesAndApplyFallback(sketchpad_path)
                 self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_autosave)
@@ -770,6 +788,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.zynqtgui.fixed_layers.fill_list()
                 self.selectedTrackId = 0
                 self.song_changed.emit()
+
+                # Delete old song object after creating a new song instance
+                if old_song is not None:
+                    old_song.deleteLater()
 
                 # Reset last selected item
                 self.lastSelectedObj.reset()

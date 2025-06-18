@@ -156,7 +156,7 @@ RowLayout {
         model: Zynthbox.Plugin.sketchpadSlotCount
         delegate: Item {
             id: slotDelegate
-            property bool highlighted: control.selectedChannel.selectedSlotRow === index
+            property bool highlighted: control.selectedChannel != null && control.selectedChannel.selectedSlotRow === index
             property int slotIndex: index
             property bool isSketchpadClip: control.slotData && control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
             property QtObject clip: isSketchpadClip ? control.slotData[index] : null
@@ -245,10 +245,10 @@ RowLayout {
 
             Rectangle {
                 id: delegate
-                property int midiChannel: control.selectedChannel.chainedSounds[index]
-                property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
-                property QtObject fxPassthroughClient: Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id][index] : null
-                property QtObject sketchFxPassthroughClient: Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
+                property int midiChannel: control.selectedChannel != null ? control.selectedChannel.chainedSounds[index] : -1
+                property QtObject synthPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
+                property QtObject fxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id][index] : null
+                property QtObject sketchFxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
 
                 anchors.fill: parent
                 Kirigami.Theme.inherit: false
@@ -264,7 +264,7 @@ RowLayout {
                 enabled: (control.slotType !== "external") || (control.slotType === "external" && (index === 0 || index === 1 || index === 2))
                 opacity: enabled ? 1 : 0
                 visible: enabled
-                readonly property bool isSelectedSlot: control.selectedChannel.selectedSlot.className === _private.className && control.selectedChannel.selectedSlot.value === slotDelegate.slotIndex
+                readonly property bool isSelectedSlot: control.selectedChannel != null && control.selectedChannel.selectedSlot.className === _private.className && control.selectedChannel.selectedSlot.value === slotDelegate.slotIndex
 
                 Rectangle {
                     anchors {

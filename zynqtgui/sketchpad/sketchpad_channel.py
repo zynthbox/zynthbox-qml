@@ -513,44 +513,46 @@ class sketchpad_channel(QObject):
         self.__externalSettings__.midiOutDeviceChanged.connect(self.externalSlotsDataChanged.emit)
 
     def handlePassthroughClientSomethingChanged(self, theSender, theSomething, theValue):
-        if theSender == self.__trackMixerClient:
-            if theSomething == "muted":
-                # Do not update channel muted state when being played on solo mode
-                # If muted state is changed at all times, when setting solo mode, all channel's muted state is set to True
-                # and hence disabling solo mode does
-                if self.__song__.playChannelSolo == -1:
-                    self.set_muted(theValue)
-        elif theSender in self.__trackPassthroughClients:
-            # if theSomething == "muted":
-                # Do not update channel muted state when being played on solo mode
-                # If muted state is changed at all times, when setting solo mode, all channel's muted state is set to True
-                # and hence disabling solo mode does
-                # if self.__song__.playChannelSolo == -1:
-                    # self.set_muted(theValue)
-            # elif theSomething == "wetFx1Amount":
-                # self.set_wetFx1Amount(theValue)
-            # elif theSomething == "wetFx2Amount":
-                # self.set_wetFx2Amount(theValue)
-            pass
-        elif theSender in self.__synthPassthroughClients:
-            clientIndex = self.__synthPassthroughClients.index(theSender)
-            if clientIndex in self.__chained_sounds__:
-                laneId = self.__chained_sounds__.index(clientIndex)
-                self.set_passthroughValue("synthPassthrough", laneId, theSomething, theValue)
-        elif theSender in self.__fxPassthroughClients:
-            clientIndex = self.__fxPassthroughClients.index(theSender)
-            if clientIndex in self.__chained_fx:
-                laneId = self.__chained_fx.index(clientIndex)
-                self.set_passthroughValue("fxPassthrough", laneId, theSomething, theValue)
-        elif theSender in self.__sketchFxPassthroughClients:
-            clientIndex = self.__sketchFxPassthroughClients.index(theSender)
-            if clientIndex in self.__chained_sketch_fx:
-                laneId = self.__chained_sketch_fx.index(clientIndex)
-                self.set_passthroughValue("sketchFxPassthrough", laneId, theSomething, theValue)
+        if not self.__song__.__to_be_deleted__:
+            if theSender == self.__trackMixerClient:
+                if theSomething == "muted":
+                    # Do not update channel muted state when being played on solo mode
+                    # If muted state is changed at all times, when setting solo mode, all channel's muted state is set to True
+                    # and hence disabling solo mode does
+                    if self.__song__.playChannelSolo == -1:
+                        self.set_muted(theValue)
+            elif theSender in self.__trackPassthroughClients:
+                # if theSomething == "muted":
+                    # Do not update channel muted state when being played on solo mode
+                    # If muted state is changed at all times, when setting solo mode, all channel's muted state is set to True
+                    # and hence disabling solo mode does
+                    # if self.__song__.playChannelSolo == -1:
+                        # self.set_muted(theValue)
+                # elif theSomething == "wetFx1Amount":
+                    # self.set_wetFx1Amount(theValue)
+                # elif theSomething == "wetFx2Amount":
+                    # self.set_wetFx2Amount(theValue)
+                pass
+            elif theSender in self.__synthPassthroughClients:
+                clientIndex = self.__synthPassthroughClients.index(theSender)
+                if clientIndex in self.__chained_sounds__:
+                    laneId = self.__chained_sounds__.index(clientIndex)
+                    self.set_passthroughValue("synthPassthrough", laneId, theSomething, theValue)
+            elif theSender in self.__fxPassthroughClients:
+                clientIndex = self.__fxPassthroughClients.index(theSender)
+                if clientIndex in self.__chained_fx:
+                    laneId = self.__chained_fx.index(clientIndex)
+                    self.set_passthroughValue("fxPassthrough", laneId, theSomething, theValue)
+            elif theSender in self.__sketchFxPassthroughClients:
+                clientIndex = self.__sketchFxPassthroughClients.index(theSender)
+                if clientIndex in self.__chained_sketch_fx:
+                    laneId = self.__chained_sketch_fx.index(clientIndex)
+                    self.set_passthroughValue("sketchFxPassthrough", laneId, theSomething, theValue)
 
     def handleChainedSoundsKeyzoneChanged(self, keyzoneData, slotIndex):
-        Zynthbox.MidiRouter.instance().setZynthianSynthKeyzones(self.__chained_sounds__[slotIndex], keyzoneData.keyZoneStart, keyzoneData.keyZoneEnd, keyzoneData.rootNote)
-        self.chainedSoundsKeyzonesChanged.emit()
+        if not self.__song__.__to_be_deleted__:
+            Zynthbox.MidiRouter.instance().setZynthianSynthKeyzones(self.__chained_sounds__[slotIndex], keyzoneData.keyZoneStart, keyzoneData.keyZoneEnd, keyzoneData.rootNote)
+            self.chainedSoundsKeyzonesChanged.emit()
 
     # If we want to eventually change to having multiple versions
     # again... this will letus do that without fundamentally
@@ -622,443 +624,464 @@ class sketchpad_channel(QObject):
         return mixingValues
 
     def layerPresetChangedHandler(self, layer_index):
-        layer = self.zynqtgui.layer.layers[layer_index]
-        if layer in self.chainedFx:
-            self.chainedFxNamesChanged.emit()
+        if not self.__song__.__to_be_deleted__:
+            layer = self.zynqtgui.layer.layers[layer_index]
+            if layer in self.chainedFx:
+                self.chainedFxNamesChanged.emit()
 
     def layerCreatedHandler(self, midichannel):
-        if midichannel in self.chainedSounds:
-            self.chainedSoundsAcceptedChannelsChanged.emit()
+        if not self.__song__.__to_be_deleted__:
+            if midichannel in self.chainedSounds:
+                self.chainedSoundsAcceptedChannelsChanged.emit()
 
     def snapshotLoadedHandler(self):
-        self.__sound_snapshot_changed = True
+        if not self.__song__.__to_be_deleted__:
+            self.__sound_snapshot_changed = True
 
     @Slot(int, int)
     def onClipEnabledChanged(self, trackIndex, clipId):
-        clip = self.getClipsModelById(clipId).getClip(trackIndex)
+        if not self.__song__.__to_be_deleted__:
+            clip = self.getClipsModelById(clipId).getClip(trackIndex)
 
-        if clip is not None and clip.enabled is True:
-            self.set_selected_clip(clipId)
-            # We will now allow playing multiple clips of a sample-loop channel
-            # allowMulticlip = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
-            # logging.error(f"Allowing multiclip playback: {self.__allowMulticlip__}")
-            if not self.__allowMulticlip__:
-                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                    if clipId != self.__selected_clip__:
-                        clipForDisabling = self.getClipsModelById(clipId).getClip(trackIndex)
-                        # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
-                        if clipForDisabling is not None:
-                            clipForDisabling.enabled = False
+            if clip is not None and clip.enabled is True:
+                self.set_selected_clip(clipId)
+                # We will now allow playing multiple clips of a sample-loop channel
+                # allowMulticlip = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
+                # logging.error(f"Allowing multiclip playback: {self.__allowMulticlip__}")
+                if not self.__allowMulticlip__:
+                    for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                        if clipId != self.__selected_clip__:
+                            clipForDisabling = self.getClipsModelById(clipId).getClip(trackIndex)
+                            # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
+                            if clipForDisabling is not None:
+                                clipForDisabling.enabled = False
 
-        self.selectedClipNamesChanged.emit()
+            self.selectedClipNamesChanged.emit()
 
     def track_index_changed_handler(self):
-        self.scene_clip_changed.emit()
-        self.selectedClipNamesChanged.emit()
+        if not self.__song__.__to_be_deleted__:
+            self.scene_clip_changed.emit()
+            self.selectedClipNamesChanged.emit()
 
     def chained_sounds_changed_handler(self):
-        self.cache_bank_preset_lists()
-        self.update_filter_controllers()
-        self.occupiedSlotsChanged.emit()
-        self.connectedSoundChanged.emit()
-        self.connectedSoundNameChanged.emit()
-        self.chainedSoundsNamesChanged.emit()
-        self.chainedFxNamesChanged.emit()
-        self.chainedSoundsAcceptedChannelsChanged.emit()
-        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+        if not self.__song__.__to_be_deleted__:
+            self.cache_bank_preset_lists()
+            self.update_filter_controllers()
+            self.occupiedSlotsChanged.emit()
+            self.connectedSoundChanged.emit()
+            self.connectedSoundNameChanged.emit()
+            self.chainedSoundsNamesChanged.emit()
+            self.chainedFxNamesChanged.emit()
+            self.chainedSoundsAcceptedChannelsChanged.emit()
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
     def chainedFxChangedHandler(self):
-        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
-        self.chainedFxNamesChanged.emit()
-        self.update_fx_filter_controllers()
+        if not self.__song__.__to_be_deleted__:
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+            self.chainedFxNamesChanged.emit()
+            self.update_fx_filter_controllers()
 
     def chainedSketchFxChangedHandler(self):
-        # self.clearFxPassthroughForEmtpySlots()
-        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
-        self.chainedSketchFxNamesChanged.emit()
-        self.update_sketchfx_filter_controllers()
+        if not self.__song__.__to_be_deleted__:
+            # self.clearFxPassthroughForEmtpySlots()
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+            self.chainedSketchFxNamesChanged.emit()
+            self.update_sketchfx_filter_controllers()
 
     def fixed_layers_list_updated_handler(self):
-        self.connectedSoundChanged.emit()
-        self.connectedSoundNameChanged.emit()
-        self.chainedSoundsNamesChanged.emit()
-        self.chainedFxNamesChanged.emit()
-        self.updateSynthRoutingData()
+        if not self.__song__.__to_be_deleted__:
+            self.connectedSoundChanged.emit()
+            self.connectedSoundNameChanged.emit()
+            self.chainedSoundsNamesChanged.emit()
+            self.chainedFxNamesChanged.emit()
+            self.updateSynthRoutingData()
 
     def cache_bank_preset_lists(self):
-        # Back up curlayer
-        curlayer = self.zynqtgui.curlayer
+        if not self.__song__.__to_be_deleted__:
+            # Back up curlayer
+            curlayer = self.zynqtgui.curlayer
 
-        for midi_channel in self.chainedSounds:
-            if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
-                # Change curlayer to synth's layer and fill back/preset list
-                self.zynqtgui.curlayer = self.zynqtgui.layer.layer_midi_map[midi_channel]
-                logging.debug(f"Caching midi channel : channel({midi_channel}), layer({self.zynqtgui.curlayer})")
-                self.zynqtgui.currentTaskMessage = f"Caching bank/preset lists for Track {self.name}"
-                self.zynqtgui.bank.fill_list()
-                self.zynqtgui.preset.fill_list()
+            for midi_channel in self.chainedSounds:
+                if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
+                    # Change curlayer to synth's layer and fill back/preset list
+                    self.zynqtgui.curlayer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+                    logging.debug(f"Caching midi channel : channel({midi_channel}), layer({self.zynqtgui.curlayer})")
+                    self.zynqtgui.currentTaskMessage = f"Caching bank/preset lists for Track {self.name}"
+                    self.zynqtgui.bank.fill_list()
+                    self.zynqtgui.preset.fill_list()
 
-        # Restore curlayer
-        self.zynqtgui.curlayer = curlayer
-        self.zynqtgui.bank.fill_list()
-        self.zynqtgui.preset.fill_list()
+            # Restore curlayer
+            self.zynqtgui.curlayer = curlayer
+            self.zynqtgui.bank.fill_list()
+            self.zynqtgui.preset.fill_list()
 
     def update_filter_controllers(self):
-        for index, midi_channel in enumerate(self.chainedSounds):
-            self.__filter_cutoff_controllers[index].clear_controls()
-            self.__filter_resonance_controllers[index].clear_controls()
-            if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
-                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
-                synth_controllers_dict = layer.controllers_dict
+        if not self.__song__.__to_be_deleted__:
+            for index, midi_channel in enumerate(self.chainedSounds):
+                self.__filter_cutoff_controllers[index].clear_controls()
+                self.__filter_resonance_controllers[index].clear_controls()
+                if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
+                    layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+                    synth_controllers_dict = layer.controllers_dict
 
-                if layer.engine.version_info.cutoffControl != "" and layer.engine.version_info.cutoffControl in synth_controllers_dict:
-                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
-                elif "cutoff" in synth_controllers_dict:
-                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
-                elif "filter_cutoff" in synth_controllers_dict:
-                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
+                    if layer.engine.version_info.cutoffControl != "" and layer.engine.version_info.cutoffControl in synth_controllers_dict:
+                        self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
+                    elif "cutoff" in synth_controllers_dict:
+                        self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
+                    elif "filter_cutoff" in synth_controllers_dict:
+                        self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                if layer.engine.version_info.resonanceControl != "" and layer.engine.version_info.resonanceControl in synth_controllers_dict:
-                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
-                elif "resonance" in synth_controllers_dict:
-                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
-                elif "filter_resonance" in synth_controllers_dict:
-                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
+                    if layer.engine.version_info.resonanceControl != "" and layer.engine.version_info.resonanceControl in synth_controllers_dict:
+                        self.__filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
+                    elif "resonance" in synth_controllers_dict:
+                        self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
+                    elif "filter_resonance" in synth_controllers_dict:
+                        self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
 
-        self.filterCutoffControllersChanged.emit()
-        self.filterResonanceControllersChanged.emit()
+            self.filterCutoffControllersChanged.emit()
+            self.filterResonanceControllersChanged.emit()
 
     def update_fx_filter_controllers(self):
-        for index, layer in enumerate(self.chainedFx):
-            self.__fx_filter_cutoff_controllers[index].clear_controls()
-            self.__fx_filter_resonance_controllers[index].clear_controls()
-            if layer is not None:
-                synth_controllers_dict = layer.controllers_dict
+        if not self.__song__.__to_be_deleted__:
+            for index, layer in enumerate(self.chainedFx):
+                self.__fx_filter_cutoff_controllers[index].clear_controls()
+                self.__fx_filter_resonance_controllers[index].clear_controls()
+                if layer is not None:
+                    synth_controllers_dict = layer.controllers_dict
 
-                if layer.engine.version_info.cutoffControl != "" and layer.engine.version_info.cutoffControl in synth_controllers_dict:
-                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
-                elif "cutoff" in synth_controllers_dict:
-                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
-                elif "filter_cutoff" in synth_controllers_dict:
-                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
+                    if layer.engine.version_info.cutoffControl != "" and layer.engine.version_info.cutoffControl in synth_controllers_dict:
+                        self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
+                    elif "cutoff" in synth_controllers_dict:
+                        self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
+                    elif "filter_cutoff" in synth_controllers_dict:
+                        self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                if layer.engine.version_info.resonanceControl != "" and layer.engine.version_info.resonanceControl in synth_controllers_dict:
-                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
-                elif "resonance" in synth_controllers_dict:
-                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
-                elif "filter_resonance" in synth_controllers_dict:
-                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
+                    if layer.engine.version_info.resonanceControl != "" and layer.engine.version_info.resonanceControl in synth_controllers_dict:
+                        self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
+                    elif "resonance" in synth_controllers_dict:
+                        self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
+                    elif "filter_resonance" in synth_controllers_dict:
+                        self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
 
-        self.fxFilterCutoffControllersChanged.emit()
-        self.fxFilterResonanceControllersChanged.emit()
+            self.fxFilterCutoffControllersChanged.emit()
+            self.fxFilterResonanceControllersChanged.emit()
 
     def update_sketchfx_filter_controllers(self):
-        for index, layer in enumerate(self.chainedSketchFx):
-            self.__sketchfx_filter_cutoff_controllers[index].clear_controls()
-            self.__sketchfx_filter_resonance_controllers[index].clear_controls()
-            if layer is not None:
-                synth_controllers_dict = layer.controllers_dict
+        if not self.__song__.__to_be_deleted__:
+            for index, layer in enumerate(self.chainedSketchFx):
+                self.__sketchfx_filter_cutoff_controllers[index].clear_controls()
+                self.__sketchfx_filter_resonance_controllers[index].clear_controls()
+                if layer is not None:
+                    synth_controllers_dict = layer.controllers_dict
 
-                if layer.engine.version_info.cutoffControl != "" and layer.engine.version_info.cutoffControl in synth_controllers_dict:
-                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
-                elif "cutoff" in synth_controllers_dict:
-                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
-                elif "filter_cutoff" in synth_controllers_dict:
-                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
+                    if layer.engine.version_info.cutoffControl != "" and layer.engine.version_info.cutoffControl in synth_controllers_dict:
+                        self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
+                    elif "cutoff" in synth_controllers_dict:
+                        self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
+                    elif "filter_cutoff" in synth_controllers_dict:
+                        self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                if layer.engine.version_info.resonanceControl != "" and layer.engine.version_info.resonanceControl in synth_controllers_dict:
-                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
-                elif "resonance" in synth_controllers_dict:
-                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
-                elif "filter_resonance" in synth_controllers_dict:
-                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
+                    if layer.engine.version_info.resonanceControl != "" and layer.engine.version_info.resonanceControl in synth_controllers_dict:
+                        self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
+                    elif "resonance" in synth_controllers_dict:
+                        self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
+                    elif "filter_resonance" in synth_controllers_dict:
+                        self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
 
-        self.sketchFxFilterCutoffControllersChanged.emit()
-        self.sketchFxFilterResonanceControllersChanged.emit()
+            self.sketchFxFilterCutoffControllersChanged.emit()
+            self.sketchFxFilterResonanceControllersChanged.emit()
 
     def className(self):
         return "sketchpad_channel"
 
     def layer_deleted(self, chan : int):
-        self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
+        if not self.__song__.__to_be_deleted__:
+            self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
 
     def select_correct_layer(self):
-        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
-        if self.checkIfLayerExists(zynqtgui.active_midi_channel):
-            logging.info("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
-            try:
-                zynqtgui.screens["layers_for_channel"].update_channel_sounds()
-            except:
-                pass
-        else:
-            logging.info("### select_correct_layer : Do not Reselect channel sound since it is not removing current selected channel")
+        if not self.__song__.__to_be_deleted__:
+            zynqtgui = self.__song__.get_metronome_manager().zynqtgui
+            if self.checkIfLayerExists(zynqtgui.active_midi_channel):
+                logging.info("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
+                try:
+                    zynqtgui.screens["layers_for_channel"].update_channel_sounds()
+                except:
+                    pass
+            else:
+                logging.info("### select_correct_layer : Do not Reselect channel sound since it is not removing current selected channel")
 
     def master_volume_changed(self):
-        self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
+        if not self.__song__.__to_be_deleted__:
+            self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
 
     def stopAllClips(self):
-        for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-            for song_index in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
-                self.__song__.getClipById(self.__id__, song_index, clip_index).stop()
+        if not self.__song__.__to_be_deleted__:
+            for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                for song_index in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
+                    self.__song__.getClipById(self.__id__, song_index, clip_index).stop()
 
     def serialize(self):
-        samplesObj = []
-        for sample in self.__samples__:
-            if sample.path is not None and len(sample.path) > 0:
-                samplesObj.append(sample.serialize())
-            else:
-                samplesObj.append(None)
+        if not self.__song__.__to_be_deleted__:
+            samplesObj = []
+            for sample in self.__samples__:
+                if sample.path is not None and len(sample.path) > 0:
+                    samplesObj.append(sample.serialize())
+                else:
+                    samplesObj.append(None)
 
-        return {"name": self.__name__,
-                "color": self.__color__ if type(self.__color__) == str else self.__color__.name(),
-                "volume": self.__volume__.gainDb(),
-                "audioTypeSettings": self.__audioTypeSettings__,
-                "connectedPattern": self.__connected_pattern__,
-                "chainedSounds": self.__chained_sounds__,
-                "allowMulticlip": self.__allowMulticlip__,
-                "trackStyle": self.__trackStyle__,
-                "trackType": self.__track_type__,
-                "trackRoutingStyle": self.__track_routing_style__,
-                "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
-                "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
-                "sketchFxRoutingData": [entry.serialize() for entry in self.__routingData__["sketchfx"]],
-                "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
-                "targetTrack": int(Zynthbox.MidiRouter.instance().sketchpadTrackTargetTracks()[self.__id__]),
-                "externalMidiChannel" : self.__externalSettings__.midiChannel,
-                "externalCaptureVolume" : self.__externalSettings__.captureVolume,
-                "externalAudioSource": self.__externalSettings__.audioSource,
-                "externalKeyValueStores": self.__externalSettings__.__keyValueStores__,
-                "externalDefaultKeyValueStore": self.__externalSettings__.__defaultKeyValueStore__,
-                "externalSelectedModule": self.__externalSettings__.selectedModule,
-                "externalMidiOutDevice": self.__externalSettings__.midiOutDevice,
-                "clips": [self.__clips_model__[clipId].serialize() for clipId in range(0, 5)],
-                "selectedClip": self.__selected_clip__,
-                "samples": samplesObj,
-                "layers_snapshot": self.__layers_snapshot,
-                "sample_picking_style": self.__sample_picking_style__,
-                "trustExternalDeviceChannels": self.__trustExternalDeviceChannels__,
-                "keyzone_mode": self.__keyzone_mode__,
-                "routeThroughGlobalFX": self.route_through_global_fx,
-                "synthSlotsData": self.synthSlotsData, # synthSlotsData is a list of strings. Just what we need
-                "sampleSlotsData": [Path(f.title if f.title is not None else "").name for f in self.sampleSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
-                "fxSlotsData": self.fxSlotsData, # fxSlotsData is a list of strings. Just what we need
-                "sketchSlotsData": [Path(f.title if f.title is not None else "").name for f in self.sketchSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
-                "sketchFxSlotsData": self.sketchFxSlotsData, # sketchFxSlotsData is a list of strings. Just what we need
-                "externalSlotsData": self.externalSlotsData} # externalSlotsData is a list of strings. Just what we need
+            return {"name": self.__name__,
+                    "color": self.__color__ if type(self.__color__) == str else self.__color__.name(),
+                    "volume": self.__volume__.gainDb(),
+                    "audioTypeSettings": self.__audioTypeSettings__,
+                    "connectedPattern": self.__connected_pattern__,
+                    "chainedSounds": self.__chained_sounds__,
+                    "allowMulticlip": self.__allowMulticlip__,
+                    "trackStyle": self.__trackStyle__,
+                    "trackType": self.__track_type__,
+                    "trackRoutingStyle": self.__track_routing_style__,
+                    "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
+                    "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
+                    "sketchFxRoutingData": [entry.serialize() for entry in self.__routingData__["sketchfx"]],
+                    "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
+                    "targetTrack": int(Zynthbox.MidiRouter.instance().sketchpadTrackTargetTracks()[self.__id__]),
+                    "externalMidiChannel" : self.__externalSettings__.midiChannel,
+                    "externalCaptureVolume" : self.__externalSettings__.captureVolume,
+                    "externalAudioSource": self.__externalSettings__.audioSource,
+                    "externalKeyValueStores": self.__externalSettings__.__keyValueStores__,
+                    "externalDefaultKeyValueStore": self.__externalSettings__.__defaultKeyValueStore__,
+                    "externalSelectedModule": self.__externalSettings__.selectedModule,
+                    "externalMidiOutDevice": self.__externalSettings__.midiOutDevice,
+                    "clips": [self.__clips_model__[clipId].serialize() for clipId in range(0, 5)],
+                    "selectedClip": self.__selected_clip__,
+                    "samples": samplesObj,
+                    "layers_snapshot": self.__layers_snapshot,
+                    "sample_picking_style": self.__sample_picking_style__,
+                    "trustExternalDeviceChannels": self.__trustExternalDeviceChannels__,
+                    "keyzone_mode": self.__keyzone_mode__,
+                    "routeThroughGlobalFX": self.route_through_global_fx,
+                    "synthSlotsData": self.synthSlotsData, # synthSlotsData is a list of strings. Just what we need
+                    "sampleSlotsData": [Path(f.title if f.title is not None else "").name for f in self.sampleSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
+                    "fxSlotsData": self.fxSlotsData, # fxSlotsData is a list of strings. Just what we need
+                    "sketchSlotsData": [Path(f.title if f.title is not None else "").name for f in self.sketchSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
+                    "sketchFxSlotsData": self.sketchFxSlotsData, # sketchFxSlotsData is a list of strings. Just what we need
+                    "externalSlotsData": self.externalSlotsData} # externalSlotsData is a list of strings. Just what we need
 
     def deserialize(self, obj, load_autosave=True):
-        logging.debug(f"channel_deserialize : {load_autosave}")
-        try:
-            if "name" in obj:
-                self.__name__ = obj["name"]
-            if "color" in obj and obj["color"] != "#000000":
-                self.set_color(obj["color"], force_set=True)
-            else:
-                self.set_color(self.zynqtgui.theme_chooser.trackColors[self.__id__])
-            if "volume" in obj:
-                self.set_volume(obj["volume"], True)
-            if "connectedPattern" in obj:
-                self.__connected_pattern__ = obj["connectedPattern"]
-                self.set_connected_pattern(self.__connected_pattern__)
-            if "chainedSounds" in obj:
-                self.__chained_sounds__ = [-1, -1, -1, -1, -1] # When loading, we need to reset this forcibly to ensure things are updated fully
-                self.set_chained_sounds(obj["chainedSounds"])
+        if not self.__song__.__to_be_deleted__:
+            logging.debug(f"channel_deserialize : {load_autosave}")
+            try:
+                if "name" in obj:
+                    self.__name__ = obj["name"]
+                if "color" in obj and obj["color"] != "#000000":
+                    self.set_color(obj["color"], force_set=True)
+                else:
+                    self.set_color(self.zynqtgui.theme_chooser.trackColors[self.__id__])
+                if "volume" in obj:
+                    self.set_volume(obj["volume"], True)
+                if "connectedPattern" in obj:
+                    self.__connected_pattern__ = obj["connectedPattern"]
+                    self.set_connected_pattern(self.__connected_pattern__)
+                if "chainedSounds" in obj:
+                    self.__chained_sounds__ = [-1, -1, -1, -1, -1] # When loading, we need to reset this forcibly to ensure things are updated fully
+                    self.set_chained_sounds(obj["chainedSounds"])
 
-            if "allowMulticlip" in obj:
-                self.set_allowMulticlip(obj["allowMulticlip"], True)
-            else:
-                self.set_allowMulticlip(False, True)
+                if "allowMulticlip" in obj:
+                    self.set_allowMulticlip(obj["allowMulticlip"], True)
+                else:
+                    self.set_allowMulticlip(False, True)
 
-            if "trackStyle" in obj:
-                self.set_trackStyle(obj["trackStyle"])
-            else:
-                self.set_trackStyle("everything")
+                if "trackStyle" in obj:
+                    self.set_trackStyle(obj["trackStyle"])
+                else:
+                    self.set_trackStyle("everything")
 
-            # TODO : `channelAudioType` key is deprecated and has been renamed to `trackType`. Remove this fallback later
-            if "channelAudioType" in obj:
-                warnings.warn("`channelAudioType` key is deprecated (will be removed soon) and has been renamed to `trackType`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
-                self.__track_type__ = obj["channelAudioType"]
-                self.set_track_type(self.__track_type__, True)
-            if "trackType" in obj:
-                self.__track_type__ = obj["trackType"]
-                self.set_track_type(self.__track_type__, True)
+                # TODO : `channelAudioType` key is deprecated and has been renamed to `trackType`. Remove this fallback later
+                if "channelAudioType" in obj:
+                    warnings.warn("`channelAudioType` key is deprecated (will be removed soon) and has been renamed to `trackType`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
+                    self.__track_type__ = obj["channelAudioType"]
+                    self.set_track_type(self.__track_type__, True)
+                if "trackType" in obj:
+                    self.__track_type__ = obj["trackType"]
+                    self.set_track_type(self.__track_type__, True)
 
-            _audioTypeSettings = self.defaultAudioTypeSettings()
-            if "audioTypeSettings" in obj:
-                _audioTypeSettings.update(obj["audioTypeSettings"])
-            # Set audioTypeSettings even if not found in json to set the default values and emit respective signals
-            self.setAudioTypeSettings(_audioTypeSettings)
+                _audioTypeSettings = self.defaultAudioTypeSettings()
+                if "audioTypeSettings" in obj:
+                    _audioTypeSettings.update(obj["audioTypeSettings"])
+                # Set audioTypeSettings even if not found in json to set the default values and emit respective signals
+                self.setAudioTypeSettings(_audioTypeSettings)
 
-            # TODO : `channelRoutingStyle` key is deprecated and has been renamed to `trackRoutingStyle`. Remove this fallback later
-            if "channelRoutingStyle" in obj:
-                warnings.warn("`channelRoutingStyle` key is deprecated (will be removed soon) and has been renamed to `trackRoutingStyle`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
-                self.set_track_routing_style(obj["channelRoutingStyle"], True)
-            else:
-                self.set_track_routing_style("standard", True)
-            if "trackRoutingStyle" in obj:
-                self.set_track_routing_style(obj["trackRoutingStyle"], True)
-            else:
-                self.set_track_routing_style("standard", True)
+                # TODO : `channelRoutingStyle` key is deprecated and has been renamed to `trackRoutingStyle`. Remove this fallback later
+                if "channelRoutingStyle" in obj:
+                    warnings.warn("`channelRoutingStyle` key is deprecated (will be removed soon) and has been renamed to `trackRoutingStyle`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
+                    self.set_track_routing_style(obj["channelRoutingStyle"], True)
+                else:
+                    self.set_track_routing_style("standard", True)
+                if "trackRoutingStyle" in obj:
+                    self.set_track_routing_style(obj["trackRoutingStyle"], True)
+                else:
+                    self.set_track_routing_style("standard", True)
 
-            if "sketchFxRoutingData" in obj:
-                for slotIndex, routingData in enumerate(obj["sketchFxRoutingData"]):
-                    if slotIndex > 4:
-                        logging.error("Error during deserialization: sketchFxRoutingData has too many entries")
-                        break
-                    self.__routingData__["sketchfx"][slotIndex].deserialize(routingData)
-            self.sketchFxRoutingDataChanged.emit()
-            if "fxRoutingData" in obj:
-                for slotIndex, routingData in enumerate(obj["fxRoutingData"]):
-                    if slotIndex > 4:
-                        logging.error("Error during deserialization: fxRoutingData has too many entries")
-                        break
-                    self.__routingData__["fx"][slotIndex].deserialize(routingData)
-            self.fxRoutingDataChanged.emit()
-            if "synthRoutingData" in obj:
-                for slotIndex, routingData in enumerate(obj["synthRoutingData"]):
-                    if slotIndex > 4:
-                        logging.error("Error during deserialization: synthRoutingData has too many entries")
-                        break
-                    self.__routingData__["synth"][slotIndex].deserialize(routingData)
-            self.synthRoutingDataChanged.emit()
-            if "synthKeyzoneData" in obj:
-                for slotIndex, keyzoneData in enumerate(obj["synthKeyzoneData"]):
-                    if slotIndex > 4:
-                        logging.error("Error during deserialization: synthKeyzoneData has too many entries")
-                        break
-                    self.__chained_sounds_keyzones__[slotIndex].deserialize(keyzoneData)
-            else:
-                for entry in self.__chained_sounds_keyzones__:
-                    entry.clear()
-            self.chainedSoundsKeyzonesChanged.emit()
+                if "sketchFxRoutingData" in obj:
+                    for slotIndex, routingData in enumerate(obj["sketchFxRoutingData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: sketchFxRoutingData has too many entries")
+                            break
+                        self.__routingData__["sketchfx"][slotIndex].deserialize(routingData)
+                self.sketchFxRoutingDataChanged.emit()
+                if "fxRoutingData" in obj:
+                    for slotIndex, routingData in enumerate(obj["fxRoutingData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: fxRoutingData has too many entries")
+                            break
+                        self.__routingData__["fx"][slotIndex].deserialize(routingData)
+                self.fxRoutingDataChanged.emit()
+                if "synthRoutingData" in obj:
+                    for slotIndex, routingData in enumerate(obj["synthRoutingData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: synthRoutingData has too many entries")
+                            break
+                        self.__routingData__["synth"][slotIndex].deserialize(routingData)
+                self.synthRoutingDataChanged.emit()
+                if "synthKeyzoneData" in obj:
+                    for slotIndex, keyzoneData in enumerate(obj["synthKeyzoneData"]):
+                        if slotIndex > 4:
+                            logging.error("Error during deserialization: synthKeyzoneData has too many entries")
+                            break
+                        self.__chained_sounds_keyzones__[slotIndex].deserialize(keyzoneData)
+                else:
+                    for entry in self.__chained_sounds_keyzones__:
+                        entry.clear()
+                self.chainedSoundsKeyzonesChanged.emit()
 
-            if "targetTrack" in obj:
-                Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(obj["targetTrack"]))
-            else:
-                Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(self.__id__))
+                if "targetTrack" in obj:
+                    Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(obj["targetTrack"]))
+                else:
+                    Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(self.__id__))
 
-            if "externalMidiChannel" in obj:
-                self.set_externalMidiChannel(obj["externalMidiChannel"])
-            if "externalAudioSource" in obj:
-                self.set_externalAudioSource(obj["externalAudioSource"])
-            if "externalCaptureVolume" in obj:
-                self.set_externalCaptureVolume(obj["externalCaptureVolume"])
-            if "externalDefaultKeyValueStore" in obj:
-                self.__externalSettings__.__defaultKeyValueStore__ = obj["externalDefaultKeyValueStore"]
-                self.__externalSettings__.keyValueStoreChanged.emit()
-            if "externalKeyValueStores" in obj:
-                self.__externalSettings__.__keyValueStores__ = obj["externalKeyValueStores"]
-                self.__externalSettings__.keyValueStoreChanged.emit()
-            if "externalSelectedModule" in obj:
-                self.__externalSettings__.selectedModule = obj["externalSelectedModule"]
-            if "externalMidiOutDevice" in obj:
-                self.__externalSettings__.midiOutDevice = obj["externalMidiOutDevice"]
-            if not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
-                # TODO : `sample-bank.json` file is deprecated. sample data is now stored in sketchpad json. Remove this fallback later
-                # Read sample-bank.json and inject sample data to all saved versions as it should have with new latest sketchpad structure
-                warnings.warn("`sample-bank.json` is deprecated (will be removed soon) and is now stored in sketchpad json. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
-                with open(Path(self.bankDir) / "sample-bank.json", "r") as f:
-                    samples_obj = json.load(f)
-                for sketchpad_file in Path(self.__song__.sketchpad_folder).glob("*.sketchpad.json"):
-                    logging.debug(f"Injecting sample-bank to sketchpad {sketchpad_file}")
-                    with open(sketchpad_file, "r+") as f:
-                        _obj = json.load(f)
-                        _obj["tracks"][self.id]["samples"] = samples_obj
-                        f.seek(0)
-                        f.write(json.dumps(_obj))
-                        f.flush()
-                        os.fsync(f.fileno())
-                # Inject samples to current sketchpad data
-                obj["samples"] = samples_obj
-                # Delete sample-bank.json as we now have modified existing sketchpad files
-                (Path(self.bankDir) / "sample-bank.json").unlink(missing_ok=True)
-            if "samples" in obj:
-                bank_dir = Path(self.bankDir)
-                for i, clip in enumerate(obj["samples"]):
-                    if clip is None:
-                        self.__samples__[i].clear()
-                    else:
-                        self.__samples__[i].deserialize(clip)
-                self.samples_changed.emit()
-            if "clips" in obj:
-                for clipId, clip_model in enumerate(self.__clips_model__):
-                    self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId)
-                    for clip in clip_model.__clips__:
-                        clip.path_changed.connect(self.sketchSlotsDataChanged.emit)
-            if "selectedClip" in obj:
-                self.set_selected_clip(obj["selectedClip"], force_set=True)
-            else:
-                self.set_selected_clip(0, force_set=True)
-            if "layers_snapshot" in obj:
-                self.__layers_snapshot = obj["layers_snapshot"]
-                self.sound_data_changed.emit()
-            if "sample_picking_style" in obj:
-                self.set_samplePickingStyle(obj["sample_picking_style"])
-            if "trustExternalDeviceChannels" in obj:
-                self.set_trustExternalDeviceChannels(obj["trustExternalDeviceChannels"])
-            else:
-                self.set_trustExternalDeviceChannels(False)
-            if "keyzone_mode" in obj:
-                self.__keyzone_mode__ = obj["keyzone_mode"]
-                self.keyZoneModeChanged.emit();
-            if "routeThroughGlobalFX" in obj:
-                self.set_routeThroughGlobalFX(obj["routeThroughGlobalFX"], True)
-                # Run autoconnect to update jack connections when routeThrouGlobalFX is set
-                self.zynqtgui.zynautoconnect()
-            if "synthSlotsData" not in obj or "sampleSlotsData" not in obj or "sketchSlotsData" not in obj or "fxSlotsData" not in obj or "externalSlotsData" not in obj:
-                # Sketchpad does not have slots data. Schedule autosave explicitly to save the updated sketchpad json
-                # TODO : Rmove this check after a considerable amount of time when supposedly all the old sketchpads are migrated
-                self.__song__.schedule_save()
-            # Finally, make sure our selected slot value makes some decent amount of sense
-            self.selectFirstAndBestSlot()
-        except Exception as e:
-            logging.error(f"Error during channel deserialization: {e}")
-            traceback.print_exception(None, e, e.__traceback__)
+                if "externalMidiChannel" in obj:
+                    self.set_externalMidiChannel(obj["externalMidiChannel"])
+                if "externalAudioSource" in obj:
+                    self.set_externalAudioSource(obj["externalAudioSource"])
+                if "externalCaptureVolume" in obj:
+                    self.set_externalCaptureVolume(obj["externalCaptureVolume"])
+                if "externalDefaultKeyValueStore" in obj:
+                    self.__externalSettings__.__defaultKeyValueStore__ = obj["externalDefaultKeyValueStore"]
+                    self.__externalSettings__.keyValueStoreChanged.emit()
+                if "externalKeyValueStores" in obj:
+                    self.__externalSettings__.__keyValueStores__ = obj["externalKeyValueStores"]
+                    self.__externalSettings__.keyValueStoreChanged.emit()
+                if "externalSelectedModule" in obj:
+                    self.__externalSettings__.selectedModule = obj["externalSelectedModule"]
+                if "externalMidiOutDevice" in obj:
+                    self.__externalSettings__.midiOutDevice = obj["externalMidiOutDevice"]
+                if not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
+                    # TODO : `sample-bank.json` file is deprecated. sample data is now stored in sketchpad json. Remove this fallback later
+                    # Read sample-bank.json and inject sample data to all saved versions as it should have with new latest sketchpad structure
+                    warnings.warn("`sample-bank.json` is deprecated (will be removed soon) and is now stored in sketchpad json. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
+                    with open(Path(self.bankDir) / "sample-bank.json", "r") as f:
+                        samples_obj = json.load(f)
+                    for sketchpad_file in Path(self.__song__.sketchpad_folder).glob("*.sketchpad.json"):
+                        logging.debug(f"Injecting sample-bank to sketchpad {sketchpad_file}")
+                        with open(sketchpad_file, "r+") as f:
+                            _obj = json.load(f)
+                            _obj["tracks"][self.id]["samples"] = samples_obj
+                            f.seek(0)
+                            f.write(json.dumps(_obj))
+                            f.flush()
+                            os.fsync(f.fileno())
+                    # Inject samples to current sketchpad data
+                    obj["samples"] = samples_obj
+                    # Delete sample-bank.json as we now have modified existing sketchpad files
+                    (Path(self.bankDir) / "sample-bank.json").unlink(missing_ok=True)
+                if "samples" in obj:
+                    bank_dir = Path(self.bankDir)
+                    for i, clip in enumerate(obj["samples"]):
+                        if clip is None:
+                            self.__samples__[i].clear()
+                        else:
+                            self.__samples__[i].deserialize(clip)
+                    self.samples_changed.emit()
+                if "clips" in obj:
+                    for clipId, clip_model in enumerate(self.__clips_model__):
+                        self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId)
+                        for clip in clip_model.__clips__:
+                            clip.path_changed.connect(self.sketchSlotsDataChanged.emit)
+                if "selectedClip" in obj:
+                    self.set_selected_clip(obj["selectedClip"], force_set=True)
+                else:
+                    self.set_selected_clip(0, force_set=True)
+                if "layers_snapshot" in obj:
+                    self.__layers_snapshot = obj["layers_snapshot"]
+                    self.sound_data_changed.emit()
+                if "sample_picking_style" in obj:
+                    self.set_samplePickingStyle(obj["sample_picking_style"])
+                if "trustExternalDeviceChannels" in obj:
+                    self.set_trustExternalDeviceChannels(obj["trustExternalDeviceChannels"])
+                else:
+                    self.set_trustExternalDeviceChannels(False)
+                if "keyzone_mode" in obj:
+                    self.__keyzone_mode__ = obj["keyzone_mode"]
+                    self.keyZoneModeChanged.emit();
+                if "routeThroughGlobalFX" in obj:
+                    self.set_routeThroughGlobalFX(obj["routeThroughGlobalFX"], True)
+                    # Run autoconnect to update jack connections when routeThrouGlobalFX is set
+                    self.zynqtgui.zynautoconnect()
+                if "synthSlotsData" not in obj or "sampleSlotsData" not in obj or "sketchSlotsData" not in obj or "fxSlotsData" not in obj or "externalSlotsData" not in obj:
+                    # Sketchpad does not have slots data. Schedule autosave explicitly to save the updated sketchpad json
+                    # TODO : Rmove this check after a considerable amount of time when supposedly all the old sketchpads are migrated
+                    self.__song__.schedule_save()
+                # Finally, make sure our selected slot value makes some decent amount of sense
+                self.selectFirstAndBestSlot()
+            except Exception as e:
+                logging.error(f"Error during channel deserialization: {e}")
+                traceback.print_exception(None, e, e.__traceback__)
 
     def selectFirstAndBestSlot(self):
-        pickedASlot = False
-        if self.trackType == "synth" or self.trackType == "sample-trig":
-            for slotIndex, chainedSound in enumerate(self.__chained_sounds__):
-                if chainedSound > -1:
-                    self.__selected_slot_obj.setTo("TracksBar_synthslot", slotIndex, None)
-                    pickedASlot = True
-                    break
-            if pickedASlot == False:
-                for slotIndex, sample in enumerate(self.__samples__):
-                    if sample.path is not None and len(sample.path) > 0:
-                        self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None)
+        if not self.__song__.__to_be_deleted__:
+            pickedASlot = False
+            if self.trackType == "synth" or self.trackType == "sample-trig":
+                for slotIndex, chainedSound in enumerate(self.__chained_sounds__):
+                    if chainedSound > -1:
+                        self.__selected_slot_obj.setTo("TracksBar_synthslot", slotIndex, None)
                         pickedASlot = True
                         break
-            if pickedASlot == False:
-                for slotIndex, fx in enumerate(self.__chained_fx):
-                    if fx is not None:
-                        self.__selected_slot_obj.setTo("TracksBar_fxslot", slotIndex, None)
+                if pickedASlot == False:
+                    for slotIndex, sample in enumerate(self.__samples__):
+                        if sample.path is not None and len(sample.path) > 0:
+                            self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None)
+                            pickedASlot = True
+                            break
+                if pickedASlot == False:
+                    for slotIndex, fx in enumerate(self.__chained_fx):
+                        if fx is not None:
+                            self.__selected_slot_obj.setTo("TracksBar_fxslot", slotIndex, None)
+                            pickedASlot = True
+                            break
+                if pickedASlot == False:
+                    self.__selected_slot_obj.setTo("TracksBar_synthslot", 0, None)
+            elif self.trackType == "sample-loop":
+                for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    clips_model = self.getClipsModelById(slotIndex)
+                    clip = clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
+                    if clip.path is not None and len(clip.path) > 0:
+                        self.__selected_slot_obj.setTo("TracksBar_sketchslot", slotIndex, None)
                         pickedASlot = True
                         break
-            if pickedASlot == False:
-                self.__selected_slot_obj.setTo("TracksBar_synthslot", 0, None)
-        elif self.trackType == "sample-loop":
-            for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                clips_model = self.getClipsModelById(slotIndex)
-                clip = clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
-                if clip.path is not None and len(clip.path) > 0:
-                    self.__selected_slot_obj.setTo("TracksBar_sketchslot", slotIndex, None)
-                    pickedASlot = True
-                    break
-            if pickedASlot == False:
-                for slotIndex, fx in enumerate(self.__chained_sketch_fx):
-                    if fx is not None:
-                        self.__selected_slot_obj.setTo("TracksBar_sketchfxslot", slotIndex, None)
-                        pickedASlot = True
-                        break
-            if pickedASlot == False:
-                self.__selected_slot_obj.setTo("TracksBar_sketchslot", 0, None)
-        elif self.trackType == "external":
-            self.__selected_slot_obj.setTo("TracksBar_externalslot", 0, None)
+                if pickedASlot == False:
+                    for slotIndex, fx in enumerate(self.__chained_sketch_fx):
+                        if fx is not None:
+                            self.__selected_slot_obj.setTo("TracksBar_sketchfxslot", slotIndex, None)
+                            pickedASlot = True
+                            break
+                if pickedASlot == False:
+                    self.__selected_slot_obj.setTo("TracksBar_sketchslot", 0, None)
+            elif self.trackType == "external":
+                self.__selected_slot_obj.setTo("TracksBar_externalslot", 0, None)
 
     def set_layers_snapshot(self, snapshot):
-        self.__layers_snapshot = snapshot
-        self.sound_data_changed.emit()
+        if not self.__song__.__to_be_deleted__:
+            self.__layers_snapshot = snapshot
+            self.sound_data_changed.emit()
 
     def get_layers_snapshot(self):
         return self.__layers_snapshot
@@ -1182,17 +1205,18 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def clear(self):
-        channel = self.__song__.channelsModel.getChannel(self.__id__)
-        clipsModel = channel.clipsModel
+        if not self.__song__.__to_be_deleted__:
+            channel = self.__song__.channelsModel.getChannel(self.__id__)
+            clipsModel = channel.clipsModel
 
-        logging.debug(f"Channel {channel} ClipsModel {clipsModel}")
+            logging.debug(f"Channel {channel} ClipsModel {clipsModel}")
 
-        for clip_index in range(0, clipsModel.count):
-            logging.debug(f"Channel {self.__id__} Clip {clip_index}")
-            clip: sketchpad_clip = clipsModel.getClip(clip_index)
-            logging.debug(
-                f"Clip : clip.row({clip.row}), clip.col({clip.col}), clip({clip})")
-            clip.clear()
+            for clip_index in range(0, clipsModel.count):
+                logging.debug(f"Channel {self.__id__} Clip {clip_index}")
+                clip: sketchpad_clip = clipsModel.getClip(clip_index)
+                logging.debug(
+                    f"Clip : clip.row({clip.row}), clip.col({clip.col}), clip({clip})")
+                clip.clear()
 
     ### BEGIN Property name
     @Signal
@@ -1254,11 +1278,12 @@ class sketchpad_channel(QObject):
 
     ### BEGIN Property gainHandler
     def handleGainChanged(self):
-        self.volume_changed.emit()
-        self.__song__.schedule_save()
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
-        if self.zynqtgui.sketchpad.selectedTrackId == self.__id__:
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
+        if not self.__song__.__to_be_deleted__:
+            self.volume_changed.emit()
+            self.__song__.schedule_save()
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
+            if self.zynqtgui.sketchpad.selectedTrackId == self.__id__:
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
     def get_gainHandler(self):
         return self.__volume__
     gainHandler = Property(QObject, get_gainHandler, constant=True)
@@ -1410,22 +1435,6 @@ class sketchpad_channel(QObject):
     def checkIfLayerExists(self, channel):
         return channel in self.__song__.get_metronome_manager().zynqtgui.screens["layer"].layer_midi_map.keys()
 
-    @Slot(int, result='QVariantList')
-    def chainForLayer(self,chan):
-        chain = []
-        for i in range (16):
-            if zynqtgui.screens['layer'].is_midi_cloned(chan, i) or zynqtgui.screens['layer'].is_midi_cloned(i, chan):
-                cain.append(i)
-        return chain
-
-    @Slot(int, result='QVariantList')
-    def printableChainForLayer(self,chan):
-        chain = ""
-        for i in range (16):
-            if zynqtgui.screens['layer'].is_midi_cloned(chan, i) or zynqtgui.screens['layer'].is_midi_cloned(i, chan):
-                cain.append(" {}".format(i))
-        return chain
-
     @Slot(int)
     def selectSound(self, index):
         zynqtgui = self.__song__.get_metronome_manager().zynqtgui
@@ -1536,67 +1545,69 @@ class sketchpad_channel(QObject):
         self.__synthRoutingDataUpdaterThrottle__.start()
 
     def updateSynthRoutingDataActual(self):
-        # logging.error(f"Updating routing data for {self.name} with chained sounds {self.__chained_sounds__}")
-        for position in range(0, 5):
-            newEntry = self.__chained_sounds__[position]
-            if newEntry > -1 and self.checkIfLayerExists(newEntry):
-                # if any engines have been added, ensure the synth engine data slot has that information
-                newLayer = self.zynqtgui.layer.layer_midi_map[newEntry]
-                # logging.error(f"Updating data container for {newLayer.engine.name}")
-                dataContainer = self.__routingData__["synth"][position]
-                dataContainer.name = self.getLayerNameByMidiChannel(newEntry)
-                audioInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_audio=True, is_input=True)
-                for port in audioInPorts:
-                    # logging.error(f"Adding audio in port for {port}")
-                    dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
-                midiInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_midi=True, is_input=True)
-                for port in midiInPorts:
-                    # logging.error(f"Adding midi in port for {port}")
-                    dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
-            elif newEntry == -1: # Don't clear data unless the position is actually cleared
-                # if any engines have been removed, clear out the equivalent synth engine data slot
-                self.__routingData__["synth"][position].clear()
+        if not self.__song__.__to_be_deleted__:
+            # logging.error(f"Updating routing data for {self.name} with chained sounds {self.__chained_sounds__}")
+            for position in range(0, 5):
+                newEntry = self.__chained_sounds__[position]
+                if newEntry > -1 and self.checkIfLayerExists(newEntry):
+                    # if any engines have been added, ensure the synth engine data slot has that information
+                    newLayer = self.zynqtgui.layer.layer_midi_map[newEntry]
+                    # logging.error(f"Updating data container for {newLayer.engine.name}")
+                    dataContainer = self.__routingData__["synth"][position]
+                    dataContainer.name = self.getLayerNameByMidiChannel(newEntry)
+                    audioInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_audio=True, is_input=True)
+                    for port in audioInPorts:
+                        # logging.error(f"Adding audio in port for {port}")
+                        dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+                    midiInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_midi=True, is_input=True)
+                    for port in midiInPorts:
+                        # logging.error(f"Adding midi in port for {port}")
+                        dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+                elif newEntry == -1: # Don't clear data unless the position is actually cleared
+                    # if any engines have been removed, clear out the equivalent synth engine data slot
+                    self.__routingData__["synth"][position].clear()
 
     def set_chained_sounds(self, sounds, updateRoutingData:bool = True):
-        logging.debug(f"set_chained_sounds : {sounds}")
-        update_jack_ports = True
+        if not self.__song__.__to_be_deleted__:
+            logging.debug(f"set_chained_sounds : {sounds}")
+            update_jack_ports = True
 
-        # Stop all playing notes
-        for old_chan in self.__chained_sounds__:
-            if old_chan > -1:
-                self.zynqtgui.raw_all_notes_off_chan(self.id)
+            # Stop all playing notes
+            for old_chan in self.__chained_sounds__:
+                if old_chan > -1:
+                    self.zynqtgui.raw_all_notes_off_chan(self.id)
 
-        chained_sounds = [-1, -1, -1, -1, -1]
-        for i, sound in enumerate(sounds):
-            if sound not in chained_sounds:
-                chained_sounds[i] = sound
+            chained_sounds = [-1, -1, -1, -1, -1]
+            for i, sound in enumerate(sounds):
+                if sound not in chained_sounds:
+                    chained_sounds[i] = sound
 
-        if chained_sounds == self.__chained_sounds__:
-            update_jack_ports = False
+            if chained_sounds == self.__chained_sounds__:
+                update_jack_ports = False
 
-        oldChainedSounds = self.__chained_sounds__
-        self.__chained_sounds__ = chained_sounds
+            oldChainedSounds = self.__chained_sounds__
+            self.__chained_sounds__ = chained_sounds
 
-        try: #can be called before creation
-            self.zynqtgui.screens['layers_for_channel'].fill_list()
-            if self.connectedSound >= 0:
-                self.zynqtgui.screens['layers_for_channel'].layer_selection_consistency_check()
-            else:
-                self.zynqtgui.screens['layers_for_channel'].select_action(
-                    self.zynqtgui.screens['layers_for_channel'].current_index)
-        except:
-            pass
+            try: #can be called before creation
+                self.zynqtgui.screens['layers_for_channel'].fill_list()
+                if self.connectedSound >= 0:
+                    self.zynqtgui.screens['layers_for_channel'].layer_selection_consistency_check()
+                else:
+                    self.zynqtgui.screens['layers_for_channel'].select_action(
+                        self.zynqtgui.screens['layers_for_channel'].current_index)
+            except:
+                pass
 
-        if update_jack_ports:
-            self.update_jack_port()
+            if update_jack_ports:
+                self.update_jack_port()
 
-        if updateRoutingData:
-            self.updateSynthRoutingData()
+            if updateRoutingData:
+                self.updateSynthRoutingData()
 
-        self.__sound_snapshot_changed = True
-        if self.zynqtgui.isBootingComplete:
-            self.__song__.schedule_save()
-        self.chained_sounds_changed.emit()
+            self.__sound_snapshot_changed = True
+            if self.zynqtgui.isBootingComplete:
+                self.__song__.schedule_save()
+            self.chained_sounds_changed.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)
@@ -1607,85 +1618,90 @@ class sketchpad_channel(QObject):
         return self.__chained_fx
 
     def set_chainedFx(self, fx):
-        if fx != self.__chained_fx:
-            self.__chained_fx = fx
-            for slot_index, layer in enumerate(fx):
-                self.updateChainedFxEngineData(slot_index, layer)
-            self.update_jack_port()
-            self.__sound_snapshot_changed = True
-            self.__song__.schedule_save()
-            self.chainedFxChanged.emit()
-            self.chainedFxNamesChanged.emit()
+        if not self.__song__.__to_be_deleted__:
+            if fx != self.__chained_fx:
+                self.__chained_fx = fx
+                for slot_index, layer in enumerate(fx):
+                    self.updateChainedFxEngineData(slot_index, layer)
+                self.update_jack_port()
+                self.__sound_snapshot_changed = True
+                self.__song__.schedule_save()
+                self.chainedFxChanged.emit()
+                self.chainedFxNamesChanged.emit()
 
     # Add or replace a fx layer at slot_row to fx chain
     # If explicit slot_row is not set then selected slot row is used
     def setFxToChain(self, layer, slot_row=-1):
-        if slot_row == -1:
-            slot_row = self.__selected_fx_slot_row
+        if not self.__song__.__to_be_deleted__:
+            if slot_row == -1:
+                slot_row = self.__selected_fx_slot_row
 
-        if self.__chained_fx[slot_row] is not None:
-            self.zynqtgui.zynautoconnect_acquire_lock()
-            self.__chained_fx[slot_row].reset()
-            self.zynqtgui.zynautoconnect_release_lock()
-            self.zynqtgui.screens['engine'].stop_unused_engines()
-            self.__routingData__["fx"][slot_row].clear()
+            if self.__chained_fx[slot_row] is not None:
+                self.zynqtgui.zynautoconnect_acquire_lock()
+                self.__chained_fx[slot_row].reset()
+                self.zynqtgui.zynautoconnect_release_lock()
+                self.zynqtgui.screens['engine'].stop_unused_engines()
+                self.__routingData__["fx"][slot_row].clear()
 
-        self.__chained_fx[slot_row] = layer
-        self.updateChainedFxEngineData(slot_row, layer)
-        self.__sound_snapshot_changed = True
-        self.update_jack_port()
-        self.chainedFxChanged.emit()
-        self.chainedFxNamesChanged.emit()
+            self.__chained_fx[slot_row] = layer
+            self.updateChainedFxEngineData(slot_row, layer)
+            self.__sound_snapshot_changed = True
+            self.update_jack_port()
+            self.chainedFxChanged.emit()
+            self.chainedFxNamesChanged.emit()
 
     @Slot()
     def removeSelectedFxFromChain(self):
-        self.removeFxFromChain(self.__selected_fx_slot_row)
+        if not self.__song__.__to_be_deleted__:
+            self.removeFxFromChain(self.__selected_fx_slot_row)
 
     @Slot(int)
     def removeFxFromChain(self, fxSlotIndex, showLoadingScreen=True):
-        if -1 < fxSlotIndex and fxSlotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
-            def task():
-                if self.__chained_fx[fxSlotIndex] is not None:
-                    try:
-                        layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[fxSlotIndex])
-                        self.zynqtgui.layer.remove_layer(layer_index)
-                        self.__chained_fx[fxSlotIndex] = None
-                        self.__routingData__["fx"][fxSlotIndex].clear()
-                        # Ensure we clear the passthrough (or it'll retain its value)
-                        passthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][fxSlotIndex]
-                        self.__song__.clearPassthroughClient(passthroughClient)
-                        passthroughClient.setPanAmount(self.__initial_pan__)
-                        passthroughClient.setDryWetMixAmount(1)
-                        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+        if not self.__song__.__to_be_deleted__:
+            if -1 < fxSlotIndex and fxSlotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+                def task():
+                    if self.__chained_fx[fxSlotIndex] is not None:
+                        try:
+                            layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[fxSlotIndex])
+                            self.zynqtgui.layer.remove_layer(layer_index)
+                            self.__chained_fx[fxSlotIndex] = None
+                            self.__routingData__["fx"][fxSlotIndex].clear()
+                            # Ensure we clear the passthrough (or it'll retain its value)
+                            passthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][fxSlotIndex]
+                            self.__song__.clearPassthroughClient(passthroughClient)
+                            passthroughClient.setPanAmount(self.__initial_pan__)
+                            passthroughClient.setDryWetMixAmount(1)
+                            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
-                        self.chainedFxChanged.emit()
-                        self.chainedFxNamesChanged.emit()
-            #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
-            #            self.zynqtgui.layer_effects.fx_layer = None
-            #            self.zynqtgui.layer_effects.fill_list()
-            #            self.zynqtgui.main_layers_view.fill_list()
-            #            self.zynqtgui.fixed_layers.fill_list()
-                    except Exception as e:
-                        logging.exception(e)
+                            self.chainedFxChanged.emit()
+                            self.chainedFxNamesChanged.emit()
+                #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
+                #            self.zynqtgui.layer_effects.fx_layer = None
+                #            self.zynqtgui.layer_effects.fill_list()
+                #            self.zynqtgui.main_layers_view.fill_list()
+                #            self.zynqtgui.fixed_layers.fill_list()
+                        except Exception as e:
+                            logging.exception(e)
 
-                    if showLoadingScreen:
-                        QTimer.singleShot(1000, self.zynqtgui.end_long_task)
+                        if showLoadingScreen:
+                            QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
-            if showLoadingScreen:
-                self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
-            else:
-                task()
+                if showLoadingScreen:
+                    self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
+                else:
+                    task()
 
     def updateChainedFxEngineData(self, position, layer):
-        if layer is not None:
-            dataContainer = self.__routingData__["fx"][position]
-            dataContainer.name = self.chainedFxNames[position]
-            audioInPorts = self.jclient.get_ports(layer.jackname, is_audio=True, is_input=True)
-            for port in audioInPorts:
-                dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
-            midiInPorts = self.jclient.get_ports(layer.jackname, is_midi=True, is_input=True)
-            for port in midiInPorts:
-                dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+        if not self.__song__.__to_be_deleted__:
+            if layer is not None:
+                dataContainer = self.__routingData__["fx"][position]
+                dataContainer.name = self.chainedFxNames[position]
+                audioInPorts = self.jclient.get_ports(layer.jackname, is_audio=True, is_input=True)
+                for port in audioInPorts:
+                    dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+                midiInPorts = self.jclient.get_ports(layer.jackname, is_midi=True, is_input=True)
+                for port in midiInPorts:
+                    dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
 
     chainedFxChanged = Signal()
     chainedFx = Property('QVariantList', get_chainedFx, set_chainedFx, notify=chainedFxChanged)
@@ -1716,82 +1732,87 @@ class sketchpad_channel(QObject):
         return self.__chained_sketch_fx
 
     def set_chainedSketchFx(self, fx):
-        if fx != self.__chained_sketch_fx:
-            self.__chained_sketch_fx = fx
-            for slot_index, layer in enumerate(fx):
-                self.updateChainedSketchFxEngineData(slot_index, layer)
-            self.update_jack_port()
-            self.__sound_snapshot_changed = True
-            self.__song__.schedule_save()
-            self.chainedSketchFxChanged.emit()
-            self.chainedSketchFxNamesChanged.emit()
+        if not self.__song__.__to_be_deleted__:
+            if fx != self.__chained_sketch_fx:
+                self.__chained_sketch_fx = fx
+                for slot_index, layer in enumerate(fx):
+                    self.updateChainedSketchFxEngineData(slot_index, layer)
+                self.update_jack_port()
+                self.__sound_snapshot_changed = True
+                self.__song__.schedule_save()
+                self.chainedSketchFxChanged.emit()
+                self.chainedSketchFxNamesChanged.emit()
 
     # Add or replace a fx layer at slot_row to fx chain
     # If explicit slot_row is not set then selected slot row is used
     def setSketchFxToChain(self, layer, slot_row=-1):
-        if slot_row == -1:
-            if self.selectedSlot.className == "TracksBar_sketchfxslot":
-                slot_row == self.selectedSlot.value
-            else:
-                logging.error(f"Selected Slot is not a TracksBar_sketchfxslot. Cannot continue adding fx! : slotType({self.selectedSlot.className}), value({self.selectedSlot.value})")
-                return
+        if not self.__song__.__to_be_deleted__:
+            if slot_row == -1:
+                if self.selectedSlot.className == "TracksBar_sketchfxslot":
+                    slot_row == self.selectedSlot.value
+                else:
+                    logging.error(f"Selected Slot is not a TracksBar_sketchfxslot. Cannot continue adding fx! : slotType({self.selectedSlot.className}), value({self.selectedSlot.value})")
+                    return
 
-        if self.__chained_sketch_fx[slot_row] is not None:
-            self.zynqtgui.zynautoconnect_acquire_lock()
-            self.__chained_sketch_fx[slot_row].reset()
-            self.zynqtgui.zynautoconnect_release_lock()
-            self.zynqtgui.screens['engine'].stop_unused_engines()
-            self.__routingData__["sketchfx"][slot_row].clear()
+            if self.__chained_sketch_fx[slot_row] is not None:
+                self.zynqtgui.zynautoconnect_acquire_lock()
+                self.__chained_sketch_fx[slot_row].reset()
+                self.zynqtgui.zynautoconnect_release_lock()
+                self.zynqtgui.screens['engine'].stop_unused_engines()
+                self.__routingData__["sketchfx"][slot_row].clear()
 
-        self.update_jack_port()
-        self.__chained_sketch_fx[slot_row] = layer
-        self.updateChainedSketchFxEngineData(slot_row, layer)
-        self.__sound_snapshot_changed = True
-        self.chainedSketchFxChanged.emit()
-        self.chainedSketchFxNamesChanged.emit()
+            self.update_jack_port()
+            self.__chained_sketch_fx[slot_row] = layer
+            self.updateChainedSketchFxEngineData(slot_row, layer)
+            self.__sound_snapshot_changed = True
+            self.chainedSketchFxChanged.emit()
+            self.chainedSketchFxNamesChanged.emit()
 
     @Slot()
     def removeSelectedSketchFxFromChain(self):
-        if self.selectedSlot.className == "TracksBar_sketchfxslot":
-           self.removeSketchFxFromChain(self.selectedSlot.value)
-        else:
-           logging.error(f"Selected Slot is not a TracksBar_sketchfxslot. Cannot continue removing fx! : slotType({self.selectedSlot.className}), value({self.selectedSlot.value})")
-           return
+        if not self.__song__.__to_be_deleted__:
+            if self.selectedSlot.className == "TracksBar_sketchfxslot":
+               self.removeSketchFxFromChain(self.selectedSlot.value)
+            else:
+               logging.error(f"Selected Slot is not a TracksBar_sketchfxslot. Cannot continue removing fx! : slotType({self.selectedSlot.className}), value({self.selectedSlot.value})")
+               return
 
     @Slot(int)
     def removeSketchFxFromChain(self, fxSlotIndex):
-        if -1 < fxSlotIndex and fxSlotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
-            def task():
-                if self.__chained_sketch_fx[fxSlotIndex] is not None:
-                    try:
-                        layer_index = self.zynqtgui.layer.layers.index(self.__chained_sketch_fx[fxSlotIndex])
-                        self.zynqtgui.layer.remove_layer(layer_index)
-                        self.__chained_sketch_fx[fxSlotIndex] = None
-                        self.__routingData__["sketchfx"][fxSlotIndex].clear()
-                        # Ensure we clear the passthrough (or it'll retain its value)
-                        passthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][fxSlotIndex]
-                        self.__song__.clearPassthroughClient(passthroughClient)
-                        passthroughClient.setPanAmount(self.__initial_pan__)
-                        passthroughClient.setDryWetMixAmount(1)
-                        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+        if not self.__song__.__to_be_deleted__:
+            if -1 < fxSlotIndex and fxSlotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+                def task():
+                    if self.__chained_sketch_fx[fxSlotIndex] is not None:
+                        try:
+                            layer_index = self.zynqtgui.layer.layers.index(self.__chained_sketch_fx[fxSlotIndex])
+                            self.zynqtgui.layer.remove_layer(layer_index)
+                            self.__chained_sketch_fx[fxSlotIndex] = None
+                            self.__routingData__["sketchfx"][fxSlotIndex].clear()
+                            # Ensure we clear the passthrough (or it'll retain its value)
+                            passthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][fxSlotIndex]
+                            self.__song__.clearPassthroughClient(passthroughClient)
+                            passthroughClient.setPanAmount(self.__initial_pan__)
+                            passthroughClient.setDryWetMixAmount(1)
+                            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
-                        self.chainedSketchFxChanged.emit()
-                        self.chainedSketchFxNamesChanged.emit()
-                    except Exception as e:
-                        logging.exception(e)
-                    QTimer.singleShot(1, self.zynqtgui.end_long_task)
-            self.zynqtgui.do_long_task(task, f"Removing {self.chainedSketchFxNames[fxSlotIndex]} from slot {fxSlotIndex + 1} on Track {self.name}")
+                            self.chainedSketchFxChanged.emit()
+                            self.chainedSketchFxNamesChanged.emit()
+                        except Exception as e:
+                            logging.exception(e)
+                        QTimer.singleShot(1, self.zynqtgui.end_long_task)
+                self.zynqtgui.do_long_task(task, f"Removing {self.chainedSketchFxNames[fxSlotIndex]} from slot {fxSlotIndex + 1} on Track {self.name}")
 
     def updateChainedSketchFxEngineData(self, position, layer):
-        if layer is not None:
-            dataContainer = self.__routingData__["sketchfx"][position]
-            dataContainer.name = self.chainedSketchFxNames[position]
-            audioInPorts = self.jclient.get_ports(layer.jackname, is_audio=True, is_input=True)
-            for port in audioInPorts:
-                dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
-            midiInPorts = self.jclient.get_ports(layer.jackname, is_midi=True, is_input=True)
-            for port in midiInPorts:
-                dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+        if not self.__song__.__to_be_deleted__:
+            if layer is not None:
+                dataContainer = self.__routingData__["sketchfx"][position]
+                dataContainer.name = self.chainedSketchFxNames[position]
+                audioInPorts = self.jclient.get_ports(layer.jackname, is_audio=True, is_input=True)
+                for port in audioInPorts:
+                    dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+                midiInPorts = self.jclient.get_ports(layer.jackname, is_midi=True, is_input=True)
+                for port in midiInPorts:
+                    dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
 
     chainedSketchFxChanged = Signal()
     chainedSketchFx = Property('QVariantList', get_chainedSketchFx, set_chainedSketchFx, notify=chainedSketchFxChanged)
@@ -2017,13 +2038,14 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def handleAudioTypeSettingsChanged(self):
-        self.panChanged.emit()
-        self.dryAmountChanged.emit()
-        self.wetFx1AmountChanged.emit()
-        self.wetFx2AmountChanged.emit()
-        self.synthPassthroughMixingChanged.emit()
-        self.fxPassthroughMixingChanged.emit()
-        self.sketchFxPassthroughMixingChanged.emit()
+        if not self.__song__.__to_be_deleted__:
+            self.panChanged.emit()
+            self.dryAmountChanged.emit()
+            self.wetFx1AmountChanged.emit()
+            self.wetFx2AmountChanged.emit()
+            self.synthPassthroughMixingChanged.emit()
+            self.fxPassthroughMixingChanged.emit()
+            self.sketchFxPassthroughMixingChanged.emit()
 
     trackTypeKey = Property(str, audioTypeKey, notify=track_type_changed)
     trackType = Property(str, get_track_type, set_track_type, notify=track_type_changed)
@@ -2312,31 +2334,32 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def emitCurrentSlotCUIAFeedback(self):
-        knownGain = 0.0
-        knownPan = 0.0
-        if self.audioTypeKey() == "synth":
-            synthIndex = self.chainedSounds[self.selectedSlotRow]
-            if synthIndex > -1:
-                knownGain = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][self.selectedSlotRow]["dryAmount"]
-                knownPan = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][self.selectedSlotRow]["panAmount"]
-        elif self.audioTypeKey() == "sample":
-            sample = self.samples[self.selectedSlotRow]
-            if sample.audioSource:
-                knownGain = sample.audioSource.rootSlice().gainHandler().gainAbsolute()
-                knownPan = sample.audioSource.rootSlice().pan()
-        elif self.audioTypeKey() == "sketch":
-            theClip = self.getClipsModelById(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
-            if theClip.audioSource:
-                knownGain = theClip.audioSource.rootSlice().gainHandler().gainAbsolute()
-                knownPan = theClip.audioSource.rootSlice().pan()
-        elif self.audioTypeKey() == "external":
-            pass
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownGain, (0, 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownPan, (-1, 1), (0, 127)))
-        knownDryWetMixAmount = 0.0
-        if self.chainedFx[self.__selected_fx_slot_row]:
-            knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
+        if not self.__song__.__to_be_deleted__:
+            knownGain = 0.0
+            knownPan = 0.0
+            if self.audioTypeKey() == "synth":
+                synthIndex = self.chainedSounds[self.selectedSlotRow]
+                if synthIndex > -1:
+                    knownGain = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][self.selectedSlotRow]["dryAmount"]
+                    knownPan = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][self.selectedSlotRow]["panAmount"]
+            elif self.audioTypeKey() == "sample":
+                sample = self.samples[self.selectedSlotRow]
+                if sample.audioSource:
+                    knownGain = sample.audioSource.rootSlice().gainHandler().gainAbsolute()
+                    knownPan = sample.audioSource.rootSlice().pan()
+            elif self.audioTypeKey() == "sketch":
+                theClip = self.getClipsModelById(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
+                if theClip.audioSource:
+                    knownGain = theClip.audioSource.rootSlice().gainHandler().gainAbsolute()
+                    knownPan = theClip.audioSource.rootSlice().pan()
+            elif self.audioTypeKey() == "external":
+                pass
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownGain, (0, 1), (0, 127)))
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownPan, (-1, 1), (0, 127)))
+            knownDryWetMixAmount = 0.0
+            if self.chainedFx[self.__selected_fx_slot_row]:
+                knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
 
         # TODO : sketchFx
 
@@ -2436,10 +2459,11 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def emitCurrentClipCUIAFeedback(self):
-        if self.__id__ == self.zynqtgui.sketchpad.selectedTrackId:
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
-        # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
+        if not self.__song__.__to_be_deleted__:
+            if self.__id__ == self.zynqtgui.sketchpad.selectedTrackId:
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
+            # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
 
     # BEGIN Property externalSettings
     def get_externalSettings(self):
@@ -2608,13 +2632,14 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def handleDryAmountChanged(self):
-        for slotType in range(0, 2):
-            for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
-                passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
-                dryAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"]
-                # logging.info(f"Changing channel dry amount for {self.__id__} lane {laneId} from {passthroughClient.dryAmount()} to {dryAmount}")
-                passthroughClient.dryGainHandler().setGain(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"])
+        if not self.__song__.__to_be_deleted__:
+            for slotType in range(0, 2):
+                for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
+                    passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
+                    dryAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"]
+                    # logging.info(f"Changing channel dry amount for {self.__id__} lane {laneId} from {passthroughClient.dryAmount()} to {dryAmount}")
+                    passthroughClient.dryGainHandler().setGain(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"])
 
     dryAmount = Property(float, get_dryAmount, set_dryAmount, notify=dryAmountChanged)
     ### END Property dryAmount
@@ -2637,11 +2662,12 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def handleWetFx1AmountChanged(self):
-        for slotType in range(0, 2):
-            for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
-                passthroughClient.wetFx1GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx1Amount"], (0, 100), (0, 1)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
+        if not self.__song__.__to_be_deleted__:
+            for slotType in range(0, 2):
+                for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
+                    passthroughClient.wetFx1GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx1Amount"], (0, 100), (0, 1)))
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
 
     wetFx1Amount = Property(float, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
     ### END Property wetFx1Amount
@@ -2664,11 +2690,12 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def handleWetFx2AmountChanged(self):
-        for slotType in range(0, 2):
-            for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
-                passthroughClient.wetFx2GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx2Amount"], (0, 100), (0, 1)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
+        if not self.__song__.__to_be_deleted__:
+            for slotType in range(0, 2):
+                for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
+                    passthroughClient.wetFx2GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx2Amount"], (0, 100), (0, 1)))
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
     """
     Store wetFx2Amount for current channel as a property and set it to JackPassthrough when value changes
     Stored value ranges from 0-100 and accepted range by setWetFx2Amount is 0-1
@@ -2702,15 +2729,16 @@ class sketchpad_channel(QObject):
     ### BEGIN synthPassthrough properties
     @Slot(None)
     def handleSynthPassthroughMixingChanged(self):
-        for laneId in range(0, 5):
-            if self.__chained_sounds__[laneId] > -1:
-                synthPassthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[self.__chained_sounds__[laneId]]
-                panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][laneId]["panAmount"]
-                dryAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][laneId]["dryAmount"]
-                # logging.info(f"Changing pan/dry amounts for {self.__id__} lane {laneId} from {synthPassthroughClient.panAmount()} and {synthPassthroughClient.dryAmount()} from {panAmount} to {dryAmount}")
-                synthPassthroughClient.setPanAmount(panAmount)
-                synthPassthroughClient.dryGainHandler().setGain(dryAmount)
-                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+        if not self.__song__.__to_be_deleted__:
+            for laneId in range(0, 5):
+                if self.__chained_sounds__[laneId] > -1:
+                    synthPassthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[self.__chained_sounds__[laneId]]
+                    panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][laneId]["panAmount"]
+                    dryAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][laneId]["dryAmount"]
+                    # logging.info(f"Changing pan/dry amounts for {self.__id__} lane {laneId} from {synthPassthroughClient.panAmount()} and {synthPassthroughClient.dryAmount()} from {panAmount} to {dryAmount}")
+                    synthPassthroughClient.setPanAmount(panAmount)
+                    synthPassthroughClient.dryGainHandler().setGain(dryAmount)
+                    self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
     def get_synthPassthrough0pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"]
     def get_synthPassthrough0dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"]
@@ -2738,14 +2766,15 @@ class sketchpad_channel(QObject):
     ### BEGIN fxPassthrough properties
     @Slot(None)
     def handleFxPassthroughMixingChanged(self):
-        for laneId in range(0, 5):
-            fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][laneId]
-            panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["panAmount"]
-            dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["dryWetMixAmount"]
-            # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
-            fxPassthroughClient.setPanAmount(panAmount)
-            fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
-            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+        if not self.__song__.__to_be_deleted__:
+            for laneId in range(0, 5):
+                fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][laneId]
+                panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["panAmount"]
+                dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["dryWetMixAmount"]
+                # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
+                fxPassthroughClient.setPanAmount(panAmount)
+                fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
     def get_fxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["panAmount"]
     def get_fxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["dryWetMixAmount"]
@@ -2771,17 +2800,18 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def handleSketchFxPassthroughMixingChanged(self):
-        for laneId in range(0, 5):
-            try:
-                fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][laneId]
-                panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"]
-                dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"]
-                # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
-                fxPassthroughClient.setPanAmount(panAmount)
-                fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
-                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
-            except Exception as e:
-                logging.error(f"Error occured in handlingSketchFxPassthroughMixingChanged : str(e)")
+        if not self.__song__.__to_be_deleted__:
+            for laneId in range(0, 5):
+                try:
+                    fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][laneId]
+                    panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"]
+                    dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"]
+                    # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
+                    fxPassthroughClient.setPanAmount(panAmount)
+                    fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
+                    self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+                except Exception as e:
+                    logging.error(f"Error occured in handlingSketchFxPassthroughMixingChanged : str(e)")
 
     def get_sketchFxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][0]["panAmount"]
     def get_sketchFxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][0]["dryWetMixAmount"]

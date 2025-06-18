@@ -228,112 +228,114 @@ class sketchpad_song(QObject):
         self.__to_be_deleted__ = True
 
     def serialize(self):
-        trackPassthroughClientsData = []
-        for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-            track = self.channelsModel.getChannel(trackIndex)
-            slotTypesData = []
-            for slotType in range(0, 2):
-                laneData = []
-                # For the future - if we eventually want to add in lane-independent equalisers here, simply comment this back in, and the loading will work
-                # for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                    # laneData.append(serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex)))
-                laneData.append(serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, 0)))
-                slotTypesData.append(laneData)
-            trackPassthroughClientsData.append(slotTypesData)
-        return {
-            "name": self.__name__,
-            "bpm": self.__bpm__,
-            "volume": self.__volume__,
-            "selectedScaleIndex": self.__selected_scale_index__,
-            "octave": self.__octave__,
-            "tracks": self.__channels_model__.serialize(),
-            "scenes": self.__scenes_model__.serialize(),
-            "arrangements": self.__arrangements_model__.serialize(),
-            "globalPlaybackClient": serializePassthroughData(Zynthbox.Plugin.instance().globalPlaybackClient()),
-            "trackPassthroughClients": trackPassthroughClientsData
-        }
+        if not self.__to_be_deleted__:
+            trackPassthroughClientsData = []
+            for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
+                track = self.channelsModel.getChannel(trackIndex)
+                slotTypesData = []
+                for slotType in range(0, 2):
+                    laneData = []
+                    # For the future - if we eventually want to add in lane-independent equalisers here, simply comment this back in, and the loading will work
+                    # for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                        # laneData.append(serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex)))
+                    laneData.append(serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, 0)))
+                    slotTypesData.append(laneData)
+                trackPassthroughClientsData.append(slotTypesData)
+            return {
+                "name": self.__name__,
+                "bpm": self.__bpm__,
+                "volume": self.__volume__,
+                "selectedScaleIndex": self.__selected_scale_index__,
+                "octave": self.__octave__,
+                "tracks": self.__channels_model__.serialize(),
+                "scenes": self.__scenes_model__.serialize(),
+                "arrangements": self.__arrangements_model__.serialize(),
+                "globalPlaybackClient": serializePassthroughData(Zynthbox.Plugin.instance().globalPlaybackClient()),
+                "trackPassthroughClients": trackPassthroughClientsData
+            }
 
     def save(self, autosave=True, save_empty=False):
-        if self.__is_saving__ == False and self.__is_loading__ == False:
-            if self.__to_be_deleted__:
-                return
-            self.set_isSaving(True)
+        if not self.__to_be_deleted__:
+            if self.__is_saving__ == False and self.__is_loading__ == False:
+                if self.__to_be_deleted__:
+                    return
+                self.set_isSaving(True)
 
-            sketchpad_file = None
-            save_snapshot = None
-            soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
-            current_state_obj = self.serialize()
+                sketchpad_file = None
+                save_snapshot = None
+                soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
+                current_state_obj = self.serialize()
 
-            if not self.isTemp and autosave is True:
-                logging.debug("Writing autosave")
-                # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
-                save_snapshot = False
-                # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
-                # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
-                sketchpad_file = Path(self.sketchpad_folder) / "Autosave.sketchpad.json"
-                # Since this is an autosave, sketchpad has unsaved changes
-                self.hasUnsavedChanges = True
-            else:
-                if self.isTemp:
-                    # For temp sketchpad, do not save snapshot as it relies on last_state snapshot
+                if not self.isTemp and autosave is True:
+                    logging.debug("Writing autosave")
+                    # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
                     save_snapshot = False
-                    # temp sketchpad should always have hasUnsavedChanges set to True
+                    # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
+                    # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
+                    sketchpad_file = Path(self.sketchpad_folder) / "Autosave.sketchpad.json"
+                    # Since this is an autosave, sketchpad has unsaved changes
                     self.hasUnsavedChanges = True
                 else:
-                    # For non temp sketchpads, do save snapshot
-                    save_snapshot = True
-                    # For non temp sketchpads, saving sketchpad deletes the autosave and hence mark hasUnsavedChanges to False
-                    self.hasUnsavedChanges = False
-                # Since this is not an autosave, set sketchpad file name to fullname
-                sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
-                logging.info(f"Storing sketchpad to {str(sketchpad_file)}")
-                # Also delete the cache file as we are performing a sketchpad save initiated by user
-                Path(self.sketchpad_folder + "Autosave.sketchpad.json").unlink(missing_ok=True)
+                    if self.isTemp:
+                        # For temp sketchpad, do not save snapshot as it relies on last_state snapshot
+                        save_snapshot = False
+                        # temp sketchpad should always have hasUnsavedChanges set to True
+                        self.hasUnsavedChanges = True
+                    else:
+                        # For non temp sketchpads, do save snapshot
+                        save_snapshot = True
+                        # For non temp sketchpads, saving sketchpad deletes the autosave and hence mark hasUnsavedChanges to False
+                        self.hasUnsavedChanges = False
+                    # Since this is not an autosave, set sketchpad file name to fullname
+                    sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
+                    logging.info(f"Storing sketchpad to {str(sketchpad_file)}")
+                    # Also delete the cache file as we are performing a sketchpad save initiated by user
+                    Path(self.sketchpad_folder + "Autosave.sketchpad.json").unlink(missing_ok=True)
 
-            # When saving an empty sketchpad, we are not switching to it. Do not set lastSelectedSketchpad
-            if not save_empty:
-                # Save current operating sketchpad file to lastSelectedSketchpad
-                self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_file))
+                # When saving an empty sketchpad, we are not switching to it. Do not set lastSelectedSketchpad
+                if not save_empty:
+                    # Save current operating sketchpad file to lastSelectedSketchpad
+                    self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_file))
 
-            # Save a sequence for this version if not a temp sketchpad and not an autosave version and not saving an empty sketchpad
-            if not self.isTemp and not autosave and not save_empty:
-                sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.scenesModel.selectedSequenceName)
-                sequenceModel.exportTo(f"{self.sketchpad_folder}/sequences/{self.name}/{sequenceModel.objectName().lower().replace(' ', '-')}/metadata.sequence.json")
+                # Save a sequence for this version if not a temp sketchpad and not an autosave version and not saving an empty sketchpad
+                if not self.isTemp and not autosave and not save_empty:
+                    sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.scenesModel.selectedSequenceName)
+                    sequenceModel.exportTo(f"{self.sketchpad_folder}/sequences/{self.name}/{sequenceModel.objectName().lower().replace(' ', '-')}/metadata.sequence.json")
 
-            try:
-                Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
-                with open(sketchpad_file, "w") as f:
-                    f.write(json.dumps(current_state_obj))
-                    f.flush()
-                    os.fsync(f.fileno())
-            except Exception as e:
-                logging.exception(f"Error writing sketchpad json to {str(sketchpad_file)} : {e}")
-
-            snapshot_file = str(soundsets_dir) + "/" + self.__name__ + ".zss"
-            soundsets_dir.mkdir(parents=True, exist_ok=True)
-            if save_snapshot and not save_empty:
                 try:
-                    self.zynqtgui.layer.save_snapshot(snapshot_file)
+                    Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
+                    with open(sketchpad_file, "w") as f:
+                        f.write(json.dumps(current_state_obj))
+                        f.flush()
+                        os.fsync(f.fileno())
                 except Exception as e:
-                    logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
-            elif save_empty:
-                Path(snapshot_file).unlink(missing_ok=True)
-                shutil.copyfile("/zynthian/zynthian-my-data/snapshots/default.zss", snapshot_file)
-            self.set_isSaving(False)
+                    logging.exception(f"Error writing sketchpad json to {str(sketchpad_file)} : {e}")
 
-            for trackId in range(self.__channels_model__.count):
-                track = self.__channels_model__.getChannel(trackId)
-                bank_dir = Path(track.bankDir)
-                # Do some cleanup
-                # If there's a sample bank there already, get rid of it
-                if (bank_dir / 'sample-bank.json').exists():
-                    os.remove(bank_dir / 'sample-bank.json')
-                if bank_dir.exists() and len(os.listdir(bank_dir)) == 0:
-                    os.removedirs(bank_dir)
+                snapshot_file = str(soundsets_dir) + "/" + self.__name__ + ".zss"
+                soundsets_dir.mkdir(parents=True, exist_ok=True)
+                if save_snapshot and not save_empty:
+                    try:
+                        self.zynqtgui.layer.save_snapshot(snapshot_file)
+                    except Exception as e:
+                        logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
+                elif save_empty:
+                    Path(snapshot_file).unlink(missing_ok=True)
+                    shutil.copyfile("/zynthian/zynthian-my-data/snapshots/default.zss", snapshot_file)
+                self.set_isSaving(False)
+
+                for trackId in range(self.__channels_model__.count):
+                    track = self.__channels_model__.getChannel(trackId)
+                    bank_dir = Path(track.bankDir)
+                    # Do some cleanup
+                    # If there's a sample bank there already, get rid of it
+                    if (bank_dir / 'sample-bank.json').exists():
+                        os.remove(bank_dir / 'sample-bank.json')
+                    if bank_dir.exists() and len(os.listdir(bank_dir)) == 0:
+                        os.removedirs(bank_dir)
 
     @Slot(None)
     def schedule_save(self):
-        if self.__is_loading__ == False and self.__is_saving__ == False and self.zynqtgui.isBootingComplete:
+        if not self.__to_be_deleted__ and self.__is_loading__ == False and self.__is_saving__ == False and self.zynqtgui.isBootingComplete:
             QMetaObject.invokeMethod(self.__save_timer__, "start", Qt.QueuedConnection)
 
     def restore(self, load_autosave):

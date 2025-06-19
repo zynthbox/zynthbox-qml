@@ -161,6 +161,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
                         # Do not set description text if the synth name and description text is the same
                         metadata["description"] = engine_info[1]
                     metadata["pluginFormat"] = engine_info[6]
+                    metadata["image"] = version_info.plugin_info.image
 
                     self.list_data.append((engine_short_name, len(self.list_data), engine_info[0]))
                     self.list_metadata.append(metadata)
@@ -201,7 +202,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
                         elif info[1] is not None and not info[0] == info[1]:
                             # Do not set description text if the synth name and description text is the same
                             metadata["description"] = info[1]
-                        metadata["pluginFormat"] = info[6]
+                        metadata["pluginFormat"] = info[6]                        
+                        metadata["image"] = version_info.plugin_info.image
                         metadata_entries.append((metadata, None, info[1]))
 
                 cat_entries = sorted(cat_entries, key=cmp_to_key(customSort))

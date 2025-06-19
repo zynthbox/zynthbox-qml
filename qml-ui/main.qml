@@ -680,9 +680,18 @@ Kirigami.AbstractApplicationWindow {
     onWidthChanged: width = screen.width
     onHeightChanged: height = screen.height
     pageStack: pageManager
-    header: RowLayout {            
-        spacing: 0
-        Zynthian.BreadcrumbButton {
+    header: QQC2.Pane {
+        padding: 0 //placeholders to respect current UI and make PRs clean looking
+        background: null //placeholder
+
+        contentItem: RowLayout {
+        spacing: Kirigami.Units.smallSpacing
+
+        QQC2.Control {
+        contentItem: RowLayout
+        {
+            spacing: 0
+            Zynthian.BreadcrumbButton {
             id: menuButton
             icon.name: "application-menu"
             icon.color: Kirigami.Theme.textColor
@@ -1007,10 +1016,16 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
         }
+        }
+       }
         Item {
             Layout.fillWidth: true
         }
 
+        QQC2.Control {
+            padding: 0
+            background: null
+            contentItem: RowLayout {
         QQC2.Button {
             id: globalRecordButton
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
@@ -1059,8 +1074,10 @@ Kirigami.AbstractApplicationWindow {
                 color: "white"
             }
         }
-
+            }
+        }
         Zynthian.StatusInfo {}
+        }
     }
     background: Rectangle {
         Kirigami.Theme.inherit: false

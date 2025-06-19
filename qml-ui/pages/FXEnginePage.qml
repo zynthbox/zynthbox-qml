@@ -252,6 +252,8 @@ Zynthian.ScreenPage {
                                 border.width: view.currentIndex === index ? 4 : 0
                                 border.color: "#ffffff"
 
+
+
                                 Image {
                                     asynchronous: true
                                     anchors {
@@ -259,11 +261,9 @@ Zynthian.ScreenPage {
                                         margins: Kirigami.Units.smallSpacing * 2
                                     }
                                     fillMode: Image.PreserveAspectCrop
-                                    horizontalAlignment: Image.AlignHCenter
-                                    verticalAlignment: Image.AlignVCenter
                                     clip: true
-                                    opacity: 0.3
-                                    source: Qt.resolvedUrl("../../img/synths/zynth-default.png")
+                                    opacity: 0.5
+                                    source: Qt.resolvedUrl("../../img/" + model.metadata.image)
                                 }
                                 Rectangle {
                                     id: colorBackground

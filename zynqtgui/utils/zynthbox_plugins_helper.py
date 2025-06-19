@@ -68,7 +68,11 @@ class zynthbox_plugin_info(QObject):
         self.displayName = plugin_details["displayName"]
         self.description = plugin_details["description"]
         self.longDescription = plugin_details["longDescription"]
-        self.image = plugin_details["image"]
+        if plugin_details["image"] is None:
+            # Set a default image when not provided
+            self.image = "synths/zynth-default.png"
+        else:
+            self.image = plugin_details["image"]
         # List of category_info instances
         self.categories = []
         for category_details in plugin_details["categories"]:

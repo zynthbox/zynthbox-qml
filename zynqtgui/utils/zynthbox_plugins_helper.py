@@ -107,7 +107,11 @@ class zynthbox_plugin_category_info(QObject):
             self.displayName = "Instrument"
         else:
             self.displayName = category_details["displayName"]
-        self.image = category_details["image"]
+        if category_details["image"] is None:
+            # Set a default image when not provided
+            self.image = "synths/zynth-default.png"
+        else:
+            self.image = category_details["image"]
         self.description = category_details["description"]
         self.defaultDryWetMixAmount = category_details["defaultDryWetMixAmount"]
 

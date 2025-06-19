@@ -68,11 +68,11 @@ class zynthbox_plugin_info(QObject):
         self.displayName = plugin_details["displayName"]
         self.description = plugin_details["description"]
         self.longDescription = plugin_details["longDescription"]
-        if plugin_details["image"] is None:
-            # Set a default image when not provided
-            self.image = "synths/zynth-default.png"
+        if plugin_details["image"] is not None and (Path("/zynthian/zynthbox-qml/img/") / plugin_details["image"]).exists():
+            self.image = "/zynthian/zynthbox-qml/img/" + plugin_details["image"]
         else:
-            self.image = plugin_details["image"]
+            # Set a default image when not provided
+            self.image = "/zynthian/zynthbox-qml/img/synths/zynth-default.png"
         # List of category_info instances
         self.categories = []
         for category_details in plugin_details["categories"]:
@@ -107,11 +107,11 @@ class zynthbox_plugin_category_info(QObject):
             self.displayName = "Instrument"
         else:
             self.displayName = category_details["displayName"]
-        if category_details["image"] is None:
-            # Set a default image when not provided
-            self.image = "synths/zynth-default.png"
+        if category_details["image"] is not None and (Path("/zynthian/zynthbox-qml/img/") / category_details["image"]).exists():
+            self.image = "/zynthian/zynthbox-qml/img/" + category_details["image"]
         else:
-            self.image = category_details["image"]
+            # Set a default image when not provided
+            self.image = "/zynthian/zynthbox-qml/img/synths/zynth-default.png"
         self.description = category_details["description"]
         self.defaultDryWetMixAmount = category_details["defaultDryWetMixAmount"]
 

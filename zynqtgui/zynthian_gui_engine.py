@@ -40,14 +40,6 @@ from PySide2.QtCore import Signal, Property
 #------------------------------------------------------------------------------
 
 
-def customSort(item1, item2):
-    if item1[2].upper() > item2[2].upper():
-        return 1
-    elif item1[2].upper() == item2[2].upper():
-        return 0
-    else:
-        return -1
-
 class zynthian_gui_engine(zynthian_gui_selector):
     def __init__(self, parent = None):
         super(zynthian_gui_engine, self).__init__('Engine', parent)
@@ -131,18 +123,6 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
     synth_engine_type = Property(str, get_engine_type, set_engine_type, notify = engine_type_changed)
 
-    def filtered_engines_by_cat(self):
-        result = OrderedDict()
-        for eng, info in self.engine_info.items():
-            eng_type = info[2]
-            cat = info[3]
-            enabled = info[5]
-            if enabled and (eng_type==self.engine_type or self.engine_type is None) and eng not in self.zyngines and self.plugin_format == info[6]:
-                if cat not in result:
-                    result[cat] = OrderedDict()
-                result[cat][eng] = info
-        return result
-
 
     def fill_list(self):
         self.list_data=[]
@@ -166,52 +146,54 @@ class zynthian_gui_engine(zynthian_gui_selector):
                     self.list_data.append((engine_short_name, len(self.list_data), engine_info[0]))
                     self.list_metadata.append(metadata)
         else:
-            # Sort category headings, but headings starting with "Zynthian" are shown first
+            # A variable to keep track of categories that are already inserted when displaying only categories
+            already_inserted_categories = []
+            index = 0
+            # To make things simple, add cat_entries in the format :
+            # For engine entries : [<engine short name>, index, <engine_description>, <engine display name>]
+            # For category entries : [<category name>, index, <category name>, <category name>]
+            # Category entries have redundant data to match with the format for engine entries and later sort with element at index 3
+            cat_entries = []
+            # To make things simple, add cat_entries in the format :
+            # [<metadata>, cat_entry[3]]
+            # Metadata will get sorted by index [1] and hence will have same sorting like category entries
+            metadata_entries = []
 
-            for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
-                cat_entries = []
-                # Metadata entries have to be a set of 3 items in the format (<metadata>, None, info[1])
-                # This is because the customSort method sorts the cat_entries by the value at index `2` and hence
-                # metadata_entries has to have the info[1] enter at index 2, so it sorts correctly along with cat_entries
-                metadata_entries = []
+            for eng, engine_info in self.engine_info.items():
+                # Check if engine is enabled or not (MX for example is not enabled as it is not supposed to be displayed)
+                if engine_info[5]:
+                    version_info = engine_info[7]
+                    plugin_info = version_info.plugin_info
 
-                # Add category header...
-                if self.single_category == None:
-                    if self.engine_type=="MIDI Synth":
-                        if self.only_categories:
-                            self.list_data.append((cat,len(self.list_data),"LV2 {}".format(cat)))
-                        else:
-                            self.list_data.append((None,len(self.list_data),"> LV2 {}".format(cat)))
-                    else:
-                        if self.only_categories:
-                            self.list_data.append((cat,len(self.list_data),format(cat)))
-                            metadata_entries.append(({"image": "synths/zynth-default.png"}, None, format(cat)))
-                        else:
-                            self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
-
-
-                if not self.only_categories and (self.single_category == None or self.single_category == cat or (cat == None and self.single_category == "None")): # Treat the string None as "we only want engines of None category
-                    # Add engines on this category...
-                    for eng, info in infos.items():
+                    if self.single_category == None and self.only_categories:
+                        category_identifier = f"{plugin_info.categories[0].type}/{plugin_info.categories[0].id}"
+                        if category_identifier not in already_inserted_categories and plugin_info.categories[0].displayName != "Instrument":
+                            # Fill list with categories only
+                            cat_entries.append((plugin_info.categories[0].displayName, index, plugin_info.categories[0].displayName, plugin_info.categories[0].displayName))
+                            metadata_entries.append(({"image": plugin_info.categories[0].image}, plugin_info.categories[0].displayName))
+                            already_inserted_categories.append(category_identifier)
+                    elif self.only_categories is not None and (self.single_category is None or self.single_category == plugin_info.categories[0].displayName):
+                        # Fill list with engines under selected category
                         metadata = {}
-                        version_info = info[7]
-                        cat_entries.append((eng,len(self.list_data),info[1],info[0]))
+                        cat_entries.append((eng, index, engine_info[1], engine_info[0]))
 
                         if version_info.plugin_info.description is not None:
                             metadata["description"] = version_info.plugin_info.description
-                        elif info[1] is not None and not info[0] == info[1]:
+                        elif engine_info[1] is not None and not engine_info[0] == engine_info[1]:
                             # Do not set description text if the synth name and description text is the same
-                            metadata["description"] = info[1]
-                        metadata["pluginFormat"] = info[6]                        
+                            metadata["description"] = engine_info[1]
+                        metadata["pluginFormat"] = engine_info[6]
                         metadata["image"] = version_info.plugin_info.image
-                        metadata_entries.append((metadata, None, info[1]))
+                        metadata_entries.append((metadata, engine_info[0]))
 
-                cat_entries = sorted(cat_entries, key=cmp_to_key(customSort))
-                metadata_entries = sorted(metadata_entries, key=cmp_to_key(customSort))
+                    index += 1
 
-                self.list_data.extend(cat_entries)
-                # Append only the metadata after sorting metadata_entries
-                self.list_metadata.extend([x[0] for x in metadata_entries])
+            cat_entries = sorted(cat_entries, key=lambda e: e[3].lower())
+            metadata_entries = sorted(metadata_entries, key=lambda e: e[1].lower())
+
+            self.list_data.extend(cat_entries)
+            # Append only the metadata after sorting metadata_entries
+            self.list_metadata.extend([x[0] for x in metadata_entries])
 
             # Select the first element that is not a category heading
             if self.reset_index:

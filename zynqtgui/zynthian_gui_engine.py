@@ -169,6 +169,12 @@ class zynthian_gui_engine(zynthian_gui_selector):
             # Sort category headings, but headings starting with "Zynthian" are shown first
 
             for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
+                cat_entries = []
+                # Metadata entries have to be a set of 3 items in the format (<metadata>, None, info[1])
+                # This is because the customSort method sorts the cat_entries by the value at index `2` and hence
+                # metadata_entries has to have the info[1] enter at index 2, so it sorts correctly along with cat_entries
+                metadata_entries = []
+
                 # Add category header...
                 if self.single_category == None:
                     if self.engine_type=="MIDI Synth":
@@ -179,16 +185,10 @@ class zynthian_gui_engine(zynthian_gui_selector):
                     else:
                         if self.only_categories:
                             self.list_data.append((cat,len(self.list_data),format(cat)))
+                            metadata_entries.append(({"image": "synths/zynth-default.png"}, None, format(cat)))
                         else:
                             self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
 
-                    self.list_metadata.append({})
-
-                cat_entries = []
-                # Metadata entries have to be a set of 3 items in the format (<metadata>, None, info[1])
-                # This is because the customSort method sorts the cat_entries by the value at index `2` and hence
-                # metadata_entries has to have the info[1] enter at index 2, so it sorts correctly along with cat_entries
-                metadata_entries = []
 
                 if not self.only_categories and (self.single_category == None or self.single_category == cat or (cat == None and self.single_category == "None")): # Treat the string None as "we only want engines of None category
                     # Add engines on this category...

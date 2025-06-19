@@ -237,23 +237,9 @@ Zynthian.ScreenPage {
                                     fillMode: Image.PreserveAspectCrop
                                     clip: true
                                     opacity: 0.5
-                                    source: Qt.resolvedUrl("../../img/synths/" + model.display.toLowerCase().replace(/ /g, "-")  + ".png")
+                                    source: Qt.resolvedUrl("../../img/" + model.metadata.image)
                                 }
 
-                                Image {
-                                    asynchronous: true
-                                    visible: synthImage.status === Image.Error
-                                    anchors {
-                                        fill: parent
-                                        margins: Kirigami.Units.smallSpacing * 2
-                                    }
-                                    fillMode: Image.PreserveAspectCrop
-                                    horizontalAlignment: Image.AlignHCenter
-                                    verticalAlignment: Image.AlignVCenter
-                                    clip: true
-                                    opacity: 0.3
-                                    source: Qt.resolvedUrl("../../img/synths/zynth-default.png")
-                                }
                                 Rectangle {
                                     id: colorBackground
                                     anchors {

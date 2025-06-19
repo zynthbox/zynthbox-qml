@@ -42,32 +42,17 @@ class zynthbox_plugin_version_info(QObject):
 
         self.version = version
         self.plugin_info = plugin_info
+        self.visible = version_details["visible"]
         self.pluginName = version_details["pluginName"]
         self.format = version_details["format"]
         self.path = version_details["path"]
+        self.engineType = version_details["engineType"]
+        self.sha256sum = version_details["sha256sum"]
         self.zynthboxVersionAdded = version_details["zynthboxVersionAdded"]
-        self.url = ""
-        self.engineType = None
-        self.volumeControls = [] # List of strings
-        self.cutoffControl = ""
-        self.resonanceControl = ""
-        self.visible = True
-        self.sha256sum = ""
-
-        if "url" in version_details:
-            self.url = version_details["url"]
-        if "engineType" in version_details:
-            self.engineType = version_details["engineType"]
-        if "volumeControls" in version_details:
-            self.volumeControls = version_details["volumeControls"]
-        if "cutoffControl" in version_details:
-            self.cutoffControl = version_details["cutoffControl"]
-        if "resonanceControl" in version_details:
-            self.resonanceControl = version_details["resonanceControl"]
-        if "visible" in version_details:
-            self.visible = version_details["visible"]
-        if "sha256sum" in version_details:
-            self.sha256sum = version_details["sha256sum"]
+        self.url = version_details["url"]
+        self.volumeControls = version_details["volumeControls"]
+        self.cutoffControl = version_details["cutoffControl"]
+        self.resonanceControl = version_details["resonanceControl"]
 
 
 class zynthbox_plugin_info(QObject):
@@ -75,34 +60,52 @@ class zynthbox_plugin_info(QObject):
     A Class that represents a zynthbox plugin and stores its details like plugin id, plugin type, etc as defined on plugins json
     """
     def __init__(self, key, plugin_details, type, parent=None):
+        global categories_by_type
         super(zynthbox_plugin_info, self).__init__(parent)
 
         self.id = key
         self.type = type
         self.displayName = plugin_details["displayName"]
+        self.description = plugin_details["description"]
+        self.longDescription = plugin_details["longDescription"]
+        self.image = plugin_details["image"]
+        # List of category_info instances
+        self.categories = []
+        for category_details in plugin_details["categories"]:
+            self.categories.append(zynthbox_plugins_helper.categories_by_type[category_details["type"]][category_details["id"]])
         # Stores the current version name
         self.currentVersion = plugin_details["currentVersion"]
         # Stores the instance of current version info
         self.currentVersionInfo = None
-        # Stores the category of the fx. In case of synths, this is set to "Instrument"
-        self.category = ""
-        self.description = ""
         # Stores plugin details per version. A plugin can have different version with different engineType
         self.versions = {}
-
-        if "description" in plugin_details:
-            self.description = plugin_details["description"]
-
-        if type == "MIDI Synth":
-            self.category = "Instrument"
-        elif type != "MIDI Synth" and "category" in plugin_details:
-            self.category = plugin_details["category"]
 
         if "versions" in plugin_details:
             for version in plugin_details["versions"]:
                 self.versions[version] = zynthbox_plugin_version_info(version, plugin_details["versions"][version], self)
                 if version == self.currentVersion:
                     self.currentVersionInfo = self.versions[version]
+
+
+class zynthbox_plugin_category_info(QObject):
+    """
+    A Class that represents a zynthbox plugin category and stores its details like category id and name
+    """
+    def __init__(self, type, id, category_details, parent):
+        super(zynthbox_plugin_category_info, self).__init__(parent)
+
+        self.type = type
+        self.id = id
+        if type == "synth":
+            # Set displayName to "Instrument" as a fallback for MIDI Synths
+            # This is to maintain compatibility with old gui_engine logic where synths
+            # were always displayed as "Instrument"
+            self.displayName = "Instrument"
+        else:
+            self.displayName = category_details["displayName"]
+        self.image = category_details["image"]
+        self.description = category_details["description"]
+        self.defaultDryWetMixAmount = category_details["defaultDryWetMixAmount"]
 
 
 class zynthbox_old_plugin_info(QObject):
@@ -159,6 +162,19 @@ class zynthbox_old_plugin_info(QObject):
 
 
 class zynthbox_plugins_helper(QObject):
+    categories_by_type = {
+        "synth": {},
+        "soundfont": {},
+        "audioFx": {}
+    }
+    plugins_by_type = {
+        "synth": {},
+        "soundfont": {},
+        "audioFx": {}
+    }
+    old_plugins_by_name = {}
+    old_plugins_by_id = {}
+
     """
     zynthian_plugin_helper class will be used to translate between Zynthbox plugin ids and plugin names in sketch files
     This is required for future proofing sketches and other files that references plugins so that if plugin name changes,
@@ -167,42 +183,45 @@ class zynthbox_plugins_helper(QObject):
     def __init__(self, parent=None):
         super(zynthbox_plugins_helper, self).__init__(parent)
 
-        self.plugins_by_type = {
-            "synth": {},
-            "soundfont": {},
-            "fx": {}
-        }
-        self.old_plugins_by_name = {}
-        self.old_plugins_by_id = {}
-
         with open("/zynthian/zynthbox-qml/config/plugins.json", "r") as f:
             plugins_json = json.load(f)
-
+        with open("/zynthian/zynthbox-qml/config/categories.json", "r") as f:
+            categories_json = json.load(f)
         with open("/zynthian/zynthbox-qml/config/plugins.old.json", "r") as f:
             old_plugins_json = json.load(f)
 
+        for key in categories_json["synth"]:
+            category_info = zynthbox_plugin_category_info("synth", key, categories_json["synth"][key], self)
+            zynthbox_plugins_helper.categories_by_type["synth"][key] = category_info
+        for key in categories_json["audioFx"]:
+            category_info = zynthbox_plugin_category_info("audioFx", key, categories_json["audioFx"][key], self)
+            zynthbox_plugins_helper.categories_by_type["audioFx"][key] = category_info
+        for key in categories_json["soundfont"]:
+            category_info = zynthbox_plugin_category_info("soundfont", key, categories_json["soundfont"][key], self)
+            zynthbox_plugins_helper.categories_by_type["soundfont"][key] = category_info
+
         for key in plugins_json["synth"]:
             plugin_info = zynthbox_plugin_info(key, plugins_json["synth"][key], "MIDI Synth", self)
-            self.plugins_by_type["synth"][key] = plugin_info
-        for key in plugins_json["fx"]:
-            plugin_info = zynthbox_plugin_info(key, plugins_json["fx"][key], "Audio Effect", self)
-            self.plugins_by_type["fx"][key] = plugin_info
+            zynthbox_plugins_helper.plugins_by_type["synth"][key] = plugin_info
+        for key in plugins_json["audioFx"]:
+            plugin_info = zynthbox_plugin_info(key, plugins_json["audioFx"][key], "Audio Effect", self)
+            zynthbox_plugins_helper.plugins_by_type["audioFx"][key] = plugin_info
         for key in plugins_json["soundfont"]:
             plugin_info = zynthbox_plugin_info(key, plugins_json["soundfont"][key], "MIDI Synth", self)
-            self.plugins_by_type["soundfont"][key] = plugin_info
+            zynthbox_plugins_helper.plugins_by_type["soundfont"][key] = plugin_info
 
         for key in old_plugins_json:
             # type parameter in old-old json(plugin id < 1000) used to store the plugin format.
             # old plugins json also contains newer plugin ids but they do not have version data in them.
             plugin_info = zynthbox_old_plugin_info(key, old_plugins_json[key], "", self)
-            self.old_plugins_by_id[key] = plugin_info
+            zynthbox_plugins_helper.old_plugins_by_id[key] = plugin_info
             if "type" in old_plugins_json[key]:
-                self.old_plugins_by_name[f"{old_plugins_json[key]['type']}/{old_plugins_json[key]['name']}"] = plugin_info
+                zynthbox_plugins_helper.old_plugins_by_name[f"{old_plugins_json[key]['type']}/{old_plugins_json[key]['name']}"] = plugin_info
             else:
-                self.old_plugins_by_name[f"{old_plugins_json[key]['format'].lower()}/{old_plugins_json[key]['name']}"] = plugin_info
+                zynthbox_plugins_helper.old_plugins_by_name[f"{old_plugins_json[key]['format'].lower()}/{old_plugins_json[key]['name']}"] = plugin_info
 
     def get_plugins_by_type(self, type):
-        return self.plugins_by_type[type]
+        return zynthbox_plugins_helper.plugins_by_type[type]
 
     def update_layer_snapshot_plugin_id_to_name(self, source_snapshot):
         """

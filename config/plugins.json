@@ -3,18 +3,29 @@
     "ZBP_SYNTH_00000": {
       "displayName": "Calf Monosynth",
       "description": "Virtual analogue monophonic synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/calf-monosynth.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Calf Monosynth",
           "format": "LV2",
           "path": "/usr/lib/lv2/calf.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
           "url": "http://calf.sourceforge.net/plugins/Monosynth",
           "volumeControls": [
             "master"
           ],
+          "cutoffControl": null,
           "resonanceControl": "res"
         }
       }
@@ -22,138 +33,223 @@
     "ZBP_SYNTH_00001": {
       "displayName": "Nekobi",
       "description": "Simple single-oscillator synth based on the Roland TB-303",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/nekobi.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Nekobi",
           "format": "LV2",
           "path": "/usr/lib/lv2/Nekobi.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://distrho.sf.net/plugins/Nekobi"
+          "url": "http://distrho.sf.net/plugins/Nekobi",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00002": {
       "displayName": "Raffo Synth",
       "description": "4-oscillator subtractive synthesizer emulator of Minimoog",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/raffo-synth.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Raffo Synth",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/raffo.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://example.org/raffo"
+          "url": "http://example.org/raffo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00003": {
       "displayName": "String machine",
       "description": "Virtual analog string ensemble synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/string-machine.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "String machine",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/string-machine.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://jpcima.sdf1.org/lv2/string-machine-mk2"
+          "url": "http://jpcima.sdf1.org/lv2/string-machine-mk2",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00004": {
       "displayName": "Noize Mak3r",
       "description": "Virtual analog synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/noize-mak3r.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Noize Mak3r",
           "format": "LV2",
           "path": "/usr/lib/lv2/TAL-NoiseMaker.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://kunz.corrupt.ch/products/tal-noisemaker"
+          "url": "http://kunz.corrupt.ch/products/tal-noisemaker",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00005": {
       "displayName": "Red Zeppelin 5",
       "description": "Drumkits Percussion section of the AVL Drumkits series",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/red-zeppelin-5.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Red Zeppelin 5",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/Red_Zeppelin_5.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
           "url": "http://kxstudio.linuxaudio.org/plugins/FluidPlug_Red_Zeppelin_5",
           "volumeControls": [
             "level"
-          ]
+          ],
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00006": {
       "displayName": "padthv1",
       "description": "An old-school polyphonic additive synthesizer with stereo fx",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/padthv1.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "padthv1",
           "format": "LV2",
           "path": "/usr/lib/lv2/padthv1.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://padthv1.sourceforge.net/lv2"
+          "url": "http://padthv1.sourceforge.net/lv2",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00007": {
       "displayName": "Foo YC20 Organ",
       "description": "Physical modelling implementation of the Yamaha YC-20 combo organ synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/foo-yc20-organ.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Foo YC20 Organ",
           "format": "LV2",
           "path": "/usr/local/lib/lv2/foo-yc20.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://studionumbersix.com/foo/lv2/yc20"
+          "url": "http://studionumbersix.com/foo/lv2/yc20",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00008": {
       "displayName": "synthv1",
       "description": "An old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/synthv1.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "synthv1",
           "format": "LV2",
           "path": "/usr/lib/lv2/synthv1.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
           "url": "http://synthv1.sourceforge.net/lv2",
-          "volumeControls": [
-            "OUT1_VOLUME",
-            "OUT2_VOLUME"
-          ],
-          "cutoffControl": "DCF1_CUTOFF",
-          "resonanceControl": "DCF1_RESO"
-        },
-        "1.3.2": {
-          "visible": false,
-          "pluginName": "synthv1-1.3.2",
-          "format": "LV2",
-          "path": "/usr/lib/lv2/synthv1-1.3.2.lv2/",
-          "engineType": "jalv",
-          "zynthboxVersionAdded": "1",
-          "url": "http://synthv1.sourceforge.net/lv2/1.3.2",
           "volumeControls": [
             "OUT1_VOLUME",
             "OUT2_VOLUME"
@@ -166,1002 +262,1878 @@
     "ZBP_SYNTH_00009": {
       "displayName": "Helm",
       "description": "A polyphonic synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/helm.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Helm",
           "format": "LV2",
           "path": "/usr/lib/lv2/Helm.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://tytel.org/helm"
+          "url": "http://tytel.org/helm",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00010": {
       "displayName": "Fabla",
       "description": "An open-source drum sampler plugin instrument",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/fabla.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Fabla",
           "format": "LV2",
           "path": "/usr/lib/lv2/fabla.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://www.openavproductions.com/fabla"
+          "url": "http://www.openavproductions.com/fabla",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00011": {
       "displayName": "ZynAddSubFX",
       "description": "Polyphonic software synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/zynaddsubfx.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZynAddSubFX",
           "format": "Other",
           "path": "/usr/bin/zynaddsubfx",
           "engineType": "zynaddsubfx",
-          "zynthboxVersionAdded": "1"
+          "sha256sum": null,
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00012": {
       "displayName": "Obxd",
       "description": "Oberheim OB-X Inspired Synth",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/obxd.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Obxd",
           "format": "LV2",
           "path": "/usr/lib/lv2/Obxd.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "https://obxd.wordpress.com"
+          "url": "https://obxd.wordpress.com",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00013": {
       "displayName": "Surge",
       "description": "Open Source Digital Synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/surge.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Surge",
           "format": "LV2",
           "path": "/usr/lib/lv2/Surge.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "https://surge-synthesizer.github.io/lv2/surge"
+          "url": "https://surge-synthesizer.github.io/lv2/surge",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00014": {
       "displayName": "Vex",
       "description": "A 3-oscillator wavesample/subtractive synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/vex.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Vex",
           "format": "LV2",
           "path": "/usr/lib/lv2/vex.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:juce:Vex"
+          "url": "urn:juce:Vex",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00015": {
       "displayName": "DrumSynth",
       "description": "A realtime 32/64-bit virtual drum synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/drumsynth.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "DrumSynth",
           "format": "LV2",
           "path": "/usr/lib/lv2/drumsynth.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:juced:DrumSynth"
+          "url": "urn:juced:DrumSynth",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00016": {
       "displayName": "Aeolus",
       "description": "Pipe organ synthesizer",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/aeolus.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Aeolus",
           "format": "Other",
           "path": "/usr/bin/aeolus",
           "engineType": "aeolus",
-          "zynthboxVersionAdded": "1"
+          "sha256sum": null,
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00017": {
       "displayName": "FluidSynth",
       "description": "SF2 Player",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/fluidsynth.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "FluidSynth",
           "format": "Other",
           "path": "/usr/bin/fluidsynth",
           "engineType": "fluidsynth",
-          "zynthboxVersionAdded": "1"
+          "sha256sum": null,
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00018": {
       "displayName": "setBfree",
       "description": "Hammond Emulator",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/setbfree.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "setBfree",
           "format": "Other",
           "path": "/usr/bin/setBfree",
           "engineType": "setbfree",
-          "zynthboxVersionAdded": "1"
+          "sha256sum": null,
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SYNTH_00019": {
       "displayName": "Sfizz",
       "description": "SFZ Player",
-      "currentVersion": "0.0",
+      "longDescription": null,
+      "image": "synths/sfizz.png",
+      "categories": [
+        {
+          "type": "synth",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Sfizz",
           "format": "Other",
           "path": "/usr/bin/sfizz_jack",
           "engineType": "sfizz",
-          "zynthboxVersionAdded": "1"
+          "sha256sum": null,
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     }
   },
-  "fx": {
+  "audioFx": {
     "ZBP_FX_00000": {
       "displayName": "Calf Flanger",
-      "category": "Modulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0009"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Calf Flanger",
           "format": "LV2",
           "path": "/usr/lib/lv2/calf.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://calf.sourceforge.net/plugins/Flanger"
+          "url": "http://calf.sourceforge.net/plugins/Flanger",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00001": {
       "displayName": "Calf Phaser",
-      "category": "Modulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0009"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Calf Phaser",
           "format": "LV2",
           "path": "/usr/lib/lv2/calf.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://calf.sourceforge.net/plugins/Phaser"
+          "url": "http://calf.sourceforge.net/plugins/Phaser",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00002": {
       "displayName": "ALO",
-      "category": "Utility",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0014"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ALO",
           "format": "LV2",
           "path": "/usr/local/lib/lv2/alo.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://devcurmudgeon.com/alo"
+          "url": "http://devcurmudgeon.com/alo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00003": {
       "displayName": "3 Band EQ",
-      "category": "EQ",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0005"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "3 Band EQ",
           "format": "LV2",
           "path": "/usr/lib/lv2/3BandEQ.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://distrho.sf.net/plugins/3BandEQ"
+          "url": "http://distrho.sf.net/plugins/3BandEQ",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00004": {
       "displayName": "MVerb",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "MVerb",
           "format": "LV2",
           "path": "/usr/lib/lv2/MVerb.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://distrho.sf.net/plugins/MVerb"
+          "url": "http://distrho.sf.net/plugins/MVerb",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00005": {
       "displayName": "Ping Pong Pan",
-      "category": "Spatial",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "00013"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Ping Pong Pan",
           "format": "LV2",
           "path": "/usr/lib/lv2/PingPongPan.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://distrho.sf.net/plugins/PingPongPan"
+          "url": "http://distrho.sf.net/plugins/PingPongPan",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00006": {
       "displayName": "CS10QS",
-      "category": "Compressor",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0001"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "CS10QS",
           "format": "LV2",
           "path": "/usr/lib/lv2/sapistaEQv2.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://eq10q.sourceforge.net/compressor_stereo"
+          "url": "http://eq10q.sourceforge.net/compressor_stereo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00007": {
       "displayName": "CS10QS-SC",
-      "category": "Compressor",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0001"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "CS10QS-SC",
           "format": "LV2",
           "path": "/usr/lib/lv2/sapistaEQv2.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://eq10q.sourceforge.net/compressor_stereo_sc"
+          "url": "http://eq10q.sourceforge.net/compressor_stereo_sc",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00008": {
       "displayName": "x42 Whirl - Rotary Speaker",
-      "category": "Simulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0012"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "x42 Whirl - Rotary Speaker",
           "format": "LV2",
           "path": "/usr/lib/lv2/b_whirl/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://gareus.org/oss/lv2/b_whirl#extended"
+          "url": "http://gareus.org/oss/lv2/b_whirl#extended",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00009": {
       "displayName": "GxDistortionPlus",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxDistortionPlus",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_DistortionPlus.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_DistortionPlus_#_DistortionPlus_"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_DistortionPlus_#_DistortionPlus_",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00010": {
       "displayName": "GxAmplifier-X",
-      "category": "Simulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0012"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxAmplifier-X",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_amp.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_amp#GUITARIX"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_amp#GUITARIX",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00011": {
       "displayName": "GxAmplifier-Stereo-X",
-      "category": "Simulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0012"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxAmplifier-Stereo-X",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_amp_stereo.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_amp_stereo#GUITARIX_ST"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_amp_stereo#GUITARIX_ST",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00012": {
       "displayName": "GxBaJaTubeDriver",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxBaJaTubeDriver",
           "format": "LV2",
           "path": "/usr/lib/lv2/gx_bajatubedriver.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_bajatubedriver_#_bajatubedriver_"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_bajatubedriver_#_bajatubedriver_",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00013": {
       "displayName": "GxBoss DS1",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxBoss DS1",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_bossds1.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_bossds1_#_bossds1_"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_bossds1_#_bossds1_",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00014": {
       "displayName": "GxChorus-Stereo",
-      "category": "Chorus",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxChorus-Stereo",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_chorus.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_chorus_stereo#_chorus_stereo"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_chorus_stereo#_chorus_stereo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00015": {
       "displayName": "GxWahwah",
-      "category": "Modulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0009"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxWahwah",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_colwah.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_colwah_#_colwah_"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_colwah_#_colwah_",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00016": {
       "displayName": "Gxdigital_delay_st",
-      "category": "Delay",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0002"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Gxdigital_delay_st",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_digital_delay_st.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_digital_delay_st_#_digital_delay_st_"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_digital_delay_st_#_digital_delay_st_",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00017": {
       "displayName": "GxEcho-Stereo",
-      "category": "Delay",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0002"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxEcho-Stereo",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_echo.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_echo_stereo#_echo_stereo"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_echo_stereo#_echo_stereo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00018": {
       "displayName": "GxFlanger",
-      "category": "Flanger",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0007"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxFlanger",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_flanger.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_flanger#_flanger"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_flanger#_flanger",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00019": {
       "displayName": "GxPhaser",
-      "category": "Phaser",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0010"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxPhaser",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_phaser.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_phaser#_phaser"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_phaser#_phaser",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00020": {
       "displayName": "GxTremolo",
-      "category": "Modulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0009"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxTremolo",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gx_tremolo.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_tremolo#_tremolo"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_tremolo#_tremolo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00021": {
       "displayName": "GxVoodooFuzz",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxVoodooFuzz",
           "format": "LV2",
           "path": "/usr/lib/lv2/gx_voodoo.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gx_voodoo_#_voodoo_"
+          "url": "http://guitarix.sourceforge.net/plugins/gx_voodoo_#_voodoo_",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00022": {
       "displayName": "GxTubeScreamer",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxTubeScreamer",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gxts9.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gxts9#ts9sim"
+          "url": "http://guitarix.sourceforge.net/plugins/gxts9#ts9sim",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00023": {
       "displayName": "GxTubeDelay",
-      "category": "Delay",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0002"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "GxTubeDelay",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/gxtubedelay.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://guitarix.sourceforge.net/plugins/gxtubedelay#tubedelay"
+          "url": "http://guitarix.sourceforge.net/plugins/gxtubedelay#tubedelay",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00024": {
       "displayName": "abGate",
-      "category": "Gate",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0008"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "abGate",
           "format": "LV2",
           "path": "/usr/lib/lv2/abGate.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://hippie.lt/lv2/gate"
+          "url": "http://hippie.lt/lv2/gate",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00025": {
       "displayName": "String machine chorus",
-      "category": "Chorus",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "String machine chorus",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/string-machine-chorus.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://jpcima.sdf1.org/lv2/string-machine-chorus"
+          "url": "http://jpcima.sdf1.org/lv2/string-machine-chorus",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00026": {
       "displayName": "String machine stereo chorus",
-      "category": "Chorus",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "String machine stereo chorus",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/string-machine-chorus-stereo.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://jpcima.sdf1.org/lv2/string-machine-chorus-stereo"
+          "url": "http://jpcima.sdf1.org/lv2/string-machine-chorus-stereo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00027": {
       "displayName": "Tal-Vocoder-II",
-      "category": "Modulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0009"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Tal-Vocoder-II",
           "format": "LV2",
           "path": "/usr/lib/lv2/TAL-Vocoder-2.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://kunz.corrupt.ch/products/tal-vocoder"
+          "url": "http://kunz.corrupt.ch/products/tal-vocoder",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00028": {
       "displayName": "Open Big Muff",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Open Big Muff",
           "format": "LV2",
           "path": "/usr/lib/lv2/mod-bigmuff.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://moddevices.com/plugins/mod-devel/BigMuffPi"
+          "url": "http://moddevices.com/plugins/mod-devel/BigMuffPi",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00029": {
       "displayName": "DS1",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "DS1",
           "format": "LV2",
           "path": "/usr/lib/lv2/mod-ds1.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://moddevices.com/plugins/mod-devel/DS1"
+          "url": "http://moddevices.com/plugins/mod-devel/DS1",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00030": {
       "displayName": "Gain",
-      "category": "Utility",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0014"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Gain",
           "format": "LV2",
           "path": "/usr/lib/lv2/mod-gain.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://moddevices.com/plugins/mod-devel/Gain"
+          "url": "http://moddevices.com/plugins/mod-devel/Gain",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00031": {
       "displayName": "Gain 2x2",
-      "category": "Utility",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0014"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Gain 2x2",
           "format": "LV2",
           "path": "/usr/lib/lv2/mod-gain2x2.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://moddevices.com/plugins/mod-devel/Gain2x2"
+          "url": "http://moddevices.com/plugins/mod-devel/Gain2x2",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00032": {
       "displayName": "TAP Stereo Dynamics",
-      "category": "Dynamics",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0004"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "TAP Stereo Dynamics",
           "format": "LV2",
           "path": "/usr/lib/lv2/tap-dynamics-st.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://moddevices.com/plugins/tap/dynamics-st"
+          "url": "http://moddevices.com/plugins/tap/dynamics-st",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00033": {
       "displayName": "TAP Reverberator",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "TAP Reverberator",
           "format": "LV2",
           "path": "/usr/lib/lv2/tap-reverb.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://moddevices.com/plugins/tap/reverb"
+          "url": "http://moddevices.com/plugins/tap/reverb",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00034": {
       "displayName": "TAP Tubewarmth",
-      "category": "Simulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0012"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "TAP Tubewarmth",
           "format": "LV2",
           "path": "/usr/lib/lv2/tap-tubewarmth.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://moddevices.com/plugins/tap/tubewarmth"
+          "url": "http://moddevices.com/plugins/tap/tubewarmth",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00035": {
       "displayName": "Roomy",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Roomy",
           "format": "LV2",
           "path": "/usr/lib/lv2/artyfx.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://www.openavproductions.com/artyfx#roomy"
+          "url": "http://www.openavproductions.com/artyfx#roomy",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00036": {
       "displayName": "ZynChorus",
-      "category": "Chorus",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZynChorus",
           "format": "LV2",
           "path": "/usr/lib/lv2/ZynChorus.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://zynaddsubfx.sourceforge.net/fx#Chorus"
+          "url": "http://zynaddsubfx.sourceforge.net/fx#Chorus",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00037": {
       "displayName": "ZynDistortion",
-      "category": "Distortion",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0003"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZynDistortion",
           "format": "LV2",
           "path": "/usr/lib/lv2/ZynDistortion.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://zynaddsubfx.sourceforge.net/fx#Distortion"
+          "url": "http://zynaddsubfx.sourceforge.net/fx#Distortion",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00038": {
       "displayName": "ZynEcho",
-      "category": "Delay",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0002"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZynEcho",
           "format": "LV2",
           "path": "/usr/lib/lv2/ZynEcho.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://zynaddsubfx.sourceforge.net/fx#Echo"
+          "url": "http://zynaddsubfx.sourceforge.net/fx#Echo",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00039": {
       "displayName": "ZynPhaser",
-      "category": "Phaser",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0010"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZynPhaser",
           "format": "LV2",
           "path": "/usr/lib/lv2/ZynPhaser.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "http://zynaddsubfx.sourceforge.net/fx#Phaser"
+          "url": "http://zynaddsubfx.sourceforge.net/fx#Phaser",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00040": {
       "displayName": "YK Chorus",
-      "category": "Chorus",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "YK Chorus",
           "format": "LV2",
           "path": "/zynthian/zynthian-plugins/lv2/ykchorus.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "https://chrisarndt.de/plugins/ykchorus"
+          "url": "https://chrisarndt.de/plugins/ykchorus",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00041": {
       "displayName": "Dragonfly Hall Reverb",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dragonfly Hall Reverb",
           "format": "LV2",
           "path": "/usr/lib/lv2/DragonflyHallReverb.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "https://github.com/michaelwillis/dragonfly-reverb"
+          "url": "https://github.com/michaelwillis/dragonfly-reverb",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00042": {
       "displayName": "Larynx",
-      "category": "Modulator",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0009"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Larynx",
           "format": "LV2",
           "path": "/usr/lib/lv2/Larynx.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "https://github.com/ninodewit/SHIRO-Plugins/plugins/larynx"
+          "url": "https://github.com/ninodewit/SHIRO-Plugins/plugins/larynx",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00043": {
       "displayName": "Modulay",
-      "category": "Delay",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0002"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Modulay",
           "format": "LV2",
           "path": "/usr/lib/lv2/Modulay.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "https://github.com/ninodewit/SHIRO-Plugins/plugins/modulay"
+          "url": "https://github.com/ninodewit/SHIRO-Plugins/plugins/modulay",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00044": {
       "displayName": "Shiroverb",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Shiroverb",
           "format": "LV2",
           "path": "/usr/lib/lv2/Shiroverb.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "https://github.com/ninodewit/SHIRO-Plugins/plugins/shiroverb"
+          "url": "https://github.com/ninodewit/SHIRO-Plugins/plugins/shiroverb",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00045": {
       "displayName": "Dragonfly Early Reflections",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dragonfly Early Reflections",
           "format": "LV2",
           "path": "/usr/lib/lv2/DragonflyEarlyReflections.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:dragonfly:early"
+          "url": "urn:dragonfly:early",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00046": {
       "displayName": "Dragonfly Plate Reverb",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dragonfly Plate Reverb",
           "format": "LV2",
           "path": "/usr/lib/lv2/DragonflyPlateReverb.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:dragonfly:plate"
+          "url": "urn:dragonfly:plate",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00047": {
       "displayName": "Dragonfly Room Reverb",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dragonfly Room Reverb",
           "format": "LV2",
           "path": "/usr/lib/lv2/DragonflyRoomReverb.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:dragonfly:room"
+          "url": "urn:dragonfly:room",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00048": {
       "displayName": "Tal-Dub-3",
-      "category": "Delay",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0002"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Tal-Dub-3",
           "format": "LV2",
           "path": "/usr/lib/lv2/TAL-Dub-3.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:juce:TalDub3"
+          "url": "urn:juce:TalDub3",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00049": {
       "displayName": "Tal-Filter",
-      "category": "Filter",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0006"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Tal-Filter",
           "format": "LV2",
           "path": "/usr/lib/lv2/TAL-Filter.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:juce:TalFilter"
+          "url": "urn:juce:TalFilter",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00050": {
       "displayName": "Tal-Reverb",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Tal-Reverb",
           "format": "LV2",
           "path": "/usr/lib/lv2/TAL-Reverb.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:juce:TalReverb"
+          "url": "urn:juce:TalReverb",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00051": {
       "displayName": "Tal-Reverb-II",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Tal-Reverb-II",
           "format": "LV2",
           "path": "/usr/lib/lv2/TAL-Reverb-2.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:juce:TalReverb2"
+          "url": "urn:juce:TalReverb2",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00052": {
       "displayName": "Tal-Reverb-III",
-      "category": "Reverb",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0011"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Tal-Reverb-III",
           "format": "LV2",
           "path": "/usr/lib/lv2/TAL-Reverb-3.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:juce:TalReverb3"
+          "url": "urn:juce:TalReverb3",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00053": {
       "displayName": "ZamComp",
-      "category": "Compressor",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0001"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZamComp",
           "format": "LV2",
           "path": "/usr/lib/lv2/ZamComp.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:zamaudio:ZamComp"
+          "url": "urn:zamaudio:ZamComp",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00054": {
       "displayName": "ZamCompX2",
-      "category": "Compressor",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0001"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZamCompX2",
           "format": "LV2",
           "path": "/usr/lib/lv2/ZamCompX2.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:zamaudio:ZamCompX2"
+          "url": "urn:zamaudio:ZamCompX2",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_FX_00055": {
       "displayName": "ZamGrains",
-      "category": "Delay",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "audioFx",
+          "id": "0002"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "ZamGrains",
           "format": "LV2",
           "path": "/usr/lib/lv2/ZamGrains.lv2/",
           "engineType": "jalv",
+          "sha256sum": null,
           "zynthboxVersionAdded": "1",
-          "url": "urn:zamaudio:ZamGrains"
+          "url": "urn:zamaudio:ZamGrains",
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     }
@@ -1169,688 +2141,1485 @@
   "soundfont": {
     "ZBP_SF_00000": {
       "displayName": "Dance Organs",
-      "currentVersion": "d92366eef494b5b49c8e3c86c86b561e6b8d8e16e5c435127f8ab3d3a1afb28f",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "d92366eef494b5b49c8e3c86c86b561e6b8d8e16e5c435127f8ab3d3a1afb28f": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dance Organs",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Dance Organs.sf2",
+          "engineType": null,
           "sha256sum": "d92366eef494b5b49c8e3c86c86b561e6b8d8e16e5c435127f8ab3d3a1afb28f",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00001": {
       "displayName": "BuenosBassSlides",
-      "currentVersion": "e5ba83f6ad2226db02db2fa64703bf0642185fdf7f9545cc57abe16fd9198dd7",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "e5ba83f6ad2226db02db2fa64703bf0642185fdf7f9545cc57abe16fd9198dd7": {
+        "0000": {
+          "visible": true,
           "pluginName": "BuenosBassSlides",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/BuenosBassSlides.sf2",
+          "engineType": null,
           "sha256sum": "e5ba83f6ad2226db02db2fa64703bf0642185fdf7f9545cc57abe16fd9198dd7",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00002": {
       "displayName": "Moogbazz",
-      "currentVersion": "7609955b0455926092a846f6ba3cd9a449b0368260abff0183c882a107928d8d",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "7609955b0455926092a846f6ba3cd9a449b0368260abff0183c882a107928d8d": {
+        "0000": {
+          "visible": true,
           "pluginName": "Moogbazz",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Moogbazz.sf2",
+          "engineType": null,
           "sha256sum": "7609955b0455926092a846f6ba3cd9a449b0368260abff0183c882a107928d8d",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00003": {
       "displayName": "Bassguitars",
-      "currentVersion": "69aa9e514388cde99b3df0b800c04ed7ffa2b7c4c24881d42bbe4260f3769be3",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "69aa9e514388cde99b3df0b800c04ed7ffa2b7c4c24881d42bbe4260f3769be3": {
+        "0000": {
+          "visible": true,
           "pluginName": "Bassguitars",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Bassguitars.sf2",
+          "engineType": null,
           "sha256sum": "69aa9e514388cde99b3df0b800c04ed7ffa2b7c4c24881d42bbe4260f3769be3",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00004": {
       "displayName": "Naturally Decaying B-Guitars",
-      "currentVersion": "61e36bdedeb3a7fece9068710a6cc9300a7a5362277b3cab18233e158a844107",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "61e36bdedeb3a7fece9068710a6cc9300a7a5362277b3cab18233e158a844107": {
+        "0000": {
+          "visible": true,
           "pluginName": "Naturally Decaying B-Guitars",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Naturally Decaying B-Guitars.sf2",
+          "engineType": null,
           "sha256sum": "61e36bdedeb3a7fece9068710a6cc9300a7a5362277b3cab18233e158a844107",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00005": {
       "displayName": "Funky Guitars",
-      "currentVersion": "15b53e46a9e1eb4a9dadb92bf48d7255cb34e98cda51c9eeb7c25e856f56aad4",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "15b53e46a9e1eb4a9dadb92bf48d7255cb34e98cda51c9eeb7c25e856f56aad4": {
+        "0000": {
+          "visible": true,
           "pluginName": "Funky Guitars",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Funky Guitars.sf2",
+          "engineType": null,
           "sha256sum": "15b53e46a9e1eb4a9dadb92bf48d7255cb34e98cda51c9eeb7c25e856f56aad4",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00006": {
       "displayName": "Beeper",
-      "currentVersion": "09214fd2f3b4c6e8f5feec5e2a924233fdb868a4ad6280a1d4cebcae6c98d448",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "09214fd2f3b4c6e8f5feec5e2a924233fdb868a4ad6280a1d4cebcae6c98d448": {
+        "0000": {
+          "visible": true,
           "pluginName": "Beeper",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Beeper.sf2",
+          "engineType": null,
           "sha256sum": "09214fd2f3b4c6e8f5feec5e2a924233fdb868a4ad6280a1d4cebcae6c98d448",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00007": {
       "displayName": "Acoustic Guitars",
-      "currentVersion": "91ef66198863a40de3ce02984378a0cecca65826b6a814e7eeb274530ce8c9a8",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "91ef66198863a40de3ce02984378a0cecca65826b6a814e7eeb274530ce8c9a8": {
+        "0000": {
+          "visible": true,
           "pluginName": "Acoustic Guitars",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Acoustic Guitars.sf2",
+          "engineType": null,
           "sha256sum": "91ef66198863a40de3ce02984378a0cecca65826b6a814e7eeb274530ce8c9a8",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00008": {
       "displayName": "DX7 Wurlitzer",
-      "currentVersion": "c99998751c297825843ffe61e4c68825a9e2461aa47280a825f7aab07e930118",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "c99998751c297825843ffe61e4c68825a9e2461aa47280a825f7aab07e930118": {
+        "0000": {
+          "visible": true,
           "pluginName": "DX7 Wurlitzer",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/DX7 Wurlitzer.sf2",
+          "engineType": null,
           "sha256sum": "c99998751c297825843ffe61e4c68825a9e2461aa47280a825f7aab07e930118",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00009": {
       "displayName": "Super Saw 3",
-      "currentVersion": "6b7145f00754c1fbd843b2f5b47f734250aa3488c9d7b8a4f30b0d1d1c49a44c",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "6b7145f00754c1fbd843b2f5b47f734250aa3488c9d7b8a4f30b0d1d1c49a44c": {
+        "0000": {
+          "visible": true,
           "pluginName": "Super Saw 3",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Super Saw 3.sf2",
+          "engineType": null,
           "sha256sum": "6b7145f00754c1fbd843b2f5b47f734250aa3488c9d7b8a4f30b0d1d1c49a44c",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00010": {
       "displayName": "Guitars Universal 1.4",
-      "currentVersion": "73a0ce7abd473ba628fc4aebeb887bea68936ef589803cc3383f0bcdb1fe9fef",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "73a0ce7abd473ba628fc4aebeb887bea68936ef589803cc3383f0bcdb1fe9fef": {
+        "0000": {
+          "visible": true,
           "pluginName": "Guitars Universal 1.4",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Guitars Universal 1.4.sf2",
+          "engineType": null,
           "sha256sum": "73a0ce7abd473ba628fc4aebeb887bea68936ef589803cc3383f0bcdb1fe9fef",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00011": {
       "displayName": "Analog Saw",
-      "currentVersion": "eaea982bd2a27b656913a1d25038e9a8cdac7923e83b22596b297be2f3adce73",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "eaea982bd2a27b656913a1d25038e9a8cdac7923e83b22596b297be2f3adce73": {
+        "0000": {
+          "visible": true,
           "pluginName": "Analog Saw",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Analog Saw.sf2",
+          "engineType": null,
           "sha256sum": "eaea982bd2a27b656913a1d25038e9a8cdac7923e83b22596b297be2f3adce73",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00012": {
       "displayName": "Jazz Guitars",
-      "currentVersion": "9c06974f4c41e450ab1564db5a4e6f2a2662cc1bcaf1a9f50f40db5a69c10dab",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "9c06974f4c41e450ab1564db5a4e6f2a2662cc1bcaf1a9f50f40db5a69c10dab": {
+        "0000": {
+          "visible": true,
           "pluginName": "Jazz Guitars",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Jazz Guitars.sf2",
+          "engineType": null,
           "sha256sum": "9c06974f4c41e450ab1564db5a4e6f2a2662cc1bcaf1a9f50f40db5a69c10dab",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00013": {
       "displayName": "Synth Samples",
-      "currentVersion": "ce5bb5fc9e1d5a943d34420f824659dd72c8fa75ea4b01a90e5054581c6dc478",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "ce5bb5fc9e1d5a943d34420f824659dd72c8fa75ea4b01a90e5054581c6dc478": {
+        "0000": {
+          "visible": true,
           "pluginName": "Synth Samples",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Synth Samples.sf2",
+          "engineType": null,
           "sha256sum": "ce5bb5fc9e1d5a943d34420f824659dd72c8fa75ea4b01a90e5054581c6dc478",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00014": {
       "displayName": "Super Saw 1",
-      "currentVersion": "c8f0dcead907ba248623bddd5d77ccb3b364b81893b5abc0c2f6a5ef77faeb5f",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "c8f0dcead907ba248623bddd5d77ccb3b364b81893b5abc0c2f6a5ef77faeb5f": {
+        "0000": {
+          "visible": true,
           "pluginName": "Super Saw 1",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Super Saw 1.sf2",
+          "engineType": null,
           "sha256sum": "c8f0dcead907ba248623bddd5d77ccb3b364b81893b5abc0c2f6a5ef77faeb5f",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00015": {
       "displayName": "Prophet Killer",
-      "currentVersion": "d0915f6bdb24f1ba7242abc564b552a8a8c237ade48163ad34b548db1360a287",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "d0915f6bdb24f1ba7242abc564b552a8a8c237ade48163ad34b548db1360a287": {
+        "0000": {
+          "visible": true,
           "pluginName": "Prophet Killer",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Prophet Killer.sf2",
+          "engineType": null,
           "sha256sum": "d0915f6bdb24f1ba7242abc564b552a8a8c237ade48163ad34b548db1360a287",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00016": {
       "displayName": "Squierbass",
-      "currentVersion": "b41d544a7236a910e86763112c0167ac670f90444402ef5a2d577b4e5dafa16d",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "b41d544a7236a910e86763112c0167ac670f90444402ef5a2d577b4e5dafa16d": {
+        "0000": {
+          "visible": true,
           "pluginName": "Squierbass",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Squierbass.sf2",
+          "engineType": null,
           "sha256sum": "b41d544a7236a910e86763112c0167ac670f90444402ef5a2d577b4e5dafa16d",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00017": {
       "displayName": "Roland Novation Bass",
-      "currentVersion": "667e255ac2113994db216eada85e121c2ee9b05c2454b51b1fc1992aed2a3167",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "667e255ac2113994db216eada85e121c2ee9b05c2454b51b1fc1992aed2a3167": {
+        "0000": {
+          "visible": true,
           "pluginName": "Roland Novation Bass",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Roland Novation Bass.sf2",
+          "engineType": null,
           "sha256sum": "667e255ac2113994db216eada85e121c2ee9b05c2454b51b1fc1992aed2a3167",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00018": {
       "displayName": "Oberheim OB-3",
-      "currentVersion": "a2d3aad1c14ee5e64fc9e95a70c3b5dca312b9246e71b26f6a349b497aa9dfe0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "a2d3aad1c14ee5e64fc9e95a70c3b5dca312b9246e71b26f6a349b497aa9dfe0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Oberheim OB-3",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Oberheim OB-3.sf2",
+          "engineType": null,
           "sha256sum": "a2d3aad1c14ee5e64fc9e95a70c3b5dca312b9246e71b26f6a349b497aa9dfe0",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00019": {
       "displayName": "Dx7 velobass - VS",
-      "currentVersion": "107e9fd8fa0e8937eccb2e8a19b39bcde324570c921f0c910105a37814b53131",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "107e9fd8fa0e8937eccb2e8a19b39bcde324570c921f0c910105a37814b53131": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dx7 velobass - VS",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Dx7 velobass - VS.sf2",
+          "engineType": null,
           "sha256sum": "107e9fd8fa0e8937eccb2e8a19b39bcde324570c921f0c910105a37814b53131",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00020": {
       "displayName": "FM Modulator",
-      "currentVersion": "f1ea3b08b76ac8c312cc35a2074d8e470760e49eca94c1f0ffa1beaf783d6a85",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "f1ea3b08b76ac8c312cc35a2074d8e470760e49eca94c1f0ffa1beaf783d6a85": {
+        "0000": {
+          "visible": true,
           "pluginName": "FM Modulator",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/FM Modulator.sf2",
+          "engineType": null,
           "sha256sum": "f1ea3b08b76ac8c312cc35a2074d8e470760e49eca94c1f0ffa1beaf783d6a85",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00021": {
       "displayName": "Juno FilterBass ",
-      "currentVersion": "2277fcca18f32ec2ffd76dd968d5c30f2557bc64d6a5314d304bb5ab39f26cc7",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "2277fcca18f32ec2ffd76dd968d5c30f2557bc64d6a5314d304bb5ab39f26cc7": {
+        "0000": {
+          "visible": true,
           "pluginName": "Juno FilterBass ",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Juno FilterBass .sf2",
+          "engineType": null,
           "sha256sum": "2277fcca18f32ec2ffd76dd968d5c30f2557bc64d6a5314d304bb5ab39f26cc7",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00022": {
       "displayName": "Kawai Upright Piano",
-      "currentVersion": "6e545389e4552283f4bc00c3fc7db14b98ec0d489e942cd8741f493467d7d896",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "6e545389e4552283f4bc00c3fc7db14b98ec0d489e942cd8741f493467d7d896": {
+        "0000": {
+          "visible": true,
           "pluginName": "Kawai Upright Piano",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Kawai Upright Piano.sf2",
+          "engineType": null,
           "sha256sum": "6e545389e4552283f4bc00c3fc7db14b98ec0d489e942cd8741f493467d7d896",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00023": {
       "displayName": "Nylon Guitar",
-      "currentVersion": "0eae8a500c099975505752f8d71abdb6a31c6fe411887247ea1687f1495daf64",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0eae8a500c099975505752f8d71abdb6a31c6fe411887247ea1687f1495daf64": {
+        "0000": {
+          "visible": true,
           "pluginName": "Nylon Guitar",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Nylon Guitar.sf2",
+          "engineType": null,
           "sha256sum": "0eae8a500c099975505752f8d71abdb6a31c6fe411887247ea1687f1495daf64",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00024": {
       "displayName": "Pipe Organ",
-      "currentVersion": "a7909c1afe31436e1d0261fb9d7adb1147394a3ef81705c67379e35f5976dcf7",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "a7909c1afe31436e1d0261fb9d7adb1147394a3ef81705c67379e35f5976dcf7": {
+        "0000": {
+          "visible": true,
           "pluginName": "Pipe Organ",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Pipe Organ.sf2",
+          "engineType": null,
           "sha256sum": "a7909c1afe31436e1d0261fb9d7adb1147394a3ef81705c67379e35f5976dcf7",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00025": {
       "displayName": "BluesBzz",
-      "currentVersion": "b24b7821de0542b2e80bf8f4337d6896065f134fb75ba635fd7b9f1efd469ced",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "b24b7821de0542b2e80bf8f4337d6896065f134fb75ba635fd7b9f1efd469ced": {
+        "0000": {
+          "visible": true,
           "pluginName": "BluesBzz",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/BluesBzz.sf2",
+          "engineType": null,
           "sha256sum": "b24b7821de0542b2e80bf8f4337d6896065f134fb75ba635fd7b9f1efd469ced",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00026": {
       "displayName": "Hip Hop Combo",
-      "currentVersion": "a7eda18eb0e1e748249a6f965d6390932fdfd605d2dd1752c574d965b57cd468",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "a7eda18eb0e1e748249a6f965d6390932fdfd605d2dd1752c574d965b57cd468": {
+        "0000": {
+          "visible": true,
           "pluginName": "Hip Hop Combo",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Hip Hop Combo.sf2",
+          "engineType": null,
           "sha256sum": "a7eda18eb0e1e748249a6f965d6390932fdfd605d2dd1752c574d965b57cd468",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00027": {
       "displayName": "ModSynth R1",
-      "currentVersion": "e4904b94c408cd3649476ead0d9d2e5facaa6e43e11dbfc41697405d45352d36",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "e4904b94c408cd3649476ead0d9d2e5facaa6e43e11dbfc41697405d45352d36": {
+        "0000": {
+          "visible": true,
           "pluginName": "ModSynth_R1",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/ModSynth_R1.sf2",
+          "engineType": null,
           "sha256sum": "e4904b94c408cd3649476ead0d9d2e5facaa6e43e11dbfc41697405d45352d36",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00028": {
       "displayName": "Heavy Guitars",
-      "currentVersion": "15e10b1e871274cb2f73a00e430af62d8621ca551a92d3a4884f4fa560f3b614",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "15e10b1e871274cb2f73a00e430af62d8621ca551a92d3a4884f4fa560f3b614": {
+        "0000": {
+          "visible": true,
           "pluginName": "Heavy Guitars",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Heavy Guitars.sf2",
+          "engineType": null,
           "sha256sum": "15e10b1e871274cb2f73a00e430af62d8621ca551a92d3a4884f4fa560f3b614",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00029": {
       "displayName": "FM Piano",
-      "currentVersion": "0d93ac83407edffb8a1311f6b1b56179302dc7792a3a51e95a7b542223180d3f",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0d93ac83407edffb8a1311f6b1b56179302dc7792a3a51e95a7b542223180d3f": {
+        "0000": {
+          "visible": true,
           "pluginName": "FM Piano",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/FM Piano.sf2",
+          "engineType": null,
           "sha256sum": "0d93ac83407edffb8a1311f6b1b56179302dc7792a3a51e95a7b542223180d3f",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00030": {
       "displayName": "BookerT",
-      "currentVersion": "c9fd14908c676bea63e8e79258e28879464109dc67995ecced228c0e9ca69c4f",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "c9fd14908c676bea63e8e79258e28879464109dc67995ecced228c0e9ca69c4f": {
+        "0000": {
+          "visible": true,
           "pluginName": "BookerT",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/BookerT.sf2",
+          "engineType": null,
           "sha256sum": "c9fd14908c676bea63e8e79258e28879464109dc67995ecced228c0e9ca69c4f",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00031": {
       "displayName": "Dance Trance",
-      "currentVersion": "c99e2be541d9ed1e649f7fd5673d3f99c6d58bbb6f396f41c32d03ad49fee272",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "c99e2be541d9ed1e649f7fd5673d3f99c6d58bbb6f396f41c32d03ad49fee272": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dance Trance",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Dance Trance.sf2",
+          "engineType": null,
           "sha256sum": "c99e2be541d9ed1e649f7fd5673d3f99c6d58bbb6f396f41c32d03ad49fee272",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00032": {
       "displayName": "ACBass",
-      "currentVersion": "310575f1daf78af26f402d19a4acf7867126927caf8fb10b2f78957bc0ca7747",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "310575f1daf78af26f402d19a4acf7867126927caf8fb10b2f78957bc0ca7747": {
+        "0000": {
+          "visible": true,
           "pluginName": "ACBass",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/ACBass.sf2",
+          "engineType": null,
           "sha256sum": "310575f1daf78af26f402d19a4acf7867126927caf8fb10b2f78957bc0ca7747",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00033": {
       "displayName": "Super Saw 2",
-      "currentVersion": "b228f7fe3dc7d1c52829d95d8e4a393c0de6283ca14ae1a568b6334ac5fc20ca",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "b228f7fe3dc7d1c52829d95d8e4a393c0de6283ca14ae1a568b6334ac5fc20ca": {
+        "0000": {
+          "visible": true,
           "pluginName": "Super Saw 2",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Super Saw 2.sf2",
+          "engineType": null,
           "sha256sum": "b228f7fe3dc7d1c52829d95d8e4a393c0de6283ca14ae1a568b6334ac5fc20ca",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00034": {
       "displayName": "Dirty Sub",
-      "currentVersion": "956369d5a2d0d937a069950fe77e72d8c1443538c99a09154abcc0410d6c0876",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "956369d5a2d0d937a069950fe77e72d8c1443538c99a09154abcc0410d6c0876": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dirty Sub",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Dirty Sub.sf2",
+          "engineType": null,
           "sha256sum": "956369d5a2d0d937a069950fe77e72d8c1443538c99a09154abcc0410d6c0876",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00035": {
       "displayName": "Perfect Sine",
-      "currentVersion": "88482266f8051ab6166459b0ab21bb9c9160c70c852cbdb95668a37678c77992",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "88482266f8051ab6166459b0ab21bb9c9160c70c852cbdb95668a37678c77992": {
+        "0000": {
+          "visible": true,
           "pluginName": "Perfect Sine",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Perfect Sine.sf2",
+          "engineType": null,
           "sha256sum": "88482266f8051ab6166459b0ab21bb9c9160c70c852cbdb95668a37678c77992",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00036": {
       "displayName": "Djents",
-      "currentVersion": "662751aed0c3c675c0d8e97b2443c38d4013e0a339f6c8d1ffa6cf20fe253d79",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "662751aed0c3c675c0d8e97b2443c38d4013e0a339f6c8d1ffa6cf20fe253d79": {
+        "0000": {
+          "visible": true,
           "pluginName": "Djents",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Djents.sf2",
+          "engineType": null,
           "sha256sum": "662751aed0c3c675c0d8e97b2443c38d4013e0a339f6c8d1ffa6cf20fe253d79",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00037": {
       "displayName": "Acid SQ Neutral",
-      "currentVersion": "9742f50452b056f13f79f0ffe9f8876195f51d486eff362a97fd9f1ad202ee76",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "9742f50452b056f13f79f0ffe9f8876195f51d486eff362a97fd9f1ad202ee76": {
+        "0000": {
+          "visible": true,
           "pluginName": "Acid SQ Neutral",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Acid SQ Neutral.sf2",
+          "engineType": null,
           "sha256sum": "9742f50452b056f13f79f0ffe9f8876195f51d486eff362a97fd9f1ad202ee76",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00038": {
       "displayName": "Expressive Acoustic Guitar",
-      "currentVersion": "d365c0a24ef5fcc4821e1e3007e93752070c5fecf4d146c3ceaf313c40793026",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "d365c0a24ef5fcc4821e1e3007e93752070c5fecf4d146c3ceaf313c40793026": {
+        "0000": {
+          "visible": true,
           "pluginName": "Expressive Acoustic Guitar",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Expressive Acoustic Guitar.sf2",
+          "engineType": null,
           "sha256sum": "d365c0a24ef5fcc4821e1e3007e93752070c5fecf4d146c3ceaf313c40793026",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00039": {
       "displayName": "Dsix Magic",
-      "currentVersion": "bfc22285166350d6dc90656012132d096007caa31888530055c397298a140023",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "bfc22285166350d6dc90656012132d096007caa31888530055c397298a140023": {
+        "0000": {
+          "visible": true,
           "pluginName": "Dsix Magic",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Dsix Magic.sf2",
+          "engineType": null,
           "sha256sum": "bfc22285166350d6dc90656012132d096007caa31888530055c397298a140023",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00040": {
       "displayName": "Giga Piano",
-      "currentVersion": "e4733ce910e1f4b845746c82a43160962b605572b22316a96f4868394c4d7ca0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "e4733ce910e1f4b845746c82a43160962b605572b22316a96f4868394c4d7ca0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Giga Piano",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Giga Piano.sf2",
+          "engineType": null,
           "sha256sum": "e4733ce910e1f4b845746c82a43160962b605572b22316a96f4868394c4d7ca0",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00041": {
       "displayName": "Bindo FingeredBass",
-      "currentVersion": "6f074e0ec862065dbf97af21a005d0dcd81002337d572de1b5c27715145c63b4",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "6f074e0ec862065dbf97af21a005d0dcd81002337d572de1b5c27715145c63b4": {
+        "0000": {
+          "visible": true,
           "pluginName": "Bindo_FingeredBass",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Bindo_FingeredBass.sf2",
+          "engineType": null,
           "sha256sum": "6f074e0ec862065dbf97af21a005d0dcd81002337d572de1b5c27715145c63b4",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00042": {
       "displayName": "JAzz BAzz",
-      "currentVersion": "56b8a8a8c828338b4d8ee29b88afc41c0351969c5f1a0dc25b343b408d510095",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "56b8a8a8c828338b4d8ee29b88afc41c0351969c5f1a0dc25b343b408d510095": {
+        "0000": {
+          "visible": true,
           "pluginName": "JAzz BAzz",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/JAzz BAzz.sf2",
+          "engineType": null,
           "sha256sum": "56b8a8a8c828338b4d8ee29b88afc41c0351969c5f1a0dc25b343b408d510095",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00043": {
       "displayName": "Full Grands",
-      "currentVersion": "675ac9ffd6144af1a225dd38a8a9ad34861f199aa192fb9d88a143164c4e72a2",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "675ac9ffd6144af1a225dd38a8a9ad34861f199aa192fb9d88a143164c4e72a2": {
+        "0000": {
+          "visible": true,
           "pluginName": "Full Grands",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Full Grands.sf2",
+          "engineType": null,
           "sha256sum": "675ac9ffd6144af1a225dd38a8a9ad34861f199aa192fb9d88a143164c4e72a2",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00044": {
       "displayName": "Fazioli Grand",
-      "currentVersion": "75aafd588c31471651ec66231a547061614009a9589326584caf242ceb859b70",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "75aafd588c31471651ec66231a547061614009a9589326584caf242ceb859b70": {
+        "0000": {
+          "visible": true,
           "pluginName": "Fazioli Grand",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Fazioli Grand.sf2",
+          "engineType": null,
           "sha256sum": "75aafd588c31471651ec66231a547061614009a9589326584caf242ceb859b70",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00045": {
       "displayName": "VintageDreamsWaves-v2",
-      "currentVersion": "52132b2b83994f0067d3a66b93b4f1b67d53ff8c0d3be90d39f23f92b4585cdd",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "52132b2b83994f0067d3a66b93b4f1b67d53ff8c0d3be90d39f23f92b4585cdd": {
+        "0000": {
+          "visible": true,
           "pluginName": "VintageDreamsWaves-v2",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/VintageDreamsWaves-v2.sf2",
+          "engineType": null,
           "sha256sum": "52132b2b83994f0067d3a66b93b4f1b67d53ff8c0d3be90d39f23f92b4585cdd",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00046": {
       "displayName": "jRhodes4",
-      "currentVersion": "5b8ed7261b568431e76eb8fbd5e649e23e41ae81e69c5c0fdbb5f033d0d22161",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "5b8ed7261b568431e76eb8fbd5e649e23e41ae81e69c5c0fdbb5f033d0d22161": {
+        "0000": {
+          "visible": true,
           "pluginName": "jRhodes4",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/jRhodes4.sf2",
+          "engineType": null,
           "sha256sum": "5b8ed7261b568431e76eb8fbd5e649e23e41ae81e69c5c0fdbb5f033d0d22161",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00047": {
       "displayName": "Valve OD Guitar",
-      "currentVersion": "88a27c93047861672818ca58bc2aa177a71618baa530ea39822db2185d895ea5",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "88a27c93047861672818ca58bc2aa177a71618baa530ea39822db2185d895ea5": {
+        "0000": {
+          "visible": true,
           "pluginName": "Valve OD Guitar",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Valve OD Guitar.sf2",
+          "engineType": null,
           "sha256sum": "88a27c93047861672818ca58bc2aa177a71618baa530ea39822db2185d895ea5",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00048": {
       "displayName": "d10 TEK bass",
-      "currentVersion": "36d9c390606373759f6162fbc9ba9b86f810aa015b05973a51f5a008dd351751",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "36d9c390606373759f6162fbc9ba9b86f810aa015b05973a51f5a008dd351751": {
+        "0000": {
+          "visible": true,
           "pluginName": "d10 TEK bass",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/d10 TEK bass.sf2",
+          "engineType": null,
           "sha256sum": "36d9c390606373759f6162fbc9ba9b86f810aa015b05973a51f5a008dd351751",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00049": {
       "displayName": "Stratocaster",
-      "currentVersion": "89e839d77250e0474f39fd2675a4b097fba90094bfee99311020781a319c184f",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "89e839d77250e0474f39fd2675a4b097fba90094bfee99311020781a319c184f": {
+        "0000": {
+          "visible": true,
           "pluginName": "Stratocaster",
           "format": "SF2",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/Stratocaster.sf2",
+          "engineType": null,
           "sha256sum": "89e839d77250e0474f39fd2675a4b097fba90094bfee99311020781a319c184f",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00050": {
       "displayName": "FluidR3Mono GM",
-      "currentVersion": "cfcd66d89e8386823400eca64934b14fbea7bf48ba1f00d21189af1262794ec2",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "cfcd66d89e8386823400eca64934b14fbea7bf48ba1f00d21189af1262794ec2": {
+        "0000": {
+          "visible": true,
           "pluginName": "FluidR3Mono_GM",
           "format": "SF3",
           "path": "/zynthian/zynthian-data/soundfonts/sf2/FluidR3Mono_GM.sf3",
+          "engineType": null,
           "sha256sum": "cfcd66d89e8386823400eca64934b14fbea7bf48ba1f00d21189af1262794ec2",
-          "zynthboxVersionAdded": "1"
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00051": {
       "displayName": "Drum Machines",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Drum Machines",
           "format": "SFZ",
           "path": "/zynthian/zynthian-data/soundfonts/sfz/Drum Machines",
-          "zynthboxVersionAdded": "1"
+          "engineType": null,
+          "sha256sum": "0.0",
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     },
     "ZBP_SF_00052": {
       "displayName": "Synths",
-      "currentVersion": "0.0",
+      "description": null,
+      "longDescription": null,
+      "image": null,
+      "categories": [
+        {
+          "type": "soundfont",
+          "id": "0000"
+        }
+      ],
+      "currentVersion": "0000",
       "versions": {
-        "0.0": {
+        "0000": {
+          "visible": true,
           "pluginName": "Synths",
           "format": "SFZ",
           "path": "/zynthian/zynthian-data/soundfonts/sfz/Synths",
-          "zynthboxVersionAdded": "1"
+          "engineType": null,
+          "sha256sum": "0.0",
+          "zynthboxVersionAdded": "1",
+          "url": null,
+          "volumeControls": null,
+          "cutoffControl": null,
+          "resonanceControl": null
         }
       }
     }

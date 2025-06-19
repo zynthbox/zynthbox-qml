@@ -2,91 +2,91 @@
     "audioFx": {
         "0000": {
             "displayName": "Chorus",
-            "image": "categories/chorus.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0001": {
             "displayName": "Compressor",
-            "image": "categories/compressor.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0002": {
             "displayName": "Delay",
-            "image": "categories/delay.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0003": {
             "displayName": "Distortion",
-            "image": "categories/distortion.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0004": {
             "displayName": "Dynamics",
-            "image": "categories/dynamics.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0005": {
             "displayName": "EQ",
-            "image": "categories/eq.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "2"
         },
         "0006": {
             "displayName": "Filter",
-            "image": "categories/filter.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "2"
         },
         "0007": {
             "displayName": "Flanger",
-            "image": "categories/flanger.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0008": {
             "displayName": "Gate",
-            "image": "categories/gate.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0009": {
             "displayName": "Modulator",
-            "image": "categories/modulator.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0010": {
             "displayName": "Phaser",
-            "image": "categories/Phaser.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0011": {
             "displayName": "Reverb",
-            "image": "categories/reberb.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0012": {
             "displayName": "Simulator",
-            "image": "categories/simulator.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "00013": {
             "displayName": "Spatial",
-            "image": "categories/spatial.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
         "0014": {
             "displayName": "Utility",
-            "image": "categories/utility.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": "1"
         }
@@ -94,7 +94,7 @@
     "synth": {
         "0000": {
             "displayName": "Synth",
-            "image": "categories/synth.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": null
         }
@@ -102,7 +102,7 @@
     "soundfont": {
         "0000": {
             "displayName": "Soundfont",
-            "image": "categories/soundfont.png",
+            "image": null,
             "description": "",
             "defaultDryWetMixAmount": null
         }

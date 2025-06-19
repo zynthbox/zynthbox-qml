@@ -235,7 +235,7 @@ Zynthian.ScreenPage {
                                     fillMode: Image.PreserveAspectCrop
                                     clip: true
                                     opacity: 0.5
-                                    source: Qt.resolvedUrl("../../img/" + model.metadata.image)
+                                    source: model.metadata.image
                                 }
 
                                 Rectangle {

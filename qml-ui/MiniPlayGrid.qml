@@ -42,12 +42,15 @@ RowLayout {
         Layout.preferredWidth: 64
         Layout.maximumWidth: Layout.preferredWidth
         Layout.fillHeight: true
-        Layout.margins: 8
-        Zynthian.PlayGridButton {
+        Layout.margins: Kirigami.Units.mediumSpacing
+        QQC2.Button {
             id: settingsButton
+            Layout.fillWidth: true
             Layout.preferredHeight: width
             Layout.maximumHeight: width
             icon.name: "configure"
+            icon.width: 32
+            icon.height: 32
             // TODO Reenable this for properly we re-add the ability to have more plaground modules
             visible: applicationWindow().playGrids.count > 2
             Rectangle {
@@ -194,10 +197,13 @@ RowLayout {
 
         Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             icon.name: "arrow-up"
+            Layout.fillWidth: true
             Layout.preferredHeight: width
             Layout.maximumHeight: width
+            icon.width: 32
+            icon.height: 32
             enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
                 if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
@@ -211,10 +217,13 @@ RowLayout {
             Layout.alignment: Qt.AlignHCenter
         }
 
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             icon.name: "arrow-down"
+            Layout.fillWidth: true
             Layout.preferredHeight: width
             Layout.maximumHeight: width
+            icon.width: 32
+            icon.height: 32
             enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
                 if (playGridStack.currentPlayGridItem.octave > 0) {
@@ -225,10 +234,13 @@ RowLayout {
 
         Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             text: "Hide"
+            Layout.fillWidth: true
             Layout.preferredHeight: width
             Layout.maximumHeight: width
+            icon.width: 48
+            icon.height: 48
             onClicked: {
                 zynqtgui.callable_ui_action_simple("HIDE_KEYBOARD")
             }

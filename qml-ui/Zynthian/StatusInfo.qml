@@ -32,11 +32,16 @@ import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
 import "private" as Private
 
-MouseArea {
-    id: root
+QQC2.Control
+{
+    padding: 0 //styling placeholder
+    background: null // styling placeholder
     Layout.minimumWidth: Kirigami.Units.gridUnit * 10
     Layout.maximumWidth: Kirigami.Units.gridUnit * 10
     Layout.fillHeight: true
+
+    contentItem: MouseArea {
+        id: root
 
     onClicked: zynqtgui.globalPopupOpened = true
 
@@ -746,4 +751,5 @@ MouseArea {
             }
         }
     }
+}
 }

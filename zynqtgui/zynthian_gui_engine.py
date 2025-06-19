@@ -48,7 +48,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
         self.zyngine_counter = 0
         self.zyngines = OrderedDict()
 
-        # [<short name>, (<long name>, <description>, <plugin type>, <plugin category>, <plugin class>, <enabled>, <plugin format>, <version object>)]
+        # [<short name>, (<long name>, <description>, <plugin type>, <plugin category(unused)>, <plugin class>, <enabled>, <plugin format>, <version object>)]
         engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other", None)}
         # Generate list of synth and fx plugin items
         plugins = self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("synth") | self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("audioFx")
@@ -72,7 +72,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
                             eng = 'JV/{}'.format(version_info.pluginName)
 
                         if eng != "":
-                            engine_info[eng] = (version_info.pluginName, version_info.pluginName, version_info.plugin_info.type, version_info.plugin_info.categories[0].displayName, globals()[f"zynthian_engine_{version_info.engineType}"], True, version_info.format, version_info)
+                            engine_info[eng] = (version_info.pluginName, version_info.pluginName, version_info.plugin_info.type, None, globals()[f"zynthian_engine_{version_info.engineType}"], True, version_info.format, version_info)
             except Exception as e:
                 logging.exception(f"Error while trying to parse plugin details : {str(e)}")
 
@@ -166,25 +166,33 @@ class zynthian_gui_engine(zynthian_gui_selector):
                     plugin_info = version_info.plugin_info
 
                     if self.single_category == None and self.only_categories:
-                        category_identifier = f"{plugin_info.categories[0].type}/{plugin_info.categories[0].id}"
-                        if category_identifier not in already_inserted_categories and plugin_info.categories[0].displayName != "Instrument":
-                            # Fill list with categories only
-                            cat_entries.append((plugin_info.categories[0].displayName, index, plugin_info.categories[0].displayName, plugin_info.categories[0].displayName))
-                            metadata_entries.append(({"image": plugin_info.categories[0].image}, plugin_info.categories[0].displayName))
-                            already_inserted_categories.append(category_identifier)
-                    elif self.only_categories is not None and (self.single_category is None or self.single_category == plugin_info.categories[0].displayName):
+                        # Iterate over all categories of a plugin and fill list with categories only
+                        # If a category is already inserted, skip it
+                        # If the category is "Instrument", skip it as it is not a effect type
+                        for category in plugin_info.categories:
+                            category_identifier = f"{category.type}/{category.id}"
+                            if category_identifier not in already_inserted_categories and category.displayName != "Instrument":
+                                # Fill list with categories only
+                                cat_entries.append((category.displayName, index, category.displayName, category.displayName))
+                                metadata_entries.append(({"image": category.image}, category.displayName))
+                                already_inserted_categories.append(category_identifier)
+                    elif self.only_categories is not None:
                         # Fill list with engines under selected category
-                        metadata = {}
-                        cat_entries.append((eng, index, engine_info[1], engine_info[0]))
+                        # Iterate over all categories of a plugin and fill list with engines only if the category matches
+                        # Make sure to add the plugin to all categories it belongs to
+                        for category in plugin_info.categories:
+                            if (self.single_category is None or self.single_category == category.displayName):
+                                metadata = {}
+                                cat_entries.append((eng, index, engine_info[1], engine_info[0]))
 
-                        if version_info.plugin_info.description is not None:
-                            metadata["description"] = version_info.plugin_info.description
-                        elif engine_info[1] is not None and not engine_info[0] == engine_info[1]:
-                            # Do not set description text if the synth name and description text is the same
-                            metadata["description"] = engine_info[1]
-                        metadata["pluginFormat"] = engine_info[6]
-                        metadata["image"] = version_info.plugin_info.image
-                        metadata_entries.append((metadata, engine_info[0]))
+                                if version_info.plugin_info.description is not None:
+                                    metadata["description"] = version_info.plugin_info.description
+                                elif engine_info[1] is not None and not engine_info[0] == engine_info[1]:
+                                    # Do not set description text if the synth name and description text is the same
+                                    metadata["description"] = engine_info[1]
+                                metadata["pluginFormat"] = engine_info[6]
+                                metadata["image"] = version_info.plugin_info.image
+                                metadata_entries.append((metadata, engine_info[0]))
 
                     index += 1
 

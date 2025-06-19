@@ -227,9 +227,7 @@ Zynthian.ScreenPage {
                                 border.color: "#ffffff"
 
                                 Image {
-                                    id: synthImage
                                     asynchronous: true
-                                    visible: synthImage.status !== Image.Error
                                     anchors {
                                         fill: parent
                                         margins: Kirigami.Units.smallSpacing * 2

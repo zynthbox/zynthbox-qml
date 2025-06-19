@@ -59,7 +59,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
         # [<short name>, (<long name>, <description>, <plugin type>, <plugin category>, <plugin class>, <enabled>, <plugin format>, <version object>)]
         engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other", None)}
         # Generate list of synth and fx plugin items
-        plugins = self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("synth") | self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("fx")
+        plugins = self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("synth") | self.zynqtgui.zynthbox_plugins_helper.get_plugins_by_type("audioFx")
         for plugin_id, plugin_info in plugins.items():
             try:
                 for _, version_info in plugin_info.versions.items():
@@ -80,7 +80,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
                             eng = 'JV/{}'.format(version_info.pluginName)
 
                         if eng != "":
-                            engine_info[eng] = (version_info.pluginName, version_info.pluginName, version_info.plugin_info.type, version_info.plugin_info.category, globals()[f"zynthian_engine_{version_info.engineType}"], True, version_info.format, version_info)
+                            engine_info[eng] = (version_info.pluginName, version_info.pluginName, version_info.plugin_info.type, version_info.plugin_info.categories[0].displayName, globals()[f"zynthian_engine_{version_info.engineType}"], True, version_info.format, version_info)
             except Exception as e:
                 logging.exception(f"Error while trying to parse plugin details : {str(e)}")
 
@@ -155,7 +155,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
                 version_info = engine_info[7]
                 if enabled and (eng_type == self.engine_type or self.engine_type is None) and engine_short_name not in self.zyngines:
                     metadata = {}
-                    if version_info.plugin_info.description != "":
+                    if version_info.plugin_info.description is not None:
                         metadata["description"] = version_info.plugin_info.description
                     elif engine_info[1] is not None and engine_info[0] != engine_info[1]:
                         # Do not set description text if the synth name and description text is the same
@@ -196,7 +196,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
                         version_info = info[7]
                         cat_entries.append((eng,len(self.list_data),info[1],info[0]))
 
-                        if version_info.plugin_info.description != "":
+                        if version_info.plugin_info.description is not None:
                             metadata["description"] = version_info.plugin_info.description
                         elif info[1] is not None and not info[0] == info[1]:
                             # Do not set description text if the synth name and description text is the same

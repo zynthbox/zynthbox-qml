@@ -78,31 +78,33 @@
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
-        "0001": {
+        "00013": {
             "displayName": "Spatial",
             "image": "categories/spatial.png",
             "description": "",
             "defaultDryWetMixAmount": "1"
         },
-        "0013": {
+        "0014": {
             "displayName": "Utility",
             "image": "categories/utility.png",
             "description": "",
             "defaultDryWetMixAmount": "1"
         }
     },
-    "synths": {
+    "synth": {
         "0000": {
             "displayName": "Synth",
             "image": "categories/synth.png",
-            "description": ""
+            "description": "",
+            "defaultDryWetMixAmount": null
         }
     },
-    "soundfonts": {
+    "soundfont": {
         "0000": {
             "displayName": "Soundfont",
             "image": "categories/soundfont.png",
-            "description": ""
+            "description": "",
+            "defaultDryWetMixAmount": null
         }
     }
 }

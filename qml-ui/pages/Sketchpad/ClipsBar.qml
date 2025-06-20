@@ -36,8 +36,7 @@ import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
 // GridLayout so TabbedControlView knows how to navigate it
-QQC2.Pane
-{
+QQC2.Pane {
     id: root
 
     Layout.fillWidth: true
@@ -229,6 +228,11 @@ QQC2.Pane
                     onClicked: {
                         bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
                     }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                 }
             }
         }

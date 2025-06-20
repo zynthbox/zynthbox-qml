@@ -30,11 +30,12 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
+import QtGraphicalEffects 1.0
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
-Rectangle {
+QQC2.Pane {
     id: root
 
     property alias bottomBarButton: bottomBarButton
@@ -55,114 +56,118 @@ Rectangle {
     property QtObject selectedSlotRowItem
 
     Layout.fillWidth: true
-    color: Kirigami.Theme.backgroundColor
+    padding: 0
+    background: Rectangle {
+        color: Kirigami.Theme.backgroundColor
+        // border.color: "orange"
+    }
 
     function cuiaCallback(cuia) {
         var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
 
         switch (cuia) {
-            case "SWITCH_SELECT_SHORT":
-                handleItemClick()
+        case "SWITCH_SELECT_SHORT":
+            handleItemClick()
 
-                return true;
+            return true;
 
-            case "NAVIGATE_LEFT":
-                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-                return true;
+        case "NAVIGATE_LEFT":
+            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            return true;
 
-            case "NAVIGATE_RIGHT":
-                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-                return true;
+        case "NAVIGATE_RIGHT":
+            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            return true;
 
-            case "SELECT_UP":
-                if (root.selectedSlotRowItem.channel.selectedSlotRow > 0) {
-                    root.selectedSlotRowItem.channel.selectedSlotRow -= 1
-                }
+        case "SELECT_UP":
+            if (root.selectedSlotRowItem.channel.selectedSlotRow > 0) {
+                root.selectedSlotRowItem.channel.selectedSlotRow -= 1
+            }
 
-                return true;
+            return true;
 
-            case "SELECT_DOWN":
-                if (root.selectedSlotRowItem.channel.selectedSlotRow < 4) {
-                    root.selectedSlotRowItem.channel.selectedSlotRow += 1
-                }
+        case "SELECT_DOWN":
+            if (root.selectedSlotRowItem.channel.selectedSlotRow < 4) {
+                root.selectedSlotRowItem.channel.selectedSlotRow += 1
+            }
 
-                return true;
+            return true;
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-            case "TRACK_1":
-                if (fxButton.checked) {
-                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 0
-                } else {
-                    root.selectedSlotRowItem.channel.selectedSlotRow = 0
-                }
-                handleItemClick()
-                return true
+        case "TRACK_1":
+            if (fxButton.checked) {
+                root.selectedSlotRowItem.channel.selectedFxSlotRow = 0
+            } else {
+                root.selectedSlotRowItem.channel.selectedSlotRow = 0
+            }
+            handleItemClick()
+            return true
 
-            case "TRACK_2":
-                if (fxButton.checked) {
-                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 1
-                } else {
-                    root.selectedSlotRowItem.channel.selectedSlotRow = 1
-                }
-                handleItemClick()
-                return true
+        case "TRACK_2":
+            if (fxButton.checked) {
+                root.selectedSlotRowItem.channel.selectedFxSlotRow = 1
+            } else {
+                root.selectedSlotRowItem.channel.selectedSlotRow = 1
+            }
+            handleItemClick()
+            return true
 
-            case "TRACK_3":
-                if (fxButton.checked) {
-                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 2
-                } else {
-                    root.selectedSlotRowItem.channel.selectedSlotRow = 2
-                }
-                handleItemClick()
-                return true
+        case "TRACK_3":
+            if (fxButton.checked) {
+                root.selectedSlotRowItem.channel.selectedFxSlotRow = 2
+            } else {
+                root.selectedSlotRowItem.channel.selectedSlotRow = 2
+            }
+            handleItemClick()
+            return true
 
-            case "TRACK_4":
-                if (fxButton.checked) {
-                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 3
-                } else {
-                    root.selectedSlotRowItem.channel.selectedSlotRow = 3
-                }
-                handleItemClick()
-                return true
+        case "TRACK_4":
+            if (fxButton.checked) {
+                root.selectedSlotRowItem.channel.selectedFxSlotRow = 3
+            } else {
+                root.selectedSlotRowItem.channel.selectedSlotRow = 3
+            }
+            handleItemClick()
+            return true
 
-            case "TRACK_5":
-                if (fxButton.checked) {
-                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 4
-                } else {
-                    root.selectedSlotRowItem.channel.selectedSlotRow = 4
-                }
-                handleItemClick()
-                return true
-            case "KNOB0_UP":
-                if (root.synthsButton.checked) {
-                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
-                }
-                return true;
-            case "KNOB0_DOWN":
-                if (root.synthsButton.checked) {
-                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
-                }
-                return true;
-            case "KNOB1_UP":
-                if (root.synthsButton.checked) {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1)
-                }
-                return true;
-            case "KNOB1_DOWN":
-                if (root.synthsButton.checked) {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1)
-                }
-                return true;
-            case "KNOB2_UP":
-                if (root.synthsButton.checked) {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1)
-                }
-                return true;
-            case "KNOB2_DOWN":
-                if (root.synthsButton.checked) {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1)
-                }
-                return true;
+        case "TRACK_5":
+            if (fxButton.checked) {
+                root.selectedSlotRowItem.channel.selectedFxSlotRow = 4
+            } else {
+                root.selectedSlotRowItem.channel.selectedSlotRow = 4
+            }
+            handleItemClick()
+            return true
+        case "KNOB0_UP":
+            if (root.synthsButton.checked) {
+                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
+            }
+            return true;
+        case "KNOB0_DOWN":
+            if (root.synthsButton.checked) {
+                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
+            }
+            return true;
+        case "KNOB1_UP":
+            if (root.synthsButton.checked) {
+                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1)
+            }
+            return true;
+        case "KNOB1_DOWN":
+            if (root.synthsButton.checked) {
+                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1)
+            }
+            return true;
+        case "KNOB2_UP":
+            if (root.synthsButton.checked) {
+                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1)
+            }
+            return true;
+        case "KNOB2_DOWN":
+            if (root.synthsButton.checked) {
+                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1)
+            }
+            return true;
         }
 
         return false;
@@ -263,27 +268,27 @@ Rectangle {
         } else if (type === "external") {
             console.log("handleItemClick : External")
             switch (root.selectedChannel.selectedSlotRow) {
-                case 0:
-                default:
-                    externalAudioSourcePicker.pickChannel(root.selectedChannel);
-                    break;
-                case 1:
-                    externalMidiChannelPicker.pickChannel(root.selectedChannel);
-                    break;
-                case 2:
-                    externalMidiOutPicker.pickOutput(root.selectedChannel);
-                    break;
+            case 0:
+            default:
+                externalAudioSourcePicker.pickChannel(root.selectedChannel);
+                break;
+            case 1:
+                externalMidiChannelPicker.pickChannel(root.selectedChannel);
+                break;
+            case 2:
+                externalMidiOutPicker.pickOutput(root.selectedChannel);
+                break;
             }
         }
     }
 
-    GridLayout {
-        rows: 1
-        anchors.fill: parent
+    QQC2.ButtonGroup {
+        buttons: buttonsColumn.children
+    }
 
+    contentItem: Item {
         ColumnLayout {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+            anchors.fill: parent
 
             Kirigami.Heading {
                 visible: false
@@ -293,11 +298,7 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 1
-
-                QQC2.ButtonGroup {
-                    buttons: buttonsColumn.children
-                }
+                spacing: Kirigami.Units.smallSpacing
 
                 ColumnLayout {
                     id: buttonsColumn
@@ -307,7 +308,6 @@ Rectangle {
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
 
                     //// INVISIBLE BUTTONS
-
                     QQC2.Button {
                         id: bottomBarButton
                         Layout.fillWidth: true
@@ -435,187 +435,221 @@ Rectangle {
                     }
                 }
 
-                RowLayout {
-                    id: channelsSlotsRow
-
-                    property int currentIndex: 0
+                QQC2.Pane {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    spacing: 1
 
-                    Repeater {
-                        model: root.song.channelsModel
+                    padding: 1
 
-                        delegate: Rectangle {
-                            id: channelDelegate
+                    background: Rectangle
+                    {
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        Kirigami.Theme.inherit: false
+                        color: Kirigami.Theme.backgroundColor
+                        border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2.5)
+                        radius: 6
+                    }
 
-                            property bool highlighted: false
-                            Timer {
-                                id: channelHighlightedThrottle
-                                interval: 1; running: false; repeat: false;
-                                onTriggered: {
-                                    channelDelegate.highlighted = (index === zynqtgui.sketchpad.selectedTrackId);
-                                    if (channelDelegate.highlighted) {
-                                        root.selectedSlotRowItem = channelDelegate;
+                    contentItem: Item {
+                        id: slotsContainer
+
+                        layer.enabled: true
+                        layer.effect: OpacityMask
+                        {
+                            maskSource: Rectangle
+                            {
+                                width: slotsContainer.width
+                                height: slotsContainer.height
+                                radius: 5
+                            }
+                        }
+
+                        RowLayout {
+                            id: channelsSlotsRow
+                            anchors.fill: parent
+                            property int currentIndex: 0
+
+                            spacing: 1
+
+                            Repeater {
+                                model: root.song.channelsModel
+
+                                delegate: QQC2.Control {
+                                    id: channelDelegate
+
+                                    property bool highlighted: false
+
+                                    background: Rectangle
+                                    {
+                                        // Kirigami.Separator {
+                                        //     height: parent.height
+                                        //     Layout.preferredWidth: 1
+                                        //     color: "#ff31363b"
+                                        //     visible: index !== root.song.channelsModel.count-1 && !highlighted
+                                        // }
+                                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                                        Kirigami.Theme.inherit: false
+                                        color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
+                                        border.width: 1
+                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                     }
-                                }
-                            }
-                            Connections {
-                                target: zynqtgui.sketchpad
-                                onSelected_track_id_changed: channelHighlightedThrottle.restart()
-                            }
-                            // Make sure to highlight first column correctly after booting is complete
-                            Connections {
-                                target: zynqtgui
-                                onIsBootingCompleteChanged: channelHighlightedThrottle.restart()
-                            }
-                            // And once the song has completed loading
-                            Connections {
-                                target: zynqtgui.sketchpad.song
-                                onIsLoadingChanged: channelHighlightedThrottle.restart()
-                            }
-                            // And once the component is completed (which happens when loading sketchpads)
-                            Component.onCompleted: {
-                                channelHighlightedThrottle.restart();
-                            }
-    //                            property int selectedRow: 0
-                            property int channelIndex: index
-                            property QtObject channel: model.channel
 
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            color: highlighted ? "#22ffffff" : "transparent"
-                            border.width: 1
-                            border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                    Timer {
+                                        id: channelHighlightedThrottle
+                                        interval: 1; running: false; repeat: false;
+                                        onTriggered: {
+                                            channelDelegate.highlighted = (index === zynqtgui.sketchpad.selectedTrackId);
+                                            if (channelDelegate.highlighted) {
+                                                root.selectedSlotRowItem = channelDelegate;
+                                            }
+                                        }
+                                    }
+                                    Connections {
+                                        target: zynqtgui.sketchpad
+                                        onSelected_track_id_changed: channelHighlightedThrottle.restart()
+                                    }
+                                    // Make sure to highlight first column correctly after booting is complete
+                                    Connections {
+                                        target: zynqtgui
+                                        onIsBootingCompleteChanged: channelHighlightedThrottle.restart()
+                                    }
+                                    // And once the song has completed loading
+                                    Connections {
+                                        target: zynqtgui.sketchpad.song
+                                        onIsLoadingChanged: channelHighlightedThrottle.restart()
+                                    }
+                                    // And once the component is completed (which happens when loading sketchpads)
+                                    Component.onCompleted: {
+                                        channelHighlightedThrottle.restart();
+                                    }
+                                    //                            property int selectedRow: 0
+                                    property int channelIndex: index
+                                    property QtObject channel: model.channel
 
-                            onHighlightedChanged: {
-                                if (highlighted) {
-                                    root.selectedSlotRowItem = channelDelegate;
-                                }
-                            }
-
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.topMargin: 4
-                                spacing: 0
-
-                                ColumnLayout {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    Layout.topMargin: Kirigami.Units.gridUnit * 0.7
-                                    Layout.bottomMargin: Kirigami.Units.gridUnit * 0.7
-                                    spacing: Kirigami.Units.gridUnit * 0.7
 
-                                    Repeater {
-                                        model: 5
-                                        delegate: Rectangle {
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            Layout.alignment: Qt.AlignVCenter
-                                            Layout.leftMargin: 4
-                                            Layout.rightMargin: 4
-                                            color: "transparent"
-                                            border.width: 2
-                                            border.color: channelDelegate.highlighted &&
-                                                          ((!fxButton.checked && channelDelegate.channel.selectedSlotRow === index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow === index))
-                                                            ? Kirigami.Theme.highlightColor
-                                                            : "transparent"
+                                    onHighlightedChanged: {
+                                        if (highlighted) {
+                                            root.selectedSlotRowItem = channelDelegate;
+                                        }
+                                    }
 
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: {
-                                                    if (zynqtgui.sketchpad.selectedTrackId !== channelDelegate.channelIndex ||
-                                                        (synthsButton.checked && root.selectedChannel.selectedSlot.value != index) ||
-                                                        (samplesButton.checked && root.selectedChannel.selectedSlot.value != index) ||
-                                                        (fxButton.checked && root.selectedChannel.selectedSlot.value != index)
-                                                    ) {
-                                                        // Check only if slot index matches selected index. This will allow us overcoming the situation
-                                                        // Where a slot index is already selected for another slot type but would require clicking twice if
-                                                        // slot type is checked here to switch first and then activate the slot. Hence when activating, make sure to
-                                                        // switch to slot to have consistent selected slot type.
-                                                        channelsSlotsRow.currentIndex = index
-                                                        if (fxButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
-                                                            channelDelegate.channel.selectedFxSlotRow = index
-                                                        } else if (samplesButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
-                                                            channelDelegate.channel.selectedSlotRow = index
-                                                        } else if (synthsButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
-                                                            channelDelegate.channel.selectedSlotRow = index
+                                    contentItem: ColumnLayout {
+                                        // anchors.fill: parent
+                                        // anchors.topMargin: Kirigami.Units.gridUnit * 0.7
+                                        // anchors.bottomMargin: Kirigami.Units.gridUnit * 0.7
+                                        spacing: Kirigami.Units.gridUnit * 0.7
+
+                                        Repeater {
+                                            model: 5
+                                            delegate: Rectangle {
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                Kirigami.Theme.inherit: false
+
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                Layout.alignment: Qt.AlignVCenter
+                                                color: "transparent"
+                                                border.width: 2
+                                                border.color: channelDelegate.highlighted &&
+                                                              ((!fxButton.checked && channelDelegate.channel.selectedSlotRow === index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow === index))
+                                                              ? Kirigami.Theme.textColor
+                                                              : "transparent"
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        if (zynqtgui.sketchpad.selectedTrackId !== channelDelegate.channelIndex ||
+                                                                (synthsButton.checked && root.selectedChannel.selectedSlot.value != index) ||
+                                                                (samplesButton.checked && root.selectedChannel.selectedSlot.value != index) ||
+                                                                (fxButton.checked && root.selectedChannel.selectedSlot.value != index)
+                                                                ) {
+                                                            // Check only if slot index matches selected index. This will allow us overcoming the situation
+                                                            // Where a slot index is already selected for another slot type but would require clicking twice if
+                                                            // slot type is checked here to switch first and then activate the slot. Hence when activating, make sure to
+                                                            // switch to slot to have consistent selected slot type.
+                                                            channelsSlotsRow.currentIndex = index
+                                                            if (fxButton.checked) {
+                                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
+                                                                channelDelegate.channel.selectedFxSlotRow = index
+                                                            } else if (samplesButton.checked) {
+                                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
+                                                                channelDelegate.channel.selectedSlotRow = index
+                                                            } else if (synthsButton.checked) {
+                                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
+                                                                channelDelegate.channel.selectedSlotRow = index
+                                                            }
+
+                                                            zynqtgui.sketchpad.selectedTrackId = channelDelegate.channelIndex;
+                                                        } else {
+                                                            // As mentioned in the above if clause, when a slot index is already selected, the slot will want activation
+                                                            // but can have wrong slot type selected. Hence make sure to always have correct slot type before activating
+                                                            if (fxButton.checked) {
+                                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
+                                                                channelDelegate.channel.selectedFxSlotRow = index
+                                                            } else if (samplesButton.checked) {
+                                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
+                                                                channelDelegate.channel.selectedSlotRow = index
+                                                            } else if (synthsButton.checked) {
+                                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
+                                                                channelDelegate.channel.selectedSlotRow = index
+                                                            }
+                                                            handleItemClick()
                                                         }
-
-                                                        zynqtgui.sketchpad.selectedTrackId = channelDelegate.channelIndex;
-                                                    } else {
-                                                        // As mentioned in the above if clause, when a slot index is already selected, the slot will want activation
-                                                        // but can have wrong slot type selected. Hence make sure to always have correct slot type before activating
-                                                        if (fxButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
-                                                            channelDelegate.channel.selectedFxSlotRow = index
-                                                        } else if (samplesButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
-                                                            channelDelegate.channel.selectedSlotRow = index
-                                                        } else if (synthsButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
-                                                            channelDelegate.channel.selectedSlotRow = index
-                                                        }
-                                                        handleItemClick()
                                                     }
+                                                    z: 10
                                                 }
-                                                z: 10
-                                            }
 
-                                            Rectangle {
-                                                property string text: synthsButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
-                                                                        ? channelDelegate.channel.getLayerNameByMidiChannel(channelDelegate.channel.chainedSounds[index]).split(">")[0]
-                                                                        : fxButton.checked
+                                                Rectangle {
+                                                    property string text: synthsButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
+                                                                          ? channelDelegate.channel.getLayerNameByMidiChannel(channelDelegate.channel.chainedSounds[index]).split(">")[0]
+                                                                          : fxButton.checked
                                                                             ? channelDelegate.channel.chainedFxNames[index]
                                                                             : samplesButton.checked && channelDelegate.channel.samples[index].path
-                                                                                ? channelDelegate.channel.samples[index].path.split("/").pop()
-                                                                                : ""
+                                                                              ? channelDelegate.channel.samples[index].path.split("/").pop()
+                                                                              : ""
 
-                                                clip: true
-                                                anchors.centerIn: parent
-                                                width: parent.width - 4
-                                                height: Kirigami.Units.gridUnit * 1.5
+                                                    clip: true
+                                                    anchors.centerIn: parent
+                                                    width: parent.width - 8
+                                                    height: Kirigami.Units.gridUnit * 1.5
 
-                                                Kirigami.Theme.inherit: false
-                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                color: Kirigami.Theme.backgroundColor
+                                                    Kirigami.Theme.inherit: false
+                                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                    color: Kirigami.Theme.backgroundColor
 
-                                                border.color: "#ff999999"
-                                                border.width: 2
-                                                radius: 4
+                                                    border.color: channelDelegate.highlighted &&
+                                                                  ((!fxButton.checked && channelDelegate.channel.selectedSlotRow === index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow === index))
+                                                                  ? Kirigami.Theme.highlightColor
+                                                                  : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+                                                    border.width: 1
+                                                    radius: 4
+                                                    border.pixelAligned: false
+                                                    antialiasing: true
 
-                                                QQC2.Label {
-                                                    anchors {
-                                                        verticalCenter: parent.verticalCenter
-                                                        left: parent.left
-                                                        leftMargin: 10
-                                                        right: parent.right
-                                                        rightMargin: 10
+                                                    QQC2.Label {
+                                                        anchors {
+                                                            verticalCenter: parent.verticalCenter
+                                                            left: parent.left
+                                                            leftMargin: 10
+                                                            right: parent.right
+                                                            rightMargin: 10
+                                                        }
+                                                        font.pointSize: 10
+                                                        elide: Text.ElideRight
+                                                        text: parent.text
                                                     }
-                                                    font.pointSize: 10
-                                                    elide: Text.ElideRight
-                                                    text: parent.text
                                                 }
                                             }
                                         }
                                     }
                                 }
-
-                                Kirigami.Separator {
-                                    Layout.fillHeight: true
-                                    Layout.preferredWidth: 1
-                                    color: "#ff31363b"
-                                    visible: index !== root.song.channelsModel.count-1 && !highlighted
-                                }
                             }
                         }
                     }
                 }
-
                 ColumnLayout {
                     Layout.fillWidth: false
                     Layout.fillHeight: false
@@ -629,8 +663,8 @@ Rectangle {
                         Layout.alignment: Qt.AlignHCenter
                         font.pointSize: 14
                         text: qsTr("Ch%1-Slot%2")
-                                .arg(zynqtgui.sketchpad.selectedTrackId + 1)
-                                .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
+                        .arg(zynqtgui.sketchpad.selectedTrackId + 1)
+                        .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
@@ -690,14 +724,14 @@ Rectangle {
                             wrapMode: "WrapAnywhere"
                             font.pointSize: 10
                             text: root.selectedSlotRowItem
-                                      ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                          ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
-                                          : fxButton.checked
-                                              ? root.selectedSlotRowItem.channel.chainedFxNames[root.selectedSlotRowItem.channel.selectedFxSlotRow]
-                                              : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
-                                                  ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
-                                                  : ""
-                                      : ""
+                                  ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                    ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
+                                    : fxButton.checked
+                                      ? root.selectedSlotRowItem.channel.chainedFxNames[root.selectedSlotRowItem.channel.selectedFxSlotRow]
+                                      : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
+                                        ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
+                                        : ""
+                            : ""
                         }
 
                         MouseArea {
@@ -752,6 +786,7 @@ Rectangle {
         }
     }
 
+
     Zynthian.FilePickerDialog {
         id: samplePickerDialog
         parent: zlScreen.parent
@@ -781,12 +816,12 @@ Rectangle {
         property int sampleSlot: -1
 
         headerText: saveMode
-            ? qsTr("Pick Save Location For %1-S%2")
-                .arg(root.selectedChannel.name)
-                .arg(sampleSlot + 1)
-            : qsTr("%1-S%2 : Pick a sample")
-                .arg(root.selectedChannel.name)
-                .arg(sampleSlot + 1)
+                    ? qsTr("Pick Save Location For %1-S%2")
+                      .arg(root.selectedChannel.name)
+                      .arg(sampleSlot + 1)
+                    : qsTr("%1-S%2 : Pick a sample")
+        .arg(root.selectedChannel.name)
+        .arg(sampleSlot + 1)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
@@ -844,13 +879,13 @@ Rectangle {
         property QtObject theClip: null
 
         headerText: saveMode
-            ? qsTr("Pick Save Location For %1%2")
-                .arg(root.selectedChannel.name)
-                .arg(root.selectedChannel.selectedSlotRow + 1)
-            : qsTr("%1%2 : Pick a %3")
-                .arg(root.selectedChannel.name)
-                .arg(root.selectedChannel.selectedSlotRow + 1)
-                .arg(thingToPick)
+                    ? qsTr("Pick Save Location For %1%2")
+                      .arg(root.selectedChannel.name)
+                      .arg(root.selectedChannel.selectedSlotRow + 1)
+                    : qsTr("%1%2 : Pick a %3")
+        .arg(root.selectedChannel.name)
+        .arg(root.selectedChannel.selectedSlotRow + 1)
+        .arg(thingToPick)
         property string thingToPick: ""
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
@@ -1062,18 +1097,18 @@ Rectangle {
         visible: false
         function pickOutput(channel) {
             externalMidiOutPicker.channel = channel;
-                for (let index = 0; index < Zynthbox.MidiRouter.model.midiOutSources.length; ++index) {
-                    let entry = Zynthbox.MidiRouter.model.midiOutSources[index];
-                    if (channel.externalSettings.midiOutDevice === "") {
-                        if (entry.value === "external:ttymidi:MIDI") {
-                            externalMidiOutPicker.selectIndex(index);
-                            break;
-                        }
-                    } else {
-                        if (entry.value === channel.externalSettings.midiOutDevice) {
-                            externalMidiOutPicker.selectIndex(index);
-                            break;
-                        }
+            for (let index = 0; index < Zynthbox.MidiRouter.model.midiOutSources.length; ++index) {
+                let entry = Zynthbox.MidiRouter.model.midiOutSources[index];
+                if (channel.externalSettings.midiOutDevice === "") {
+                    if (entry.value === "external:ttymidi:MIDI") {
+                        externalMidiOutPicker.selectIndex(index);
+                        break;
+                    }
+                } else {
+                    if (entry.value === channel.externalSettings.midiOutDevice) {
+                        externalMidiOutPicker.selectIndex(index);
+                        break;
+                    }
                 }
             }
             externalMidiOutPicker.onClicked();
@@ -1093,16 +1128,16 @@ Rectangle {
     Zynthian.ActionPickerPopup {
         id: fxSetupDialog
         property var selectedFx: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_fxslot"
-                                    ? root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value]
-                                    : root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot"
-                                        ? root.selectedChannel.chainedSketchFx[root.selectedChannel.selectedSlot.value]
-                                        : null
+                                 ? root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value]
+                                 : root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot"
+                                   ? root.selectedChannel.chainedSketchFx[root.selectedChannel.selectedSlot.value]
+                                   : null
 
         actions: [
             Kirigami.Action {
                 text: fxSetupDialog.selectedFx == null
-                        ? qsTr("Pick FX")
-                        : qsTr("Change FX")
+                      ? qsTr("Pick FX")
+                      : qsTr("Change FX")
                 onTriggered: {
                     zynqtgui.forced_screen_back = "sketchpad"
                     zynqtgui.current_screen_id = "layer_effects"

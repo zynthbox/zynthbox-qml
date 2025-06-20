@@ -86,7 +86,7 @@ QQC2.Pane {
     background: Rectangle
     {
         color: Kirigami.Theme.backgroundColor
-        border.color: "red"
+        // border.color: "red"
     }
 
     function pickNextSlot(onlySelectSlot=false) {
@@ -767,7 +767,7 @@ QQC2.Pane {
                 background: Rectangle
                 {
                     color: Kirigami.Theme.backgroundColor
-                    border.color: "yellow"
+                    // border.color: "yellow"
                 }
 
                 contentItem: ColumnLayout {

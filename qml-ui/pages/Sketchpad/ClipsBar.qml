@@ -43,7 +43,7 @@ QQC2.Pane
     Layout.fillWidth: true
     background: Rectangle {
         color: Kirigami.Theme.backgroundColor
-        border.color: "orange"
+        // border.color: "orange"
     }
 
     property QtObject bottomBar: null

@@ -169,19 +169,21 @@ class zynthian_gui_engine(zynthian_gui_selector):
                         # Iterate over all categories of a plugin and fill list with categories only
                         # If a category is already inserted, skip it
                         # If the category is "Instrument", skip it as it is not a effect type
-                        for category in plugin_info.categories:
-                            category_identifier = f"{category.type}/{category.id}"
-                            if category_identifier not in already_inserted_categories and category.displayName != "Instrument":
-                                # Fill list with categories only
-                                cat_entries.append((category.displayName, index, category.displayName, category.displayName))
-                                metadata_entries.append(({"image": category.image}, category.displayName))
+                        for category_info in plugin_info.categories:
+                            category_identifier = f"{category_info.type}/{category_info.id}"
+                            if category_identifier not in already_inserted_categories and category_info.displayName != "Instrument":
+                                metadata = {"image": category_info.image}
+                                if category_info.description is not None:
+                                    metadata["description"] = category_info.description
+                                cat_entries.append((category_info.displayName, index, category_info.displayName, category_info.displayName))
+                                metadata_entries.append((metadata, category_info.displayName))
                                 already_inserted_categories.append(category_identifier)
                     elif self.only_categories is not None:
                         # Fill list with engines under selected category
                         # Iterate over all categories of a plugin and fill list with engines only if the category matches
                         # Make sure to add the plugin to all categories it belongs to
-                        for category in plugin_info.categories:
-                            if (self.single_category is None or self.single_category == category.displayName):
+                        for category_info in plugin_info.categories:
+                            if (self.single_category is None or self.single_category == category_info.displayName):
                                 metadata = {}
                                 cat_entries.append((eng, index, engine_info[1], engine_info[0]))
 

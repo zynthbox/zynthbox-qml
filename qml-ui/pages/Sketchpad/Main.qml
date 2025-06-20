@@ -1093,7 +1093,7 @@ Zynthian.ScreenPage {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.bottomMargin: Kirigami.Units.smallSpacing
+            // anchors.bottomMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.smallSpacing
 
             QQC2.Control {
@@ -1121,7 +1121,7 @@ Zynthian.ScreenPage {
 
                 contentItem: RowLayout {
 
-                    spacing: 1
+                    spacing:  Kirigami.Units.smallSpacing
 
                     ColumnLayout {
                         id: sketchpadSketchHeadersColumn
@@ -1177,7 +1177,7 @@ Zynthian.ScreenPage {
                     {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Layout.margins: Kirigami.Units.smallSpacing
+                        // Layout.margins: Kirigami.Units.smallSpacing
 
                         padding: 2
                         background: Rectangle

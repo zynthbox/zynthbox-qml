@@ -41,6 +41,7 @@ QQC2.Pane
     id: root
 
     Layout.fillWidth: true
+    padding: 0
     background: Rectangle {
         color: Kirigami.Theme.backgroundColor
         // border.color: "orange"
@@ -104,7 +105,6 @@ QQC2.Pane
             QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.margins: Kirigami.Units.smallSpacing
 
                 padding: 2
 

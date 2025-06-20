@@ -3,91 +3,91 @@
         "0000": {
             "displayName": "Chorus",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0001": {
             "displayName": "Compressor",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0002": {
             "displayName": "Delay",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0003": {
             "displayName": "Distortion",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0004": {
             "displayName": "Dynamics",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0005": {
             "displayName": "EQ",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "2"
         },
         "0006": {
             "displayName": "Filter",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "2"
         },
         "0007": {
             "displayName": "Flanger",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0008": {
             "displayName": "Gate",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0009": {
             "displayName": "Modulator",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0010": {
             "displayName": "Phaser",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0011": {
             "displayName": "Reverb",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0012": {
             "displayName": "Simulator",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "00013": {
             "displayName": "Spatial",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         },
         "0014": {
             "displayName": "Utility",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": "1"
         }
     },
@@ -95,7 +95,7 @@
         "0000": {
             "displayName": "Synth",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": null
         }
     },
@@ -103,7 +103,7 @@
         "0000": {
             "displayName": "Soundfont",
             "image": null,
-            "description": "",
+            "description": null,
             "defaultDryWetMixAmount": null
         }
     }

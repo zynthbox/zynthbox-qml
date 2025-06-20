@@ -239,13 +239,6 @@ class zynthian_gui_engine(zynthian_gui_selector):
                 self.zynqtgui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
                 self.zynqtgui.stop_loading()
 
-            # Try to set created synth engine's volume to max
-            try:
-                logging.debug("Setting synth volume to max when initializing")
-                self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value = self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value_max
-            except:
-                logging.error("Error setting synth volume to max when initializing")
-
     def select_by_engine(self, eng):
         for i, val in enumerate(self.list_data):
             if eng == val[0]:

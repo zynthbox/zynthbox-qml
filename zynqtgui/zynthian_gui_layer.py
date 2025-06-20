@@ -505,6 +505,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
                     layer = zynthian_layer(zyngine, midich, self.zynqtgui, selected_track.id, selected_track.selectedSlot.className, selected_track.selectedSlot.value)
 
+                # Some engine specific default settings after creating instance
+                if layer.engine.type == "MIDI Synth":
+                    # Try to set created synth engine's volume to max
+                    try:
+                        logging.debug(f"Setting engine {layer.engine.name} volume to max when initializing")
+                        self.zynqtgui.fixed_layers.volumeControllers[layer.midi_chan].value = self.zynqtgui.fixed_layers.volumeControllers[layer.midi_chan].value_max
+                    except:
+                        logging.error("Error setting synth volume to max when initializing")
+                elif layer.engine.type == "Audio Effect":
+                    for category_info in layer.engine.version_info.plugin_info.categories:
+                        if category_info.defaultDryWetMixAmount is not None:
+                            logging.debug(f"Setting defaultDryWetMixAmount of engine {layer.engine.name} to : {category_info.defaultDryWetMixAmount}")
+                            fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[selected_track.id][selected_track.selectedSlot.value]
+                            fxPassthroughClient.setDryWetMixAmount(float(category_info.defaultDryWetMixAmount))
+
                 self.zynqtgui.set_curlayer(layer, queue=False)
 
                 # Try to connect Audio Effects ...

@@ -517,8 +517,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     for category_info in layer.engine.version_info.plugin_info.categories:
                         if category_info.defaultDryWetMixAmount is not None:
                             logging.debug(f"Setting defaultDryWetMixAmount of engine {layer.engine.name} to : {category_info.defaultDryWetMixAmount}")
-                            fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[selected_track.id][selected_track.selectedSlot.value]
-                            fxPassthroughClient.setDryWetMixAmount(float(category_info.defaultDryWetMixAmount))
+                            selected_track.set_passthroughValue("fxPassthrough", selected_track.selectedSlot.value, "dryWetMixAmount", float(category_info.defaultDryWetMixAmount))
 
                 self.zynqtgui.set_curlayer(layer, queue=False)
 

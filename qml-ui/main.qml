@@ -713,10 +713,38 @@ Kirigami.AbstractApplicationWindow {
                     border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
                 }
 
+                component BreadcrumbButton : QQC2.Button
+                {
+                    id: btn
+                    Layout.fillHeight: true
+
+                    padding: Kirigami.Units.mediumSpacing
+                    // leftPadding: 0
+                    // rightPadding: breadcrumbSeparator.width/2
+                    // implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding + Kirigami.Units.gridUnit
+                    icon.color: root.highlighted || root.pressed ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                    icon.width: 24
+                    icon.height: 24
+                    property bool showSeparator : true
+                    background: Rectangle
+                    {
+                        color: btn.pressed || btn.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                        radius: 4
+                        Kirigami.Separator
+                        {
+                            visible: root.showSeparator
+                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                            height: parent.height
+                            anchors.left: parent.left
+                        }
+                    }
+                    font.pointSize: 11
+                }
+
                 contentItem: RowLayout
                 {
                     spacing: 0
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: menuButton
                         icon.name: "application-menu"
                         Layout.minimumWidth: Kirigami.Units.gridUnit * 3
@@ -745,7 +773,7 @@ Kirigami.AbstractApplicationWindow {
                         }
                         highlighted: zynqtgui.current_screen_id === 'main'
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: homeButton
                         Layout.minimumWidth: Kirigami.Units.gridUnit * 6
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
@@ -791,7 +819,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: sceneButton
                         icon.color: Kirigami.Theme.textColor
                         text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
@@ -833,7 +861,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: channelButton
                         icon.color: Kirigami.Theme.textColor
                         text: qsTr("Track %1 ˬ")
@@ -861,7 +889,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: samplesButton
 
                         property QtObject selectedSample: null
@@ -907,7 +935,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: sampleLoopButton
 
                         property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
@@ -918,7 +946,7 @@ Kirigami.AbstractApplicationWindow {
 
                         visible: root.selectedChannel.trackType === "sample-loop"
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: synthButton
                         icon.color: Kirigami.Theme.textColor
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
@@ -951,7 +979,7 @@ Kirigami.AbstractApplicationWindow {
                             synthButtonSoundNameThrottle.restart();
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         id: presetButton
                         icon.color: Kirigami.Theme.textColor
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
@@ -980,7 +1008,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         icon.color: Kirigami.Theme.textColor
                         text: {
                             switch (effectScreen) {
@@ -1023,7 +1051,7 @@ Kirigami.AbstractApplicationWindow {
                         onClicked: zynqtgui.current_screen_id = effectScreen
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                     }
-                    Zynthian.BreadcrumbButton {
+                    BreadcrumbButton {
                         icon.color: Kirigami.Theme.textColor
                         text: "EDIT"
                         visible: zynqtgui.current_screen_id === "control"

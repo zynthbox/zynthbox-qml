@@ -444,7 +444,7 @@ QQC2.Pane {
 
                     background: Rectangle
                     {
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
                         Kirigami.Theme.inherit: false
                         color: Kirigami.Theme.backgroundColor
                         border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2.5)
@@ -461,7 +461,7 @@ QQC2.Pane {
                             {
                                 width: slotsContainer.width
                                 height: slotsContainer.height
-                                radius: 5
+                                radius: 6
                             }
                         }
 
@@ -482,13 +482,7 @@ QQC2.Pane {
 
                                     background: Rectangle
                                     {
-                                        // Kirigami.Separator {
-                                        //     height: parent.height
-                                        //     Layout.preferredWidth: 1
-                                        //     color: "#ff31363b"
-                                        //     visible: index !== root.song.channelsModel.count-1 && !highlighted
-                                        // }
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                                        Kirigami.Theme.colorSet: Kirigami.Theme.View
                                         Kirigami.Theme.inherit: false
                                         color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
                                         border.width: 1
@@ -545,7 +539,7 @@ QQC2.Pane {
                                         Repeater {
                                             model: 5
                                             delegate: Rectangle {
-                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Window
                                                 Kirigami.Theme.inherit: false
 
                                                 Layout.fillWidth: true

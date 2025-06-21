@@ -118,8 +118,6 @@ QQC2.Pane {
 
                 contentItem: Item {
                     id: clipsContainer
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
 
                     layer.enabled: true
                     layer.effect: OpacityMask

@@ -60,6 +60,7 @@ class zynthian_basic_engine(QObject):
 
     def __init__(self, name=None, command=None, prompt=None, zynqtgui=None):
         super(zynthian_basic_engine, self).__init__(zynqtgui)
+        self.zynqtgui = zynqtgui
         self.name = name
         self.proc = Zynthbox.ProcessWrapper(self)
         self.proc.setCommandPrompt(prompt)
@@ -68,6 +69,8 @@ class zynthian_basic_engine(QObject):
         self.command_env = os.environ.copy()
         self.command_prompt = prompt
         self.is_running = False
+        # A flag to detect if process has crashed has been restarted in handleStateChanged
+        self.has_restarted = False
 
     def __del__(self):
         # If this fails, it is likely that the engine was already stopped and the process object deleted, so let's just not worry too much
@@ -84,6 +87,13 @@ class zynthian_basic_engine(QObject):
         logging.debug(f"--- {self.name} state is now {self.proc.state()}")
         if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             self.is_running = True
+            if self.has_restarted:
+                logging.debug(f"Engine {self.name}({self}) has restarted after crash. Re-send state and autoconnect ports")
+                # If process is running and has been restarted after a crash, re-send the state again and connect process ports
+                self.zynqtgui.zynautoconnect(True)
+                self.has_restarted = False
+        elif self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RestartingState:
+            self.has_restarted = True
 
     """
     Start the engine and return output if it is waiting for a prompt
@@ -120,7 +130,7 @@ class zynthian_basic_engine(QObject):
     def proc_cmd(self, cmd:str, wait_for_output=False):
         out = ""
         if self.proc is not None and self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
-            # logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
+            logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
             if wait_for_output:
                 transaction = self.proc.call(cmd)
                 out = transaction.standardOutput()
@@ -128,6 +138,7 @@ class zynthian_basic_engine(QObject):
             else:
                 transaction = self.proc.send(cmd)
                 transaction.release()
+            logging.debug(f"{self.name} proc command output: {out}")
         return out
 
     # This will return the transaction rather than the transaction's output, which can

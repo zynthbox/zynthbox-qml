@@ -133,11 +133,13 @@ class zynthian_basic_engine(QObject):
             logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
             if wait_for_output:
                 transaction = self.proc.call(cmd)
-                out = transaction.standardOutput()
-                transaction.release()
+                if transaction is not None:
+                    out = transaction.standardOutput()
+                    transaction.release()
             else:
                 transaction = self.proc.send(cmd)
-                transaction.release()
+                if transaction is not None:
+                    transaction.release()
             logging.debug(f"{self.name} proc command output: {out}")
         return out
 

@@ -143,7 +143,7 @@ QQC2.AbstractButton {
 
                     font.pointSize: 12
                     font.weight: Font.Bold
-                    font.family: "Roboto Mono"
+                    font.family: "Hack"
                 }
             }
         }

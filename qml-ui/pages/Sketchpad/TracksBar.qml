@@ -795,7 +795,7 @@ QQC2.Pane {
                                 text: qsTr("Track: %1").arg(root.selectedChannel ? root.selectedChannel.name : "")
                                 // font.pointSize: 8
                                 font.weight: Font.Bold
-                                font.family: "Roboto Mono"
+                                font.family: "Hack"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
@@ -1123,7 +1123,7 @@ QQC2.Pane {
                                     color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                                     font.pointSize: 8
                                     font.weight: Font.Medium
-                                    font.family: "Roboto Mono"
+                                    font.family: "Hack"
                                 }
 
                                 QQC2.Control {
@@ -1197,7 +1197,7 @@ QQC2.Pane {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 8
                                                     font.weight: Font.Light
-                                                    font.family: "Roboto Mono"
+                                                    font.family: "Hack"
                                                     text: qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
                                                 }
                                                 QQC2.Label {
@@ -1206,7 +1206,7 @@ QQC2.Pane {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 8
                                                     font.weight: Font.Light
-                                                    font.family: "Roboto Mono"
+                                                    font.family: "Hack"
                                                     text: qsTr("  Bank : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.bank : "--")
                                                 }
                                                 QQC2.Label {
@@ -1215,7 +1215,7 @@ QQC2.Pane {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 8
                                                     font.weight: Font.Light
-                                                    font.family: "Roboto Mono"
+                                                    font.family: "Hack"
                                                     text: qsTr("Preset : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.preset : "--")
                                                 }
                                             }
@@ -1499,7 +1499,7 @@ QQC2.Pane {
                                             font.underline: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
                                             font.pointSize: 8
                                             font.weight: Font.DemiBold
-                                            font.family: "Roboto Mono"
+                                            font.family: "Hack"
                                             font.capitalization: Font.AllUppercase
                                             color: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                                             property int clipIndex: model.index

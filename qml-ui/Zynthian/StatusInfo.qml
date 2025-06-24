@@ -223,7 +223,7 @@ QQC2.Pane
                         visible: zynqtgui.altButtonPressed
                         font.pointSize: 6
                         font.weight: Font.DemiBold
-                        font.family: "Roboto Mono"
+                        font.family: "Hack"
                         background: Rectangle {
                             color: "transparent"
                             border {
@@ -281,7 +281,7 @@ QQC2.Pane
                             }
                             font.pointSize: 6
                             font.weight: Font.Light
-                            font.family: "Roboto Mono"
+                            font.family: "Hack"
                             text: qsTr("Audio")
                             color: Kirigami.Theme.neutralTextColor
                         }
@@ -294,7 +294,7 @@ QQC2.Pane
                               : ""
                         font.pointSize: 8
                         font.weight: Font.Normal
-                        font.family: "Roboto Mono"
+                        font.family: "Hack"
                     }
 
                     Item {
@@ -309,7 +309,7 @@ QQC2.Pane
                               : ""
                         font.pointSize: 8
                         font.weight: Font.Normal
-                        font.family: "Roboto Mono"
+                        font.family: "Hack"
                     }
                     QQC2.Label {
                         Layout.alignment: Qt.AlignRight
@@ -319,7 +319,7 @@ QQC2.Pane
                               : ""
                         font.pointSize: 8
                         font.weight: Font.Normal
-                        font.family: "Roboto Mono"
+                        font.family: "Hack"
                     }
                     //        QQC2.Label {
                     //            visible: Zynthbox.PlayGridManager.hardwareOutActiveNotes.length > 0
@@ -353,7 +353,7 @@ QQC2.Pane
                     text: Zynthbox.SyncTimer.bpm
                     font.pointSize: 8
                     font.weight: Font.Normal
-                    font.family: "Roboto Mono"
+                    font.family: "Hack"
                 }
                 Kirigami.Icon {
                     Layout.alignment: Qt.AlignCenter

@@ -636,7 +636,7 @@ QQC2.Pane {
                                                         // font.pointSize: 10
                                                         font.pointSize: 8
                                                         font.weight: Font.DemiBold
-                                                        font.family: "Roboto Mono"
+                                                        font.family: "Hack"
                                                         elide: Text.ElideRight
                                                         text: parent.text
                                                     }

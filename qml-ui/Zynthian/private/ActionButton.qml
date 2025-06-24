@@ -39,7 +39,7 @@ QQC2.Button {
     property Kirigami.Action kirigamiAction
     font.capitalization: Font.AllUppercase
     // font.weight: Font.DemiBold
-    font.family: "Roboto Mono"
+    font.family: "Hack"
 
     text: kirigamiAction && kirigamiAction.visible ? kirigamiAction.text : ""
     checkable: kirigamiAction && kirigamiAction.checkable

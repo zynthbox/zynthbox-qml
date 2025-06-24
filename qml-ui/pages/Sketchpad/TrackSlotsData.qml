@@ -127,7 +127,7 @@ RowLayout {
         // font.bold: true
         font.pointSize: 11
         font.weight: Font.DemiBold
-        font.family: "Roboto Mono"
+        font.family: "Hack"
         text: {
             if (control.slotTypeLabel == "") {
                 switch (control.slotType) {
@@ -404,7 +404,7 @@ RowLayout {
                     }
                     font.pointSize: 8
                     font.weight: Font.DemiBold
-                    font.family: "Roboto Mono"
+                    font.family: "Hack"
                     elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
                     color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                 }

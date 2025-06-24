@@ -267,7 +267,7 @@ QQC2.Pane {
 
                                                         font.pointSize: 8
                                                         font.weight: Font.Light
-                                                        font.family: "Roboto Mono"
+                                                        font.family: "Hack"
 
                                                         Timer {
                                                             id: soundnameUpdater;
@@ -350,7 +350,7 @@ QQC2.Pane {
                                                 elide: Text.ElideRight
                                                 text: model.channel.name
                                                 font.weight: Font.DemiBold
-                                                font.family: "Roboto Mono"
+                                                font.family: "Hack"
 
                                                 MouseArea {
                                                     anchors.fill: parent
@@ -374,7 +374,7 @@ QQC2.Pane {
                                                     radius: 2
                                                     font.pointSize: 8
                                                     font.weight: Font.DemiBold
-                                                    font.family: "Roboto Mono"
+                                                    font.family: "Hack"
                                                     checkable: true
                                                     checked: root.song.playChannelSolo === model.channel.id
                                                     text: qsTr("S")
@@ -401,7 +401,7 @@ QQC2.Pane {
                                                     checkable: true
                                                     text: qsTr("M")
                                                     font.weight: Font.DemiBold
-                                                    font.family: "Roboto Mono"
+                                                    font.family: "Hack"
                                                     background: Rectangle {
                                                         radius: parent.radius
                                                         border.width: 1

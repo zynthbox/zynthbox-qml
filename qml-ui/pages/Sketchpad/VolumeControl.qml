@@ -40,7 +40,7 @@ Rectangle {
             Layout.topMargin: 8
             font.pointSize: 8
             font.weight: Font.DemiBold
-            font.family: "Roboto Mono"
+            font.family: "Hack"
         }
 
         Item{
@@ -140,7 +140,7 @@ Rectangle {
 
                             font.pointSize: 8
                             font.weight: Font.DemiBold
-                            font.family: "Roboto Mono"
+                            font.family: "Hack"
 
                             style: GaugeStyle {
                                 valueBar: Rectangle {
@@ -274,7 +274,7 @@ Rectangle {
             visible: text && text.length>0
             font.pointSize: 8
             font.weight: Font.DemiBold
-            font.family: "Roboto Mono"
+            font.family: "Hack"
         }
     }
 }

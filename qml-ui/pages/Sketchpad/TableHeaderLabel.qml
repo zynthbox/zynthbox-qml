@@ -23,7 +23,7 @@ ColumnLayout {
         font.pointSize: 10
         font.weight: Font.DemiBold
         font.capitalization: Font.AllUppercase
-        font.family: "Roboto Mono"
+        font.family: "Hack"
         wrapMode: Text.WrapAnywhere
     }
 
@@ -38,7 +38,7 @@ ColumnLayout {
         font.pointSize: 10
         font.weight: Font.DemiBold
         // font.capitalization: Font.AllUppercase
-        font.family: "Roboto Mono"
+        font.family: "Hack"
     }
 
     QQC2.Label {
@@ -52,6 +52,6 @@ ColumnLayout {
         font.pointSize: 10
         font.weight: Font.DemiBold
         // font.capitalization: Font.AllUppercase
-        font.family: "Roboto Mono"
+        font.family: "Hack"
     }
 }

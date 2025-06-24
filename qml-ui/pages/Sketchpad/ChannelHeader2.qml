@@ -69,7 +69,7 @@ QQC2.AbstractButton {
                 text: root.text
                 font.pointSize: 8
                 font.weight: Font.DemiBold
-                font.family: "Roboto Mono"
+                font.family: "Hack"
             }
 
             QQC2.Label {
@@ -83,7 +83,7 @@ QQC2.AbstractButton {
                 font.pointSize: 6
                 font.weight: Font.DemiBold
                 font.capitalization: Font.AllUppercase
-                font.family: "Roboto Mono"
+                font.family: "Hack"
                 text: subSubText
                 padding: 0
                 // color: Kirigami.Theme.backgroundColor
@@ -109,7 +109,7 @@ QQC2.AbstractButton {
                     text: root.subText ? root.subText : ""
                     font.pointSize: 8
                     font.weight: Font.DemiBold
-                    font.family: "Roboto Mono"
+                    font.family: "Hack"
                 }
 
                 ColumnLayout {

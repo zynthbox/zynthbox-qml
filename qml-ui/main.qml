@@ -761,7 +761,7 @@ Kirigami.AbstractApplicationWindow {
                     icon.height: 24
                     property bool showSeparator : true
                     font.weight: Font.Normal
-                    font.family: "Roboto Mono"
+                    font.family: "Hack"
                     background: Rectangle
                     {
                         color: btn.pressed || btn.highlighted ? Kirigami.Theme.highlightColor : "transparent"
@@ -805,7 +805,7 @@ Kirigami.AbstractApplicationWindow {
                             anchors.right: parent.right
                             font.pointSize: 8
                             font.weight: Font.Bold
-                            font.family: "Roboto Mono"
+                            font.family: "Hack"
                         }
                         Zynthian.Menu {
                             id: tracksMenu

@@ -128,7 +128,7 @@ ColumnLayout {
                 font.pointSize: 12
                 // font.bold: true
                 font.weight: Font.Bold
-                font.family: "Roboto Mono"
+                font.family: "Hack"
                 visible: ["sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
                 color: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                 opacity: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? 1 : 0.3

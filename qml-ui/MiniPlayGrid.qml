@@ -37,245 +37,253 @@ import "pages" as Pages
 RowLayout {
     id: component
     spacing: 0
-    ColumnLayout {
-        z: 1
-        Layout.preferredWidth: 64
-        Layout.maximumWidth: Layout.preferredWidth
+
+    Item{
+        implicitWidth: 64
         Layout.fillHeight: true
         Layout.margins: 8
-        spacing: Kirigami.Units.mediumSpacing
 
-        Zynthian.PlayGridButton {
-            id: settingsButton
-            Layout.preferredHeight: width
-            Layout.maximumHeight: width
-            icon.name: "configure"
-            // TODO Reenable this for properly we re-add the ability to have more plaground modules
-            visible: applicationWindow().playGrids.count > 2
-            Rectangle {
-                id: slideDelegateIconMask
-                anchors {
-                    fill: parent
-                    margins: Kirigami.Units.largeSpacing
+        ColumnLayout {
+            z: 1
+            anchors.fill: parent
+            spacing: Kirigami.Units.mediumSpacing
+
+            Zynthian.PlayGridButton {
+                id: settingsButton
+                Layout.preferredHeight: width
+                Layout.maximumHeight: width
+                icon.name: "configure"
+                // TODO Reenable this for properly we re-add the ability to have more plaground modules
+                visible: applicationWindow().playGrids.count > 2
+                Rectangle {
+                    id: slideDelegateIconMask
+                    anchors {
+                        fill: parent
+                        margins: Kirigami.Units.largeSpacing
+                    }
+                    radius: width / 2
+                    visible: false
                 }
-                radius: width / 2
-                visible: false
-            }
-            Row {
-                anchors {
-                    top: parent.top
-                    left: parent.right
-                    bottom: parent.bottom
-                }
-                width: applicationWindow().playGrids.count * settingsButton.width
-                spacing: 0
-                opacity: settingsSlidePoint.pressed ? 1 : 0
-                Repeater {
-                    model: applicationWindow().playGrids.count
-                    delegate: Item {
-                        id: slideDelegate
-                        property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
-                        property var playGrid: applicationWindow().playGrids.itemAt(index).item
-                        property int labelRotation: -45
-                        width: settingsButton.width
-                        height: width
-                        Rectangle {
-                            id: slideDelegateBackground
-                            anchors {
-                                fill: parent
-                                margins: Kirigami.Units.smallSpacing
-                            }
-                            radius: width / 2
-                            Kirigami.Theme.inherit: false
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            border {
-                                width: 1
-                                color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
-                            }
-                            color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
-                        }
-                        Kirigami.Icon {
-                            anchors {
-                                fill: parent
-                                margins: Kirigami.Units.largeSpacing
-                            }
-                            source: playGrid.icon
-                            layer.enabled: true
-                            layer.effect: OpacityMask {
-                                maskSource: slideDelegateIconMask
-                            }
-                        }
-                        Item {
-                            anchors {
-                                left: parent.horizontalCenter
-                                verticalCenter: parent.verticalCenter
-                            }
-                            width: parent.width / 2 + Kirigami.Units.smallSpacing
-                            transformOrigin: Item.Left
-                            rotation: slideDelegate.labelRotation
+                Row {
+                    anchors {
+                        top: parent.top
+                        left: parent.right
+                        bottom: parent.bottom
+                    }
+                    width: applicationWindow().playGrids.count * settingsButton.width
+                    spacing: 0
+                    opacity: settingsSlidePoint.pressed ? 1 : 0
+                    Repeater {
+                        model: applicationWindow().playGrids.count
+                        delegate: Item {
+                            id: slideDelegate
+                            property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
+                            property var playGrid: applicationWindow().playGrids.itemAt(index).item
+                            property int labelRotation: -45
+                            width: settingsButton.width
+                            height: width
                             Rectangle {
+                                id: slideDelegateBackground
                                 anchors {
-                                    fill: slideDelegateLabel
-                                    margins: -Kirigami.Units.smallSpacing
+                                    fill: parent
+                                    margins: Kirigami.Units.smallSpacing
                                 }
-                                radius: height / 2
-                                color: slideDelegateBackground.color
+                                radius: width / 2
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                border {
+                                    width: 1
+                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                }
+                                color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
                             }
-                            QQC2.Label {
-                                id: slideDelegateLabel
+                            Kirigami.Icon {
                                 anchors {
+                                    fill: parent
+                                    margins: Kirigami.Units.largeSpacing
+                                }
+                                source: playGrid.icon
+                                layer.enabled: true
+                                layer.effect: OpacityMask {
+                                    maskSource: slideDelegateIconMask
+                                }
+                            }
+                            Item {
+                                anchors {
+                                    left: parent.horizontalCenter
                                     verticalCenter: parent.verticalCenter
-                                    left: parent.right
                                 }
-                                text: slideDelegate.playGrid.name
-                                color: slideDelegateBackground.border.color
+                                width: parent.width / 2 + Kirigami.Units.smallSpacing
+                                transformOrigin: Item.Left
+                                rotation: slideDelegate.labelRotation
+                                Rectangle {
+                                    anchors {
+                                        fill: slideDelegateLabel
+                                        margins: -Kirigami.Units.smallSpacing
+                                    }
+                                    radius: height / 2
+                                    color: slideDelegateBackground.color
+                                }
+                                QQC2.Label {
+                                    id: slideDelegateLabel
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        left: parent.right
+                                    }
+                                    text: slideDelegate.playGrid.name
+                                    color: slideDelegateBackground.border.color
+                                }
                             }
                         }
                     }
                 }
-            }
-            function getYChoice() {
-                var choice = 0;
-                if (settingsSlidePoint.pressed) {
-                    choice = Math.floor(settingsSlidePoint.y / settingsButton.height);
-                }
-                return choice;
-            }
-            function getXChoice() {
-                var choice = 0;
-                if (settingsSlidePoint.pressed) {
-                    choice = Math.floor(settingsSlidePoint.x / settingsButton.width);
-                }
-                return choice;
-            }
-            MultiPointTouchArea {
-                id: settingsTouchArea
-                anchors.fill: parent
-                touchPoints: [ TouchPoint { id: settingsSlidePoint; } ]
-                property int xChoice
-                property int yChoice
-                onPressed: {
+                function getYChoice() {
+                    var choice = 0;
                     if (settingsSlidePoint.pressed) {
-                        xChoice = settingsButton.getXChoice();
-                        yChoice = settingsButton.getYChoice();
-                        parent.down = true;
+                        choice = Math.floor(settingsSlidePoint.y / settingsButton.height);
                     }
+                    return choice;
                 }
-                onUpdated: {
+                function getXChoice() {
+                    var choice = 0;
                     if (settingsSlidePoint.pressed) {
-                        xChoice = settingsButton.getXChoice();
-                        yChoice = settingsButton.getYChoice();
+                        choice = Math.floor(settingsSlidePoint.x / settingsButton.width);
                     }
+                    return choice;
                 }
-                onReleased: {
-                    if (!settingsSlidePoint.pressed) {
-                        parent.down = false;
-                        if (xChoice === 0 && yChoice === 0) {
-                            // Then it we just had a tap
-                            //settingsDialog.visible = true;
-                        } else if (xChoice === 0 && yChoice !== 0) {
-                            switch (yChoice) {
-                            case -1:
-                                // Enable the swipey manipulation on the grids
-                                break;
-                            case -2:
-                                // Disable the swipy manipulation on the grids
-                                break;
-                            default:
-                                break;
-                            }
-                        } else if (yChoice === 0 && xChoice !== 0) {
-                            if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && Zynthbox.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
-                                Zynthbox.PlayGridManager.setCurrentPlaygrid("minigrid", xChoice - 1);
+                MultiPointTouchArea {
+                    id: settingsTouchArea
+                    anchors.fill: parent
+                    touchPoints: [ TouchPoint { id: settingsSlidePoint; } ]
+                    property int xChoice
+                    property int yChoice
+                    onPressed: {
+                        if (settingsSlidePoint.pressed) {
+                            xChoice = settingsButton.getXChoice();
+                            yChoice = settingsButton.getYChoice();
+                            parent.down = true;
+                        }
+                    }
+                    onUpdated: {
+                        if (settingsSlidePoint.pressed) {
+                            xChoice = settingsButton.getXChoice();
+                            yChoice = settingsButton.getYChoice();
+                        }
+                    }
+                    onReleased: {
+                        if (!settingsSlidePoint.pressed) {
+                            parent.down = false;
+                            if (xChoice === 0 && yChoice === 0) {
+                                // Then it we just had a tap
+                                //settingsDialog.visible = true;
+                            } else if (xChoice === 0 && yChoice !== 0) {
+                                switch (yChoice) {
+                                case -1:
+                                    // Enable the swipey manipulation on the grids
+                                    break;
+                                case -2:
+                                    // Disable the swipy manipulation on the grids
+                                    break;
+                                default:
+                                    break;
+                                }
+                            } else if (yChoice === 0 && xChoice !== 0) {
+                                if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && Zynthbox.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
+                                    Zynthbox.PlayGridManager.setCurrentPlaygrid("minigrid", xChoice - 1);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        Item { Layout.fillWidth: true; Layout.fillHeight: true; }
+            Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-        QQC2.Label {
-            text: "Octave"
-            Layout.alignment: Qt.AlignHCenter
-        }
-
-        QQC2.Control {
-            padding: 1
-            Layout.fillWidth: true
-            background: Rectangle
-            {
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                Kirigami.Theme.inherit: false
-                color: Kirigami.Theme.alternateBackgroundColor
-                radius: 4
-                border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+            QQC2.Label {
+                text: "Octave"
+                Layout.alignment: Qt.AlignHCenter
+                font.weight: Font.Normal
+                font.pointSize: 10
+                font.capitalization: Font.AllUppercase
+                font.family: "Hack"
             }
 
-            contentItem: Column {
-                spacing: 0
-                QQC2.Button {
-                    icon.name: "arrow-up"
-                    width: parent.width
-                    height: width
-                    // Layour.preferredHeight: width
-                    icon.width: 48
-                    icon.height: 48
-                    enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
-                    onClicked: {
-                        if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
-                            playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
-                        }
-                    }
-                    background: Rectangle
-                    {
-                        color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                        radius: 4
-                    }
-                }
-
-                Kirigami.Separator{
+            QQC2.Control {
+                padding: 1
+                Layout.fillWidth: true
+                background: Rectangle
+                {
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     Kirigami.Theme.inherit: false
-                    width: parent.width
-                    height: 1
-                    color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+                    color: Kirigami.Theme.alternateBackgroundColor
+                    radius: 4
+                    border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
                 }
 
-                QQC2.Button {
-                    icon.name: "arrow-down"
-                    width: parent.width
-                    height: width
-                    // Layour.preferredHeight: width
-                    icon.width: 48
-                    icon.height: 48
-                    enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
-                    onClicked: {
-                        if (playGridStack.currentPlayGridItem.octave > 0) {
-                            playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
+                contentItem: Column {
+                    spacing: 0
+                    QQC2.Button {
+                        icon.name: "arrow-up"
+                        width: parent.width
+                        height: width
+                        // Layour.preferredHeight: width
+                        icon.width: 24
+                        icon.height: 24
+                        enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
+                        onClicked: {
+                            if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
+                                playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
+                            }
+                        }
+                        background: Rectangle
+                        {
+                            color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                            radius: 4
                         }
                     }
-                    background: Rectangle
-                    {
-                        color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                        radius: 4
+
+                    Kirigami.Separator{
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        Kirigami.Theme.inherit: false
+                        width: parent.width
+                        height: 1
+                        color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+                    }
+
+                    QQC2.Button {
+                        icon.name: "arrow-down"
+                        width: parent.width
+                        height: width
+                        // Layour.preferredHeight: width
+                        icon.width: 24
+                        icon.height: 24
+                        enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
+                        onClicked: {
+                            if (playGridStack.currentPlayGridItem.octave > 0) {
+                                playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
+                            }
+                        }
+                        background: Rectangle
+                        {
+                            color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                            radius: 4
+                        }
                     }
                 }
             }
-        }
 
-        Item { Layout.fillWidth: true; Layout.fillHeight: true; }
+            Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-        QQC2.Button {
-            text: "Hide"
-            Layout.fillWidth: true
-            // Layour.preferredHeight: width
-            icon.width: 64
-            implicitHeight: 64
-            background: null
-            onClicked: {
-                zynqtgui.callable_ui_action_simple("HIDE_KEYBOARD")
+            QQC2.Button {
+                text: "Hide"
+                Layout.fillWidth: true
+                // Layour.preferredHeight: width
+                icon.width: 64
+                implicitHeight: 64
+                background: null
+                onClicked: {
+                    zynqtgui.callable_ui_action_simple("HIDE_KEYBOARD")
+                }
             }
         }
     }

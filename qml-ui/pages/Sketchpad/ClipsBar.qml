@@ -193,26 +193,33 @@ QQC2.Pane {
                 QQC2.Label {
                     Layout.fillWidth: true
                     wrapMode: Text.WrapAnywhere
-                    // visible: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
+                    enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
                     text: root.selectedClipObject ? root.selectedClipObject.path.split("/").pop() : ""
+                    font.weight: Font.DemiBold
+                    font.capitalization: Font.AllUppercase
+                    font.family: "Hack"
+                    // visible: text.length > 0
                 }
 
                 QQC2.Label {
                     Layout.fillWidth: true
                     wrapMode: Text.WrapAnywhere
-                    // visible: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
+                    enabled: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
                     text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.clipName) : ""
+                    font.weight: Font.DemiBold
+                    font.capitalization: Font.AllUppercase
+                    font.family: "Hack"
+                     // visible: text.length > 0
                 }
 
-                // Kirigami.Separator {
-                //     Layout.fillWidth: true
-                //     Layout.fillHeight: false
-                //     Layout.preferredHeight: 2
-                // }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
 
                 QQC2.Button {
                     Layout.fillWidth: true
-                    // visible: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
+                    enabled: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
                     text: qsTr("Swap with...")
                     onClicked: {
                         bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.clipIndex);
@@ -221,17 +228,14 @@ QQC2.Pane {
 
                 QQC2.Button {
                     Layout.fillWidth: true
-                    // visible: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
+                    enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
                     text: qsTr("Swap with...")
                     onClicked: {
                         bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
                     }
                 }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
+
             }
         }
     }

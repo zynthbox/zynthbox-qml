@@ -30,6 +30,7 @@ import random
 import string
 from collections import OrderedDict
 from subprocess import check_output, STDOUT
+from PySide2.QtCore import Qt, QTimer
 
 from . import zynthian_lv2
 from . import zynthian_engine
@@ -139,6 +140,12 @@ class zynthian_engine_jalv(zynthian_engine):
         self.plugin_url = version_info.url
         self.jackname = self.get_jalv_jackname()
 
+        # processRestartedAfterCrashTimer = QTimer(self)
+        # processRestartedAfterCrashTimer.setInterval(1000)
+        # processRestartedAfterCrashTimer.setSingleShot(True)
+        # processRestartedAfterCrashTimer.timeout.connect(self.handleProcessRestartedAfterCrash, Qt.QueuedConnection)
+        # self.processRestartedAfterCrash.connect(processRestartedAfterCrashTimer.start, Qt.QueuedConnection)
+
         self.ui = False
         # if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
         #     self.ui = self.plugins_dict[plugin_name]['UI']
@@ -195,6 +202,15 @@ class zynthian_engine_jalv(zynthian_engine):
 
         self.reset()
 
+    def handleProcessRestartedAfterCrash(self):
+        logging.debug("handleProcessRestartedAfterCrash")
+
+        # transaction = self.proc.call("presets")
+        # logging.debug(f"--- presets command output BEGIN\n{transaction.standardOutput()}\n--- presets command output END")
+        # transaction.release()
+
+        # for zctrl in self.lv2_zctrl_dict:
+        #     self.send_controller_value(self.lv2_zctrl_dict[zctrl])
 
     # Jack, when listing ports, accepts regular expressions as the jack name.
     # So, for avoiding problems, jack names shouldn't contain regex characters.

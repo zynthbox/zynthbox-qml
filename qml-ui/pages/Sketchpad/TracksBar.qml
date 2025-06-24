@@ -777,7 +777,7 @@ QQC2.Pane {
 
                     ColumnLayout {
                         id: contentColumn
-                       anchors.fill: parent
+                        anchors.fill: parent
 
                         RowLayout {
                             id: tabButtons
@@ -792,8 +792,9 @@ QQC2.Pane {
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                                 level: 3
-                                text: qsTr("Track: %1").arg(root.selectedChannel ? root.selectedChannel.name : "")
+                                text: qsTr("Track %1").arg(root.selectedChannel ? root.selectedChannel.name : "")
                                 // font.pointSize: 8
+                                font.capitalization: Font.AllUppercase
                                 font.weight: Font.Bold
                                 font.family: "Hack"
                             }

@@ -69,6 +69,7 @@ QQC2.AbstractButton {
                 text: root.text
                 font.pointSize: 8
                 font.weight: Font.DemiBold
+                font.capitalization: Font.AllUppercase
                 font.family: "Hack"
             }
 

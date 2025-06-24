@@ -124,10 +124,11 @@ RowLayout {
         horizontalAlignment: Qt.AlignLeft
         verticalAlignment: Qt.AlignVCenter
         visible: control.showSlotTypeLabel
-        // font.bold: true
-        font.pointSize: 11
+        font.pointSize: 10
         font.weight: Font.DemiBold
+        font.capitalization: Font.AllUppercase
         font.family: "Hack"
+
         text: {
             if (control.slotTypeLabel == "") {
                 switch (control.slotType) {

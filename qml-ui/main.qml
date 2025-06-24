@@ -803,10 +803,12 @@ Kirigami.AbstractApplicationWindow {
                             color: Kirigami.Theme.negativeTextColor
                             anchors.top: parent.top
                             anchors.right: parent.right
+                            anchors.margins: Kirigami.Units.smallSpacing
                             font.pointSize: 8
                             font.weight: Font.Bold
                             font.family: "Hack"
                         }
+
                         Zynthian.Menu {
                             id: tracksMenu
                             y: parent.height
@@ -831,7 +833,9 @@ Kirigami.AbstractApplicationWindow {
                         id: sceneButton
                         text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-
+                        // font.weight: Font.DemiBold
+                        font.capitalization: Font.AllUppercase
+                        font.family: "Hack"
                         onClicked: scenesMenu.visible = true
 
                         Timer {
@@ -872,7 +876,9 @@ Kirigami.AbstractApplicationWindow {
                         id: channelButton
                         text: qsTr("Track %1 ˬ")
                         .arg(zynqtgui.sketchpad.selectedTrackId+1)
-
+                        // font.weight: Font.DemiBold
+                        font.capitalization: Font.AllUppercase
+                        font.family: "Hack"
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
 
                         onClicked: channelsMenu.visible = true

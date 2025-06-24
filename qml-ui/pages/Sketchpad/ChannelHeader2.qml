@@ -87,6 +87,8 @@ QQC2.AbstractButton {
                 font.family: "Hack"
                 text: subSubText
                 padding: 0
+                font.letterSpacing: 2
+
                 // color: Kirigami.Theme.backgroundColor
 
                 background: Rectangle {

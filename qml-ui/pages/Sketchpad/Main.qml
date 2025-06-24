@@ -1568,8 +1568,12 @@ Zynthian.ScreenPage {
                                                             Layout.preferredWidth: 1
                                                             Layout.topMargin: Kirigami.Units.smallSpacing
                                                             Layout.bottomMargin: Kirigami.Units.smallSpacing
-                                                            font.pointSize: 9
+                                                            font.pointSize: 6
                                                             text: "Sends"
+                                                            font.weight: Font.DemiBold
+                                                            font.capitalization: Font.AllUppercase
+                                                            font.family: "Hack"
+                                                            font.letterSpacing: 2
                                                         }
                                                         QQC2.Dial {
                                                             Layout.fillWidth: true

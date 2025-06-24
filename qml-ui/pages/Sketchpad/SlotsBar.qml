@@ -298,7 +298,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: Kirigami.Units.mediumSpacing
+                spacing: Kirigami.Units.smallSpacing
 
                 ColumnLayout {
                     id: buttonsColumn
@@ -654,7 +654,7 @@ QQC2.Pane {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignTop
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: Kirigami.Units.mediumSpacing
 
                     QQC2.Label {
                         Layout.fillWidth: true

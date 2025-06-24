@@ -26,34 +26,32 @@ Rectangle {
     border.width: highlight ? 1 : 0
     color: "transparent"
     radius: 2
-    anchors.leftMargin: 2
-    anchors.rightMargin: 2
 
     ColumnLayout {
         anchors.fill: parent
+        anchors.margins: Kirigami.Units.smallSpacing
         spacing: 4
 
         QQC2.Label {
             id: headerLabel
+            Layout.fillWidth: true
+            visible: text.length > 0
             Layout.alignment: Qt.AlignCenter
             Layout.topMargin: 8
-            font.pointSize: 9
+            font.pointSize: 8
+            font.weight: Font.DemiBold
+            font.family: "Roboto Mono"
         }
 
-        RowLayout {
+        Item{
             Layout.fillHeight: true
-            Layout.alignment: Qt.AlignLeft
-            spacing: 8
+            Layout.fillWidth: true
 
             QQC2.Slider {
                 id: slider
 
-                Layout.fillHeight: true
-                Layout.alignment: Qt.AlignCenter
-                Layout.preferredWidth: control.width/2
-                Layout.topMargin: 6
-                Layout.bottomMargin: 6
-                Layout.leftMargin: 30
+                anchors.centerIn: parent
+                height: parent.height
 
                 enabled: control.enabled
                 orientation: Qt.Vertical
@@ -61,15 +59,21 @@ Rectangle {
                 to: 20
                 stepSize: 1
 
-                background: Rectangle {
-                    x: slider.leftPadding
-                    y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                    width: 8
-                    height: slider.availableHeight
-                    radius: 2
-                    color: "transparent"
+                background: Item {
 
-                    /*Canvas {
+                    Rectangle {
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        Kirigami.Theme.inherit: false
+                        width: 8
+                        height: parent.height
+                        anchors.centerIn: parent
+                        radius: 4
+                        border.pixelAligned: false
+                        antialiasing: true
+                        border.color: Qt.darker(color, 1.5)
+                        color: Kirigami.Theme.backgroundColor
+
+                        /*Canvas {
                         readonly property real xCenter: width / 2
                         readonly property real yCenter: height / 2
                         property real shineLength: height * 0.95
@@ -93,72 +97,81 @@ Rectangle {
                         }
                     }*/
 
-                    Rectangle {
-                        id: valueBox
-                        width: parent.width
-                        height: parent.height * (1 - slider.visualPosition)
-                        color: "transparent"//Kirigami.Theme.highlightColor
-                        radius: 2
-                        anchors.bottom: parent.bottom
-                    }
+                        Rectangle {
+                            id: valueBox
 
-                    Rectangle {
-                        width: parent.width + 6
-                        height: width
-                        radius: width
+                            height: parent.height * (1 - slider.visualPosition)
+                            color: Kirigami.Theme.highlightColor
+                            opacity: slider.enabled ? 1 : 0.5
+                            border.color: Qt.darker(color, 1.5)
 
-                        anchors.top: valueBox.top
-                        anchors.topMargin: -height/2
-                        anchors.horizontalCenter: valueBox.horizontalCenter
-                        color: "white"
-                    }
-                    Extras.Gauge {
-                        id: audioGauge
-                        z: -1
-
-                        anchors {
-                            top: parent.top
-                            bottom:parent.bottom
-                            right: parent.right
+                            radius: parent.radius
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            // anchors.margins: 2
                         }
-                        //Layout.fillHeight: true
-                        //Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                        //Layout.leftMargin: 4
-                        minimumValue: -40
-                        maximumValue: 20
 
-                        font.pointSize: 8
+                        Rectangle {
+                            width: parent.width + 6
+                            height: width
+                            radius: width/2
+                            visible: enabled
+                            anchors.top: valueBox.top
+                            anchors.topMargin: -height/2
+                            anchors.horizontalCenter: valueBox.horizontalCenter
+                            color: Kirigami.Theme.textColor
+                            border.color: parent.border.color
+                        }
+                        Extras.Gauge {
+                            id: audioGauge
+                            z: -1
 
-                        style: GaugeStyle {
-                            valueBar: Rectangle {
-                                color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                                implicitWidth: 6
+                            anchors {
+                                top: parent.top
+                                bottom:parent.bottom
+                                right: parent.right
                             }
-                            minorTickmark: Item {
-                                implicitWidth: 8
-                                implicitHeight: 1
+                            //Layout.fillHeight: true
+                            //Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                            //Layout.leftMargin: 4
+                            minimumValue: -40
+                            maximumValue: 20
 
-                                Rectangle {
-                                    color: "#cccccc"
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 2
-                                    anchors.rightMargin: 4
+                            font.pointSize: 8
+                            font.weight: Font.DemiBold
+                            font.family: "Roboto Mono"
+
+                            style: GaugeStyle {
+                                valueBar: Rectangle {
+                                    color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                    implicitWidth: 6
                                 }
-                            }
-                            tickmark: Item {
-                                implicitWidth: 12
-                                implicitHeight: 1
+                                minorTickmark: Item {
+                                    implicitWidth: 8
+                                    implicitHeight: 1
 
-                                Rectangle {
-                                    color: "#dfdfdf"
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 3
-                                    anchors.rightMargin: 3
+                                    Rectangle {
+                                        color: "#cccccc"
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 2
+                                        anchors.rightMargin: 4
+                                    }
                                 }
-                            }
-                            tickmarkLabel: QQC2.Label {
-                                text: {
-                                    switch (styleData.value) {
+                                tickmark: Item {
+                                    implicitWidth: 12
+                                    implicitHeight: 1
+
+                                    Rectangle {
+                                        color: "#dfdfdf"
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 3
+                                        anchors.rightMargin: 3
+                                    }
+                                }
+                                tickmarkLabel: QQC2.Label {
+                                    text: {
+                                        switch (styleData.value) {
                                         case -40:
                                             return "-40"
                                         case 0:
@@ -167,36 +180,37 @@ Rectangle {
                                             return "+20"
                                         default:
                                             return ""
+                                        }
                                     }
-                                }
 
-                                font: audioGauge.font
+                                    font: audioGauge.font
+                                }
                             }
                         }
-                    }
 
-                    Extras.Gauge {
-                        id: inputAudioLevelGauge
-                        anchors.top: audioGauge.top
-                        anchors.bottom: audioGauge.bottom
-                        anchors.right: audioGauge.right
-                        anchors.rightMargin: -8
-                        visible: control.inputAudioLeveldB != null
+                        Extras.Gauge {
+                            id: inputAudioLevelGauge
+                            anchors.top: audioGauge.top
+                            anchors.bottom: audioGauge.bottom
+                            anchors.right: audioGauge.right
+                            anchors.rightMargin: -8
+                            visible: control.inputAudioLeveldB != null
 
-                        minimumValue: -100
-                        maximumValue: 20
-                        value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
+                            minimumValue: -100
+                            maximumValue: 20
+                            value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
 
-                        font.pointSize: 8
+                            font.pointSize: 8
 
-                        style: GaugeStyle {
-                            valueBar: Rectangle {
-                                color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                                implicitWidth: 3
+                            style: GaugeStyle {
+                                valueBar: Rectangle {
+                                    color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                    implicitWidth: 3
+                                }
+                                minorTickmark: null
+                                tickmark: null
+                                tickmarkLabel: null
                             }
-                            minorTickmark: null
-                            tickmark: null
-                            tickmarkLabel: null
                         }
                     }
                 }
@@ -254,10 +268,13 @@ Rectangle {
         QQC2.Label {
             id: footerLabel
             Layout.alignment: Qt.AlignCenter
-            Layout.maximumWidth: parent.width
+            Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
             visible: text && text.length>0
+            font.pointSize: 8
+            font.weight: Font.DemiBold
+            font.family: "Roboto Mono"
         }
     }
 }

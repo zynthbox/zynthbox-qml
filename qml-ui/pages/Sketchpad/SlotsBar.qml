@@ -530,8 +530,10 @@ QQC2.Pane {
                                         }
                                     }
 
-                                    contentItem: ColumnLayout {
-                                        // anchors.fill: parent
+                                    contentItem: Item {
+
+                                        ColumnLayout {
+                                        anchors.fill: parent
                                         // anchors.topMargin: Kirigami.Units.gridUnit * 0.7
                                         // anchors.bottomMargin: Kirigami.Units.gridUnit * 0.7
                                         spacing: Kirigami.Units.gridUnit * 0.7
@@ -631,7 +633,10 @@ QQC2.Pane {
                                                             right: parent.right
                                                             rightMargin: 10
                                                         }
-                                                        font.pointSize: 10
+                                                        // font.pointSize: 10
+                                                        font.pointSize: 8
+                                                        font.weight: Font.DemiBold
+                                                        font.family: "Roboto Mono"
                                                         elide: Text.ElideRight
                                                         text: parent.text
                                                     }
@@ -639,6 +644,7 @@ QQC2.Pane {
                                             }
                                         }
                                     }
+                                }
                                 }
                             }
                         }

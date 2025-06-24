@@ -58,7 +58,7 @@ from PySide2.QtCore import (
     QEventLoop,
     QSettings
 )
-from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap
+from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap, QFont
 
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, QQmlDebuggingEnabler, qmlRegisterType
@@ -5124,6 +5124,8 @@ if __name__ == "__main__":
     palette.setColor(QPalette.Text, QColor(zynthian_gui_config.color_tx))
     palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
     app.setPalette(palette)
+    font = QFont("Roboto")
+    app.setFont(font)
     zynqtgui.screens["theme_chooser"].apply_font()
     zynqtgui.show_screen(zynqtgui.home_screen)
     zynqtgui.screens["preset"].disable_show_fav_presets()

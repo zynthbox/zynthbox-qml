@@ -107,7 +107,7 @@ QQC2.AbstractButton {
             property string highlightColor: "#ffffffff" // green "#ccaaff00"
             property string inactiveColor: "#33ffffff"
             anchors.centerIn: parent
-            spacing: 0
+            spacing: 2
             visible: ["synth", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0
 
             Repeater {
@@ -142,7 +142,8 @@ QQC2.AbstractButton {
                     }
 
                     font.pointSize: 12
-                    font.bold: true
+                    font.weight: Font.Bold
+                    font.family: "Roboto Mono"
                 }
             }
         }

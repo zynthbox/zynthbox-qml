@@ -43,7 +43,6 @@ QQC2.Pane
 
     Layout.fillHeight: true
 
-    Layout.margins: Kirigami.Units.smallSpacing
     padding: Kirigami.Units.mediumSpacing
 
     background: Rectangle
@@ -219,10 +218,12 @@ QQC2.Pane
 
                     QQC2.Label {
                         color: Kirigami.Theme.textColor
-                        font.pointSize: 7
                         text: "ALT"
                         padding: 1
-                        visible: zynqtgui.altButtonPressed
+                        // visible: zynqtgui.altButtonPressed
+                        font.pointSize: 6
+                        font.weight: Font.DemiBold
+                        font.family: "Roboto Mono"
                         background: Rectangle {
                             color: "transparent"
                             border {
@@ -279,6 +280,8 @@ QQC2.Pane
                                 bottom: parent.bottom
                             }
                             font.pointSize: 6
+                            font.weight: Font.Light
+                            font.family: "Roboto Mono"
                             text: qsTr("Audio")
                             color: Kirigami.Theme.neutralTextColor
                         }
@@ -289,7 +292,9 @@ QQC2.Pane
                         text: visible
                               ? "<font size=\"1\">I:</font>" + Zynthbox.PlayGridManager.hardwareInActiveNotes[0] + (Zynthbox.PlayGridManager.hardwareInActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.hardwareInActiveNotes.length - 1) : "")
                               : ""
-                        font.pointSize: 9
+                        font.pointSize: 8
+                        font.weight: Font.Normal
+                        font.family: "Roboto Mono"
                     }
 
                     Item {
@@ -302,7 +307,9 @@ QQC2.Pane
                         text: visible
                               ? Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length - 1) : "")
                               : ""
-                        font.pointSize: 9
+                        font.pointSize: 8
+                        font.weight: Font.Normal
+                        font.family: "Roboto Mono"
                     }
                     QQC2.Label {
                         Layout.alignment: Qt.AlignRight
@@ -310,7 +317,9 @@ QQC2.Pane
                         text: visible
                               ? "<font size=\"1\">S:</font>" + Zynthbox.PlayGridManager.internalPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
                               : ""
-                        font.pointSize: 9
+                        font.pointSize: 8
+                        font.weight: Font.Normal
+                        font.family: "Roboto Mono"
                     }
                     //        QQC2.Label {
                     //            visible: Zynthbox.PlayGridManager.hardwareOutActiveNotes.length > 0
@@ -342,7 +351,9 @@ QQC2.Pane
                     // Hide scale info for now
                     // text: zynqtgui.sketchpad.song.selectedScale +" "+ Zynthbox.SyncTimer.bpm
                     text: Zynthbox.SyncTimer.bpm
-                    font.pointSize: 9
+                    font.pointSize: 8
+                    font.weight: Font.Normal
+                    font.family: "Roboto Mono"
                 }
                 Kirigami.Icon {
                     Layout.alignment: Qt.AlignCenter

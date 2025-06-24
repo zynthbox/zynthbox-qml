@@ -68,23 +68,30 @@ QQC2.AbstractButton {
                 elide: Text.ElideRight
                 text: root.text
                 font.pointSize: 8
+                font.weight: Font.DemiBold
+                font.family: "Roboto Mono"
             }
 
-            Rectangle {
+            QQC2.Label {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                color: root.color
-                radius: 2
                 visible: subSubText.length > 0
 
-                QQC2.Label {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                    font.pointSize: 8
-                    text: subSubText
+                horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
+                font.pointSize: 6
+                font.weight: Font.DemiBold
+                font.capitalization: Font.AllUppercase
+                font.family: "Roboto Mono"
+                text: subSubText
+                padding: 0
+                // color: Kirigami.Theme.backgroundColor
+
+                background: Rectangle {
+
+                    color: root.color
+                    radius: 2
                 }
             }
 
@@ -101,6 +108,8 @@ QQC2.AbstractButton {
                     elide: Text.ElideRight
                     text: root.subText ? root.subText : ""
                     font.pointSize: 8
+                    font.weight: Font.DemiBold
+                    font.family: "Roboto Mono"
                 }
 
                 ColumnLayout {

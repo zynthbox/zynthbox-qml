@@ -175,14 +175,14 @@ RowLayout {
                             //settingsDialog.visible = true;
                         } else if (xChoice === 0 && yChoice !== 0) {
                             switch (yChoice) {
-                                case -1:
-                                    // Enable the swipey manipulation on the grids
-                                    break;
-                                case -2:
-                                    // Disable the swipy manipulation on the grids
-                                    break;
-                                default:
-                                    break;
+                            case -1:
+                                // Enable the swipey manipulation on the grids
+                                break;
+                            case -2:
+                                // Disable the swipy manipulation on the grids
+                                break;
+                            default:
+                                break;
                             }
                         } else if (yChoice === 0 && xChoice !== 0) {
                             if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && Zynthbox.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
@@ -196,35 +196,71 @@ RowLayout {
 
         Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-        QQC2.Button {
-            icon.name: "arrow-up"
-            Layout.fillWidth: true
-            // Layour.preferredHeight: width
-            icon.width: 48
-            icon.height: 48
-            enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
-            onClicked: {
-                if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
-                    playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
-                }
-            }
-        }
-
         QQC2.Label {
             text: "Octave"
             Layout.alignment: Qt.AlignHCenter
         }
 
-        QQC2.Button {
-            icon.name: "arrow-down"
+        QQC2.Control {
+            padding: 1
             Layout.fillWidth: true
-            // Layour.preferredHeight: width
-            icon.width: 48
-            icon.height: 48
-            enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
-            onClicked: {
-                if (playGridStack.currentPlayGridItem.octave > 0) {
-                    playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
+            background: Rectangle
+            {
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                Kirigami.Theme.inherit: false
+                color: Kirigami.Theme.alternateBackgroundColor
+                radius: 4
+                border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+            }
+
+            contentItem: Column {
+                spacing: 0
+                QQC2.Button {
+                    icon.name: "arrow-up"
+                    width: parent.width
+                    height: width
+                    // Layour.preferredHeight: width
+                    icon.width: 48
+                    icon.height: 48
+                    enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
+                    onClicked: {
+                        if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
+                            playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
+                        }
+                    }
+                    background: Rectangle
+                    {
+                        color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                        radius: 4
+                    }
+                }
+
+                Kirigami.Separator{
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    Kirigami.Theme.inherit: false
+                    width: parent.width
+                    height: 1
+                    color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+                }
+
+                QQC2.Button {
+                    icon.name: "arrow-down"
+                    width: parent.width
+                    height: width
+                    // Layour.preferredHeight: width
+                    icon.width: 48
+                    icon.height: 48
+                    enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
+                    onClicked: {
+                        if (playGridStack.currentPlayGridItem.octave > 0) {
+                            playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
+                        }
+                    }
+                    background: Rectangle
+                    {
+                        color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                        radius: 4
+                    }
                 }
             }
         }
@@ -237,6 +273,7 @@ RowLayout {
             // Layour.preferredHeight: width
             icon.width: 64
             implicitHeight: 64
+            background: null
             onClicked: {
                 zynqtgui.callable_ui_action_simple("HIDE_KEYBOARD")
             }

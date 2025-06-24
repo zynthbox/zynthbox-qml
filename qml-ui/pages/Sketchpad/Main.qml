@@ -1119,458 +1119,434 @@ Zynthian.ScreenPage {
                     }
                 }
 
-                contentItem: RowLayout {
+                contentItem: Item {
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing:  Kirigami.Units.smallSpacing
 
-                    spacing:  Kirigami.Units.smallSpacing
-
-                    ColumnLayout {
-                        id: sketchpadSketchHeadersColumn
-                        Layout.fillWidth: false
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                        spacing: 1
-
-                        TableHeader {
-                            id: songCell
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                            Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                            Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                            color: "transparent"
-                            highlightOnFocus: false
-                            highlighted: root.showOccupiedSlotsHeader
-                            //                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedSketchpadSongIndex + 1)
-                            text: root.showOccupiedSlotsHeader
-                                  ? qsTr("Inputs")
-                                  : qsTr("Track State")
-                            onPressed: {
-                                //                            root.displayTrackButtons = !root.displayTrackButtons
-                                //                            bottomStack.slotsBar.channelButton.checked = true
-                                //                            zynqtgui.sketchpad.displaySceneButtons = false
-                                root.showOccupiedSlotsHeader = !root.showOccupiedSlotsHeader
-                            }
-                        }
-
-                        TableHeader {
-                            Layout.fillWidth: true
+                        ColumnLayout {
+                            id: sketchpadSketchHeadersColumn
+                            Layout.fillWidth: false
                             Layout.fillHeight: true
-                            color: "transparent"
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                            spacing: 1
 
-                            text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
-                            highlightOnFocus: false
-                            highlighted: root.displaySceneButtons
-                            onPressed: {
-                                if (zynqtgui.sketchpad.displaySceneButtons) {
-                                    zynqtgui.sketchpad.displaySceneButtons = false
-                                    bottomStack.slotsBar.channelButton.checked = true
-                                } else {
-                                    zynqtgui.sketchpad.displaySceneButtons = true
-                                    bottomStack.slotsBar.clipsButton.checked = true
-                                    root.displayTrackButtons = false
+                            TableHeader {
+                                id: songCell
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                                Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                                Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                                color: "transparent"
+                                highlightOnFocus: false
+                                highlighted: root.showOccupiedSlotsHeader
+                                //                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedSketchpadSongIndex + 1)
+                                text: root.showOccupiedSlotsHeader
+                                      ? qsTr("Inputs")
+                                      : qsTr("Track State")
+                                onPressed: {
+                                    //                            root.displayTrackButtons = !root.displayTrackButtons
+                                    //                            bottomStack.slotsBar.channelButton.checked = true
+                                    //                            zynqtgui.sketchpad.displaySceneButtons = false
+                                    root.showOccupiedSlotsHeader = !root.showOccupiedSlotsHeader
+                                }
+                            }
+
+                            TableHeader {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                color: "transparent"
+
+                                text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
+                                highlightOnFocus: false
+                                highlighted: root.displaySceneButtons
+                                onPressed: {
+                                    if (zynqtgui.sketchpad.displaySceneButtons) {
+                                        zynqtgui.sketchpad.displaySceneButtons = false
+                                        bottomStack.slotsBar.channelButton.checked = true
+                                    } else {
+                                        zynqtgui.sketchpad.displaySceneButtons = true
+                                        bottomStack.slotsBar.clipsButton.checked = true
+                                        root.displayTrackButtons = false
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    QQC2.Control
-                    {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        // Layout.margins: Kirigami.Units.smallSpacing
-
-                        padding: 2
-                        background: Rectangle
+                        QQC2.Control
                         {
-                            Kirigami.Theme.inherit: false
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                            radius: 6
-                            color: Kirigami.Theme.alternateBackgroundColor
-                            border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2.5)
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            // Layout.margins: Kirigami.Units.smallSpacing
 
-                            Kirigami.Separator
+                            padding: 2
+                            background: Rectangle
                             {
                                 Kirigami.Theme.inherit: false
                                 Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                                height: 1
-                                width: parent.width
-                                anchors.centerIn: parent
-                                color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2)
-                            }
-                        }
+                                radius: 6
+                                color: Kirigami.Theme.alternateBackgroundColor
+                                border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2.5)
 
-                        contentItem: Item {
-                            id: sketchpadClipContent
-
-                            layer.enabled: true
-                            layer.effect: OpacityMask
-                            {
-                                maskSource: Rectangle
+                                Kirigami.Separator
                                 {
-                                    width: sketchpadClipContent.width
-                                    height: sketchpadClipContent.height
-                                    radius: 4
+                                    Kirigami.Theme.inherit: false
+                                    Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                                    height: 1
+                                    width: parent.width
+                                    anchors.centerIn: parent
+                                    color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2)
                                 }
                             }
 
-                            ColumnLayout {
-                                id: sketchpadClipsColumn
-                                anchors.fill: parent
-                                spacing: 1
+                            contentItem: Item {
+                                id: sketchpadClipContent
 
-                                // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
-                                property bool shouldShowSegmentArrows: root.song.arrangementsModel.selectedArrangement.segmentsModel.count > 10
-                                // Segment offset will determine what is the first segment to display when arrow keys are displayed
-                                property int segmentOffset: 0
-                                // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
-                                property int maximumSegmentOffset: root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2
+                                layer.enabled: true
+                                layer.effect: OpacityMask
+                                {
+                                    maskSource: Rectangle
+                                    {
+                                        width: sketchpadClipContent.width
+                                        height: sketchpadClipContent.height
+                                        radius: 4
+                                    }
+                                }
 
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
+                                ColumnLayout {
+                                    id: sketchpadClipsColumn
+                                    anchors.fill: parent
                                     spacing: 1
 
-                                    // Display 10 header buttons which will show channel header buttons
-                                    Repeater {
-                                        id: channelsHeaderRepeater
+                                    // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
+                                    property bool shouldShowSegmentArrows: root.song.arrangementsModel.selectedArrangement.segmentsModel.count > 10
+                                    // Segment offset will determine what is the first segment to display when arrow keys are displayed
+                                    property int segmentOffset: 0
+                                    // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
+                                    property int maximumSegmentOffset: root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2
 
-                                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                        model: zynqtgui.isBootingComplete
-                                               ? 10
-                                               : 0
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        spacing: 1
 
-                                        delegate: Item {
-                                            id: headerDelegate
-                                            property QtObject channel: root.song.channelsModel.getChannel(index)
-                                            function switchToThisChannel() {
-                                                // If song mode is not active, clicking on cells should activate that channel
-                                                zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
-                                                zynqtgui.sketchpad.lastSelectedObj.value = channelHeaderDelegate.channel
-                                                zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
-                                                zynqtgui.sketchpad.selectedTrackId = index;
-                                                Qt.callLater(function() {
-                                                    // Open TracksBar and switch to channel
-                                                    // bottomStack.slotsBar.channelButton.checked = true
-                                                    root.resetBottomBar(false)
-                                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                                    zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
-                                                })
-                                            }
+                                        // Display 10 header buttons which will show channel header buttons
+                                        Repeater {
+                                            id: channelsHeaderRepeater
 
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            state: root.showOccupiedSlotsHeader
-                                                   ? "SlotsOverviewMode"
-                                                   : "ChannelMode"
-                                            states: [
-                                                State {
-                                                    name: "SlotsOverviewMode"
-                                                    PropertyChanges { target: filledSlotsOverview; visible: true }
-                                                    PropertyChanges { target: channelHeaderDelegate; visible: false }
-                                                },
-                                                State {
-                                                    name: "ChannelMode"
-                                                    PropertyChanges { target: filledSlotsOverview; visible: false }
-                                                    PropertyChanges { target: channelHeaderDelegate; visible: true }
-                                                }
-                                            ]
+                                            // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                            model: zynqtgui.isBootingComplete
+                                                   ? 10
+                                                   : 0
 
-
-                                            //                                TableHeader {
-                                            //                                    id: trackHeaderDelegate
-                                            //                                    property QtObject sketch: root.song.arrangementsModel.getArrangement(index)
-
-                                            //                                    visible: root.displayTrackButtons
-                                            //                                    anchors.fill: parent
-                                            //                                    color: Kirigami.Theme.backgroundColor
-                                            //                                    highlightOnFocus: false
-                                            //                                    highlighted: root.displayTrackButtons
-                                            //                                                    ? root.song.scenesModel.selectedSketchpadSongIndex === index
-                                            //                                                    : ""
-
-                                            //                                    text: root.displayTrackButtons
-                                            //                                            ? qsTr("T%1").arg(index+1)
-                                            //                                            : ""
-                                            //                                    textSize: 10
-
-                                            //                                    onPressed: {
-                                            //                                        if (root.displayTrackButtons) {
-                                            //                                            zynqtgui.sketchpad.lastSelectedObj = {
-                                            //                                                className: "sketchpad_track",
-                                            //                                                value: index,
-                                            //                                                component: trackHeaderDelegate
-                                            //                                            }
-                                            //                                            root.song.scenesModel.selectedSketchpadSongIndex = index
-                                            //                                        }
-                                            //                                    }
-                                            //                                }
-
-                                            QQC2.AbstractButton {
-                                                id: filledSlotsOverview
-                                                anchors.fill: parent
-                                                background: Rectangle {
-                                                    border.width: index === zynqtgui.sketchpad.selectedTrackId ? 1 : 0
-                                                    border.color: Kirigami.Theme.highlightColor
-
-                                                    color: Kirigami.Theme.backgroundColor
-                                                }
-                                                onClicked: {
-                                                    headerDelegate.switchToThisChannel()
+                                            delegate: Item {
+                                                id: headerDelegate
+                                                property QtObject channel: root.song.channelsModel.getChannel(index)
+                                                function switchToThisChannel() {
+                                                    // If song mode is not active, clicking on cells should activate that channel
+                                                    zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
+                                                    zynqtgui.sketchpad.lastSelectedObj.value = channelHeaderDelegate.channel
+                                                    zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
+                                                    zynqtgui.sketchpad.selectedTrackId = index;
+                                                    Qt.callLater(function() {
+                                                        // Open TracksBar and switch to channel
+                                                        // bottomStack.slotsBar.channelButton.checked = true
+                                                        root.resetBottomBar(false)
+                                                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                                        zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
+                                                    })
                                                 }
 
-                                                ColumnLayout {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                state: root.showOccupiedSlotsHeader
+                                                       ? "SlotsOverviewMode"
+                                                       : "ChannelMode"
+                                                states: [
+                                                    State {
+                                                        name: "SlotsOverviewMode"
+                                                        PropertyChanges { target: filledSlotsOverview; visible: true }
+                                                        PropertyChanges { target: channelHeaderDelegate; visible: false }
+                                                    },
+                                                    State {
+                                                        name: "ChannelMode"
+                                                        PropertyChanges { target: filledSlotsOverview; visible: false }
+                                                        PropertyChanges { target: channelHeaderDelegate; visible: true }
+                                                    }
+                                                ]
+
+
+                                                //                                TableHeader {
+                                                //                                    id: trackHeaderDelegate
+                                                //                                    property QtObject sketch: root.song.arrangementsModel.getArrangement(index)
+
+                                                //                                    visible: root.displayTrackButtons
+                                                //                                    anchors.fill: parent
+                                                //                                    color: Kirigami.Theme.backgroundColor
+                                                //                                    highlightOnFocus: false
+                                                //                                    highlighted: root.displayTrackButtons
+                                                //                                                    ? root.song.scenesModel.selectedSketchpadSongIndex === index
+                                                //                                                    : ""
+
+                                                //                                    text: root.displayTrackButtons
+                                                //                                            ? qsTr("T%1").arg(index+1)
+                                                //                                            : ""
+                                                //                                    textSize: 10
+
+                                                //                                    onPressed: {
+                                                //                                        if (root.displayTrackButtons) {
+                                                //                                            zynqtgui.sketchpad.lastSelectedObj = {
+                                                //                                                className: "sketchpad_track",
+                                                //                                                value: index,
+                                                //                                                component: trackHeaderDelegate
+                                                //                                            }
+                                                //                                            root.song.scenesModel.selectedSketchpadSongIndex = index
+                                                //                                        }
+                                                //                                    }
+                                                //                                }
+
+                                                QQC2.AbstractButton {
+                                                    id: filledSlotsOverview
                                                     anchors.fill: parent
-                                                    anchors.margins: Kirigami.Units.largeSpacing
-                                                    spacing: Kirigami.Units.largeSpacing
+                                                    background: Rectangle {
+                                                        border.width: index === zynqtgui.sketchpad.selectedTrackId ? 1 : 0
+                                                        border.color: Kirigami.Theme.highlightColor
 
-                                                    Repeater {
-                                                        model: headerDelegate.channel.occupiedSlots
-                                                        delegate: Rectangle {
-                                                            Layout.fillWidth: true
-                                                            Layout.fillHeight: true
-                                                            radius: height
-                                                            color: modelData ? "#aaffffff" : "#33ffffff"
+                                                        color: Kirigami.Theme.backgroundColor
+                                                    }
+                                                    onClicked: {
+                                                        headerDelegate.switchToThisChannel()
+                                                    }
+
+                                                    ColumnLayout {
+                                                        anchors.fill: parent
+                                                        anchors.margins: Kirigami.Units.largeSpacing
+                                                        spacing: Kirigami.Units.largeSpacing
+
+                                                        Repeater {
+                                                            model: headerDelegate.channel.occupiedSlots
+                                                            delegate: Rectangle {
+                                                                Layout.fillWidth: true
+                                                                Layout.fillHeight: true
+                                                                radius: height
+                                                                color: Kirigami.Theme.textColor
+                                                                opacity: modelData ? 0.7 : 0.2
+                                                                border.color: modelData ? Kirigami.Theme.textColor : "transparent"
+                                                            }
                                                         }
                                                     }
                                                 }
-                                            }
 
-                                            ChannelHeader2 {
-                                                id: channelHeaderDelegate
-                                                anchors.fill: parent
+                                                ChannelHeader2 {
+                                                    id: channelHeaderDelegate
+                                                    anchors.fill: parent
 
-                                                channel: headerDelegate.channel
-                                                text: channelHeaderDelegate.channel.name
-                                                subText: null
-                                                subSubText: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected")
-                                                subSubTextSize: 7
+                                                    channel: headerDelegate.channel
+                                                    text: channelHeaderDelegate.channel.name
+                                                    subText: null
+                                                    subSubText: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected")
+                                                    subSubTextSize: 7
 
-                                                Binding {
-                                                    target: channelHeaderDelegate
-                                                    property: "color"
-                                                    when: root.visible
-                                                    delayed: true
+                                                    Binding {
+                                                        target: channelHeaderDelegate
+                                                        property: "color"
+                                                        when: root.visible
+                                                        delayed: true
 
-                                                    value: {
-                                                        if (root.copySourceObj && root.copySourceObj.value === model.channel) {
-                                                            return "#ff2196f3"
-                                                        } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0) {
-                                                            return channelHeaderDelegate.channel.color;
+                                                        value: {
+                                                            if (root.copySourceObj && root.copySourceObj.value === model.channel) {
+                                                                return "#ff2196f3"
+                                                            } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0) {
+                                                                return channelHeaderDelegate.channel.color;
+                                                            }
+                                                            return "#66888888";
                                                         }
-                                                        return "#66888888";
+                                                    }
+
+                                                    highlightOnFocus: false
+                                                    highlighted: index === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
+
+                                                    onPressed: {
+                                                        headerDelegate.switchToThisChannel()
                                                     }
                                                 }
 
-                                                highlightOnFocus: false
-                                                highlighted: index === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
-
-                                                onPressed: {
-                                                    headerDelegate.switchToThisChannel()
-                                                }
-                                            }
-
-                                            Extras.Gauge {
-                                                id: volumeGauge
-                                                visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id
-                                                anchors {
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                    right: parent.right
-                                                    rightMargin: 2
-                                                    topMargin: -4
-                                                    bottomMargin: -4
-                                                }
-                                                minimumValue: -40
-                                                maximumValue: 20
-                                                value: channelHeaderDelegate.channel.volume
-                                                font.pointSize: 8
-                                                opacity: 0.7
-                                                style: GaugeStyle {
-                                                    valueBar: Rectangle {
-                                                        color: Kirigami.Theme.highlightColor
-                                                        implicitWidth: 6
+                                                Extras.Gauge {
+                                                    id: volumeGauge
+                                                    visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id
+                                                    anchors {
+                                                        top: parent.top
+                                                        bottom: parent.bottom
+                                                        right: parent.right
+                                                        rightMargin: 2
+                                                        topMargin: -4
+                                                        bottomMargin: -4
                                                     }
-                                                    minorTickmark: null
-                                                    tickmark: null
-                                                    tickmarkLabel: null
+                                                    minimumValue: -40
+                                                    maximumValue: 20
+                                                    value: channelHeaderDelegate.channel.volume
+                                                    font.pointSize: 8
+                                                    opacity: 0.7
+                                                    style: GaugeStyle {
+                                                        valueBar: Rectangle {
+                                                            color: Kirigami.Theme.highlightColor
+                                                            implicitWidth: 6
+                                                        }
+                                                        minorTickmark: null
+                                                        tickmark: null
+                                                        tickmarkLabel: null
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                }
 
-                                RowLayout {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    spacing: 1
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        spacing: 1
 
-                                    Repeater {
-                                        id: clipsRepeater
-                                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                        model: zynqtgui.isBootingComplete ? root.song.channelsModel : 0
+                                        Repeater {
+                                            id: clipsRepeater
+                                            // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                            model: zynqtgui.isBootingComplete ? root.song.channelsModel : 0
 
-                                        delegate: Item {
-                                            id: clipsDelegate
-                                            function switchToThisClip(allowToggle) {
-                                                if (zynqtgui.sketchpad.lastSelectedObj != null &&
-                                                        zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview" &&
-                                                        zynqtgui.sketchpad.lastSelectedObj.value === index &&
-                                                        zynqtgui.sketchpad.lastSelectedObj.component != null &&
-                                                        zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
-                                                    // Clip overview is already selected. Toggle between track/clips view
-                                                    root.resetBottomBar(allowToggle)
-                                                } else {
-                                                    // Clip overview is not selected. Open clips grid view
-                                                    bottomStack.slotsBar.clipsButton.checked = true
-                                                    zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clipoverview"
-                                                    zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                    zynqtgui.sketchpad.lastSelectedObj.component = clipCell
-                                                    zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id
-                                                }
-                                            }
-
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            state: root.displaySceneButtons
-                                                   ? "SceneMode"
-                                                   : bottomStack.slotsBar.mixerButton.checked
-                                                     ? "MixerMode"
-                                                     : "ClipsMode"
-                                            states: [
-                                                State {
-                                                    name: "SceneMode"
-                                                    PropertyChanges { target: sceneHeader; visible: true }
-                                                    PropertyChanges { target: clipCell; visible: false }
-                                                    PropertyChanges { target: mixerCell; visible: false }
-                                                },
-                                                State {
-                                                    name: "ClipsMode"
-                                                    PropertyChanges { target: sceneHeader; visible: false }
-                                                    PropertyChanges { target: clipCell; visible: true }
-                                                    PropertyChanges { target: mixerCell; visible: false }
-                                                },
-                                                State {
-                                                    name: "MixerMode"
-                                                    PropertyChanges { target: sceneHeader; visible: false }
-                                                    PropertyChanges { target: clipCell; visible: false }
-                                                    PropertyChanges { target: mixerCell; visible: true }
-                                                }
-                                            ]
-
-                                            TableHeader {
-                                                id: sceneHeader
-                                                anchors.fill: parent
-                                                text: String.fromCharCode(65+index).toUpperCase()
-                                                highlighted: index === root.song.scenesModel.selectedSceneIndex
-                                                highlightOnFocus: false
-                                                onPressed: {
-                                                    Zynthian.CommonUtils.switchToScene(index);
-                                                }
-                                            }
-
-                                            ClipCell {
-                                                id: clipCell
-
-                                                anchors.fill: parent
-                                                channel: model.channel
-                                                backgroundColor: "#000000"
-                                                Connections {
-                                                    target: channel.sceneClip
-                                                    onInCurrentSceneChanged: colorTimer.restart()
-                                                    onPathChanged: colorTimer.restart()
-                                                    onIsPlayingChanged: colorTimer.restart()
-                                                }
-                                                Connections {
-                                                    target: channel
-                                                    onConnectedPatternChanged: colorTimer.restart()
-                                                    onTrackTypeChanged: colorTimer.restart()
-                                                    onClipsModelChanged: colorTimer.restart()
-                                                }
-                                                Connections {
-                                                    target: clipCell.pattern
-                                                    onLastModifiedChanged: colorTimer.restart()
-                                                    onEnabledChanged: colorTimer.restart()
-                                                }
-                                                Connections {
-                                                    target: clipCell.sequence
-                                                    onIsPlayingChanged: colorTimer.restart()
-                                                }
-                                                Connections {
-                                                    target: zynqtgui.sketchpad
-                                                    onIsMetronomeRunningChanged: colorTimer.restart()
-                                                }
-                                                Connections {
-                                                    target: root.song.scenesModel
-                                                    onSelectedSketchpadSongIndexChanged: colorTimer.restart()
-                                                }
-
-                                                Timer {
-                                                    id: colorTimer
-                                                    interval: 10
-                                                    onTriggered: {
-                                                        // update isPlaying
-                                                        if (channel.connectedPattern < 0) {
-                                                            clipCell.isPlaying = channel.sceneClip.isPlaying;
-                                                        } else {
-                                                            var patternIsPlaying = false;
-                                                            if (clipCell.sequence && clipCell.sequence.isPlaying) {
-                                                                if (clipCell.sequence.soloPattern > -1) {
-                                                                    patternIsPlaying = (clipCell.sequence.soloPattern == channel.connectedPattern)
-                                                                } else if (clipCell.pattern) {
-                                                                    patternIsPlaying = clipCell.pattern.enabled
-                                                                }
-                                                            }
-                                                            clipCell.isPlaying = patternIsPlaying && root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col) && zynqtgui.sketchpad.isMetronomeRunning;
-                                                        }
+                                            delegate: Item {
+                                                id: clipsDelegate
+                                                function switchToThisClip(allowToggle) {
+                                                    if (zynqtgui.sketchpad.lastSelectedObj != null &&
+                                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview" &&
+                                                            zynqtgui.sketchpad.lastSelectedObj.value === index &&
+                                                            zynqtgui.sketchpad.lastSelectedObj.component != null &&
+                                                            zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
+                                                        // Clip overview is already selected. Toggle between track/clips view
+                                                        root.resetBottomBar(allowToggle)
+                                                    } else {
+                                                        // Clip overview is not selected. Open clips grid view
+                                                        bottomStack.slotsBar.clipsButton.checked = true
+                                                        zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clipoverview"
+                                                        zynqtgui.sketchpad.lastSelectedObj.value = index
+                                                        zynqtgui.sketchpad.lastSelectedObj.component = clipCell
+                                                        zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id
                                                     }
                                                 }
 
-                                                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                                sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-                                                pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByClipId(channel.id, channel.selectedClip) : null
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                state: root.displaySceneButtons
+                                                       ? "SceneMode"
+                                                       : bottomStack.slotsBar.mixerButton.checked
+                                                         ? "MixerMode"
+                                                         : "ClipsMode"
+                                                states: [
+                                                    State {
+                                                        name: "SceneMode"
+                                                        PropertyChanges { target: sceneHeader; visible: true }
+                                                        PropertyChanges { target: clipCell; visible: false }
+                                                        PropertyChanges { target: mixerCell; visible: false }
+                                                    },
+                                                    State {
+                                                        name: "ClipsMode"
+                                                        PropertyChanges { target: sceneHeader; visible: false }
+                                                        PropertyChanges { target: clipCell; visible: true }
+                                                        PropertyChanges { target: mixerCell; visible: false }
+                                                    },
+                                                    State {
+                                                        name: "MixerMode"
+                                                        PropertyChanges { target: sceneHeader; visible: false }
+                                                        PropertyChanges { target: clipCell; visible: false }
+                                                        PropertyChanges { target: mixerCell; visible: true }
+                                                    }
+                                                ]
 
-                                                onPressed: {
-                                                    clipsDelegate.switchToThisClip(true)
-                                                }
-                                            }
-
-                                            Rectangle {
-                                                id: mixerCell
-                                                anchors.fill: parent
-                                                color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
-
-                                                RowLayout {
+                                                TableHeader {
+                                                    id: sceneHeader
                                                     anchors.fill: parent
+                                                    text: String.fromCharCode(65+index).toUpperCase()
+                                                    highlighted: index === root.song.scenesModel.selectedSceneIndex
+                                                    highlightOnFocus: false
+                                                    font.weight: Font.Bold
+                                                    font.family: "Roboto Mono"
+                                                    onPressed: {
+                                                        Zynthian.CommonUtils.switchToScene(index);
+                                                    }
+                                                }
 
-                                                    QQC2.Dial {
-                                                        Layout.fillWidth: true
-                                                        Layout.fillHeight: true
-                                                        Layout.leftMargin: Kirigami.Units.smallSpacing
-                                                        Layout.rightMargin: Kirigami.Units.smallSpacing
-                                                        inputMode: QQC2.Dial.Vertical
-                                                        handle: null
-                                                        value: applicationWindow().channels[index].wetFx1Amount
-                                                        stepSize: 1
-                                                        from: 0
-                                                        to: 100
-                                                        onValueChanged: {
-                                                            applicationWindow().channels[index].wetFx1Amount = value;
+                                                ClipCell {
+                                                    id: clipCell
+
+                                                    anchors.fill: parent
+                                                    channel: model.channel
+                                                    backgroundColor: "#000000"
+                                                    Connections {
+                                                        target: channel.sceneClip
+                                                        onInCurrentSceneChanged: colorTimer.restart()
+                                                        onPathChanged: colorTimer.restart()
+                                                        onIsPlayingChanged: colorTimer.restart()
+                                                    }
+                                                    Connections {
+                                                        target: channel
+                                                        onConnectedPatternChanged: colorTimer.restart()
+                                                        onTrackTypeChanged: colorTimer.restart()
+                                                        onClipsModelChanged: colorTimer.restart()
+                                                    }
+                                                    Connections {
+                                                        target: clipCell.pattern
+                                                        onLastModifiedChanged: colorTimer.restart()
+                                                        onEnabledChanged: colorTimer.restart()
+                                                    }
+                                                    Connections {
+                                                        target: clipCell.sequence
+                                                        onIsPlayingChanged: colorTimer.restart()
+                                                    }
+                                                    Connections {
+                                                        target: zynqtgui.sketchpad
+                                                        onIsMetronomeRunningChanged: colorTimer.restart()
+                                                    }
+                                                    Connections {
+                                                        target: root.song.scenesModel
+                                                        onSelectedSketchpadSongIndexChanged: colorTimer.restart()
+                                                    }
+
+                                                    Timer {
+                                                        id: colorTimer
+                                                        interval: 10
+                                                        onTriggered: {
+                                                            // update isPlaying
+                                                            if (channel.connectedPattern < 0) {
+                                                                clipCell.isPlaying = channel.sceneClip.isPlaying;
+                                                            } else {
+                                                                var patternIsPlaying = false;
+                                                                if (clipCell.sequence && clipCell.sequence.isPlaying) {
+                                                                    if (clipCell.sequence.soloPattern > -1) {
+                                                                        patternIsPlaying = (clipCell.sequence.soloPattern == channel.connectedPattern)
+                                                                    } else if (clipCell.pattern) {
+                                                                        patternIsPlaying = clipCell.pattern.enabled
+                                                                    }
+                                                                }
+                                                                clipCell.isPlaying = patternIsPlaying && root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col) && zynqtgui.sketchpad.isMetronomeRunning;
+                                                            }
                                                         }
                                                     }
 
-                                                    ColumnLayout {
-                                                        Layout.fillWidth: true
-                                                        Layout.fillHeight: true
+                                                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                                    sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
+                                                    pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByClipId(channel.id, channel.selectedClip) : null
 
-                                                        QQC2.Label {
-                                                            Layout.fillWidth: true
-                                                            Layout.fillHeight: false
-                                                            Layout.preferredWidth: 1
-                                                            Layout.topMargin: Kirigami.Units.smallSpacing
-                                                            Layout.bottomMargin: Kirigami.Units.smallSpacing
-                                                            font.pointSize: 9
-                                                            text: "Sends"
-                                                        }
+                                                    onPressed: {
+                                                        clipsDelegate.switchToThisClip(true)
+                                                    }
+                                                }
+
+                                                Rectangle {
+                                                    id: mixerCell
+                                                    anchors.fill: parent
+                                                    color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+
+                                                    RowLayout {
+                                                        anchors.fill: parent
+
                                                         QQC2.Dial {
                                                             Layout.fillWidth: true
                                                             Layout.fillHeight: true
@@ -1578,12 +1554,44 @@ Zynthian.ScreenPage {
                                                             Layout.rightMargin: Kirigami.Units.smallSpacing
                                                             inputMode: QQC2.Dial.Vertical
                                                             handle: null
-                                                            value: applicationWindow().channels[index].wetFx2Amount
+                                                            value: applicationWindow().channels[index].wetFx1Amount
                                                             stepSize: 1
                                                             from: 0
                                                             to: 100
                                                             onValueChanged: {
-                                                                applicationWindow().channels[index].wetFx2Amount = value;
+                                                                applicationWindow().channels[index].wetFx1Amount = value;
+                                                            }
+                                                        }
+
+                                                        ColumnLayout {
+                                                            Layout.fillWidth: true
+                                                            Layout.fillHeight: true
+
+                                                            QQC2.Label {
+                                                                Layout.fillWidth: true
+                                                                Layout.fillHeight: false
+                                                                Layout.preferredWidth: 1
+                                                                Layout.topMargin: Kirigami.Units.smallSpacing
+                                                                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                                                                font.pointSize: 8
+                                                                font.weight: Font.DemiBold
+                                                                font.family: "Roboto Mono"
+                                                                text: "Sends"
+                                                            }
+                                                            QQC2.Dial {
+                                                                Layout.fillWidth: true
+                                                                Layout.fillHeight: true
+                                                                Layout.leftMargin: Kirigami.Units.smallSpacing
+                                                                Layout.rightMargin: Kirigami.Units.smallSpacing
+                                                                inputMode: QQC2.Dial.Vertical
+                                                                handle: null
+                                                                value: applicationWindow().channels[index].wetFx2Amount
+                                                                stepSize: 1
+                                                                from: 0
+                                                                to: 100
+                                                                onValueChanged: {
+                                                                    applicationWindow().channels[index].wetFx2Amount = value;
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -1594,218 +1602,218 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
-                    }
-                    ColumnLayout {
-                        id: sketchpadCopyPasteButtonsColumn
-                        Layout.fillWidth: false
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                        spacing: 1
-
-                        // Common copy button to set the object to copy
-                        TableHeader {
-                            Layout.fillWidth: true
+                        ColumnLayout {
+                            id: sketchpadCopyPasteButtonsColumn
+                            Layout.fillWidth: false
                             Layout.fillHeight: true
-                            highlightOnFocus: false
-                            font.pointSize: 10
-                            enabled: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className
-                            text: qsTr("Copy %1").arg(zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className
-                                                      ? zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"
-                                                        ? qsTr("Clip")
-                                                        : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"
-                                                          ? qsTr("Track")
-                                                          : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
-                                                            ? qsTr("Deprecated Track")
-                                                            : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"
-                                                              ? qsTr("Clip")
-                                                              : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment"
-                                                                ? qsTr("Segment")
-                                                                : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement"
-                                                                  ? qsTr("Arrangement")
-                                                                  : ""
-                                                      : "")
-                            visible: root.copySourceObj == null
-                            color: "transparent"
-                            onClicked: {
-                                // Check and set copy source object from bottombar as bottombar
-                                // controlObj is the current focused/selected object by user
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                            spacing: 1
 
-                                root.copySourceObj = zynqtgui.sketchpad.lastSelectedObj
-                                console.log("Copy", root.copySourceObj)
-                            }
-                        }
+                            // Common copy button to set the object to copy
+                            TableHeader {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlightOnFocus: false
+                                font.pointSize: 10
+                                enabled: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className
+                                text: qsTr("Copy %1").arg(zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className
+                                                          ? zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"
+                                                            ? qsTr("Clip")
+                                                            : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"
+                                                              ? qsTr("Track")
+                                                              : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
+                                                                ? qsTr("Deprecated Track")
+                                                                : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"
+                                                                  ? qsTr("Clip")
+                                                                  : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment"
+                                                                    ? qsTr("Segment")
+                                                                    : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement"
+                                                                      ? qsTr("Arrangement")
+                                                                      : ""
+                                                          : "")
+                                visible: root.copySourceObj == null
+                                color: "transparent"
+                                onClicked: {
+                                    // Check and set copy source object from bottombar as bottombar
+                                    // controlObj is the current focused/selected object by user
 
-                        // Common cancel button to cancel copy
-                        TableHeader {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            highlightOnFocus: false
-                            font.pointSize: 10
-                            text: qsTr("Cancel Copy")
-                            visible: root.copySourceObj != null
-                            color: "transparent"
-                            onPressed: {
-                                root.copySourceObj = null
-                            }
-                        }
-
-                        // Common button to paste object
-                        TableHeader {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            highlightOnFocus: false
-                            font.pointSize: 10
-                            color: "transparent"
-                            enabled: {
-                                if (root.copySourceObj != null &&
-                                        root.copySourceObj.value &&
-                                        root.copySourceObj.className) {
-
-                                    // Check if source and destination are same
-                                    if (root.copySourceObj.className === "sketchpad_clip" &&
-                                            root.copySourceObj.value !== root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) &&
-                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
-                                        return true
-                                    } else if (root.copySourceObj.className === "sketchpad_channel" &&
-                                               root.copySourceObj.value.id !== zynqtgui.sketchpad.selectedTrackId &&
-                                               zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                                        return true
-                                    } else if (root.copySourceObj.className === "sketchpad_track" &&
-                                               root.copySourceObj.value !== root.song.scenesModel.selectedSketchpadSongIndex &&
-                                               zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
-                                        return true
-                                    } else if (root.copySourceObj.className === "sketchpad_clips" &&
-                                               root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                               zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips") {
-                                        return true
-                                    } else if (root.copySourceObj.className === "sketchpad_segment" &&
-                                               root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                               zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" &&
-                                               root.copySourceObj.value.sketchId === zynqtgui.sketchpad.lastSelectedObj.value.sketchId) {
-                                        return true
-                                    } else if (root.copySourceObj.className === "sketchpad_arrangement" &&
-                                               root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                               zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement") {
-                                        return true
-                                    }
+                                    root.copySourceObj = zynqtgui.sketchpad.lastSelectedObj
+                                    console.log("Copy", root.copySourceObj)
                                 }
-
-                                return false
                             }
-                            text: qsTr("Paste %1").arg(root.copySourceObj && root.copySourceObj.className
-                                                       ? root.copySourceObj.className === "sketchpad_clip"
-                                                         ? qsTr("Clip")
-                                                         : root.copySourceObj.className === "sketchpad_channel"
-                                                           ? qsTr("Track")
-                                                           : root.copySourceObj.className === "sketchpad_track"
-                                                             ? qsTr("Deprecated Track")
-                                                             : root.copySourceObj.className === "sketchpad_clips"
-                                                               ? qsTr("Clip")
-                                                               : root.copySourceObj.className === "sketchpad_segment"
-                                                                 ? qsTr("Segment")
-                                                                 : root.copySourceObj.className === "sketchpad_arrangement"
-                                                                   ? qsTr("Arrangement")
-                                                                   : ""
-                                                       : "")
-                            onPressed: {
-                                if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clip") {
-                                    var sourceClip = root.copySourceObj.value
-                                    var destClip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
-                                    // Copy Clip
-                                    destClip.copyFrom(sourceClip)
-                                    // Copy pattern
-                                    var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
-                                    var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destChannel.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
-                                    destPattern.cloneOther(sourcePattern)
-
+                            // Common cancel button to cancel copy
+                            TableHeader {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlightOnFocus: false
+                                font.pointSize: 10
+                                text: qsTr("Cancel Copy")
+                                visible: root.copySourceObj != null
+                                color: "transparent"
+                                onPressed: {
                                     root.copySourceObj = null
-                                } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_channel") {
-                                    zynqtgui.start_loading()
+                                }
+                            }
 
-                                    // Copy Channel
-                                    var sourceChannel = root.copySourceObj.value
-                                    var destChannel = root.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
-                                    destChannel.copyFrom(sourceChannel)
+                            // Common button to paste object
+                            TableHeader {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlightOnFocus: false
+                                font.pointSize: 10
+                                color: "transparent"
+                                enabled: {
+                                    if (root.copySourceObj != null &&
+                                            root.copySourceObj.value &&
+                                            root.copySourceObj.className) {
 
-                                    for (var clipId=0; clipId<5; clipId++) {
-                                        for (var i=0; i<sourceChannel.clipsModel.count; i++) {
-                                            var sourceClip = sourceChannel.clips[clipId].getClip(i)
-                                            var destClip = destChannel.clips[clipId].getClip(i)
-                                            var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, clipId)
-                                            var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, clipId)
+                                        // Check if source and destination are same
+                                        if (root.copySourceObj.className === "sketchpad_clip" &&
+                                                root.copySourceObj.value !== root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) &&
+                                                zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
+                                            return true
+                                        } else if (root.copySourceObj.className === "sketchpad_channel" &&
+                                                   root.copySourceObj.value.id !== zynqtgui.sketchpad.selectedTrackId &&
+                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                                            return true
+                                        } else if (root.copySourceObj.className === "sketchpad_track" &&
+                                                   root.copySourceObj.value !== root.song.scenesModel.selectedSketchpadSongIndex &&
+                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
+                                            return true
+                                        } else if (root.copySourceObj.className === "sketchpad_clips" &&
+                                                   root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
+                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips") {
+                                            return true
+                                        } else if (root.copySourceObj.className === "sketchpad_segment" &&
+                                                   root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
+                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" &&
+                                                   root.copySourceObj.value.sketchId === zynqtgui.sketchpad.lastSelectedObj.value.sketchId) {
+                                            return true
+                                        } else if (root.copySourceObj.className === "sketchpad_arrangement" &&
+                                                   root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
+                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement") {
+                                            return true
+                                        }
+                                    }
+
+                                    return false
+                                }
+                                text: qsTr("Paste %1").arg(root.copySourceObj && root.copySourceObj.className
+                                                           ? root.copySourceObj.className === "sketchpad_clip"
+                                                             ? qsTr("Clip")
+                                                             : root.copySourceObj.className === "sketchpad_channel"
+                                                               ? qsTr("Track")
+                                                               : root.copySourceObj.className === "sketchpad_track"
+                                                                 ? qsTr("Deprecated Track")
+                                                                 : root.copySourceObj.className === "sketchpad_clips"
+                                                                   ? qsTr("Clip")
+                                                                   : root.copySourceObj.className === "sketchpad_segment"
+                                                                     ? qsTr("Segment")
+                                                                     : root.copySourceObj.className === "sketchpad_arrangement"
+                                                                       ? qsTr("Arrangement")
+                                                                       : ""
+                                                           : "")
+                                onPressed: {
+                                    if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clip") {
+                                        var sourceClip = root.copySourceObj.value
+                                        var destClip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+
+                                        // Copy Clip
+                                        destClip.copyFrom(sourceClip)
+                                        // Copy pattern
+                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
+                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destChannel.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
+                                        destPattern.cloneOther(sourcePattern)
+
+                                        root.copySourceObj = null
+                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_channel") {
+                                        zynqtgui.start_loading()
+
+                                        // Copy Channel
+                                        var sourceChannel = root.copySourceObj.value
+                                        var destChannel = root.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+                                        destChannel.copyFrom(sourceChannel)
+
+                                        for (var clipId=0; clipId<5; clipId++) {
+                                            for (var i=0; i<sourceChannel.clipsModel.count; i++) {
+                                                var sourceClip = sourceChannel.clips[clipId].getClip(i)
+                                                var destClip = destChannel.clips[clipId].getClip(i)
+                                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, clipId)
+                                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, clipId)
+
+                                                destPattern.cloneOther(sourcePattern)
+                                            }
+                                        }
+
+                                        root.copySourceObj = null
+
+                                        zynqtgui.stop_loading()
+                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_track") {
+                                        zynqtgui.start_loading()
+
+                                        // Copy Track
+                                        root.song.scenesModel.copyTrack(root.copySourceObj.value, root.song.scenesModel.selectedSketchpadSongIndex)
+
+                                        for (var i=0; i<root.song.channelsModel.count; i++) {
+                                            var channel = root.song.channelsModel.getChannel(i)
+                                            var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(root.copySourceObj.value === 0 ? "global" : ("global"+(root.copySourceObj.value + 1))).getByClipId(channel.id, channel.selectedClip)
+                                            var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByClipId(channel.id, channel.selectedClip)
 
                                             destPattern.cloneOther(sourcePattern)
                                         }
-                                    }
 
-                                    root.copySourceObj = null
+                                        root.copySourceObj = null
 
-                                    zynqtgui.stop_loading()
-                                } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_track") {
-                                    zynqtgui.start_loading()
+                                        zynqtgui.stop_loading()
+                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clips") {
+                                        var sourceClip = root.copySourceObj.value
+                                        var destClip = zynqtgui.sketchpad.lastSelectedObj.value
 
-                                    // Copy Track
-                                    root.song.scenesModel.copyTrack(root.copySourceObj.value, root.song.scenesModel.selectedSketchpadSongIndex)
-
-                                    for (var i=0; i<root.song.channelsModel.count; i++) {
-                                        var channel = root.song.channelsModel.getChannel(i)
-                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(root.copySourceObj.value === 0 ? "global" : ("global"+(root.copySourceObj.value + 1))).getByClipId(channel.id, channel.selectedClip)
-                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByClipId(channel.id, channel.selectedClip)
-
+                                        // Copy Clip
+                                        destClip.copyFrom(sourceClip)
+                                        // Copy pattern
+                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
+                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
                                         destPattern.cloneOther(sourcePattern)
+
+                                        root.copySourceObj = null
+                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_segment") {
+                                        zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
+                                        root.copySourceObj = null
+                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_arrangement") {
+                                        zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
+                                        root.copySourceObj = null
                                     }
-
-                                    root.copySourceObj = null
-
-                                    zynqtgui.stop_loading()
-                                } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clips") {
-                                    var sourceClip = root.copySourceObj.value
-                                    var destClip = zynqtgui.sketchpad.lastSelectedObj.value
-
-                                    // Copy Clip
-                                    destClip.copyFrom(sourceClip)
-                                    // Copy pattern
-                                    var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
-                                    var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
-                                    destPattern.cloneOther(sourcePattern)
-
-                                    root.copySourceObj = null
-                                } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_segment") {
-                                    zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
-                                    root.copySourceObj = null
-                                } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_arrangement") {
-                                    zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
-                                    root.copySourceObj = null
                                 }
                             }
-                        }
 
-                        TableHeader {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            highlightOnFocus: false
-                            font.pointSize: 10
-                            color: "transparent"
+                            TableHeader {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlightOnFocus: false
+                                font.pointSize: 10
+                                color: "transparent"
 
-                            enabled: zynqtgui.sketchpad.lastSelectedObj != null &&
-                                     zynqtgui.sketchpad.lastSelectedObj.className != null &&
-                                     (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip" ||
-                                      zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" ||
-                                      zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement")
-                            text: qsTr("Clear")
-                            onPressed: {
-                                if (zynqtgui.sketchpad.lastSelectedObj.value.clear) {
-                                    zynqtgui.sketchpad.lastSelectedObj.value.clear()
-                                }
+                                enabled: zynqtgui.sketchpad.lastSelectedObj != null &&
+                                         zynqtgui.sketchpad.lastSelectedObj.className != null &&
+                                         (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip" ||
+                                          zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" ||
+                                          zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement")
+                                text: qsTr("Clear")
+                                onPressed: {
+                                    if (zynqtgui.sketchpad.lastSelectedObj.value.clear) {
+                                        zynqtgui.sketchpad.lastSelectedObj.value.clear()
+                                    }
 
-                                if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
-                                    // Try clearing pattern if exists.
-                                    try {
-                                        if (zynqtgui.sketchpad.lastSelectedObj.value.connectedPattern >= 0) {
-                                            Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByClipId(zynqtgui.sketchpad.lastSelectedObj.value.id, zynqtgui.sketchpad.lastSelectedObj.value.selectedClip).clear()
-                                        }
-                                    } catch(e) {}
+                                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
+                                        // Try clearing pattern if exists.
+                                        try {
+                                            if (zynqtgui.sketchpad.lastSelectedObj.value.connectedPattern >= 0) {
+                                                Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByClipId(zynqtgui.sketchpad.lastSelectedObj.value.id, zynqtgui.sketchpad.lastSelectedObj.value.selectedClip).clear()
+                                            }
+                                        } catch(e) {}
+                                    }
                                 }
                             }
                         }

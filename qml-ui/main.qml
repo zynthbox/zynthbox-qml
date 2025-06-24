@@ -681,7 +681,7 @@ Kirigami.AbstractApplicationWindow {
     onHeightChanged: height = screen.height
     pageStack: pageManager
     header: QQC2.Pane {
-        padding: 0
+        padding: Kirigami.Units.smallSpacing
         background: Rectangle {
             Kirigami.Theme.colorSet: Kirigami.Theme.Window
             Kirigami.Theme.inherit: false
@@ -696,12 +696,46 @@ Kirigami.AbstractApplicationWindow {
         }
 
         contentItem: RowLayout {
-            spacing: 0
+            spacing: Kirigami.Units.smallSpacing
+
+            QQC2.Button {
+                id: menuButton
+                icon.name: "application-menu"
+                Layout.minimumWidth: Kirigami.Units.gridUnit * 3
+                Layout.fillHeight: true
+                // padding: Kirigami.Units.largeSpacing*1.5
+                // rightPadding: Kirigami.Units.largeSpacing*1.5
+                property string oldPage: "sketchpad"
+                property string oldModalPage: "sketchpad"
+                onClicked: {
+                    if (zynqtgui.current_screen_id === 'main') {
+                        if (oldModalPage !== "") {
+                            zynqtgui.current_modal_screen_id = oldModalPage;
+                        } else if (oldPage !== "") {
+                            zynqtgui.current_screen_id = oldPage;
+                        }
+                    } else {
+                        if (zynqtgui.current_screen_id === "control") {
+                            oldModalPage = "";
+                            oldPage = "preset"
+                        } else {
+                            oldModalPage = zynqtgui.current_modal_screen_id;
+                            oldPage = zynqtgui.current_screen_id;
+                        }
+                        zynqtgui.current_screen_id = 'main';
+                    }
+                }
+                icon.width: 24
+                icon.height: 24
+                icon.color : highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                highlighted: zynqtgui.current_screen_id === 'main'
+                background: null
+            }
 
             QQC2.Control
             {
                 Layout.fillHeight: true
-                Layout.margins: Kirigami.Units.smallSpacing
+
                 padding: 1
                 clip: true
                 background: Rectangle
@@ -726,58 +760,32 @@ Kirigami.AbstractApplicationWindow {
                     icon.width: 24
                     icon.height: 24
                     property bool showSeparator : true
+                    font.weight: Font.Normal
+                    font.family: "Roboto Mono"
                     background: Rectangle
                     {
                         color: btn.pressed || btn.highlighted ? Kirigami.Theme.highlightColor : "transparent"
                         radius: 4
                         Kirigami.Separator
                         {
-                            visible: root.showSeparator
+                            visible: btn.showSeparator
                             color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
                             height: parent.height
                             anchors.left: parent.left
                         }
                     }
-                    font.pointSize: 11
+                    font.pointSize: 10
                 }
 
                 contentItem: RowLayout
                 {
                     spacing: 0
-                    BreadcrumbButton {
-                        id: menuButton
-                        icon.name: "application-menu"
-                        Layout.minimumWidth: Kirigami.Units.gridUnit * 3
-                        // padding: Kirigami.Units.largeSpacing*1.5
-                        // rightPadding: Kirigami.Units.largeSpacing*1.5
-                        property string oldPage: "sketchpad"
-                        property string oldModalPage: "sketchpad"
-                        showSeparator: false
-                        onClicked: {
-                            if (zynqtgui.current_screen_id === 'main') {
-                                if (oldModalPage !== "") {
-                                    zynqtgui.current_modal_screen_id = oldModalPage;
-                                } else if (oldPage !== "") {
-                                    zynqtgui.current_screen_id = oldPage;
-                                }
-                            } else {
-                                if (zynqtgui.current_screen_id === "control") {
-                                    oldModalPage = "";
-                                    oldPage = "preset"
-                                } else {
-                                    oldModalPage = zynqtgui.current_modal_screen_id;
-                                    oldPage = zynqtgui.current_screen_id;
-                                }
-                                zynqtgui.current_screen_id = 'main';
-                            }
-                        }
-                        highlighted: zynqtgui.current_screen_id === 'main'
-                    }
+
                     BreadcrumbButton {
                         id: homeButton
                         Layout.minimumWidth: Kirigami.Units.gridUnit * 6
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-
+                        showSeparator: false
                         onClicked: {
                             if (zynqtgui.current_modal_screen_id == "sketchpad") {
                                 root.showMessageDialog(zynqtgui.sketchpad.song.sketchpadFolder+zynqtgui.sketchpad.song.name+".sketchpad.json", 0)
@@ -785,20 +793,20 @@ Kirigami.AbstractApplicationWindow {
                                 zynqtgui.current_modal_screen_id = 'sketchpad'
                             }
                         }
-                        QQC2.Label {
-                            anchors.fill: parent
-                            anchors.margins: Kirigami.Units.largeSpacing
-                            horizontalAlignment: QQC2.Label.AlignHCenter
-                            verticalAlignment: QQC2.Label.AlignVCenter
-                            elide: Text.ElideMiddle
-                            wrapMode: QQC2.Label.WrapAnywhere
-                            font.pointSize: 10
-                            minimumPointSize: 5
-                            fontSizeMode: Text.Fit
-                            maximumLineCount: 3
-                            text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
-                        }
 
+                        text: zynqtgui.sketchpad.song.name
+
+                        Text
+                        {
+                            visible: zynqtgui.sketchpad.song.hasUnsavedChanges
+                            text: "*"
+                            color: Kirigami.Theme.negativeTextColor
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            font.pointSize: 8
+                            font.weight: Font.Bold
+                            font.family: "Roboto Mono"
+                        }
                         Zynthian.Menu {
                             id: tracksMenu
                             y: parent.height
@@ -821,7 +829,6 @@ Kirigami.AbstractApplicationWindow {
                     }
                     BreadcrumbButton {
                         id: sceneButton
-                        icon.color: Kirigami.Theme.textColor
                         text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
 
@@ -863,7 +870,6 @@ Kirigami.AbstractApplicationWindow {
                     }
                     BreadcrumbButton {
                         id: channelButton
-                        icon.color: Kirigami.Theme.textColor
                         text: qsTr("Track %1 ˬ")
                         .arg(zynqtgui.sketchpad.selectedTrackId+1)
 
@@ -909,7 +915,6 @@ Kirigami.AbstractApplicationWindow {
                             samplesButtonThrottle.restart();
                         }
 
-                        icon.color: Kirigami.Theme.textColor
                         text: qsTr("Sample %1 ˬ %2")
                         .arg(root.selectedChannel.selectedSlotRow + 1)
                         .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
@@ -940,7 +945,6 @@ Kirigami.AbstractApplicationWindow {
 
                         property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
-                        icon.color: Kirigami.Theme.textColor
                         text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 10
 
@@ -948,7 +952,6 @@ Kirigami.AbstractApplicationWindow {
                     }
                     BreadcrumbButton {
                         id: synthButton
-                        icon.color: Kirigami.Theme.textColor
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
 
                         visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
@@ -981,7 +984,6 @@ Kirigami.AbstractApplicationWindow {
                     }
                     BreadcrumbButton {
                         id: presetButton
-                        icon.color: Kirigami.Theme.textColor
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
 
                         visible: root.selectedChannel.trackType === "synth" && synthButton.visible
@@ -1009,7 +1011,6 @@ Kirigami.AbstractApplicationWindow {
                         }
                     }
                     BreadcrumbButton {
-                        icon.color: Kirigami.Theme.textColor
                         text: {
                             switch (effectScreen) {
                             case "layer_midi_effects":
@@ -1052,7 +1053,6 @@ Kirigami.AbstractApplicationWindow {
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                     }
                     BreadcrumbButton {
-                        icon.color: Kirigami.Theme.textColor
                         text: "EDIT"
                         visible: zynqtgui.current_screen_id === "control"
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 4
@@ -1067,7 +1067,6 @@ Kirigami.AbstractApplicationWindow {
             QQC2.Control
             {
                 Layout.fillHeight: true
-                Layout.margins: Kirigami.Units.smallSpacing
                 padding: 1
 
                 background: Rectangle
@@ -1080,7 +1079,7 @@ Kirigami.AbstractApplicationWindow {
                 }
 
                 contentItem: Row {
-                    spacing: 1
+                    spacing: 0
 
                     QQC2.Button {
                         id: globalRecordButton

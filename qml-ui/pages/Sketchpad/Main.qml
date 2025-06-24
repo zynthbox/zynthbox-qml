@@ -1120,54 +1120,47 @@ Zynthian.ScreenPage {
                 }
 
                 contentItem: RowLayout {
-
                     spacing: 1
 
-                    ColumnLayout {
-                        id: sketchpadSketchHeadersColumn
+                    QQC2.Control
+                    {
                         Layout.fillWidth: false
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                        spacing: 1
+                        Layout.margins: Kirigami.Units.smallSpacing
+                        padding: 2
+                        contentItem: Item {
+                            ColumnLayout {
+                                id: sketchpadSketchHeadersColumn
+                                anchors.fill: parent
+                                spacing: 1
 
-                        TableHeader {
-                            id: songCell
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                            Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                            Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                            color: "transparent"
-                            highlightOnFocus: false
-                            highlighted: root.showOccupiedSlotsHeader
-                            //                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedSketchpadSongIndex + 1)
-                            text: root.showOccupiedSlotsHeader
-                                  ? qsTr("Inputs")
-                                  : qsTr("Track State")
-                            onPressed: {
-                                //                            root.displayTrackButtons = !root.displayTrackButtons
-                                //                            bottomStack.slotsBar.channelButton.checked = true
-                                //                            zynqtgui.sketchpad.displaySceneButtons = false
-                                root.showOccupiedSlotsHeader = !root.showOccupiedSlotsHeader
-                            }
-                        }
+                                TableHeader {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                                    Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                                    Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                                    color: "transparent"
+                                    text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
+                                    highlightOnFocus: false
+                                    highlighted: root.displaySceneButtons
+                                    onPressed: {
+                                        if (zynqtgui.sketchpad.displaySceneButtons) {
+                                            zynqtgui.sketchpad.displaySceneButtons = false
+                                            bottomStack.slotsBar.channelButton.checked = true
+                                        } else {
+                                            zynqtgui.sketchpad.displaySceneButtons = true
+                                            bottomStack.slotsBar.clipsButton.checked = true
+                                            // root.displayTrackButtons = false
+                                        }
+                                    }
+                                }
 
-                        TableHeader {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            color: "transparent"
-
-                            text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
-                            highlightOnFocus: false
-                            highlighted: root.displaySceneButtons
-                            onPressed: {
-                                if (zynqtgui.sketchpad.displaySceneButtons) {
-                                    zynqtgui.sketchpad.displaySceneButtons = false
-                                    bottomStack.slotsBar.channelButton.checked = true
-                                } else {
-                                    zynqtgui.sketchpad.displaySceneButtons = true
-                                    bottomStack.slotsBar.clipsButton.checked = true
-                                    root.displayTrackButtons = false
+                                // Placeholder item of same size to have 2 rows in here
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
                                 }
                             }
                         }
@@ -1259,79 +1252,32 @@ Zynthian.ScreenPage {
 
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
-                                            state: root.showOccupiedSlotsHeader
-                                                   ? "SlotsOverviewMode"
+                                            state: root.displaySceneButtons
+                                                   ? "SceneMode"
                                                    : "ChannelMode"
                                             states: [
                                                 State {
-                                                    name: "SlotsOverviewMode"
-                                                    PropertyChanges { target: filledSlotsOverview; visible: true }
+                                                    name: "SceneMode"
+                                                    PropertyChanges { target: sceneHeader; visible: true }
                                                     PropertyChanges { target: channelHeaderDelegate; visible: false }
+                                                    PropertyChanges { target: volumeGauge; visible: false }
                                                 },
                                                 State {
                                                     name: "ChannelMode"
-                                                    PropertyChanges { target: filledSlotsOverview; visible: false }
+                                                    PropertyChanges { target: sceneHeader; visible: false }
                                                     PropertyChanges { target: channelHeaderDelegate; visible: true }
+                                                    PropertyChanges { target: volumeGauge; visible: true }
                                                 }
                                             ]
 
-
-                                            //                                TableHeader {
-                                            //                                    id: trackHeaderDelegate
-                                            //                                    property QtObject sketch: root.song.arrangementsModel.getArrangement(index)
-
-                                            //                                    visible: root.displayTrackButtons
-                                            //                                    anchors.fill: parent
-                                            //                                    color: Kirigami.Theme.backgroundColor
-                                            //                                    highlightOnFocus: false
-                                            //                                    highlighted: root.displayTrackButtons
-                                            //                                                    ? root.song.scenesModel.selectedSketchpadSongIndex === index
-                                            //                                                    : ""
-
-                                            //                                    text: root.displayTrackButtons
-                                            //                                            ? qsTr("T%1").arg(index+1)
-                                            //                                            : ""
-                                            //                                    textSize: 10
-
-                                            //                                    onPressed: {
-                                            //                                        if (root.displayTrackButtons) {
-                                            //                                            zynqtgui.sketchpad.lastSelectedObj = {
-                                            //                                                className: "sketchpad_track",
-                                            //                                                value: index,
-                                            //                                                component: trackHeaderDelegate
-                                            //                                            }
-                                            //                                            root.song.scenesModel.selectedSketchpadSongIndex = index
-                                            //                                        }
-                                            //                                    }
-                                            //                                }
-
-                                            QQC2.AbstractButton {
-                                                id: filledSlotsOverview
+                                            TableHeader {
+                                                id: sceneHeader
                                                 anchors.fill: parent
-                                                background: Rectangle {
-                                                    border.width: index === zynqtgui.sketchpad.selectedTrackId ? 1 : 0
-                                                    border.color: Kirigami.Theme.highlightColor
-
-                                                    color: Kirigami.Theme.backgroundColor
-                                                }
-                                                onClicked: {
-                                                    headerDelegate.switchToThisChannel()
-                                                }
-
-                                                ColumnLayout {
-                                                    anchors.fill: parent
-                                                    anchors.margins: Kirigami.Units.largeSpacing
-                                                    spacing: Kirigami.Units.largeSpacing
-
-                                                    Repeater {
-                                                        model: headerDelegate.channel.occupiedSlots
-                                                        delegate: Rectangle {
-                                                            Layout.fillWidth: true
-                                                            Layout.fillHeight: true
-                                                            radius: height
-                                                            color: modelData ? "#aaffffff" : "#33ffffff"
-                                                        }
-                                                    }
+                                                text: String.fromCharCode(65+index).toUpperCase()
+                                                highlighted: index === root.song.scenesModel.selectedSceneIndex
+                                                highlightOnFocus: false
+                                                onPressed: {
+                                                    Zynthian.CommonUtils.switchToScene(index);
                                                 }
                                             }
 
@@ -1431,42 +1377,21 @@ Zynthian.ScreenPage {
 
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
-                                            state: root.displaySceneButtons
-                                                   ? "SceneMode"
-                                                   : bottomStack.slotsBar.mixerButton.checked
-                                                     ? "MixerMode"
-                                                     : "ClipsMode"
+                                            state: bottomStack.slotsBar.mixerButton.checked
+                                                    ? "MixerMode"
+                                                    : "ClipsMode"
                                             states: [
                                                 State {
-                                                    name: "SceneMode"
-                                                    PropertyChanges { target: sceneHeader; visible: true }
-                                                    PropertyChanges { target: clipCell; visible: false }
-                                                    PropertyChanges { target: mixerCell; visible: false }
-                                                },
-                                                State {
                                                     name: "ClipsMode"
-                                                    PropertyChanges { target: sceneHeader; visible: false }
                                                     PropertyChanges { target: clipCell; visible: true }
                                                     PropertyChanges { target: mixerCell; visible: false }
                                                 },
                                                 State {
                                                     name: "MixerMode"
-                                                    PropertyChanges { target: sceneHeader; visible: false }
                                                     PropertyChanges { target: clipCell; visible: false }
                                                     PropertyChanges { target: mixerCell; visible: true }
                                                 }
                                             ]
-
-                                            TableHeader {
-                                                id: sceneHeader
-                                                anchors.fill: parent
-                                                text: String.fromCharCode(65+index).toUpperCase()
-                                                highlighted: index === root.song.scenesModel.selectedSceneIndex
-                                                highlightOnFocus: false
-                                                onPressed: {
-                                                    Zynthian.CommonUtils.switchToScene(index);
-                                                }
-                                            }
 
                                             ClipCell {
                                                 id: clipCell

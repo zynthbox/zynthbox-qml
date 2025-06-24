@@ -298,9 +298,9 @@
           "id": "0000"
         }
       ],
-      "currentVersion": "0000",
+      "currentVersion": "0001",
       "versions": {
-        "0000": {
+        "0001": {
           "visible": true,
           "pluginName": "Fabla",
           "format": "LV2",
@@ -916,9 +916,9 @@
           "id": "0003"
         }
       ],
-      "currentVersion": "0000",
+      "currentVersion": "0001",
       "versions": {
-        "0000": {
+        "0001": {
           "visible": true,
           "pluginName": "GxBaJaTubeDriver",
           "format": "LV2",

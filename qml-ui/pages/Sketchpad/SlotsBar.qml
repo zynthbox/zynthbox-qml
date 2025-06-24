@@ -616,9 +616,7 @@ QQC2.Pane {
                                                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                                     color: Kirigami.Theme.backgroundColor
 
-                                                    border.color: channelDelegate.highlighted &&
-                                                                  ((!fxButton.checked && channelDelegate.channel.selectedSlotRow === index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow === index))
-                                                                  ? Kirigami.Theme.highlightColor
+                                                    border.color: text.length > 0 ? Kirigami.Theme.highlightColor
                                                                   : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
                                                     border.width: 1
                                                     radius: 4
@@ -721,7 +719,7 @@ QQC2.Pane {
                                 right: parent.right
                                 rightMargin: 10
                             }
-                            wrapMode: "WrapAnywhere"
+                            wrapMode: Text.WrapAnywhere
                             font.pointSize: 10
                             text: root.selectedSlotRowItem
                                   ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])

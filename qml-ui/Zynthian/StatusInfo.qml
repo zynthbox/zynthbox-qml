@@ -220,7 +220,7 @@ QQC2.Pane
                         color: Kirigami.Theme.textColor
                         text: "ALT"
                         padding: 1
-                        // visible: zynqtgui.altButtonPressed
+                        visible: zynqtgui.altButtonPressed
                         font.pointSize: 6
                         font.weight: Font.DemiBold
                         font.family: "Roboto Mono"
@@ -475,7 +475,7 @@ QQC2.Pane
                                 SketchpadDial {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
-                                    // Layout.margins: Kirigami.Units.gridUnit
+                                    Layout.margins: Kirigami.Units.gridUnit
                                     id: volumeDial
                                     text: qsTr("Volume")
                                     controlObj: zynqtgui

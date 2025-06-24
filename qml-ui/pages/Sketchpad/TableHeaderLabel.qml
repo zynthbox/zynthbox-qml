@@ -20,8 +20,11 @@ ColumnLayout {
         horizontalAlignment: QQC2.Label.AlignHCenter
 //        elide: Text.ElideRight
         color: Kirigami.Theme.textColor
-        font.pointSize: 12
-        wrapMode: "WrapAnywhere"
+        font.pointSize: 10
+        font.weight: Font.DemiBold
+        font.capitalization: Font.AllUppercase
+        font.family: "Roboto Mono"
+        wrapMode: Text.WrapAnywhere
     }
 
     QQC2.Label {
@@ -33,6 +36,9 @@ ColumnLayout {
         elide: Text.ElideRight
         color: Kirigami.Theme.textColor
         font.pointSize: 10
+        font.weight: Font.DemiBold
+        // font.capitalization: Font.AllUppercase
+        font.family: "Roboto Mono"
     }
 
     QQC2.Label {
@@ -44,5 +50,8 @@ ColumnLayout {
         elide: Text.ElideRight
         color: Kirigami.Theme.textColor
         font.pointSize: 10
+        font.weight: Font.DemiBold
+        // font.capitalization: Font.AllUppercase
+        font.family: "Roboto Mono"
     }
 }

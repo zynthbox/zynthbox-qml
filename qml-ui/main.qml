@@ -727,7 +727,7 @@ Kirigami.AbstractApplicationWindow {
                 }
                 icon.width: 24
                 icon.height: 24
-                icon.color : highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                icon.color : zynqtgui.current_screen_id === 'main' ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                 highlighted: zynqtgui.current_screen_id === 'main'
                 background: null
             }

@@ -38,6 +38,8 @@ QQC2.Button {
     // FIXME: replace it with action: when a more recent Kirigami can be used
     property Kirigami.Action kirigamiAction
     font.capitalization: Font.AllUppercase
+    // font.weight: Font.DemiBold
+    font.family: "Roboto Mono"
 
     text: kirigamiAction && kirigamiAction.visible ? kirigamiAction.text : ""
     checkable: kirigamiAction && kirigamiAction.checkable

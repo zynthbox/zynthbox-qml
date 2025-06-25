@@ -1141,9 +1141,6 @@ Zynthian.ScreenPage {
                                     TableHeader {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                                        Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
-                                        Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
                                         color: "transparent"
                                         text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
                                         highlightOnFocus: false

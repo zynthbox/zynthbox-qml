@@ -47,10 +47,13 @@ QQC2.AbstractButton {
     property bool highlightOnFocus: true
     property bool active: true
 
-    contentItem: TableHeaderLabel {
-        id: contents
-        text: root.text
-        opacity: root.active ? 1 : 0.3
+    contentItem: Item {
+        TableHeaderLabel {
+            id: contents
+            anchors.fill: parent
+            text: root.text
+            opacity: root.active ? 1 : 0.3
+        }
     }
 
     onPressed: root.forceActiveFocus()

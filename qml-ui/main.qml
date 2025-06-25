@@ -696,7 +696,7 @@ Kirigami.AbstractApplicationWindow {
         }
 
         contentItem: RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: Kirigami.Units.mediumSpacing
 
             QQC2.Button {
                 id: menuButton
@@ -1151,10 +1151,6 @@ Kirigami.AbstractApplicationWindow {
                         icon.color: pressed || highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
                     }
                 }
-            }
-
-            Item {
-                Layout.fillWidth: true
             }
 
             Zynthian.StatusInfo {

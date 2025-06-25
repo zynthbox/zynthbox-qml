@@ -74,9 +74,10 @@ QQC2.Pane
 
                     Rectangle {
                         anchors.fill: parent
-                        color: Kirigami.Theme.textColor
-                        opacity: 0.2
+                        color: Kirigami.Theme.alternateBackgroundColor
+                        // opacity: 0.2
                         radius: 3
+                        border.color: Qt.darker(color, 1.5)
                     }
                     Rectangle {
                         id: holdSignalARect
@@ -147,9 +148,10 @@ QQC2.Pane
 
                     Rectangle {
                         anchors.fill: parent
-                        color: Kirigami.Theme.textColor
-                        opacity: 0.2
+                        color: Kirigami.Theme.alternateBackgroundColor
+                        // opacity: 0.2
                         radius: 3
+                        border.color: Qt.darker(color, 1.5)
                     }
 
                     Rectangle {
@@ -308,7 +310,8 @@ QQC2.Pane
                               ? Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length - 1) : "")
                               : ""
                         font.pointSize: 8
-                        font.weight: Font.Normal
+                        font.letterSpacing: 1
+                        font.weight: Font.DemiBold
                         font.family: "Hack"
                     }
                     QQC2.Label {
@@ -318,7 +321,8 @@ QQC2.Pane
                               ? "<font size=\"1\">S:</font>" + Zynthbox.PlayGridManager.internalPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
                               : ""
                         font.pointSize: 8
-                        font.weight: Font.Normal
+                        font.letterSpacing: 1
+                        font.weight: Font.DemiBold
                         font.family: "Hack"
                     }
                     //        QQC2.Label {
@@ -332,7 +336,9 @@ QQC2.Pane
                     QQC2.Label {
                         Layout.alignment: Qt.AlignRight
                         id: metronomeLabel
-                        font.pointSize: 9
+                        font.pointSize: 8
+                        font.letterSpacing: 1
+                        font.weight: Font.DemiBold
                         text: {
                             if (zynqtgui.sketchpad.isMetronomeRunning && zynqtgui.sketchpad.currentBeat >= 0 && zynqtgui.sketchpad.currentBar >= 0) {
                                 return (zynqtgui.sketchpad.currentBar+1) + "." + (zynqtgui.sketchpad.currentBeat+1)
@@ -352,7 +358,8 @@ QQC2.Pane
                     // text: zynqtgui.sketchpad.song.selectedScale +" "+ Zynthbox.SyncTimer.bpm
                     text: Zynthbox.SyncTimer.bpm
                     font.pointSize: 8
-                    font.weight: Font.Normal
+                    font.letterSpacing: 1
+                    font.weight: Font.DemiBold
                     font.family: "Hack"
                 }
                 Kirigami.Icon {

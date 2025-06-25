@@ -88,11 +88,10 @@ class zynthian_basic_engine(QObject):
         if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             self.is_running = True
             if self.has_restarted:
-                # If process is running and has been restarted after a crash, connect process ports and notify
-                self.zynqtgui.zynautoconnect(True)
                 self.processRestartedAfterCrash.emit()
                 self.has_restarted = False
         elif self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RestartingState:
+            self.is_running = False
             self.has_restarted = True
 
     """
@@ -130,7 +129,7 @@ class zynthian_basic_engine(QObject):
     def proc_cmd(self, cmd:str, wait_for_output=False):
         out = ""
         if self.proc is not None and self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
-            # logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
+            logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
             if wait_for_output:
                 transaction = self.proc.call(cmd)
                 if transaction is not None:
@@ -140,7 +139,7 @@ class zynthian_basic_engine(QObject):
                 transaction = self.proc.send(cmd)
                 if transaction is not None:
                     transaction.release()
-            # logging.debug(f"{self.name} proc command output: {out}")
+            logging.debug(f"{self.name} proc command output: {out}")
         return out
 
     # This will return the transaction rather than the transaction's output, which can

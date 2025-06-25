@@ -28,9 +28,11 @@ import shutil
 import logging
 import random
 import string
+import time
 from collections import OrderedDict
 from subprocess import check_output, STDOUT
 from PySide2.QtCore import Qt, QTimer
+import Zynthbox
 
 from . import zynthian_lv2
 from . import zynthian_engine
@@ -139,12 +141,8 @@ class zynthian_engine_jalv(zynthian_engine):
         self.plugin_name = version_info.pluginName
         self.plugin_url = version_info.url
         self.jackname = self.get_jalv_jackname()
-
-        # processRestartedAfterCrashTimer = QTimer(self)
-        # processRestartedAfterCrashTimer.setInterval(1000)
-        # processRestartedAfterCrashTimer.setSingleShot(True)
-        # processRestartedAfterCrashTimer.timeout.connect(self.handleProcessRestartedAfterCrash, Qt.QueuedConnection)
-        # self.processRestartedAfterCrash.connect(processRestartedAfterCrashTimer.start, Qt.QueuedConnection)
+        # When a process restarts after crashing, make sure to restore state
+        self.processRestartedAfterCrash.connect(self.handleProcessRestartedAfterCrash, Qt.QueuedConnection)
 
         self.ui = False
         # if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
@@ -167,16 +165,8 @@ class zynthian_engine_jalv(zynthian_engine):
 
             self.command_prompt = "\n> "
             self.proc.setCommandPrompt(self.command_prompt)
+            self.proc.setStartupCommands(["presets"])
             self.start()
-
-            # Run presets command explicitly after starting otherwise loading a preset does not work
-            transaction = self.proc.call("presets")
-            # logging.debug(f"--- presets command output BEGIN\n{transaction.standardOutput()}\n--- presets command output END")
-            transaction.release()
-            # if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
-                # pass
-            # else:
-                # logging.error("An error occurred while waiting for the function to return")
 
             # Set static MIDI Controllers from hardcoded plugin info
             try:
@@ -203,14 +193,16 @@ class zynthian_engine_jalv(zynthian_engine):
         self.reset()
 
     def handleProcessRestartedAfterCrash(self):
-        logging.debug("handleProcessRestartedAfterCrash")
+        # Restore state of controllers after crash
+        for zctrl in self.lv2_zctrl_dict:
+            self.proc_cmd("set %d %.6f" % (self.lv2_zctrl_dict[zctrl].graph_path, self.lv2_zctrl_dict[zctrl].value))
 
-        # transaction = self.proc.call("presets")
-        # logging.debug(f"--- presets command output BEGIN\n{transaction.standardOutput()}\n--- presets command output END")
-        # transaction.release()
+        # When process restarts, wait a bit before running autoconnect.
+        # This is to ensure that the process is fully initialized and ready to connect.
+        time.sleep(1)
 
-        # for zctrl in self.lv2_zctrl_dict:
-        #     self.send_controller_value(self.lv2_zctrl_dict[zctrl])
+        # Run autoconnect to connect the ports of the new process
+        self.zynqtgui.zynautoconnect()
 
     # Jack, when listing ports, accepts regular expressions as the jack name.
     # So, for avoiding problems, jack names shouldn't contain regex characters.

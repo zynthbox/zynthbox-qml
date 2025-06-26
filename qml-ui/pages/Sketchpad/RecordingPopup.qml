@@ -150,6 +150,8 @@ Zynthian.Popup {
                                 // If the dialog is already open, and we push the record button again, stop recording
                                 _private.selectedPattern.recordLive = false;
                                 zynqtgui.sketchpad.isRecording = false;
+                                // Enable clip after recording
+                                _private.selectedClip.enabled = true;
                             } else {
                                 // If we are recording and press the record button again, just open the dialog
                                 root.open();

@@ -128,9 +128,15 @@ Zynthian.ScreenPage {
                 text: qsTr("Apps")
                 onClicked: zynqtgui.main.visibleCategory = "appimages"
             }
+            // Disabled these below buttons for now
+            // FIXME : Adding empty Item{} placeholders with fillWidth and fillHeight
+            //         set to true is not taking up equal height somehow
+            //         For now set opacity to 0 and enabled to false
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                opacity: 0
+                enabled: false
                 checkable: true
                 checked: zynqtgui.main.visibleCategory === "sessions" ||
                          zynqtgui.main.visibleCategory === "sessions-versions"
@@ -140,6 +146,8 @@ Zynthian.ScreenPage {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                opacity: 0
+                enabled: false
                 checkable: true
                 checked: zynqtgui.main.visibleCategory === "templates"
                 text: qsTr("Templates")
@@ -148,6 +156,8 @@ Zynthian.ScreenPage {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                opacity: 0
+                enabled: false
                 checkable: true
                 checked: zynqtgui.main.visibleCategory === "discover"
                 text: qsTr("Discover")

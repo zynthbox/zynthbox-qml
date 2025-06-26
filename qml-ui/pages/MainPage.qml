@@ -98,70 +98,91 @@ Zynthian.ScreenPage {
         }
     }
 
+    QQC2.ButtonGroup {
+        buttons: categoryButtons.children
+    }
+
     contentItem: RowLayout {
         spacing: Kirigami.Units.gridUnit
 
-        QQC2.ButtonGroup {
-            buttons: categoryButtons.children
-        }
-
-        ColumnLayout {
-            id: categoryButtons
-
+        Item{
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                checkable: true
-                checked: zynqtgui.main.visibleCategory === "modules"
-                text: qsTr("Modules")
-                onClicked: zynqtgui.main.visibleCategory = "modules"
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                checkable: true
-                checked: zynqtgui.main.visibleCategory === "appimages"
-                text: qsTr("Apps")
-                onClicked: zynqtgui.main.visibleCategory = "appimages"
-            }
-            // Disabled these below buttons for now
-            // FIXME : Adding empty Item{} placeholders with fillWidth and fillHeight
-            //         set to true is not taking up equal height somehow
-            //         For now set opacity to 0 and enabled to false
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                opacity: 0
-                enabled: false
-                checkable: true
-                checked: zynqtgui.main.visibleCategory === "sessions" ||
-                         zynqtgui.main.visibleCategory === "sessions-versions"
-                text: qsTr("Sessions")
-                onClicked: zynqtgui.main.visibleCategory = "sessions"
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                opacity: 0
-                enabled: false
-                checkable: true
-                checked: zynqtgui.main.visibleCategory === "templates"
-                text: qsTr("Templates")
-                onClicked: zynqtgui.main.visibleCategory = "templates"
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                opacity: 0
-                enabled: false
-                checkable: true
-                checked: zynqtgui.main.visibleCategory === "discover"
-                text: qsTr("Discover")
-                onClicked: zynqtgui.main.visibleCategory = "discover"
+            ColumnLayout {
+                id: categoryButtons
+                anchors.fill: parent
+
+                //Placeholders to replace the buttons
+                QQC2.Button {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    implicitHeight: 0
+                    checkable: true
+                    checked: zynqtgui.main.visibleCategory === "modules"
+                    text: qsTr("Modules")
+                    onClicked: zynqtgui.main.visibleCategory = "modules"
+                }
+
+                QQC2.Button {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    implicitHeight: 0
+                    checkable: true
+                    checked: zynqtgui.main.visibleCategory === "appimages"
+                    text: qsTr("Apps")
+                    onClicked: zynqtgui.main.visibleCategory = "appimages"
+                }
+
+                Item {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                }
+                Item {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                }
+                Item {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                }
+
+                // Disabled these below buttons for now
+                // FIXME : Adding empty Item{} placeholders with fillWidth and fillHeight
+                //         set to true is not taking up equal height somehow
+                //         For now set opacity to 0 and enabled to false
+                // QQC2.Button {
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     opacity: 0
+                //     enabled: false
+                //     checkable: true
+                //     checked: zynqtgui.main.visibleCategory === "sessions" ||
+                //              zynqtgui.main.visibleCategory === "sessions-versions"
+                //     text: qsTr("Sessions")
+                //     onClicked: zynqtgui.main.visibleCategory = "sessions"
+                // }
+                // QQC2.Button {
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     opacity: 0
+                //     enabled: false
+                //     checkable: true
+                //     checked: zynqtgui.main.visibleCategory === "templates"
+                //     text: qsTr("Templates")
+                //     onClicked: zynqtgui.main.visibleCategory = "templates"
+                // }
+                // QQC2.Button {
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     opacity: 0
+                //     enabled: false
+                //     checkable: true
+                //     checked: zynqtgui.main.visibleCategory === "discover"
+                //     text: qsTr("Discover")
+                //     onClicked: zynqtgui.main.visibleCategory = "discover"
+                // }
             }
         }
 

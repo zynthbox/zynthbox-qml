@@ -54,6 +54,7 @@ QQC2.Pane {
     property QtObject selectedComponent
 
     signal clicked()
+    signal pressAndHold()
 
     function cuiaCallback(cuia) {
         console.log("### Clips Bar CUIA Callback :", cuia)
@@ -88,6 +89,31 @@ QQC2.Pane {
     }
 
     contentItem: Item {
+        Zynthian.ActionPickerPopup {
+            id: clipSettingsPopup
+            columns: 3
+            rows: 3
+            actions: [
+                Kirigami.Action {
+                    text: root.selectedClipObject.enabled ? qsTr("Disable Clip") : qsTr("Enable Clip")
+                    onTriggered: {
+                        root.selectedClipObject.enabled = !root.selectedClipObject.enabled
+                    }
+                },
+                Kirigami.Action {
+                    text: qsTr("Clear Notes\n(Keep settings)")
+                    onTriggered: {
+                        root.selectedClipPattern.clear()
+                    }
+                },
+                Kirigami.Action {
+                    text: qsTr("Delete Pattern")
+                    onTriggered: {
+                        root.selectedClipPattern.resetPattern(true)
+                    }
+                }
+            ]
+        }
 
         RowLayout {
             spacing: Kirigami.Units.smallSpacing
@@ -178,6 +204,15 @@ QQC2.Pane {
                                     root.selectedClipPattern = clipsBarDelegate.selectedClipPattern
                                     root.selectedComponent = clipsBarDelegate.selectedComponent
                                     root.clicked()
+                                }
+                                onPressAndHold: {
+                                    zynqtgui.sketchpad.selectedTrackId = model.index
+                                    root.selectedClipChannel = clipsBarDelegate.channel
+                                    root.selectedClipObject = clipsBarDelegate.selectedClipObject
+                                    root.selectedClipPattern = clipsBarDelegate.selectedClipPattern
+                                    root.selectedComponent = clipsBarDelegate.selectedComponent
+                                    root.pressAndHold()
+                                    clipSettingsPopup.open()
                                 }
                             }
                         }

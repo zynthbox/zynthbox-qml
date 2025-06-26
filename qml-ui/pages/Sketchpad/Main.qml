@@ -1789,6 +1789,11 @@ Zynthian.ScreenPage {
                         zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
                         zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
                     }
+                    onPressAndHold: {
+                        zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
+                        zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
+                        zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
+                    }
                 }
 
                 // If this needs reviving - it used to be a part of SessionDashboard

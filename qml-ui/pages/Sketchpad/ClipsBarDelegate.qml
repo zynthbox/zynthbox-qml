@@ -22,6 +22,7 @@ ColumnLayout {
     property bool songMode: false
 
     signal clicked()
+    signal pressAndHold()
     function handleItemClick(index) {
         clipsRepeater.itemAt(index).handleItemClick()
     }
@@ -59,6 +60,17 @@ ColumnLayout {
                 }
 
                 root.clicked()
+            }
+            function handleItemLongPress() {
+                if (root.songMode) {
+                    zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.setRestartClip(clipDelegate.clip, !zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.restartClip(clipDelegate.clip));
+                } else {
+                    root.channel.selectedClip = index;
+                    root.selectedClipObject = clipDelegate.clip
+                    root.selectedClipPattern = clipDelegate.pattern
+                    root.selectedComponent = clipDelegate
+                }
+                root.pressAndHold()
             }
             property bool clipPlaying: root.channel.trackType === "sample-loop"
                 ? clipDelegate.cppClipObject ? clipDelegate.cppClipObject.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
@@ -228,27 +240,7 @@ ColumnLayout {
                 id: mouseArea
                 anchors.fill: parent
                 onClicked: clipDelegate.handleItemClick()
-                onPressAndHold: {
-                    if (root.songMode) {
-                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.setRestartClip(clipDelegate.clip, !zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.restartClip(clipDelegate.clip));
-                    } else {
-                        clipDelegate.clip.enabled = true;
-                        root.channel.selectedClip = index;
-                        zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                        zynqtgui.bottomBarControlObj = root.channel.sceneClip;
-                        bottomStack.slotsBar.bottomBarButton.checked = true;
-
-                        if (root.channel.trackType === "sample-loop") {
-                            if (clipDelegate.clipHasWav) {
-                                bottomStack.bottomBar.waveEditorAction.trigger();
-                            } else {
-                                bottomStack.bottomBar.recordingAction.trigger();
-                            }
-                        } else {
-                            bottomStack.bottomBar.patternAction.trigger();
-                        }
-                    }
-                }
+                onPressAndHold: clipDelegate.handleItemLongPress()
             }
         }
     }

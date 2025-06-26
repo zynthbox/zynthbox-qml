@@ -116,6 +116,8 @@ Zynthian.Popup {
                         // Don't reset the state to what we had before recording, as that would be disruptive, just let the user get on where they are
                         _private.selectedPattern.recordLive = false;
                         zynqtgui.sketchpad.isRecording = false;
+                        // Enable clip after recording
+                        _private.selectedClip.enabled = true;
                         returnValue = true;
                     }
                     // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up

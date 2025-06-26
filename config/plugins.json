@@ -194,7 +194,9 @@
           "sha256sum": null,
           "zynthboxVersionAdded": "1.0",
           "url": "http://padthv1.sourceforge.net/lv2",
-          "volumeControls": null,
+          "volumeControls": [
+            "OUT1_VOLUME"
+          ],
           "cutoffControl": null,
           "resonanceControl": null
         }
@@ -421,7 +423,9 @@
           "sha256sum": null,
           "zynthboxVersionAdded": "1.0",
           "url": "urn:juce:Vex",
-          "volumeControls": null,
+          "volumeControls": [
+            "Master"
+          ],
           "cutoffControl": null,
           "resonanceControl": null
         }

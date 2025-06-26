@@ -66,6 +66,14 @@ Kirigami.AbstractApplicationWindow {
         if (recordingPopup.opened === false) {
             result = recordingPopup.cuiaCallback(cuia);
         }
+        // Since VK is not a Zynthian Menu/Popup/Drawer, CUIA events are not sent implicitly
+        // If the virtual keyboard is open, pass CUIA events explicitly
+        // When Qt.inputMethod.visible is true, only a selected set of events are passed to
+        // not parse with VK key presses as shortcuts. See Instantiator { model: zynqtgui.keybinding.key_sequences_model; ...}
+        if (result == false && virtualKeyboardLoader.item && virtualKeyboardLoader.item.visible) {
+            result = virtualKeyboardLoader.item.cuiaCallback(cuia);
+        }
+
         if (result === false) {
             switch (cuia) {
             case "SWITCH_METRONOME_SHORT":
@@ -336,12 +344,6 @@ Kirigami.AbstractApplicationWindow {
                 returnValue = true;
                 break;
             }
-        }
-
-        // Since VK is not a Zynthian Menu/Popup/Drawer, CUIA events are not sent implicitly
-        // If the virtual keyboard is open, pass CUIA events explicitly
-        if (virtualKeyboardLoader.item && virtualKeyboardLoader.item.visible) {
-            result = virtualKeyboardLoader.item.cuiaCallback(cuia);
         }
 
         return result
@@ -1225,11 +1227,26 @@ Kirigami.AbstractApplicationWindow {
         delegate: Shortcut {
             sequence: model.display
             context: Qt.ApplicationShortcut
-            enabled: Qt.inputMethod.visible === false
             // Don't auto-repeat, as that causes havoc in some cases (we will auto-repeat the select key if a heavy operation is done, causing ghost repeats even if the key has actually been released)
             autoRepeat: false // If we want some to be auto-repeatable, we will need to modify the model to not be just a list of strings, and instead use a custom model which can provide us with a value for this as well as the shortcut itself
             function activateThing() {
-                zynqtgui.process_keybinding_shortcut(model.display);
+                let processKeyPress = false;
+
+                if (Qt.inputMethod.visible) {
+                    switch (model.display) {
+                        // Only accept Escape keypress event when VK is open to not parse
+                        // VK input as shortcut
+                        case "Escape":
+                            processKeyPress = true
+                            break;
+                    }
+                } else {
+                    processKeyPress = true
+                }
+
+                if (processKeyPress) {
+                    zynqtgui.process_keybinding_shortcut(model.display);
+                }
             }
             onActivated: activateThing()
             onActivatedAmbiguously: activateThing()

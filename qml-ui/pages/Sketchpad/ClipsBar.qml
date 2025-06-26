@@ -263,14 +263,24 @@ QQC2.Pane {
 
                 QQC2.Button {
                     Layout.fillWidth: true
-                    enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
-                    text: qsTr("Swap with...")
+                    text: qsTr("Clear Column")
                     onClicked: {
-                        bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
+                        // TODO : 1.1 Clear clips when loop mode gets enabled
+                        for (let i=0; i < Zynthbox.Plugin.sketchpadSlotCount; ++i) {
+                            Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.selectedClipChannel.id, i).resetPattern(true)
+                        }
                     }
                 }
 
-
+                // TODO : 1.1 Enable this back when loop mode gets enabled again
+                // QQC2.Button {
+                //     Layout.fillWidth: true
+                //     enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
+                //     text: qsTr("Swap with...")
+                //     onClicked: {
+                //         bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
+                //     }
+                // }
             }
         }
     }

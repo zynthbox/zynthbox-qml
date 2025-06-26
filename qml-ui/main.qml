@@ -1297,6 +1297,16 @@ Kirigami.AbstractApplicationWindow {
         z: Qt.inputMethod.visible ? 99999999 : 1
         anchors.fill: parent
         source: "./VirtualKeyboard.qml"
+
+        MouseArea {
+            enabled: Qt.inputMethod.visible
+            anchors.fill: parent
+            acceptedButtons: Qt.BackButton
+            onClicked: {
+                console.log("Back button clicked")
+                Qt.inputMethod.hide()
+            }
+        }
     }
 
     Connections {

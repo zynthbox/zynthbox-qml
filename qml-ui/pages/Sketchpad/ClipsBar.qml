@@ -95,7 +95,7 @@ QQC2.Pane {
             rows: 3
             actions: [
                 Kirigami.Action {
-                    text: root.selectedClipObject.enabled ? qsTr("Disable Clip") : qsTr("Enable Clip")
+                    text: root.selectedObject && root.selectedClipObject.enabled ? qsTr("Disable Clip") : qsTr("Enable Clip")
                     onTriggered: {
                         root.selectedClipObject.enabled = !root.selectedClipObject.enabled
                     }

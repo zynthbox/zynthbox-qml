@@ -44,7 +44,7 @@ class zynthian_engine_sfizz(zynthian_engine):
 
     # SFZ Default MIDI Controllers (modulators)
     _ctrls=[
-        ['volume',7,96],
+        ['volume',7,127],
         ['pan',10,64],
         ['sustain',64,'off',['off','on']],
         ['sostenuto',66,'off',['off','on']],

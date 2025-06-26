@@ -84,7 +84,7 @@ class zynthian_engine_setbfree(zynthian_engine):
 
     # MIDI Controllers
     _ctrls = [
-        ['volume',7,96,127],
+        ['volume',7,127,127],
 #        ['swellpedal 2',11,96],
         ['reverb',91,4,127],
         ['convol. mix',94,64,127],

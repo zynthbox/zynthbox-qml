@@ -43,7 +43,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     # Standard MIDI Controllers
     _ctrls=[
-        ['volume',7,96],
+        ['volume',7,127],
         ['modulation',1,0],
         ['pan',10,64],
         ['expression',11,127],

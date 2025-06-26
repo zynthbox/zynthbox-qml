@@ -588,6 +588,11 @@ class zynthian_engine(zynthian_basic_engine):
                 if len(options)>0:
                     zctrl.set_options(options)
 
+                if zctrl.symbol.casefold() == "volume" or (self.version_info.volumeControls is not None and zctrl.symbol in self.version_info.volumeControls):
+                    # When encountering a volume controller, set it to max, and add to controller list otherwise CC messages do not get sent
+                    # This is to handle any CC controllers from any engines other than jalv
+                    zctrl.set_value(zctrl.value_max)
+
                 zctrls[zctrl.symbol]=zctrl
         return zctrls
 

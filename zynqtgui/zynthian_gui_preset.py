@@ -241,30 +241,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
             return
 
         if t=='S':
-            selected_channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            prev_volume = None
-            try:
-                prev_volume = self.zynqtgui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow].value
-                logging.debug(f"### Volume Previous : {prev_volume}")
-            except Exception as e:
-                logging.debug(f"Error resetting volume : {str(e)}")
-
             self.get_curlayer().set_preset(i)
             self.zynqtgui.layer.emit_layer_preset_changed(self.get_curlayer())
             self.zynqtgui.bank.select(self.get_curlayer().bankIndex)
             self.zynqtgui.preset.select(self.get_curlayer().presetIndex)
-
-            if selected_channel is not None and prev_volume is not None:
-                try:
-                    volume_control_obj = self.zynqtgui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]
-
-                    logging.debug(f"### Volume after preset change : {volume_control_obj.value}")
-                    volume_control_obj.value = prev_volume
-                    logging.debug(
-                        f"### Volume after reset : {volume_control_obj.value}")
-                except Exception as e:
-                    logging.debug(f"Error resetting volume : {str(e)}")
-
             self.zynqtgui.screens['control'].show()
             self.zynqtgui.screens['layer'].fill_list()
 

@@ -30,12 +30,30 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-Zynthian.SelectorPage {
+
+Zynthian.ScreenPage {
+    id: root
+    property var cuiaCallback: function(cuia) {
+        return false
+    }
+
     screenId: "theme_chooser"
+    visible: true
+    title: "Themes"
+    bottomPadding: Kirigami.Units.gridUnit
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Get New Themes")
             onTriggered: zynqtgui.show_modal("theme_downloader")
         }
     ]
+    contentItem: Zynthian.SelectorView {
+        id: view
+        implicitHeight: 1
+        screenId: root.screenId
+        onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+        onItemActivated: root.itemActivated(screenId, index)
+        onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+        autoActivateIndexOnChange: true
+    }
 }

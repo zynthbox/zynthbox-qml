@@ -23,9 +23,9 @@
 # 
 #******************************************************************************
 
-import sys
 import logging
 import os
+import json
 from pathlib import Path
 
 # Zynthian specific modules
@@ -88,42 +88,79 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
         self.fill_list()
 
         # Read existing config to find previously selected theme name
+        self.selected_theme_name = None
         try:
             config = ConfigParser()
             config.read("/root/.config/plasmarc")
-            selected_theme_name = config["Theme"]["name"]
-        except Exception as e:
-            # If theme config is not found or unable to read config, force set theme to zynthian
-            for index, theme in enumerate(self.list_data):
-                if theme[0] == "zynthian":
-                    self.select_action(index)
-                    break
-            selected_theme_name = "zynthian"
+            self.selected_theme_name = config["Theme"]["name"]
+        except: pass
 
-        # Select correct index as per previously selected theme
-        if selected_theme_name is not None:
-            for index, theme in enumerate(self.list_data):
-                if selected_theme_name == theme[0]:
-                    self.select_action(index)
+        # If theme config cannot be read apply default theme
+        if self.selected_theme_name is None:
+            self.applyDefaultTheme()
+
+    def show(self):
+        self.select(-1)
+        for index, theme in enumerate(self.list_data):
+            if theme[0] == self.selected_theme_name:
+                self.select(index)
+                break
+
+        super().show()
+
+    def applyDefaultTheme(self):
+        for index, theme in enumerate(self.list_data):
+            if theme[0] == "zynthian":
+                self.select_action(index)
+                break
+
+    def get_theme_name(self, theme_base_dir, theme_dir_name):
+        theme_name = None
+
+        # Check if metadata.desktop exists and try reading name
+        metadata_path = Path(theme_base_dir) / theme_dir_name / "metadata.desktop"
+        try:
+            if metadata_path.exists():
+                config = ConfigParser()
+                config.read(metadata_path)
+                theme_name = config["Desktop Entry"]["Name"]
+        except: pass
+
+        # If above failed, try checking if metadata.json exists and try reading name
+        if theme_name is None:
+            metadata_path = Path(theme_base_dir) / theme_dir_name / "metadata.json"
+            try:
+                if metadata_path.exists():
+                    with open(metadata_path, "r") as f:
+                        config = json.load(f)
+                        theme_name = config["KPlugin"]["Name"]
+            except: pass
+
+        # If still failed, fallback to dir name
+        if theme_name is None:
+            theme_name = theme_dir_name
+
+        return theme_name
 
     def fill_list(self):
         self.list_data=[]
 
-        if Path("/usr/share/plasma/desktoptheme").exists():
-            for theme_dir in [f.name for f in os.scandir("/usr/share/plasma/desktoptheme") if f.is_dir()]:
-                self.list_data.append((theme_dir,len(self.list_data),theme_dir))
-
-        if Path("/root/.local/share/plasma/desktoptheme").exists():
-            for theme_dir in [f.name for f in os.scandir("/root/.local/share/plasma/desktoptheme") if f.is_dir()]:
-                self.list_data.append((theme_dir,len(self.list_data),theme_dir))
+        theme_base_dirs = ["/usr/share/plasma/desktoptheme", "/root/.local/share/plasma/desktoptheme"]
+        for theme_base_dir in theme_base_dirs:
+            if Path(theme_base_dir).exists():
+                for theme_dir in [f.name for f in os.scandir(theme_base_dir) if f.is_dir()]:
+                    self.list_data.append((theme_dir,len(self.list_data),self.get_theme_name(theme_base_dir, theme_dir)))
 
         super().fill_list()
+
+    def select(self, index=None):
+        super().select(index)
 
     @Slot(int)
     def select_action(self, i, t='S'):
         if i < 0 or i >= len(self.list_data):
             return
-        self.current_index = i
+        self.select(i)
 
         config_file = Path("/root/.config/plasmarc")
         config = ConfigParser()
@@ -134,6 +171,7 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
         with open(config_file, "w") as fd:
             config.write(fd)
 
+        self.selected_theme_name = self.list_data[self.current_index][0]
         self.apply_font()
 
     def apply_font(self):

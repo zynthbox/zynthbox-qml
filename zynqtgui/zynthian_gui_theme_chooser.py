@@ -118,14 +118,14 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
                 if (Path(theme_base_dir) / self.selected_theme_name).exists():
                     selected_theme_exists = True
 
-        # TODO : 1.0 Before releasing, remove the fallback logic and directly set to zynthbox-theme-v1
-        # zynthian theme has been renamed to zynthbox-theme-v1
-        # If selected theme is zynthian and zynthbox-theme-v1 exists, switch to zynthbox-theme-v1
-        if selected_theme_exists and self.selected_theme_name == "zynthian" and Path("/usr/share/plasma/desktoptheme/zynthbox-theme-v1").exists():
-            switch_theme_to = "zynthbox-theme-v1"
+        # TODO : 1.0 Before releasing, remove the fallback logic and directly set to zynthbox-theme
+        # zynthian theme has been renamed to zynthbox-theme
+        # If selected theme is zynthian and zynthbox-theme exists, switch to zynthbox-theme
+        if selected_theme_exists and self.selected_theme_name == "zynthian" and Path("/usr/share/plasma/desktoptheme/zynthbox-theme").exists():
+            switch_theme_to = "zynthbox-theme"
         elif not selected_theme_exists:
-            if Path("/usr/share/plasma/desktoptheme/zynthbox-theme-v1").exists():
-                switch_theme_to = "zynthbox-theme-v1"
+            if Path("/usr/share/plasma/desktoptheme/zynthbox-theme").exists():
+                switch_theme_to = "zynthbox-theme"
             elif Path("/usr/share/plasma/desktoptheme/zynthian").exists():
                 switch_theme_to = "zynthian"
 
@@ -168,6 +168,9 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
             if Path(theme_base_dir).exists():
                 for theme_dir in [f.name for f in os.scandir(theme_base_dir) if f.is_dir()]:
                     self.list_data.append((theme_dir,len(self.list_data),self.get_theme_name(theme_base_dir, theme_dir)))
+
+        # Sort themes by name
+        self.list_data = sorted(self.list_data, key=lambda k: k[2].casefold())
 
         super().fill_list()
 

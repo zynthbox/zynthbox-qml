@@ -121,29 +121,26 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-        horizontalAlignment: Qt.AlignLeft
+        horizontalAlignment: Qt.AlignRight
         verticalAlignment: Qt.AlignVCenter
         visible: control.showSlotTypeLabel
         font.pointSize: 10
-        font.weight: Font.DemiBold
-        font.capitalization: Font.AllUppercase
-        font.family: "Hack"
 
         text: {
             if (control.slotTypeLabel == "") {
                 switch (control.slotType) {
                     case "synth":
-                        return qsTr("Synths")
+                        return qsTr("Synths :")
                     case "sample-trig":
-                        return qsTr("Samples")
+                        return qsTr("Samples :")
                     case "sample-loop":
-                        return qsTr("Sketches")
+                        return qsTr("Sketches :")
                     case "external":
-                        return qsTr("Settings")
+                        return qsTr("Settings :")
                     case "fx":
-                        return qsTr("FX")
+                        return qsTr("FX :")
                     case "sketch-fx":
-                        return qsTr("FX")
+                        return qsTr("FX :")
                     case "text":
                         return qsTr("")
                 }
@@ -404,8 +401,6 @@ RowLayout {
                         }
                     }
                     font.pointSize: 8
-                    font.weight: Font.DemiBold
-                    font.family: "Hack"
                     elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
                     color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                 }

@@ -68,9 +68,6 @@ QQC2.AbstractButton {
                 elide: Text.ElideRight
                 text: root.text
                 font.pointSize: 8
-                font.weight: Font.DemiBold
-                font.capitalization: Font.AllUppercase
-                font.family: "Hack"
             }
 
             QQC2.Label {
@@ -81,18 +78,13 @@ QQC2.AbstractButton {
 
                 horizontalAlignment: Text.AlignHCenter
                 elide: Text.ElideRight
-                font.pointSize: 6
-                font.weight: Font.DemiBold
-                font.capitalization: Font.AllUppercase
-                font.family: "Hack"
+                font.pointSize: 8
                 text: subSubText
                 padding: 0
-                font.letterSpacing: 2
 
                 // color: Kirigami.Theme.backgroundColor
 
                 background: Rectangle {
-
                     color: root.color
                     radius: 2
                 }
@@ -111,8 +103,6 @@ QQC2.AbstractButton {
                     elide: Text.ElideRight
                     text: root.subText ? root.subText : ""
                     font.pointSize: 8
-                    font.weight: Font.DemiBold
-                    font.family: "Hack"
                 }
 
                 ColumnLayout {

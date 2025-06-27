@@ -792,11 +792,7 @@ QQC2.Pane {
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                                 level: 3
-                                text: qsTr("Track %1").arg(root.selectedChannel ? root.selectedChannel.name : "")
-                                // font.pointSize: 8
-                                font.capitalization: Font.AllUppercase
-                                font.weight: Font.Bold
-                                font.family: "Hack"
+                                text: qsTr("Track: %1").arg(root.selectedChannel ? root.selectedChannel.name : "")
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
@@ -1122,9 +1118,6 @@ QQC2.Pane {
                                     : ""
                                     elide: Text.ElideMiddle
                                     color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
-                                    font.pointSize: 8
-                                    font.weight: Font.Medium
-                                    font.family: "Hack"
                                 }
 
                                 QQC2.Control {
@@ -1197,8 +1190,6 @@ QQC2.Pane {
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 8
-                                                    font.weight: Font.Light
-                                                    font.family: "Hack"
                                                     text: qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
                                                 }
                                                 QQC2.Label {
@@ -1206,8 +1197,6 @@ QQC2.Pane {
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 8
-                                                    font.weight: Font.Light
-                                                    font.family: "Hack"
                                                     text: qsTr("  Bank : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.bank : "--")
                                                 }
                                                 QQC2.Label {
@@ -1215,8 +1204,6 @@ QQC2.Pane {
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 8
-                                                    font.weight: Font.Light
-                                                    font.family: "Hack"
                                                     text: qsTr("Preset : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.preset : "--")
                                                 }
                                             }
@@ -1499,9 +1486,6 @@ QQC2.Pane {
                                             text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
                                             font.underline: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
                                             font.pointSize: 8
-                                            font.weight: Font.DemiBold
-                                            font.family: "Hack"
-                                            font.capitalization: Font.AllUppercase
                                             color: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                                             property int clipIndex: model.index
                                             property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null

@@ -1100,24 +1100,9 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 9
-                padding: Kirigami.Units.smallSpacing
+                padding: 0
 
-                background: Rectangle
-                {
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    Kirigami.Theme.inherit: false
-                    color: Kirigami.Theme.alternateBackgroundColor
-
-                    Kirigami.Separator
-                    {
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                        height: 1
-                        width: parent.width
-                        anchors.bottom: parent.bottom
-                        color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
-                    }
-                }
+                background: null
 
                 contentItem: Item {
 
@@ -1131,7 +1116,6 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
-                            padding: 2
                             contentItem: Item {
                                 ColumnLayout {
                                     id: sketchpadSketchHeadersColumn
@@ -1170,41 +1154,22 @@ Zynthian.ScreenPage {
                         {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            Layout.margins: Kirigami.Units.smallSpacing
 
-                            padding: 2
-                            background: Rectangle
-                            {
-                                Kirigami.Theme.inherit: false
-                                Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                                radius: 6
-                                color: Kirigami.Theme.alternateBackgroundColor
-                                border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2.5)
-
-                                Kirigami.Separator
-                                {
-                                    Kirigami.Theme.inherit: false
-                                    Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                                    height: 1
-                                    width: parent.width
-                                    anchors.centerIn: parent
-                                    color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2)
-                                }
-                            }
+                            background: null
 
                             contentItem: Item {
-                                id: sketchpadClipContent
+                                // id: sketchpadClipContent
 
-                                layer.enabled: true
-                                layer.effect: OpacityMask
-                                {
-                                    maskSource: Rectangle
-                                    {
-                                        width: sketchpadClipContent.width
-                                        height: sketchpadClipContent.height
-                                        radius: 4
-                                    }
-                                }
+                                // layer.enabled: true
+                                // layer.effect: OpacityMask
+                                // {
+                                //     maskSource: Rectangle
+                                //     {
+                                //         width: sketchpadClipContent.width
+                                //         height: sketchpadClipContent.height
+                                //         radius: 4
+                                //     }
+                                // }
 
                                 ColumnLayout {
                                     id: sketchpadClipsColumn
@@ -1493,12 +1458,8 @@ Zynthian.ScreenPage {
                                                                 Layout.preferredWidth: 1
                                                                 Layout.topMargin: Kirigami.Units.smallSpacing
                                                                 Layout.bottomMargin: Kirigami.Units.smallSpacing
-                                                                font.pointSize: 6
+                                                                font.pointSize: 8
                                                                 text: "Sends"
-                                                                font.weight: Font.DemiBold
-                                                                font.capitalization: Font.AllUppercase
-                                                                font.family: "Hack"
-                                                                font.letterSpacing: 2
                                                             }
                                                             QQC2.Dial {
                                                                 Layout.fillWidth: true

@@ -39,8 +39,6 @@ Rectangle {
             Layout.alignment: Qt.AlignCenter
             Layout.topMargin: 8
             font.pointSize: 8
-            font.weight: Font.DemiBold
-            font.family: "Hack"
         }
 
         Item{
@@ -139,9 +137,6 @@ Rectangle {
                             maximumValue: 20
 
                             font.pointSize: 8
-                            font.weight: Font.DemiBold
-                            font.family: "Hack"
-
                             style: GaugeStyle {
                                 valueBar: Rectangle {
                                     color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
@@ -273,8 +268,6 @@ Rectangle {
             elide: Text.ElideRight
             visible: text && text.length>0
             font.pointSize: 8
-            font.weight: Font.DemiBold
-            font.family: "Hack"
         }
     }
 }

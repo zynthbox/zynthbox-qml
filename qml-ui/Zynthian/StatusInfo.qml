@@ -45,14 +45,7 @@ QQC2.Pane
 
     padding: Kirigami.Units.mediumSpacing
 
-    background: Rectangle
-    {
-        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-        Kirigami.Theme.inherit: false
-        color: Kirigami.Theme.alternateBackgroundColor
-        radius: 4
-        border.color: root.highlighted ? Kirigami.Theme.highlightColor : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
-    }
+    background: null
 
     contentItem: MouseArea {
 
@@ -72,13 +65,13 @@ QQC2.Pane
                     implicitHeight: 6
                     clip: true
 
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Kirigami.Theme.alternateBackgroundColor
-                        // opacity: 0.2
-                        radius: 3
-                        border.color: Qt.darker(color, 1.5)
-                    }
+                    // Rectangle {
+                    //     anchors.fill: parent
+                    //     color: Kirigami.Theme.alternateBackgroundColor
+                    //     // opacity: 0.2
+                    //     radius: 3
+                    //     border.color: Qt.darker(color, 1.5)
+                    // }
                     Rectangle {
                         id: holdSignalARect
                         anchors {
@@ -146,13 +139,13 @@ QQC2.Pane
                     implicitHeight: 6
                     clip: true
 
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Kirigami.Theme.alternateBackgroundColor
-                        // opacity: 0.2
-                        radius: 3
-                        border.color: Qt.darker(color, 1.5)
-                    }
+                    // Rectangle {
+                    //     anchors.fill: parent
+                    //     color: Kirigami.Theme.alternateBackgroundColor
+                    //     // opacity: 0.2
+                    //     radius: 3
+                    //     border.color: Qt.darker(color, 1.5)
+                    // }
 
                     Rectangle {
                         id: holdSignalBRect
@@ -224,8 +217,6 @@ QQC2.Pane
                         padding: 1
                         visible: zynqtgui.altButtonPressed
                         font.pointSize: 6
-                        font.weight: Font.DemiBold
-                        font.family: "Hack"
                         background: Rectangle {
                             color: "transparent"
                             border {
@@ -282,8 +273,6 @@ QQC2.Pane
                                 bottom: parent.bottom
                             }
                             font.pointSize: 6
-                            font.weight: Font.Light
-                            font.family: "Hack"
                             text: qsTr("Audio")
                             color: Kirigami.Theme.neutralTextColor
                         }
@@ -295,8 +284,6 @@ QQC2.Pane
                               ? "<font size=\"1\">I:</font>" + Zynthbox.PlayGridManager.hardwareInActiveNotes[0] + (Zynthbox.PlayGridManager.hardwareInActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.hardwareInActiveNotes.length - 1) : "")
                               : ""
                         font.pointSize: 8
-                        font.weight: Font.Normal
-                        font.family: "Hack"
                     }
 
                     Item {
@@ -310,9 +297,6 @@ QQC2.Pane
                               ? Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length - 1) : "")
                               : ""
                         font.pointSize: 8
-                        font.letterSpacing: 1
-                        font.weight: Font.DemiBold
-                        font.family: "Hack"
                     }
                     QQC2.Label {
                         Layout.alignment: Qt.AlignRight
@@ -321,9 +305,6 @@ QQC2.Pane
                               ? "<font size=\"1\">S:</font>" + Zynthbox.PlayGridManager.internalPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
                               : ""
                         font.pointSize: 8
-                        font.letterSpacing: 1
-                        font.weight: Font.DemiBold
-                        font.family: "Hack"
                     }
                     //        QQC2.Label {
                     //            visible: Zynthbox.PlayGridManager.hardwareOutActiveNotes.length > 0
@@ -336,9 +317,7 @@ QQC2.Pane
                     QQC2.Label {
                         Layout.alignment: Qt.AlignRight
                         id: metronomeLabel
-                        font.pointSize: 8
-                        font.letterSpacing: 1
-                        font.weight: Font.DemiBold
+                        // font.pointSize: 8
                         text: {
                             if (zynqtgui.sketchpad.isMetronomeRunning && zynqtgui.sketchpad.currentBeat >= 0 && zynqtgui.sketchpad.currentBar >= 0) {
                                 return (zynqtgui.sketchpad.currentBar+1) + "." + (zynqtgui.sketchpad.currentBeat+1)
@@ -354,13 +333,11 @@ QQC2.Pane
                Layout.fillHeight: true
                 QQC2.Label {
                     id: bpmLabel
+                    Layout.alignment: Qt.AlignTop
                     // Hide scale info for now
                     // text: zynqtgui.sketchpad.song.selectedScale +" "+ Zynthbox.SyncTimer.bpm
                     text: Zynthbox.SyncTimer.bpm
                     font.pointSize: 8
-                    font.letterSpacing: 1
-                    font.weight: Font.DemiBold
-                    font.family: "Hack"
                 }
                 Kirigami.Icon {
                     Layout.alignment: Qt.AlignCenter
@@ -368,10 +345,9 @@ QQC2.Pane
                     implicitWidth: 16
                     source: Qt.resolvedUrl("../../img/metronome.svg")
                     color: Kirigami.Theme.textColor
-                    opacity: zynqtgui.sketchpad.metronomeEnabled ? 1.0 : 0.2
+                    opacity: zynqtgui.sketchpad.metronomeEnabled ? 1 : 0
                 }
             }
-
         }
 
         Zynthian.Popup {

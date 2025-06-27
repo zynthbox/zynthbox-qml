@@ -204,24 +204,15 @@ RowLayout {
                 Layout.alignment: Qt.AlignHCenter
                 font.weight: Font.Normal
                 font.pointSize: 10
-                font.capitalization: Font.AllUppercase
-                font.family: "Hack"
             }
 
             QQC2.Control {
                 padding: 1
                 Layout.fillWidth: true
-                background: Rectangle
-                {
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    Kirigami.Theme.inherit: false
-                    color: Kirigami.Theme.alternateBackgroundColor
-                    radius: 4
-                    border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
-                }
+                background: null
 
                 contentItem: Column {
-                    spacing: 0
+                    spacing: Kirigami.Units.smallSpacing
                     QQC2.Button {
                         icon.name: "arrow-up"
                         width: parent.width
@@ -234,11 +225,6 @@ RowLayout {
                             if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
                                 playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
                             }
-                        }
-                        background: Rectangle
-                        {
-                            color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                            radius: 4
                         }
                     }
 
@@ -262,11 +248,6 @@ RowLayout {
                             if (playGridStack.currentPlayGridItem.octave > 0) {
                                 playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
                             }
-                        }
-                        background: Rectangle
-                        {
-                            color: parent.pressed || parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                            radius: 4
                         }
                     }
                 }

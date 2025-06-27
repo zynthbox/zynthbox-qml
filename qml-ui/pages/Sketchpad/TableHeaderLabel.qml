@@ -20,10 +20,7 @@ ColumnLayout {
         horizontalAlignment: QQC2.Label.AlignHCenter
 //        elide: Text.ElideRight
         color: Kirigami.Theme.textColor
-        font.pointSize: 10
-        font.weight: Font.DemiBold
-        font.capitalization: Font.AllUppercase
-        font.family: "Hack"
+        font.pointSize: 12
         wrapMode: Text.WrapAnywhere
     }
 
@@ -36,9 +33,6 @@ ColumnLayout {
         elide: Text.ElideRight
         color: Kirigami.Theme.textColor
         font.pointSize: 10
-        font.weight: Font.DemiBold
-        // font.capitalization: Font.AllUppercase
-        font.family: "Hack"
     }
 
     QQC2.Label {
@@ -50,8 +44,5 @@ ColumnLayout {
         elide: Text.ElideRight
         color: Kirigami.Theme.textColor
         font.pointSize: 10
-        font.weight: Font.DemiBold
-        // font.capitalization: Font.AllUppercase
-        font.family: "Hack"
     }
 }

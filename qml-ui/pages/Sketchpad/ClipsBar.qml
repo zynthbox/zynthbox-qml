@@ -230,9 +230,6 @@ QQC2.Pane {
                     wrapMode: Text.WrapAnywhere
                     enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
                     text: root.selectedClipObject ? root.selectedClipObject.path.split("/").pop() : ""
-                    font.weight: Font.DemiBold
-                    font.capitalization: Font.AllUppercase
-                    font.family: "Hack"
                     // visible: text.length > 0
                 }
 
@@ -241,9 +238,6 @@ QQC2.Pane {
                     wrapMode: Text.WrapAnywhere
                     enabled: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
                     text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.clipName) : ""
-                    font.weight: Font.DemiBold
-                    font.capitalization: Font.AllUppercase
-                    font.family: "Hack"
                      // visible: text.length > 0
                 }
 

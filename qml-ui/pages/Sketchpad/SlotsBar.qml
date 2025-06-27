@@ -633,8 +633,6 @@ QQC2.Pane {
                                                             }
                                                             // font.pointSize: 10
                                                             font.pointSize: 8
-                                                            font.weight: Font.DemiBold
-                                                            font.family: "Hack"
                                                             elide: Text.ElideRight
                                                             text: parent.text
                                                         }
@@ -664,10 +662,6 @@ QQC2.Pane {
                         text: qsTr("Ch%1-Slot%2")
                         .arg(zynqtgui.sketchpad.selectedTrackId + 1)
                         .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
-
-                        font.weight: Font.DemiBold
-                        font.capitalization: Font.AllUppercase
-                        font.family: "Hack"
                     }
                     QQC2.Label {
                         Layout.fillWidth: true
@@ -676,9 +670,6 @@ QQC2.Pane {
                         visible: synthsButton.checked
                         font.pointSize: 10
                         text: qsTr("Synth")
-                        font.weight: Font.Normal
-                        font.capitalization: Font.AllUppercase
-                        font.family: "Hack"
                     }
                     QQC2.Label {
                         Layout.fillWidth: true
@@ -687,9 +678,6 @@ QQC2.Pane {
                         font.pointSize: 10
                         visible: fxButton.checked
                         text: qsTr("Fx")
-                        font.weight: Font.Normal
-                        font.capitalization: Font.AllUppercase
-                        font.family: "Hack"
                     }
                     QQC2.Label {
                         Layout.fillWidth: true
@@ -698,9 +686,6 @@ QQC2.Pane {
                         font.pointSize: 10
                         visible: samplesButton.checked
                         text: qsTr("Sample")
-                        font.weight: Font.Normal
-                        font.capitalization: Font.AllUppercase
-                        font.family: "Hack"
                     }
 
                     Rectangle {
@@ -729,9 +714,6 @@ QQC2.Pane {
                             }
                             wrapMode: Text.WrapAnywhere
                             font.pointSize: 8
-                            font.weight: Font.Light
-                            // font.capitalization: Font.AllUppercase
-                            font.family: "Hack"
                             text: root.selectedSlotRowItem
                                   ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
                                     ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]

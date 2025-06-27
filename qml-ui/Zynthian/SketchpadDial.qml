@@ -97,9 +97,6 @@ ColumnLayout {
                 fontSizeMode: Text.Fit
                 minimumPointSize: 8
                 font.pointSize: 18
-                font.weight: Font.DemiBold
-                font.capitalization: Font.AllUppercase
-                font.family: "Hack"
                 text: root.showDecimalsAtInteger
                     ? dial.value.toFixed(root.fixedPointTrail)
                     : Math.floor(dial.value) == dial.value
@@ -142,9 +139,6 @@ ColumnLayout {
         visible: text !== ""
         Layout.fillWidth: parent
         horizontalAlignment: Text.AlignHCenter
-        font.weight: Font.DemiBold
-        font.capitalization: Font.AllUppercase
-        font.family: "Hack"
         Rectangle {
             anchors {
                 left: parent.left

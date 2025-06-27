@@ -41,6 +41,7 @@ Kirigami.AbstractApplicationWindow {
     readonly property Item playGrids: playGridsRepeater
     readonly property QtObject virtualKeyboard: virtualKeyboardLoader.item
     readonly property QtObject osd: osd
+    readonly property QtObject confirmer: confirmer
 
     property bool headerVisible: true
     property var channels: [
@@ -1264,6 +1265,22 @@ Kirigami.AbstractApplicationWindow {
         text: zynqtgui.confirm.text
         onAccepted: zynqtgui.confirm.accept()
         onRejected: zynqtgui.confirm.reject()
+    }
+
+    Zynthian.DialogQuestion {
+        id: confirmer
+        function confirmSomething(title, description, callbackFunction) {
+            confirmer.title = title;
+            confirmer.text = description;
+            confirmer.callbackFunction = callbackFunction;
+            confirmer.open();
+        }
+        property var callbackFunction: null
+        onAccepted: {
+            if (confirmer.callbackFunction) {
+                confirmer.callbackFunction();
+            }
+        }
     }
 
     Rectangle {

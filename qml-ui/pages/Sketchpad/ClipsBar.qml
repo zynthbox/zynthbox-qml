@@ -265,10 +265,12 @@ QQC2.Pane {
                     Layout.fillWidth: true
                     text: qsTr("Clear Column")
                     onClicked: {
-                        // TODO : 1.1 Clear clips when loop mode gets enabled
-                        for (let i=0; i < Zynthbox.Plugin.sketchpadSlotCount; ++i) {
-                            Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.selectedClipChannel.id, i).resetPattern(true)
-                        }
+                        applicationWindow().confirmer.confirmSomething(qsTr("Clear Column?"), qsTr("Are you sure that you want to clear entire column?"), function() {
+                            // TODO : 1.1 Clear clips when loop mode gets enabled
+                            for (let i=0; i < Zynthbox.Plugin.sketchpadSlotCount; ++i) {
+                                Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.selectedClipChannel.id, i).resetPattern(true)
+                            }
+                        });
                     }
                 }
 

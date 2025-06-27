@@ -27,6 +27,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
@@ -43,9 +44,28 @@ QQC2.Pane
 
     Layout.fillHeight: true
 
-    padding: Kirigami.Units.mediumSpacing
+    topPadding: svgBg.topPadding
+    bottomPadding: svgBg.bottomPadding
+    leftPadding: svgBg.leftPadding
+    rightPadding: svgBg.rightPadding
 
-    background: null
+    background: Item
+    {
+        PlasmaCore.FrameSvgItem {
+            id: svgBg
+            anchors.fill: parent
+
+            readonly property real leftPadding: margins.left
+            readonly property real rightPadding: margins.right
+            readonly property real topPadding: margins.top
+            readonly property real bottomPadding: margins.bottom
+
+            imagePath: "widgets/statusinfo_background"
+            //colorGroup: PlasmaCore.Theme.ViewColorGroup
+            prefix: root.highlighted ? ["focus", ""] : ""
+            colorGroup: PlasmaCore.Theme.ViewColorGroup
+        }
+    }
 
     contentItem: MouseArea {
 
@@ -65,13 +85,13 @@ QQC2.Pane
                     implicitHeight: 6
                     clip: true
 
-                    // Rectangle {
-                    //     anchors.fill: parent
-                    //     color: Kirigami.Theme.alternateBackgroundColor
-                    //     // opacity: 0.2
-                    //     radius: 3
-                    //     border.color: Qt.darker(color, 1.5)
-                    // }
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Kirigami.Theme.alternateBackgroundColor
+                        // opacity: 0.2
+                        radius: 3
+                        // border.color: Qt.darker(color, 1.5)
+                    }
                     Rectangle {
                         id: holdSignalARect
                         anchors {
@@ -139,13 +159,13 @@ QQC2.Pane
                     implicitHeight: 6
                     clip: true
 
-                    // Rectangle {
-                    //     anchors.fill: parent
-                    //     color: Kirigami.Theme.alternateBackgroundColor
-                    //     // opacity: 0.2
-                    //     radius: 3
-                    //     border.color: Qt.darker(color, 1.5)
-                    // }
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Kirigami.Theme.alternateBackgroundColor
+                        // opacity: 0.2
+                        radius: 3
+                        // border.color: Qt.darker(color, 1.5)
+                    }
 
                     Rectangle {
                         id: holdSignalBRect

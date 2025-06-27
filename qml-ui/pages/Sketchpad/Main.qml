@@ -26,13 +26,13 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Window 2.10
 import QtQuick.Layouts 1.4
-import QtGraphicalEffects 1.0
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4 as Extras
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Zynthian 1.0 as Zynthian
 
@@ -1100,9 +1100,28 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 9
-                padding: 0
+                topPadding: svgBg.topPadding
+                bottomPadding: svgBg.bottomPadding
+                leftPadding: svgBg.leftPadding
+                rightPadding: svgBg.rightPadding
 
-                background: null
+                background: Item
+                {
+                    PlasmaCore.FrameSvgItem {
+                        id: svgBg
+                        anchors.fill: parent
+                        // property bool highlighted
+
+                        readonly property real leftPadding: fixedMargins.left
+                        readonly property real rightPadding: fixedMargins.right
+                        readonly property real topPadding: fixedMargins.top
+                        readonly property real bottomPadding: fixedMargins.bottom
+
+                        imagePath: "widgets/header-background"
+                        colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
+                    }
+                }
 
                 contentItem: Item {
 
@@ -1155,7 +1174,29 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
-                            background: null
+                            topPadding: svgBg2.topPadding
+                            bottomPadding: svgBg2.bottomPadding
+                            leftPadding: svgBg2.leftPadding
+                            rightPadding: svgBg2.rightPadding
+
+                            background: Item
+                            {
+                                PlasmaCore.FrameSvgItem {
+                                    id: svgBg2
+                                    anchors.fill: parent
+                                    // property bool highlighted
+
+                                    readonly property real leftPadding: fixedMargins.left
+                                    readonly property real rightPadding: fixedMargins.right
+                                    readonly property real topPadding: fixedMargins.top
+                                    readonly property real bottomPadding: fixedMargins.bottom
+
+                                    imagePath: "widgets/tracks-background"
+                                    colorGroup: PlasmaCore.Theme.NormalColorGroup
+                                    // enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
+                                }
+                            }
+
 
                             contentItem: Item {
                                 // id: sketchpadClipContent

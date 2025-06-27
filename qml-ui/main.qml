@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
@@ -684,8 +685,32 @@ Kirigami.AbstractApplicationWindow {
     onHeightChanged: height = screen.height
     pageStack: pageManager
     header: QQC2.Pane {
-        padding: 0
-        background: null
+
+        topPadding: svgBg.topPadding
+        bottomPadding: svgBg.bottomPadding
+        // leftPadding: svgBg.leftPadding
+        leftPadding: 0
+        rightPadding: svgBg.rightPadding
+
+        background: Item
+        {
+            PlasmaCore.FrameSvgItem {
+                id: svgBg
+                anchors.fill: parent
+                // property bool highlighted
+
+                readonly property real leftPadding: fixedMargins.left
+                readonly property real rightPadding: fixedMargins.right
+                readonly property real topPadding: fixedMargins.top
+                readonly property real bottomPadding: fixedMargins.bottom
+
+                imagePath: "widgets/header-background"
+                //colorGroup: PlasmaCore.Theme.ViewColorGroup
+                enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
+                colorGroup: PlasmaCore.Theme.HeaderColorGroup
+            }
+        }
+
         contentItem: RowLayout {
             spacing: Kirigami.Units.mediumSpacing
             QQC2.Control
@@ -700,6 +725,8 @@ Kirigami.AbstractApplicationWindow {
                     spacing: 0
                     Zynthian.BreadcrumbButton {
                         id: menuButton
+                        icon.width: 24
+                        icon.height: 24
                         icon.name: "application-menu"
                         icon.color: Kirigami.Theme.textColor
                         padding: Kirigami.Units.largeSpacing*1.5
@@ -1032,13 +1059,33 @@ Kirigami.AbstractApplicationWindow {
 
             QQC2.Control
             {
-                Layout.fillHeight: true
-                padding: 0
+                Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                Layout.fillHeight: svgBg2.fromCurrentTheme
+                topPadding: svgBg2.topPadding
+                bottomPadding: svgBg2.bottomPadding
+                leftPadding: svgBg2.leftPadding
+                rightPadding: svgBg2.rightPadding
 
-                background: null
+                background: Item
+                {
+                    PlasmaCore.FrameSvgItem {
+                        id: svgBg2
+                        anchors.fill: parent
+
+                        readonly property real leftPadding: margins.left
+                        readonly property real rightPadding: margins.right
+                        readonly property real topPadding: margins.top
+                        readonly property real bottomPadding: margins.bottom
+
+                        imagePath: "widgets/statusinfo_background"
+                        //colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        prefix: root.highlighted ? ["focus", ""] : ""
+                        colorGroup: PlasmaCore.Theme.ViewColorGroup
+                    }
+                }
 
                 contentItem: Row {
-                    spacing: Kirigami.Units.mediumSpacing
+                    spacing: 0
 
                     QQC2.Button {
                         id: globalRecordButton
@@ -1064,6 +1111,26 @@ Kirigami.AbstractApplicationWindow {
                         icon.color:  globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive
                                      ? "#ff5cf436" // A green with the same values as the red audio record colour below
                                      : zynqtgui.sketchpad.isRecording ? "#fff44336" : Kirigami.Theme.textColor
+
+                        background: Item
+                        {
+                            visible: !svgBg2.fromCurrentTheme
+                            PlasmaCore.FrameSvgItem {
+                                id: recBtnBg
+                                anchors.fill: parent
+                                // property bool highlighted
+
+                                readonly property real leftPadding: fixedMargins.left
+                                readonly property real rightPadding: fixedMargins.right
+                                readonly property real topPadding: fixedMargins.top
+                                readonly property real bottomPadding: fixedMargins.bottom
+
+                                imagePath: "widgets/button"
+                                prefix: ["normal"]
+                                enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder | PlasmaCore.FrameSvgItem.TopBorder | PlasmaCore.FrameSvgItem.LeftBorder
+                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                            }
+                        }
                     }
 
                     QQC2.Button {
@@ -1081,6 +1148,26 @@ Kirigami.AbstractApplicationWindow {
                         icon.width: 24
                         icon.height: 24
                         icon.color: pressed || highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+
+                        background: Item
+                        {
+                            visible: !svgBg2.fromCurrentTheme
+                            PlasmaCore.FrameSvgItem {
+                                id: playBtnBg
+                                anchors.fill: parent
+                                // property bool highlighted
+
+                                readonly property real leftPadding: fixedMargins.left
+                                readonly property real rightPadding: fixedMargins.right
+                                readonly property real topPadding: fixedMargins.top
+                                readonly property real bottomPadding: fixedMargins.bottom
+
+                                imagePath: "widgets/button"
+                                prefix: ["normal"]
+                                enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder | PlasmaCore.FrameSvgItem.TopBorder | PlasmaCore.FrameSvgItem.RightBorder
+                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                            }
+                        }
                     }
                 }
             }

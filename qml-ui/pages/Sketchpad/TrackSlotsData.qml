@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
@@ -124,8 +125,8 @@ RowLayout {
         horizontalAlignment: Qt.AlignRight
         verticalAlignment: Qt.AlignVCenter
         visible: control.showSlotTypeLabel
-        font.pointSize: 10
-
+        // font.bold: true
+        font.pointSize: 11
         text: {
             if (control.slotTypeLabel == "") {
                 switch (control.slotType) {
@@ -154,7 +155,7 @@ RowLayout {
         id: slotRepeater
 
         model: Zynthbox.Plugin.sketchpadSlotCount
-        delegate: Item {
+        delegate: QQC2.Control {
             id: slotDelegate
             property bool highlighted: control.selectedChannel != null && control.selectedChannel.selectedSlotRow === index
             property int slotIndex: index
@@ -166,6 +167,50 @@ RowLayout {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
+            padding: 4
+
+            background: Item {
+
+                Rectangle {
+                    visible: !svgBg.fromCurrentTheme
+                    anchors.fill: parent
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    color: Kirigami.Theme.backgroundColor
+                    border.color: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled ? Kirigami.Theme.highlightColor : "#ff999999"
+                    border.width: 2
+                    radius: 4
+                }
+
+                PlasmaCore.FrameSvgItem {
+                    id: svgBg
+                    anchors.fill: parent
+
+                    readonly property real leftPadding: margins.left
+                    readonly property real rightPadding: margins.right
+                    readonly property real topPadding: margins.top
+                    readonly property real bottomPadding: margins.bottom
+
+                    imagePath: "widgets/statusinfo_background"
+                    //colorGroup: PlasmaCore.Theme.ViewColorGroup
+                    prefix: slotDelegate.highlighted ? ["focus", ""] : ""
+                    colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                }
+
+                Rectangle {
+                    anchors {
+                        fill: parent
+                        margins: -4
+                    }
+                    opacity: control.highlightCurrentlySelectedSlot && delegate.isSelectedSlot ? 0.8 : 0
+                    color: "transparent"
+                    border {
+                        width: 2
+                        color: "white"
+                    }
+                }
+            }
+
             function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                 if (control.performSlotInteractions) {
                     let wasAlreadySelected = (root.selectedChannel.selectedSlot.className === _private.className && root.selectedChannel.selectedSlot.value === index) ? true : false;
@@ -173,32 +218,32 @@ RowLayout {
                     if (onlySelectSlot == false) {
                         if (wasAlreadySelected == false || onlyFocus) {
                             switch (control.slotType) {
-                                case "synth":
-                                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
-                                    break;
-                                case "sample-trig":
-                                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
-                                    break;
-                                case "sample-loop":
-                                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
-                                    break;
-                                case "external":
-                                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
-                                    break;
-                                case "fx":
-                                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
-                                    break;
-                                case "sketch-fx":
-                                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchfxslot";
-                                    break;
-                                case "text":
-                                    // Do nothing for text slots
-                                    break;
-                                default:
-                                    console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
-                                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
-                                    root.selectedChannel.displayFx = false;
-                                    break;
+                            case "synth":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                                break;
+                            case "sample-trig":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
+                                break;
+                            case "sample-loop":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
+                                break;
+                            case "external":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
+                                break;
+                            case "fx":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
+                                break;
+                            case "sketch-fx":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchfxslot";
+                                break;
+                            case "text":
+                                // Do nothing for text slots
+                                break;
+                            default:
+                                console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                                root.selectedChannel.displayFx = false;
+                                break;
                             }
                             zynqtgui.sketchpad.lastSelectedObj.value = index;
                             zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate;
@@ -243,41 +288,20 @@ RowLayout {
                 control.slotClicked(slotDelegate.slotIndex);
             }
 
-            Rectangle {
+            contentItem: Item {
                 id: delegate
                 property int midiChannel: control.selectedChannel != null ? control.selectedChannel.chainedSounds[index] : -1
                 property QtObject synthPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
                 property QtObject fxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id][index] : null
                 property QtObject sketchFxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
 
-                anchors.fill: parent
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                color: Kirigami.Theme.backgroundColor
-                border.color: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled ? Kirigami.Theme.highlightColor : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
-                border.width: 1
-                radius: 4
-                border.pixelAligned: false
-                antialiasing: true
+
                 // For external mode the first three slots are visible
                 // For other modes all slots are visible
                 enabled: (control.slotType !== "external") || (control.slotType === "external" && (index === 0 || index === 1 || index === 2))
                 opacity: enabled ? 1 : 0
                 visible: enabled
                 readonly property bool isSelectedSlot: control.selectedChannel != null && control.selectedChannel.selectedSlot.className === _private.className && control.selectedChannel.selectedSlot.value === slotDelegate.slotIndex
-
-                Rectangle {
-                    anchors {
-                        fill: parent
-                        margins: -4
-                    }
-                    opacity: control.highlightCurrentlySelectedSlot && delegate.isSelectedSlot ? 0.8 : 0
-                    color: "transparent"
-                    border {
-                        width: 2
-                        color: Kirigami.Theme.textColor
-                    }
-                }
                 Item {
                     id: slotDelegateVisualsContainer
                     anchors {
@@ -343,7 +367,7 @@ RowLayout {
                             leftMargin: 3 // because of the radius of the rectangles we're "inside"
                         }
                         height: 1
-                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : Kirigami.Theme.textColor
+                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
                         opacity: width > 1 ? 0.8 : 0
                         width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
                     }
@@ -355,7 +379,7 @@ RowLayout {
                             leftMargin: 3 // because of the radius of the rectangles we're "inside"
                         }
                         height: 1
-                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : Kirigami.Theme.textColor
+                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
                         opacity: width > 1 ? 0.8 : 0
                         width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
                     }
@@ -400,7 +424,6 @@ RowLayout {
                             return ""
                         }
                     }
-                    font.pointSize: 8
                     elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
                     color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                 }

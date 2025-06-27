@@ -887,7 +887,7 @@ class sketchpad_clip(QObject):
     # END Property title
 
     def get_clip_name(self):
-        return chr(self.__col_index__+65)
+        return chr(self.__id__+65)
     clipName = Property(str, get_clip_name, constant=True)
 
     @Signal

@@ -83,21 +83,21 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
         self.__track_colors__ = [QColor("#B34D00"), QColor("#B37A00"), QColor("#B39D00"), QColor("#7CB301"), QColor("#008F00"), QColor("#006642"), QColor("#4F0099"), QColor("#7A00AB"), QColor("#B000A7"), QColor("#E60000"), QColor("#000000"), QColor("#808080")]
         self.audiofx_layer = None
         self.audiofx_layers = None
+        self.selected_theme_name = None
+        self.theme_base_dirs = ["/usr/share/plasma/desktoptheme", "/root/.local/share/plasma/desktoptheme"]
 
         # Prepare installed themes list
         self.fill_list()
 
         # Read existing config to find previously selected theme name
-        self.selected_theme_name = None
         try:
             config = ConfigParser()
             config.read("/root/.config/plasmarc")
             self.selected_theme_name = config["Theme"]["name"]
         except: pass
 
-        # If theme config cannot be read apply default theme
-        if self.selected_theme_name is None:
-            self.applyDefaultTheme()
+        # Check if current selected theme is valid or not. Select appropriate if necessary
+        self.check_current_selected_theme()
 
     def show(self):
         self.select(-1)
@@ -108,11 +108,30 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 
         super().show()
 
-    def applyDefaultTheme(self):
-        for index, theme in enumerate(self.list_data):
-            if theme[0] == "zynthian":
-                self.select_action(index)
-                break
+    def check_current_selected_theme(self):
+        selected_theme_exists = False
+        switch_theme_to = None
+
+        # Check if the selected theme exists in system
+        if self.selected_theme_name is not None:
+            for theme_base_dir in self.theme_base_dirs:
+                if (Path(theme_base_dir) / self.selected_theme_name).exists():
+                    selected_theme_exists = True
+
+        # TODO : 1.0 Before releasing, remove the fallback logic and directly set to zynthbox-theme-v1
+        # zynthian theme has been renamed to zynthbox-theme-v1
+        # If selected theme is zynthian and zynthbox-theme-v1 exists, switch to zynthbox-theme-v1
+        if selected_theme_exists and self.selected_theme_name == "zynthian" and Path("/usr/share/plasma/desktoptheme/zynthbox-theme-v1").exists():
+            switch_theme_to = "zynthbox-theme-v1"
+        elif not selected_theme_exists:
+            if Path("/usr/share/plasma/desktoptheme/zynthbox-theme-v1").exists():
+                switch_theme_to = "zynthbox-theme-v1"
+            elif Path("/usr/share/plasma/desktoptheme/zynthian").exists():
+                switch_theme_to = "zynthian"
+
+        if switch_theme_to is not None:
+            logging.debug(f"Switching theme to {switch_theme_to}")
+            self.apply_theme(switch_theme_to)
 
     def get_theme_name(self, theme_base_dir, theme_dir_name):
         theme_name = None
@@ -145,8 +164,7 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
     def fill_list(self):
         self.list_data=[]
 
-        theme_base_dirs = ["/usr/share/plasma/desktoptheme", "/root/.local/share/plasma/desktoptheme"]
-        for theme_base_dir in theme_base_dirs:
+        for theme_base_dir in self.theme_base_dirs:
             if Path(theme_base_dir).exists():
                 for theme_dir in [f.name for f in os.scandir(theme_base_dir) if f.is_dir()]:
                     self.list_data.append((theme_dir,len(self.list_data),self.get_theme_name(theme_base_dir, theme_dir)))
@@ -161,18 +179,19 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
         if i < 0 or i >= len(self.list_data):
             return
         self.select(i)
+        self.apply_theme(self.list_data[self.current_index][0])
+        self.apply_font()
 
+    def apply_theme(self, theme_name):
         config_file = Path("/root/.config/plasmarc")
         config = ConfigParser()
         config.read(config_file)
         if not "Theme" in config:
             config["Theme"] = {}
-        config["Theme"]["name"] = self.list_data[self.current_index][0]
+        config["Theme"]["name"] = theme_name
         with open(config_file, "w") as fd:
             config.write(fd)
-
-        self.selected_theme_name = self.list_data[self.current_index][0]
-        self.apply_font()
+        self.selected_theme_name = theme_name
 
     def apply_font(self):
         plasma_settings = QSettings("/root/.config/plasmarc", QSettings.IniFormat)

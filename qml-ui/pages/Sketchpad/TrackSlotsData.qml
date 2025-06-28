@@ -168,6 +168,10 @@ RowLayout {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
             padding: 4
+            bottomInset: 4
+            topInset: 4
+            rightInset: 4
+            leftInset: 4
 
             background: Item {
 
@@ -185,6 +189,7 @@ RowLayout {
                 PlasmaCore.FrameSvgItem {
                     id: svgBg
                     anchors.fill: parent
+                    readonly property bool highlighted: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled
 
                     readonly property real leftPadding: margins.left
                     readonly property real rightPadding: margins.right
@@ -193,7 +198,7 @@ RowLayout {
 
                     imagePath: "widgets/statusinfo_background"
                     //colorGroup: PlasmaCore.Theme.ViewColorGroup
-                    prefix: slotDelegate.highlighted ? ["focus", ""] : ""
+                    prefix: svgBg.highlighted ? ["focus", ""] : ""
                     colorGroup: PlasmaCore.Theme.ButtonColorGroup
                 }
 

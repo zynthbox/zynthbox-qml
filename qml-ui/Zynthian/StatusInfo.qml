@@ -44,15 +44,16 @@ QQC2.Pane
 
     Layout.fillHeight: true
 
-    topPadding: svgBg.topPadding
-    bottomPadding: svgBg.bottomPadding
-    leftPadding: svgBg.leftPadding
-    rightPadding: svgBg.rightPadding
+    topPadding: svgBg.visible ? svgBg.topPadding : Kirigami.Units.smallSpacing
+    bottomPadding: svgBg.visible ? svgBg.bottomPadding : Kirigami.Units.smallSpacing
+    leftPadding: svgBg.visible ? svgBg.leftPadding : Kirigami.Units.smallSpacing
+    rightPadding: svgBg.visible ? svgBg.rightPadding : Kirigami.Units.smallSpacing
 
     background: Item
     {
         PlasmaCore.FrameSvgItem {
             id: svgBg
+            visible: fromCurrentTheme
             anchors.fill: parent
 
             readonly property real leftPadding: margins.left
@@ -85,13 +86,6 @@ QQC2.Pane
                     implicitHeight: 6
                     clip: true
 
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Kirigami.Theme.alternateBackgroundColor
-                        // opacity: 0.2
-                        radius: 3
-                        // border.color: Qt.darker(color, 1.5)
-                    }
                     Rectangle {
                         id: holdSignalARect
                         anchors {
@@ -158,14 +152,6 @@ QQC2.Pane
                     Layout.fillWidth: true
                     implicitHeight: 6
                     clip: true
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Kirigami.Theme.alternateBackgroundColor
-                        // opacity: 0.2
-                        radius: 3
-                        // border.color: Qt.darker(color, 1.5)
-                    }
 
                     Rectangle {
                         id: holdSignalBRect

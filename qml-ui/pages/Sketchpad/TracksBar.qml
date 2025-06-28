@@ -31,6 +31,7 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtGraphicalEffects 1.0
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import QtQuick.Controls.Styles 1.4
 
@@ -1109,7 +1110,7 @@ QQC2.Pane {
                                 QQC2.Label {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
-
+                                    font.pointSize: 9
                                     opacity: waveformContainer.showWaveform ? 1 : 0
                                     text: waveformContainer.clip
                                           ? progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false
@@ -1123,15 +1124,28 @@ QQC2.Pane {
                                 QQC2.Control {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    padding: 2
+                                    padding: 1
 
-                                    background: Rectangle
-                                    {
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                                        Kirigami.Theme.inherit: false
-                                        color: Kirigami.Theme.alternateBackgroundColor
-                                        radius: 6
-                                        border.color: root.sequence.isPlaying ? Kirigami.Theme.highlightColor : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+                                    background: Item {
+
+                                        Rectangle {
+                                            visible: !svgBg.fromCurrentTheme
+                                            anchors.fill: parent
+                                            border.width: 1
+                                            border.color: "#ff999999"
+                                            radius: 4
+                                            color: "#222222"
+                                        }
+
+                                        PlasmaCore.FrameSvgItem {
+                                            id: svgBg
+                                            anchors.fill: parent
+                                            readonly property bool highlighted: root.sequence.isPlaying
+
+                                            imagePath: "widgets/statusinfo_background"
+                                            colorGroup: PlasmaCore.Theme.ViewColorGroup
+                                            prefix: svgBg.highlighted ? ["focus", ""] : ""
+                                        }
                                     }
 
                                     contentItem: Item {
@@ -1485,7 +1499,7 @@ QQC2.Pane {
                                             Layout.preferredWidth: Kirigami.Units.gridUnit
                                             text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
                                             font.underline: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
-                                            font.pointSize: 8
+                                            font.pointSize: 9
                                             color: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                                             property int clipIndex: model.index
                                             property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
@@ -1539,16 +1553,29 @@ QQC2.Pane {
                                 QQC2.Control {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    padding: 2
+                                    // Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                    padding: 1
 
-                                    background: Rectangle
-                                    {
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                                        Kirigami.Theme.inherit: false
-                                        color: Kirigami.Theme.alternateBackgroundColor
-                                        radius: 6
-                                        border.color: root.sequence.isPlaying ? Kirigami.Theme.highlightColor : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.8)
+                                    background: Item {
+
+                                        Rectangle {
+                                            visible: !svgBg2.fromCurrentTheme
+                                            anchors.fill: parent
+                                            border.width: 1
+                                            border.color: "#ff999999"
+                                            radius: 4
+                                            color: "#222222"
+                                        }
+
+                                        PlasmaCore.FrameSvgItem {
+                                            id: svgBg2
+                                            anchors.fill: parent
+                                            readonly property bool highlighted: root.sequence.isPlaying
+
+                                            imagePath: "widgets/statusinfo_background"
+                                            colorGroup: PlasmaCore.Theme.ViewColorGroup
+                                            prefix: svgBg2.highlighted ? ["focus", ""] : ""
+                                        }
                                     }
 
                                     contentItem: Item {

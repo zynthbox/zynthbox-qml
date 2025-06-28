@@ -1093,7 +1093,7 @@ Zynthian.ScreenPage {
 
         ColumnLayout {
             anchors.fill: parent
-            // anchors.bottomMargin: Kirigami.Units.smallSpacing
+            anchors.bottomMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.smallSpacing
 
             QQC2.Control {
@@ -1109,15 +1109,15 @@ Zynthian.ScreenPage {
                 {
                     PlasmaCore.FrameSvgItem {
                         id: svgBg
+                        visible: fromCurrentTheme
                         anchors.fill: parent
-                        // property bool highlighted
 
                         readonly property real leftPadding: fixedMargins.left
                         readonly property real rightPadding: fixedMargins.right
                         readonly property real topPadding: fixedMargins.top
                         readonly property real bottomPadding: fixedMargins.bottom
 
-                        imagePath: "widgets/header-background"
+                        imagePath: "widgets/statusinfo_background"
                         colorGroup: PlasmaCore.Theme.ViewColorGroup
                         enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
                     }
@@ -1127,7 +1127,7 @@ Zynthian.ScreenPage {
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: 1
+                        spacing: Kirigami.Units.smallSpacing
 
                         QQC2.Control
                         {
@@ -1744,66 +1744,96 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            StackLayout {
-                id: bottomStack
 
-                property alias bottomBar: bottomBar
-                property alias mixerBar: mixerBar
-                property alias slotsBar: slotsBar
-                property alias tracksBar: tracksBar
-                property alias clipsBar: clipsBar
-
+            QQC2.Control {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.margins: Kirigami.Units.smallSpacing
-                onCurrentIndexChanged: updateLedVariablesTimer.restart()
 
-                BottomBar {
-                    id: bottomBar
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
+                topPadding: svgBg3.topPadding
+                bottomPadding: svgBg3.bottomPadding
+                leftPadding: svgBg3.leftPadding
+                rightPadding: svgBg3.rightPadding
 
-                MixerBar {
-                    id: mixerBar
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
+                background: Item
+                {
+                    PlasmaCore.FrameSvgItem {
+                        id: svgBg3
+                        visible: fromCurrentTheme
+                        anchors.fill: parent
 
-                SlotsBar {
-                    id: slotsBar
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
+                        readonly property real leftPadding: visible ? fixedMargins.left : 0
+                        readonly property real rightPadding: visible ? fixedMargins.right : 0
+                        readonly property real topPadding: visible ? fixedMargins.top : 0
+                        readonly property real bottomPadding: visible ? fixedMargins.bottom : 0
 
-                TracksBar {
-                    id: tracksBar
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
-
-                ClipsBar {
-                    id: clipsBar
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    onClicked: {
-                        zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
-                        zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
-                        zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
-                    }
-                    onPressAndHold: {
-                        zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
-                        zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
-                        zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
+                        imagePath: "widgets/statusinfo_background"
+                        colorGroup: PlasmaCore.Theme.NormalColorGroup
+                        enabledBorders: PlasmaCore.FrameSvgItem.NoBorder
                     }
                 }
 
-                // If this needs reviving - it used to be a part of SessionDashboard
-                // ChannelsViewSoundsBar {
-                //     id: soundCombinatorBar
-                //     Layout.fillWidth: true
-                //     Layout.fillHeight: true
-                // }
+                contentItem : Item {
+
+                    StackLayout {
+                        id: bottomStack
+                        anchors.fill: parent
+
+                        property alias bottomBar: bottomBar
+                        property alias mixerBar: mixerBar
+                        property alias slotsBar: slotsBar
+                        property alias tracksBar: tracksBar
+                        property alias clipsBar: clipsBar
+
+                        onCurrentIndexChanged: updateLedVariablesTimer.restart()
+
+                        BottomBar {
+                            id: bottomBar
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        MixerBar {
+                            id: mixerBar
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        SlotsBar {
+                            id: slotsBar
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        TracksBar {
+                            id: tracksBar
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        ClipsBar {
+                            id: clipsBar
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            onClicked: {
+                                zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
+                                zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
+                                zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
+                            }
+                            onPressAndHold: {
+                                zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
+                                zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
+                                zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
+                            }
+                        }
+
+                        // If this needs reviving - it used to be a part of SessionDashboard
+                        // ChannelsViewSoundsBar {
+                        //     id: soundCombinatorBar
+                        //     Layout.fillWidth: true
+                        //     Layout.fillHeight: true
+                        // }
+                    }
+                }
             }
         }
     }

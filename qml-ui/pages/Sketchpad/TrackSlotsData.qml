@@ -176,7 +176,7 @@ RowLayout {
             background: Item {
 
                 Rectangle {
-                    visible: !svgBg.fromCurrentTheme
+                    visible: !svgBg.visible
                     anchors.fill: parent
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -189,6 +189,7 @@ RowLayout {
                 PlasmaCore.FrameSvgItem {
                     id: svgBg
                     anchors.fill: parent
+                    visible: fromCurrentTheme
                     readonly property bool highlighted: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled
 
                     readonly property real leftPadding: margins.left
@@ -196,8 +197,7 @@ RowLayout {
                     readonly property real topPadding: margins.top
                     readonly property real bottomPadding: margins.bottom
 
-                    imagePath: "widgets/statusinfo_background"
-                    //colorGroup: PlasmaCore.Theme.ViewColorGroup
+                    imagePath: "widgets/slots-delegate-background"
                     prefix: svgBg.highlighted ? ["focus", ""] : ""
                     colorGroup: PlasmaCore.Theme.ButtonColorGroup
                 }

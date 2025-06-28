@@ -31,6 +31,7 @@ import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
@@ -440,30 +441,50 @@ QQC2.Pane {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    padding: 1
+                    topPadding: svgBg.visible ? svgBg.topPadding : 0
+                    bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
+                    leftPadding: svgBg.visible ? svgBg.leftPadding : 0
+                    rightPadding: svgBg.visible ? svgBg.rightPadding : 0
 
-                    background: Rectangle
-                    {
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                        Kirigami.Theme.inherit: false
-                        color: Kirigami.Theme.backgroundColor
-                        border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2.5)
-                        radius: 6
+                    background: Item {
+
+                        Rectangle
+                        {
+                            visible: !svgBg.visible
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            Kirigami.Theme.inherit: false
+                            color: Kirigami.Theme.backgroundColor
+                        }
+
+                        PlasmaCore.FrameSvgItem {
+                            id: svgBg
+                            visible: fromCurrentTheme
+                            anchors.fill: parent
+
+                            readonly property real leftPadding: fixedMargins.left
+                            readonly property real rightPadding: fixedMargins.right
+                            readonly property real topPadding: fixedMargins.top
+                            readonly property real bottomPadding: fixedMargins.bottom
+
+                            imagePath: "widgets/tracks-background"
+                            colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        }
                     }
 
                     contentItem: Item {
                         id: slotsContainer
 
-                        layer.enabled: true
-                        layer.effect: OpacityMask
-                        {
-                            maskSource: Rectangle
-                            {
-                                width: slotsContainer.width
-                                height: slotsContainer.height
-                                radius: 6
-                            }
-                        }
+                        // layer.enabled: true
+                        // layer.effect: OpacityMask
+                        // {
+                        //     maskSource: Rectangle
+                        //     {
+                        //         width: slotsContainer.width
+                        //         height: slotsContainer.height
+                        //         radius: 6
+                        //     }
+                        // }
 
                         RowLayout {
                             id: channelsSlotsRow
@@ -480,9 +501,10 @@ QQC2.Pane {
 
                                     property bool highlighted: false
 
+                                    padding: Kirigami.Units.smallSpacing
                                     background: Rectangle
                                     {
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
                                         Kirigami.Theme.inherit: false
                                         color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
                                         border.width: 1
@@ -534,107 +556,139 @@ QQC2.Pane {
 
                                         ColumnLayout {
                                             anchors.fill: parent
-                                            // anchors.topMargin: Kirigami.Units.gridUnit * 0.7
-                                            // anchors.bottomMargin: Kirigami.Units.gridUnit * 0.7
+                                            anchors.topMargin: Kirigami.Units.gridUnit * 0.7
+                                            anchors.bottomMargin: Kirigami.Units.gridUnit * 0.7
                                             spacing: Kirigami.Units.gridUnit * 0.7
 
                                             Repeater {
                                                 model: 5
-                                                delegate: Rectangle {
-                                                    Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                                                    Kirigami.Theme.inherit: false
+                                                delegate: QQC2.Control {
 
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
-                                                    color: "transparent"
-                                                    border.width: 2
-                                                    border.color: channelDelegate.highlighted &&
-                                                                  ((!fxButton.checked && channelDelegate.channel.selectedSlotRow === index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow === index))
-                                                                  ? Kirigami.Theme.textColor
-                                                                  : "transparent"
 
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: {
-                                                            if (zynqtgui.sketchpad.selectedTrackId !== channelDelegate.channelIndex ||
-                                                                    (synthsButton.checked && root.selectedChannel.selectedSlot.value != index) ||
-                                                                    (samplesButton.checked && root.selectedChannel.selectedSlot.value != index) ||
-                                                                    (fxButton.checked && root.selectedChannel.selectedSlot.value != index)
-                                                                    ) {
-                                                                // Check only if slot index matches selected index. This will allow us overcoming the situation
-                                                                // Where a slot index is already selected for another slot type but would require clicking twice if
-                                                                // slot type is checked here to switch first and then activate the slot. Hence when activating, make sure to
-                                                                // switch to slot to have consistent selected slot type.
-                                                                channelsSlotsRow.currentIndex = index
-                                                                if (fxButton.checked) {
-                                                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
-                                                                    channelDelegate.channel.selectedFxSlotRow = index
-                                                                } else if (samplesButton.checked) {
-                                                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
-                                                                    channelDelegate.channel.selectedSlotRow = index
-                                                                } else if (synthsButton.checked) {
-                                                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
-                                                                    channelDelegate.channel.selectedSlotRow = index
-                                                                }
+                                                    padding: 4
+                                                    bottomInset: 8
+                                                    topInset: 8
+                                                    rightInset: 2
+                                                    leftInset: 2
 
-                                                                zynqtgui.sketchpad.selectedTrackId = channelDelegate.channelIndex;
-                                                            } else {
-                                                                // As mentioned in the above if clause, when a slot index is already selected, the slot will want activation
-                                                                // but can have wrong slot type selected. Hence make sure to always have correct slot type before activating
-                                                                if (fxButton.checked) {
-                                                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
-                                                                    channelDelegate.channel.selectedFxSlotRow = index
-                                                                } else if (samplesButton.checked) {
-                                                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
-                                                                    channelDelegate.channel.selectedSlotRow = index
-                                                                } else if (synthsButton.checked) {
-                                                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
-                                                                    channelDelegate.channel.selectedSlotRow = index
-                                                                }
-                                                                handleItemClick()
-                                                            }
+                                                    background: Item {
+
+                                                        Rectangle {
+                                                            visible: !slotSvgBg.visible
+                                                            anchors.fill: parent
+                                                            Kirigami.Theme.inherit: false
+                                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                            color: Kirigami.Theme.backgroundColor
+
+                                                            border.color: "#ff999999"
+                                                            border.width: 2
+                                                            radius: 4
                                                         }
-                                                        z: 10
+
+                                                        PlasmaCore.FrameSvgItem {
+                                                            id: slotSvgBg
+                                                            anchors.fill: parent
+                                                            visible: fromCurrentTheme
+                                                            readonly property bool highlighted: false
+                                                            readonly property real leftPadding: margins.left
+                                                            readonly property real rightPadding: margins.right
+                                                            readonly property real topPadding: margins.top
+                                                            readonly property real bottomPadding: margins.bottom
+
+                                                            imagePath: "widgets/slots-delegate-background"
+                                                            prefix: slotSvgBg.highlighted ? ["focus", ""] : ""
+                                                            colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                                                        }
                                                     }
 
-                                                    Rectangle {
-                                                        property string text: synthsButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
-                                                                              ? channelDelegate.channel.getLayerNameByMidiChannel(channelDelegate.channel.chainedSounds[index]).split(">")[0]
-                                                                              : fxButton.checked
-                                                                                ? channelDelegate.channel.chainedFxNames[index]
-                                                                                : samplesButton.checked && channelDelegate.channel.samples[index].path
-                                                                                  ? channelDelegate.channel.samples[index].path.split("/").pop()
-                                                                                  : ""
+                                                    contentItem : Item {
+                                                        MouseArea {
+                                                            anchors.fill: parent
+                                                            onClicked: {
+                                                                if (zynqtgui.sketchpad.selectedTrackId !== channelDelegate.channelIndex ||
+                                                                        (synthsButton.checked && root.selectedChannel.selectedSlot.value != index) ||
+                                                                        (samplesButton.checked && root.selectedChannel.selectedSlot.value != index) ||
+                                                                        (fxButton.checked && root.selectedChannel.selectedSlot.value != index)
+                                                                        ) {
+                                                                    // Check only if slot index matches selected index. This will allow us overcoming the situation
+                                                                    // Where a slot index is already selected for another slot type but would require clicking twice if
+                                                                    // slot type is checked here to switch first and then activate the slot. Hence when activating, make sure to
+                                                                    // switch to slot to have consistent selected slot type.
+                                                                    channelsSlotsRow.currentIndex = index
+                                                                    if (fxButton.checked) {
+                                                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
+                                                                        channelDelegate.channel.selectedFxSlotRow = index
+                                                                    } else if (samplesButton.checked) {
+                                                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
+                                                                        channelDelegate.channel.selectedSlotRow = index
+                                                                    } else if (synthsButton.checked) {
+                                                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
+                                                                        channelDelegate.channel.selectedSlotRow = index
+                                                                    }
 
-                                                        clip: true
-                                                        anchors.centerIn: parent
-                                                        width: parent.width - 8
-                                                        height: Kirigami.Units.gridUnit * 1.5
-
-                                                        Kirigami.Theme.inherit: false
-                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                        color: Kirigami.Theme.backgroundColor
-
-                                                        border.color: text.length > 0 ? Kirigami.Theme.highlightColor
-                                                                                      : Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
-                                                        border.width: 1
-                                                        radius: 4
-                                                        border.pixelAligned: false
-                                                        antialiasing: true
-
-                                                        QQC2.Label {
-                                                            anchors {
-                                                                verticalCenter: parent.verticalCenter
-                                                                left: parent.left
-                                                                leftMargin: 10
-                                                                right: parent.right
-                                                                rightMargin: 10
+                                                                    zynqtgui.sketchpad.selectedTrackId = channelDelegate.channelIndex;
+                                                                } else {
+                                                                    // As mentioned in the above if clause, when a slot index is already selected, the slot will want activation
+                                                                    // but can have wrong slot type selected. Hence make sure to always have correct slot type before activating
+                                                                    if (fxButton.checked) {
+                                                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
+                                                                        channelDelegate.channel.selectedFxSlotRow = index
+                                                                    } else if (samplesButton.checked) {
+                                                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
+                                                                        channelDelegate.channel.selectedSlotRow = index
+                                                                    } else if (synthsButton.checked) {
+                                                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
+                                                                        channelDelegate.channel.selectedSlotRow = index
+                                                                    }
+                                                                    handleItemClick()
+                                                                }
                                                             }
-                                                            // font.pointSize: 10
-                                                            font.pointSize: 8
-                                                            elide: Text.ElideRight
-                                                            text: parent.text
+                                                            z: 10
+                                                        }
+
+                                                        Item {
+                                                            property string text: synthsButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
+                                                                                  ? channelDelegate.channel.getLayerNameByMidiChannel(channelDelegate.channel.chainedSounds[index]).split(">")[0]
+                                                                                  : fxButton.checked
+                                                                                    ? channelDelegate.channel.chainedFxNames[index]
+                                                                                    : samplesButton.checked && channelDelegate.channel.samples[index].path
+                                                                                      ? channelDelegate.channel.samples[index].path.split("/").pop()
+                                                                                      : ""
+
+                                                            clip: true
+                                                            anchors.centerIn: parent
+                                                            width: parent.width
+                                                            height: Kirigami.Units.gridUnit * 1.5
+
+                                                            QQC2.Label {
+                                                                anchors {
+                                                                    verticalCenter: parent.verticalCenter
+                                                                    left: parent.left
+                                                                    leftMargin: 10
+                                                                    right: parent.right
+                                                                    rightMargin: 10
+                                                                }
+                                                                // font.pointSize: 10
+                                                                font.pointSize: 8
+                                                                elide: Text.ElideRight
+                                                                text: parent.text
+                                                            }
+                                                        }
+
+                                                        Rectangle {
+                                                            anchors {
+                                                                fill: parent
+                                                                margins: -4
+                                                            }
+                                                            color: "transparent"
+                                                            border.width: 2
+                                                            border.color: channelDelegate.highlighted &&
+                                                                          ((!fxButton.checked && channelDelegate.channel.selectedSlotRow === index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow === index))
+                                                                          ? Kirigami.Theme.textColor
+                                                                          : "transparent"
                                                         }
                                                     }
                                                 }
@@ -688,45 +742,66 @@ QQC2.Pane {
                         text: qsTr("Sample")
                     }
 
-                    Rectangle {
+                    QQC2.Control {
                         clip: true
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: detailsText.height + 20
                         Layout.alignment: Qt.AlignHCenter
 
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        color: Kirigami.Theme.backgroundColor
+                        background: Item {
 
-                        border.color: Qt.darker(color, 1.5)
-                        border.width: 1
-                        radius: 4
+                            Rectangle {
+                                visible: !svgBg3.visible
+                                anchors.fill: parent
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                color: Kirigami.Theme.backgroundColor
 
-                        QQC2.Label {
-                            id: detailsText
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                                left: parent.left
-                                leftMargin: 10
-                                right: parent.right
-                                rightMargin: 10
+                                border.color: "#ff999999"
+                                border.width: 1
+                                radius: 4
                             }
-                            wrapMode: Text.WrapAnywhere
-                            font.pointSize: 8
-                            text: root.selectedSlotRowItem
-                                  ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                    ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
-                                    : fxButton.checked
-                                      ? root.selectedSlotRowItem.channel.chainedFxNames[root.selectedSlotRowItem.channel.selectedFxSlotRow]
-                                      : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
-                                        ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
-                                        : ""
-                            : ""
+
+                            PlasmaCore.FrameSvgItem {
+                                id: svgBg3
+                                anchors.fill: parent
+                                visible: fromCurrentTheme
+                                readonly property bool highlighted: false
+                                readonly property real leftPadding: margins.left
+                                readonly property real rightPadding: margins.right
+                                readonly property real topPadding: margins.top
+                                readonly property real bottomPadding: margins.bottom
+
+                                imagePath: "widgets/slots-delegate-background"
+                                prefix: svgBg3.highlighted ? ["focus", ""] : ""
+                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                            }
                         }
 
-                        MouseArea {
-                            anchors.fill: parent
+                        contentItem: MouseArea {
+                            QQC2.Label {
+                                id: detailsText
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    left: parent.left
+                                    leftMargin: 10
+                                    right: parent.right
+                                    rightMargin: 10
+                                }
+                                wrapMode: Text.WrapAnywhere
+                                font.pointSize: 8
+                                text: root.selectedSlotRowItem
+                                      ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                        ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
+                                        : fxButton.checked
+                                          ? root.selectedSlotRowItem.channel.chainedFxNames[root.selectedSlotRowItem.channel.selectedFxSlotRow]
+                                          : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
+                                            ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
+                                            : ""
+                                : ""
+                            }
+
                             onClicked: {
                                 handleItemClick()
                             }

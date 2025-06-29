@@ -1140,8 +1140,7 @@ QQC2.Pane {
                                         PlasmaCore.FrameSvgItem {
                                             id: svgBg
                                             anchors.fill: parent
-                                            readonly property bool highlighted: root.sequence.isPlaying
-
+                                            readonly property bool highlighted: false
                                             imagePath: "widgets/statusinfo_background"
                                             colorGroup: PlasmaCore.Theme.ViewColorGroup
                                             prefix: svgBg.highlighted ? ["focus", ""] : ""
@@ -1570,7 +1569,7 @@ QQC2.Pane {
                                         PlasmaCore.FrameSvgItem {
                                             id: svgBg2
                                             anchors.fill: parent
-                                            readonly property bool highlighted: root.sequence.isPlaying
+                                            readonly property bool highlighted: false
 
                                             imagePath: "widgets/statusinfo_background"
                                             colorGroup: PlasmaCore.Theme.ViewColorGroup

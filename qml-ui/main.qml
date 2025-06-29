@@ -1172,9 +1172,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
 
-            Zynthian.StatusInfo {
-                highlighted: zynqtgui.sketchpad.isMetronomeRunning
-            }
+            Zynthian.StatusInfo {}
         }
     }
 

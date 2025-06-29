@@ -58,10 +58,7 @@ QQC2.Pane {
 
     Layout.fillWidth: true
     padding: 0
-    background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
-        // border.color: "orange"
-    }
+    background: null //for now it is no themeable
 
     function cuiaCallback(cuia) {
         var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
@@ -441,22 +438,12 @@ QQC2.Pane {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    topPadding: svgBg.visible ? svgBg.topPadding : 0
-                    bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
-                    leftPadding: svgBg.visible ? svgBg.leftPadding : 0
-                    rightPadding: svgBg.visible ? svgBg.rightPadding : 0
+                    topPadding: svgBg.topPadding
+                    bottomPadding: svgBg.bottomPadding
+                    leftPadding: svgBg.leftPadding
+                    rightPadding: svgBg.rightPadding
 
                     background: Item {
-
-                        Rectangle
-                        {
-                            visible: !svgBg.visible
-                            anchors.fill: parent
-                            Kirigami.Theme.colorSet: Kirigami.Theme.View
-                            Kirigami.Theme.inherit: false
-                            color: Kirigami.Theme.backgroundColor
-                        }
-
                         PlasmaCore.FrameSvgItem {
                             id: svgBg
                             visible: fromCurrentTheme
@@ -491,24 +478,36 @@ QQC2.Pane {
                             anchors.fill: parent
                             property int currentIndex: 0
 
-                            spacing: 1
+                            spacing: 0
 
                             Repeater {
                                 model: root.song.channelsModel
 
                                 delegate: QQC2.Control {
                                     id: channelDelegate
-
                                     property bool highlighted: false
+                                    //                            property int selectedRow: 0
+                                    property int channelIndex: index
+                                    property QtObject channel: model.channel
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
 
                                     padding: Kirigami.Units.smallSpacing
-                                    background: Rectangle
-                                    {
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                                        Kirigami.Theme.inherit: false
-                                        color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
-                                        border.width: 1
-                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                    background: Item {
+                                        Kirigami.Separator {
+                                            height: parent.height
+                                            anchors.left: parent.left
+                                            visible: channelDelegate.channelIndex !== 0
+                                            width: 1
+                                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                                        }
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            color: highlighted ? "#22ffffff" : "transparent"
+                                            border.width: 1
+                                            border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                        }
                                     }
 
                                     Timer {
@@ -539,12 +538,6 @@ QQC2.Pane {
                                     Component.onCompleted: {
                                         channelHighlightedThrottle.restart();
                                     }
-                                    //                            property int selectedRow: 0
-                                    property int channelIndex: index
-                                    property QtObject channel: model.channel
-
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
 
                                     onHighlightedChanged: {
                                         if (highlighted) {
@@ -553,7 +546,6 @@ QQC2.Pane {
                                     }
 
                                     contentItem: Item {
-
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.topMargin: Kirigami.Units.gridUnit * 0.7

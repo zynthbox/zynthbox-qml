@@ -38,7 +38,7 @@ Rectangle {
             visible: text.length > 0
             Layout.alignment: Qt.AlignCenter
             Layout.topMargin: 8
-            font.pointSize: 8
+            // font.pointSize: 8
         }
 
         Item{
@@ -267,7 +267,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
             visible: text && text.length>0
-            font.pointSize: 8
+            // font.pointSize: 8
         }
     }
 }

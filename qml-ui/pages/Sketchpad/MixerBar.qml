@@ -31,6 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
@@ -42,6 +43,8 @@ QQC2.Pane {
     readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
 
     Layout.fillWidth: true
+    padding: 0
+    background: null //for now it is no themeable
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -120,35 +123,32 @@ QQC2.Pane {
                 }
 
                 QQC2.Control {
-
                     id: mixerContainer
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    padding: 2
 
-                    background: Rectangle
-                    {
-                        radius: 6
-                        border.color: Qt.darker(color, 2)
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                        Kirigami.Theme.inherit: false
+                    topPadding: svgBg.topPadding
+                    bottomPadding: svgBg.bottomPadding
+                    leftPadding: svgBg.leftPadding
+                    rightPadding: svgBg.rightPadding
 
-                        color: Kirigami.Theme.backgroundColor
+                    background: Item {
+                        PlasmaCore.FrameSvgItem {
+                            id: svgBg
+                            visible: fromCurrentTheme
+                            anchors.fill: parent
+
+                            readonly property real leftPadding: fixedMargins.left
+                            readonly property real rightPadding: fixedMargins.right
+                            readonly property real topPadding: fixedMargins.top
+                            readonly property real bottomPadding: fixedMargins.bottom
+
+                            imagePath: "widgets/tracks-background"
+                            colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        }
                     }
 
                     contentItem: Item {
-
-                        layer.enabled: true
-                        layer.effect: OpacityMask
-                        {
-                            maskSource: Rectangle
-                            {
-                                width: mixerContainer.width
-                                height: mixerContainer.height
-                                radius: 4
-                            }
-                        }
-
                         RowLayout {
                             id: channelsVolumeRow
 
@@ -159,7 +159,7 @@ QQC2.Pane {
                             }
 
                             anchors.fill: parent
-                            spacing: 1
+                            spacing: 0
 
                             Repeater {
                                 model: root.song.channelsModel
@@ -170,18 +170,25 @@ QQC2.Pane {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
 
-                                    background: Rectangle
-                                    {
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                                        Kirigami.Theme.inherit: false
+                                    background: Item {
+                                        Kirigami.Separator {
+                                            height: parent.height
+                                            anchors.left: parent.left
+                                            visible: index !== 0
+                                            width: 1
+                                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                                        }
+                                        Rectangle
+                                        {
+                                            anchors.fill: parent
+                                            color: parent.highlighted ? "#22ffffff" : "transparent"
+                                            border.width: 1
+                                            border.color: parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
 
-                                        color: parent.highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
-                                        border.width: 1
-                                        border.color: parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                        }
                                     }
 
                                     contentItem: Item {
-
                                         ColumnLayout {
                                             anchors.fill: parent
                                             spacing: Kirigami.Units.smallSpacing
@@ -417,28 +424,32 @@ QQC2.Pane {
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                    padding: 2
+                    topPadding: svgBg2.topPadding
+                    bottomPadding: svgBg2.bottomPadding
+                    leftPadding: svgBg2.leftPadding
+                    rightPadding: svgBg2.rightPadding
 
-                    background: Rectangle
-                    {
-                        radius: 6
-                        border.color: Qt.darker(color, 2)
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                        Kirigami.Theme.inherit: false
+                    background: Item {
 
-                        color: Kirigami.Theme.backgroundColor
+                        PlasmaCore.FrameSvgItem {
+                            id: svgBg2
+                            visible: fromCurrentTheme
+                            anchors.fill: parent
+
+                            readonly property real leftPadding: fixedMargins.left
+                            readonly property real rightPadding: fixedMargins.right
+                            readonly property real topPadding: fixedMargins.top
+                            readonly property real bottomPadding: fixedMargins.bottom
+
+                            imagePath: "widgets/tracks-background"
+                            colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        }
                     }
 
                     contentItem: Item {
                         VolumeControl {
                             id: masterVolume
                             anchors.fill: parent
-                            Kirigami.Theme.colorSet: Kirigami.Theme.View
-                            Kirigami.Theme.inherit: false
-                            color: Kirigami.Theme.backgroundColor
-                            radius: 4
-
-
                             headerText: root.visible || Zynthbox.AudioLevels.playback <= -40
                                         ? ""
                                         : (Math.round(Zynthbox.AudioLevels.playback) + " (dB)")

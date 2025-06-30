@@ -2457,18 +2457,9 @@ Zynthian.BasePlayGrid {
                     text: "Note:\n" + (component.heardNotes.length > 0
                         ? Zynthbox.Chords.symbol(component.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
                         : "(all)")
-                    onPressed: {
-                        component.nudgeOverlayEnabled = true;
-                    }
-                    onReleased: {
-                        component.nudgeOverlayEnabled = false;
-                        if (component.nudgePerformed) {
-                            component.nudgePerformed = false;
-                            if (_private.activePatternModel.performanceActive) {
-                                _private.activePatternModel.applyPerformance();
-                                _private.activePatternModel.stopPerformance();
-                            }
-                        } else {
+                    visualPressAndHold: true
+                    onClicked: {
+                        if (pressingAndHolding ==  false) {
                             if (zynqtgui.backButtonPressed && _private.workingPatternModel) {
                                 zynqtgui.ignoreNextBackButtonPress = true;
                                 _private.workingPatternModel.clear();
@@ -2483,6 +2474,9 @@ Zynthian.BasePlayGrid {
                             }
                         }
                     }
+                    onPressAndHold: {
+                        clearNotesPopup.open();
+                    }
                     Kirigami.Icon {
                         anchors {
                             bottom: parent.bottom
@@ -2491,8 +2485,49 @@ Zynthian.BasePlayGrid {
                         }
                         height: parent.width * 0.3
                         width: height
-                        visible: component.heardNotes.length > 0
+                        visible: component.heardNotes.length > 0 || _private.selectedStep > -1
                         source: "edit-clear-locationbar"
+                    }
+                    Zynthian.ActionPickerPopup {
+                        id: clearNotesPopup
+                        columns: 2
+                        rows: 2
+                        actions: [
+                            QQC2.Action {
+                                text: component.heardNotes.length > 1
+                                    ? qsTr("Remove Selected Notes\nFrom Pattern")
+                                    : qsTr("Remove Selected Note\nFrom Pattern")
+                                enabled: component.heardNotes.length > 0
+                                onTriggered: {
+                                    let firstStep = _private.workingPatternModel.width * _private.workingPatternModel.bankOffset;
+                                    let lastStep = firstStep + _private.workingPatternModel.patternLength;
+                                    _private.workingPatternModel.removeSubnotesByNoteValue(component.heardNotes, firstStep, lastStep);
+                                }
+                            },
+                            QQC2.Action {
+                                text: component.heardNotes.length > 1
+                                    ? qsTr("Remove Selected Notes\nFrom Bar")
+                                    : qsTr("Remove Selected Note\nFrom Bar")
+                                enabled: component.heardNotes.length > 0
+                                onTriggered: {
+                                    let firstStep = _private.workingPatternModel.width * (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset);
+                                    let lastStep = firstStep + _private.workingPatternModel.width;
+                                    _private.workingPatternModel.removeSubnotesByNoteValue(component.heardNotes, firstStep, lastStep);
+                                }
+                            },
+                            QQC2.Action {
+                                text: qsTr("Clear Pattern")
+                                onTriggered: {
+                                    _private.workingPatternModel.clear();
+                                }
+                            },
+                            QQC2.Action {
+                                text: qsTr("Clear Current Bar")
+                                onTriggered: {
+                                    _private.workingPatternModel.clearRow(_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset);
+                                }
+                            }
+                        ]
                     }
                 }
                 Zynthian.PlayGridButton {
@@ -2530,17 +2565,29 @@ Zynthian.BasePlayGrid {
                                 : _private.workingPatternModel.defaultNoteDuration + "/128th"
                         : ""
                     property string velocity: component.heardVelocities.length === 0 ? "" : "Vel " + component.heardVelocities[0]
-                    onClicked: {
-                        if (_private.selectedStep > -1) {
-                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
-                        } else if (component.heardNotes.length > 0) {
-                            var filter = []
-                            for (var i = 0; i < component.heardNotes.length; ++i) {
-                                filter.push(component.heardNotes[i].midiNote);
+                    onPressed: {
+                        component.nudgeOverlayEnabled = true;
+                    }
+                    onReleased: {
+                        component.nudgeOverlayEnabled = false;
+                        if (component.nudgePerformed) {
+                            component.nudgePerformed = false;
+                            if (_private.activePatternModel.performanceActive) {
+                                _private.activePatternModel.applyPerformance();
+                                _private.activePatternModel.stopPerformance();
                             }
-                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
                         } else {
-                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], -1, -1);
+                            if (_private.selectedStep > -1) {
+                                component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
+                            } else if (component.heardNotes.length > 0) {
+                                var filter = []
+                                for (var i = 0; i < component.heardNotes.length; ++i) {
+                                    filter.push(component.heardNotes[i].midiNote);
+                                }
+                                component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
+                            } else {
+                                component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], -1, -1);
+                            }
                         }
                     }
                     Kirigami.Icon {

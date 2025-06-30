@@ -28,7 +28,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import QtGraphicalEffects 1.0
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Qt.labs.folderlistmodel 2.11
 
@@ -41,10 +41,7 @@ QQC2.Pane {
 
     Layout.fillWidth: true
     padding: 0
-    background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
-        // border.color: "orange"
-    }
+    background: null //for now it is not themeable
 
     property QtObject bottomBar: null
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
@@ -131,30 +128,29 @@ QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                padding: 2
+                topPadding: svgBg.topPadding
+                bottomPadding: svgBg.bottomPadding
+                leftPadding: svgBg.leftPadding
+                rightPadding: svgBg.rightPadding
 
-                background: Rectangle
-                {
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    Kirigami.Theme.inherit: false
-                    color: Kirigami.Theme.backgroundColor
-                    border.color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 2.5)
-                    radius: 6
+                background: Item {
+                    PlasmaCore.FrameSvgItem {
+                        id: svgBg
+                        visible: fromCurrentTheme
+                        anchors.fill: parent
+
+                        readonly property real leftPadding: fixedMargins.left
+                        readonly property real rightPadding: fixedMargins.right
+                        readonly property real topPadding: fixedMargins.top
+                        readonly property real bottomPadding: fixedMargins.bottom
+
+                        imagePath: "widgets/tracks-background"
+                        colorGroup: PlasmaCore.Theme.ViewColorGroup
+                    }
                 }
 
                 contentItem: Item {
                     id: clipsContainer
-
-                    layer.enabled: true
-                    layer.effect: OpacityMask
-                    {
-                        maskSource: Rectangle
-                        {
-                            width: clipsContainer.width
-                            height: clipsContainer.height
-                            radius: 4
-                        }
-                    }
 
                     RowLayout {
                         id: contentColumn
@@ -241,11 +237,6 @@ QQC2.Pane {
                      // visible: text.length > 0
                 }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
-
                 QQC2.Button {
                     Layout.fillWidth: true
                     enabled: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
@@ -266,6 +257,11 @@ QQC2.Pane {
                             }
                         });
                     }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                 }
 
                 // TODO : 1.1 Enable this back when loop mode gets enabled again

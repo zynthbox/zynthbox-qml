@@ -1499,7 +1499,7 @@ QQC2.Pane {
                                             text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
                                             font.underline: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
                                             font.pointSize: 9
-                                            color: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                                            color: Kirigami.Theme.textColor
                                             property int clipIndex: model.index
                                             property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
                                             property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty

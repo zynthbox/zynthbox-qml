@@ -30,7 +30,6 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
-import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
@@ -44,7 +43,7 @@ QQC2.Pane {
 
     Layout.fillWidth: true
     padding: 0
-    background: null //for now it is no themeable
+    background: null //for now it is not themeable
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -165,7 +164,7 @@ QQC2.Pane {
                                 model: root.song.channelsModel
 
                                 delegate: QQC2.Control {
-
+                                    id: mixerColumnDelegate
                                     property bool highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
@@ -181,10 +180,9 @@ QQC2.Pane {
                                         Rectangle
                                         {
                                             anchors.fill: parent
-                                            color: parent.highlighted ? "#22ffffff" : "transparent"
+                                            color: mixerColumnDelegate.highlighted ? "#22ffffff" : "transparent"
                                             border.width: 1
-                                            border.color: parent.highlighted ? Kirigami.Theme.highlightColor : "transparent"
-
+                                            border.color: mixerColumnDelegate.highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                         }
                                     }
 

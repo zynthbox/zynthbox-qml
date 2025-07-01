@@ -157,11 +157,13 @@ RowLayout {
         model: Zynthbox.Plugin.sketchpadSlotCount
         delegate: QQC2.Control {
             id: slotDelegate
-            property bool highlighted: control.selectedChannel != null && control.selectedChannel.selectedSlotRow === index
+            property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null && zynqtgui.sketchpad.lastSelectedObj.className == _private.className && zynqtgui.sketchpad.lastSelectedObj.value === index
             property int slotIndex: index
             property bool isSketchpadClip: control.slotData && control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
             property QtObject clip: isSketchpadClip ? control.slotData[index] : null
             property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[index].cppObjId) : null
+            // A property to determine if slot is a sample-loop and is enabled
+            property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -175,22 +177,21 @@ RowLayout {
 
             background: Item {
 
+                // Show highlighted color on slot border when slot is a sample-loop and is enabled
                 Rectangle {
                     visible: !svgBg.visible
                     anchors.fill: parent
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     color: Kirigami.Theme.backgroundColor
-                    border.color: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled ? Kirigami.Theme.highlightColor : "#ff999999"
+                    border.color: slotDelegate.isClipEnabled ? Kirigami.Theme.highlightColor : "#ff999999"
                     border.width: 2
                     radius: 4
                 }
-
                 PlasmaCore.FrameSvgItem {
                     id: svgBg
                     anchors.fill: parent
                     visible: fromCurrentTheme
-                    readonly property bool highlighted: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled
 
                     readonly property real leftPadding: margins.left
                     readonly property real rightPadding: margins.right
@@ -198,16 +199,18 @@ RowLayout {
                     readonly property real bottomPadding: margins.bottom
 
                     imagePath: "widgets/slots-delegate-background"
-                    prefix: svgBg.highlighted ? ["focus", ""] : ""
+                    prefix: slotDelegate.isClipEnabled ? ["focus", ""] : ""
                     colorGroup: PlasmaCore.Theme.ButtonColorGroup
                 }
 
+                // Focus rectangle outside the slot border when a slot is clicked
+                // TODO : @camilo Needs theming
                 Rectangle {
                     anchors {
                         fill: parent
                         margins: -4
                     }
-                    opacity: control.highlightCurrentlySelectedSlot && delegate.isSelectedSlot ? 0.8 : 0
+                    opacity: control.highlightCurrentlySelectedSlot && slotDelegate.highlighted ? 0.8 : 0
                     color: "transparent"
                     border {
                         width: 2
@@ -218,7 +221,7 @@ RowLayout {
 
             function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                 if (control.performSlotInteractions) {
-                    let wasAlreadySelected = (root.selectedChannel.selectedSlot.className === _private.className && root.selectedChannel.selectedSlot.value === index) ? true : false;
+                    let wasAlreadySelected = slotDelegate.highlighted
                     root.selectedChannel.selectedSlot.setTo(_private.className, index, slotDelegate);
                     if (onlySelectSlot == false) {
                         if (wasAlreadySelected == false || onlyFocus) {

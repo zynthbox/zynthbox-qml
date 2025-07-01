@@ -503,10 +503,25 @@ QQC2.Pane {
                                             color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
                                         }
                                         Rectangle {
+                                            visible: !svgBg2.visible
                                             anchors.fill: parent
                                             color: highlighted ? "#22ffffff" : "transparent"
                                             border.width: 1
                                             border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                        }
+                                        PlasmaCore.FrameSvgItem {
+                                            id: svgBg2
+                                            visible: fromCurrentTheme && highlighted
+                                            anchors.fill: parent
+
+                                            readonly property real leftPadding: fixedMargins.left
+                                            readonly property real rightPadding: fixedMargins.right
+                                            readonly property real topPadding: fixedMargins.top
+                                            readonly property real bottomPadding: fixedMargins.bottom
+
+                                            imagePath: "widgets/column-delegate-background"
+                                            prefix: channelDelegate.highlighted ? ["focus", ""] : ""
+                                            colorGroup: PlasmaCore.Theme.ViewColorGroup
                                         }
                                     }
 

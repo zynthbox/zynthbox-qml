@@ -179,10 +179,26 @@ QQC2.Pane {
                                         }
                                         Rectangle
                                         {
+                                            visible: !svgBg2.visible
                                             anchors.fill: parent
                                             color: mixerColumnDelegate.highlighted ? "#22ffffff" : "transparent"
                                             border.width: 1
                                             border.color: mixerColumnDelegate.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                        }
+
+                                        PlasmaCore.FrameSvgItem {
+                                            id: svgBg2
+                                            visible: fromCurrentTheme && mixerColumnDelegate.highlighted
+                                            anchors.fill: parent
+
+                                            readonly property real leftPadding: fixedMargins.left
+                                            readonly property real rightPadding: fixedMargins.right
+                                            readonly property real topPadding: fixedMargins.top
+                                            readonly property real bottomPadding: fixedMargins.bottom
+
+                                            imagePath: "widgets/column-delegate-background"
+                                            prefix: mixerColumnDelegate.highlighted ? ["focus", ""] : ""
+                                            colorGroup: PlasmaCore.Theme.ViewColorGroup
                                         }
                                     }
 

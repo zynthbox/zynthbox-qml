@@ -765,7 +765,7 @@ Zynthian.BasePlayGrid {
                             } else {
                                 switch (drumPad.parameterPageIndex) {
                                     case 2:
-                                        drumPadRepeater.ratchetStyleUp();
+                                        drumPadRepeater.ratchetStyleUp(); 
                                         break;
                                     case 1:
                                         drumPadRepeater.probabilityUp();
@@ -1002,11 +1002,290 @@ Zynthian.BasePlayGrid {
                             }
                         }
                     }
+                    RowLayout {
+                        id: trackClipPicker
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        spacing: 0
+                        visible: component.showPatternSettings
+                        Repeater {
+                            model: Zynthbox.Plugin.sketchpadTrackCount
+                            delegate: QQC2.Button {
+                                id: trackPicker
+                                readonly property int trackIndex: model.index
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: Kirigami.Units.gridUnit
+                                Layout.rightMargin: 5
+                                // The indicator rect is 9 px tall, spaced by 1px, and we've got 5px margin, and so
+                                // if we want 11px space between the bottom of this and the settings, 6px it is (which
+                                // there's no reason to do arithmetics for, it's a fixed value anyway, but that's where
+                                // this particular magic number comes from)
+                                Layout.bottomMargin: component.showPatternSettings ? 6 : 0
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                readonly property color foregroundColor: Kirigami.Theme.backgroundColor
+                                readonly property color backgroundColor: Kirigami.Theme.textColor
+                                readonly property color borderColor: foregroundColor
+                                readonly property QtObject trackObject: zynqtgui.sketchpad.song && zynqtgui.sketchpad.song.channelsModel ? zynqtgui.sketchpad.song.channelsModel.getChannel(model.index) : null
+
+                                onClicked: {
+                                    if (zynqtgui.playButtonPressed) {
+                                        zynqtgui.ignoreNextPlayButtonPress = true;
+                                        trackPicker.trackObject.muted = false;
+                                    } else if (zynqtgui.stopButtonPressed) {
+                                        zynqtgui.ignoreNextStopButtonPress = true;
+                                        trackPicker.trackObject.muted = true;
+                                    } else if (zynqtgui.sketchpad.selectedTrackId === trackPicker.trackIndex) {
+                                        trackPicker.trackObject.muted = !trackPicker.trackObject.muted;
+                                    } else {
+                                        zynqtgui.sketchpad.selectedTrackId = trackPicker.trackIndex;
+                                    }
+                                }
+                                background: Rectangle {
+                                    id: trackPickerBackground
+                                    anchors.fill: parent
+                                    color: trackPicker.backgroundColor
+                                    border {
+                                        color: trackPicker.borderColor
+                                        width: 1
+                                    }
+                                    QQC2.Label {
+                                        anchors {
+                                            top: parent.top
+                                            left: parent.left
+                                            right: parent.right
+                                            margins: Kirigami.Units.largeSpacing
+                                        }
+                                        color: trackPicker.foregroundColor
+                                        horizontalAlignment: Text.AlignHCenter
+                                        text: "T%1".arg(trackPicker.trackIndex + 1)
+                                    }
+                                    RowLayout {
+                                        id: trackClipsRow
+                                        anchors.centerIn: parent
+                                        spacing: 0
+                                        visible: ["synth", "sample-loop", "external"].indexOf(trackPicker.trackObject.trackType) >= 0
+
+                                        Repeater {
+                                            model: trackPicker.trackObject ? 5 : 0
+
+                                            QQC2.Label {
+                                                property bool isClipEnabled: trackPicker.trackObject.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).enabled
+                                                property bool patternHasNotes: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(trackPicker.trackObject.id, index).hasNotes
+
+                                                color: trackPicker.foregroundColor
+                                                opacity: {
+                                                    let occupied = false;
+                                                    if (["synth", "external"].indexOf(trackPicker.trackObject.trackType) >= 0 && patternHasNotes) {
+                                                        occupied = true;
+                                                    } else if (trackPicker.trackObject.trackType == "sample-loop" && trackPicker.trackObject.occupiedSketchSlots[index]) {
+                                                        occupied = true;
+                                                    }
+
+                                                    if (occupied && isClipEnabled) {
+                                                        return 1.0
+                                                    } else if (occupied) {
+                                                        return 0.3;
+                                                    } else {
+                                                        return 0.05;
+                                                    }
+                                                }
+                                                text: {
+                                                    if (["synth", "external"].indexOf(trackPicker.trackObject.trackType) >= 0) {
+                                                        return String.fromCharCode(index + 65);
+                                                    } else if (trackPicker.trackObject.trackType == "sample-loop") {
+                                                        return index + 1;
+                                                    } else {
+                                                        return "";
+                                                    }
+                                                }
+
+                                                font.pointSize: 8
+                                                font.bold: true
+                                            }
+                                        }
+                                    }
+                                    Rectangle {
+                                        anchors {
+                                            left: parent.left
+                                            right: parent.right
+                                            top: parent.bottom
+                                            margins: 1
+                                        }
+                                        height: 9
+                                        color: visible && trackPicker.trackIndex === _private.workingPatternModel.sketchpadTrack
+                                            ? "yellow"
+                                            : "transparent"
+                                    }
+                                    Kirigami.Icon {
+                                        anchors {
+                                            bottom: parent.bottom
+                                            right: parent.right
+                                        }
+                                        height: parent.width * 0.33
+                                        width: height
+                                        source: "player-volume"
+                                        color: trackPicker.foregroundColor
+                                        Rectangle {
+                                            visible: trackPicker.trackObject ? trackPicker.trackObject.muted : false
+                                            anchors.centerIn: parent
+                                            rotation: 45
+                                            width: parent.width
+                                            height: Kirigami.Units.smallSpacing
+                                            color: "red"
+                                        }
+                                    }
+                                }
+                                Zynthian.KnobIndicator {
+                                    anchors {
+                                        left: parent.left
+                                        bottom: parent.bottom
+                                        margins: 2
+                                    }
+                                    height: parent.height * 0.25
+                                    width: height
+                                    knobId: 3
+                                    visible: parent.visible && /*zynqtgui.altButtonPressed === false &&*/ trackPicker.trackIndex === _private.workingPatternModel.sketchpadTrack
+                                }
+                            }
+                        }
+                        // Ghost item to give the same spacing as the rest of our stuff (this would break for anything other than 16 steps per bar here, but that's fine, we don't support changing the pattern width yet anyway)
+                        Item {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit
+                            Layout.rightMargin: 5
+                        }
+                        Repeater {
+                            model: Zynthbox.Plugin.sketchpadSlotCount
+                            delegate: QQC2.Button {
+                                id: clipPicker
+                                readonly property int clipIndex: model.index
+                                readonly property QtObject clipObject: _private.associatedChannel ? _private.associatedChannel.getClipsModelById(clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
+                                readonly property QtObject clipPattern: clipObject ? _private.sequence.getByClipId(_private.associatedChannelIndex, clipIndex) : null
+                                readonly property bool clipEnabled: clipObject ? clipObject.enabled : false
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: Kirigami.Units.gridUnit
+                                Layout.rightMargin: 5
+                                // The indicator rect is 9 px tall, spaced by 1px, and we've got 5px margin, and so
+                                // if we want 11px space between the bottom of this and the settings, 6px it is (which
+                                // there's no reason to do arithmetics for, it's a fixed value anyway, but that's where
+                                // this particular magic number comes from)
+                                Layout.bottomMargin: component.showPatternSettings ? 6 : 0
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                readonly property color foregroundColor: Kirigami.Theme.backgroundColor
+                                readonly property color backgroundColor: Kirigami.Theme.textColor
+                                readonly property color borderColor: foregroundColor
+
+                                onClicked: {
+                                    if (zynqtgui.playButtonPressed) {
+                                        zynqtgui.ignoreNextPlayButtonPress = true;
+                                        clipPicker.clipObject.enabled = true;
+                                    } else if (zynqtgui.stopButtonPressed) {
+                                        zynqtgui.ignoreNextStopButtonPress = true;
+                                        clipPicker.clipObject.enabled = false;
+                                    } else if (_private.associatedChannel.selectedClip === clipPicker.clipIndex) {
+                                        clipPicker.clipObject.enabled = !clipPicker.clipObject.enabled;
+                                    } else {
+                                        _private.associatedChannel.selectedClip = clipPicker.clipIndex;
+                                    }
+                                }
+                                background: Rectangle {
+                                    id: clipPickerBackground
+                                    anchors.fill: parent
+                                    color: clipPicker.backgroundColor
+                                    border {
+                                        color: clipPicker.borderColor
+                                        width: 1
+                                    }
+                                    QQC2.Label {
+                                        anchors {
+                                            top: parent.top
+                                            left: parent.left
+                                            right: parent.right
+                                            margins: Kirigami.Units.largeSpacing
+                                        }
+                                        color: clipPicker.foregroundColor
+                                        horizontalAlignment: Text.AlignHCenter
+                                        text: _private.workingPatternModel ? "%1%2".arg(_private.workingPatternModel.sketchpadTrack + 1).arg(String.fromCharCode(clipPicker.clipIndex + 97)) : ""
+                                    }
+                                    Image {
+                                        id: patternBarsVisualiser
+                                        visible: _private.associatedChannel !== null && _private.associatedChannel.trackType !== "sample-loop"
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            left: parent.left
+                                            right: parent.right
+                                            margins: 2
+                                        }
+                                        height: parent.height * 0.3
+                                        source: clipPicker.clipPattern ? clipPicker.clipPattern.thumbnailUrl : ""
+                                        asynchronous: true
+                                        Rectangle {
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                            }
+                                            visible: parent.visible && clipPicker.clipPattern ? clipPicker.clipPattern.isPlaying : false
+                                            color: Kirigami.Theme.highlightColor
+                                            width: Math.max(1, Math.floor(widthFactor))
+                                            property double widthFactor: visible && clipPicker.clipPattern ? parent.width / (clipPicker.clipPattern.width * clipPicker.clipPattern.bankLength) : 1
+                                            x: visible && clipPicker.clipPattern ? clipPicker.clipPattern.bankPlaybackPosition * widthFactor : 0
+                                        }
+                                    }
+                                    Rectangle {
+                                        anchors {
+                                            left: parent.left
+                                            right: parent.right
+                                            top: parent.bottom
+                                            margins: 1
+                                        }
+                                        height: 9
+                                        color: visible && clipPicker.clipIndex === _private.workingPatternModel.clipIndex
+                                            ? "yellow"
+                                            : "transparent"
+                                    }
+                                    Kirigami.Icon {
+                                        anchors {
+                                            bottom: parent.bottom
+                                            right: parent.right
+                                        }
+                                        height: parent.width * 0.33
+                                        width: height
+                                        source: "player-volume"
+                                        color: clipPicker.foregroundColor
+                                        Rectangle {
+                                            visible: clipPicker.clipEnabled === false
+                                            anchors.centerIn: parent
+                                            rotation: 45
+                                            width: parent.width
+                                            height: Kirigami.Units.smallSpacing
+                                            color: "red"
+                                        }
+                                    }
+                                }
+                                // Zynthian.KnobIndicator {
+                                //     anchors {
+                                //         left: parent.left
+                                //         bottom: parent.bottom
+                                //         margins: 2
+                                //     }
+                                //     height: parent.height * 0.25
+                                //     width: height
+                                //     knobId: 3
+                                //     visible: parent.visible && zynqtgui.altButtonPressed === true && clipPicker.clipIndex === _private.workingPatternModel.clipIndex
+                                // }
+                            }
+                        }
+                    }
                     Item {
                         id: drumpadLoopVisualiser
                         anchors.fill:parent
                         anchors.margins: 5
-                        visible: parent.visible && drumPad.channelIsLoopType
+                        visible: parent.visible && drumPad.channelIsLoopType && component.showPatternSettings === false
                         property QtObject channel: null
                         Binding {
                             target: drumpadLoopVisualiser
@@ -1027,7 +1306,7 @@ Zynthian.BasePlayGrid {
                         anchors.fill:parent
                         anchors.margins: 5
                         spacing: 0
-                        visible: !drumPad.channelIsLoopType
+                        visible: component.showPatternSettings === false && !drumPad.channelIsLoopType
                         Repeater {
                             id:drumPadRepeater
                             model: _private.activeBarModelWidth
@@ -1077,7 +1356,9 @@ Zynthian.BasePlayGrid {
                                 }
                             }
                             function goNext() {
-                                if (!noteSettings.visible) {
+                                if (component.showPatternSettings) {
+                                    // Do nothing when the pattern settings panel is open, it handles this itself
+                                } else if (!noteSettings.visible) {
                                     var changeStep = true;
                                     if (selectedIndex > -1) {
                                         var seqPad = drumPadRepeater.itemAt(selectedIndex);
@@ -1103,7 +1384,9 @@ Zynthian.BasePlayGrid {
                                 }
                             }
                             function goPrevious() {
-                                if (!noteSettings.visible) {
+                                if (component.showPatternSettings) {
+                                    // Do nothing when the pattern settings panel is open, it handles this itself
+                                } else if (!noteSettings.visible) {
                                     var changeStep = true;
                                     if (selectedIndex > -1) {
                                         var seqPad = drumPadRepeater.itemAt(selectedIndex);
@@ -1135,7 +1418,9 @@ Zynthian.BasePlayGrid {
                                 }
                             }
                             function deselectSelectedItem() {
-                                if (noteSettingsPopup.visible) {
+                                if (component.showPatternSettings) {
+                                    // Do nothing when the pattern settings panel is open, it handles this itself
+                                } else if (noteSettingsPopup.visible) {
                                     noteSettingsPopup.close();
                                 } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
@@ -1148,7 +1433,9 @@ Zynthian.BasePlayGrid {
                                 Qt.callLater(updateMostRecentFromSelection);
                             }
                             function activateSelectedItem() {
-                                if (noteSettingsPopup.visible) {
+                                if (component.showPatternSettings) {
+                                    // Do nothing when the pattern settings panel is open, it handles this itself
+                                } else if (noteSettingsPopup.visible) {
                                     // do something? or no? probably no
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
@@ -1444,11 +1731,40 @@ Zynthian.BasePlayGrid {
                 // pad & sequencer settings
                 Rectangle {
                     id:padSettings
-                    Layout.fillWidth: true; 
-                    Layout.minimumHeight: parent.height / 5; 
+                    Layout.fillWidth: true;
+                    Layout.minimumHeight: parent.height / 5;
                     Layout.maximumHeight: parent.height / 5;
                     visible: component.showPatternSettings
                     color:"transparent"
+                    Connections {
+                        target: _private
+                        enabled: component.showPatternSettings
+                        onGoRight: {
+                            // if (zynqtgui.altButtonPressed) {
+                                // zynqtgui.ignoreNextAltButtonPress = true;
+                                // _private.associatedChannel.selectedClip = Math.max(0, Math.min(_private.associatedChannel.selectedClip + 1, Zynthbox.Plugin.sketchpadSlotCount - 1));
+                            // } else {
+                                zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack + 1;
+                            // }
+                        }
+                        onGoLeft: {
+                            // if (zynqtgui.altButtonPressed) {
+                                // zynqtgui.ignoreNextAltButtonPress = true;
+                                // _private.associatedChannel.selectedClip = Math.max(0, Math.min(_private.associatedChannel.selectedClip - 1, Zynthbox.Plugin.sketchpadSlotCount - 1));
+                            // } else {
+                                zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack - 1;
+                            // }
+                        }
+                        onActivateSelectedItem: {
+                            // if (zynqtgui.altButtonPressed) {
+                                // zynqtgui.ignoreNextAltButtonPress = true;
+                                // let clipObject = _private.associatedChannel.getClipsModelById(_private.associatedChannel.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                // clipObject.enabled = !clipObject.enabled;
+                            // } else {
+                                _private.associatedChannel.muted = !_private.associatedChannel.muted;
+                            // }
+                        }
+                    }
                     RowLayout {
                         anchors.fill:parent
 

@@ -39,6 +39,9 @@ Zynthian.Popup {
     property string selectedSlotType: "synth"
     property int selectedSlotIndex: 0
     property int selectedClip: 0
+    property string lastSelectedClassName
+    property QtObject lastSelectedValue
+    property QtObject lastSelectedComponent
 
     spacing: Kirigami.Units.gridUnit * 0.5
 
@@ -136,6 +139,10 @@ Zynthian.Popup {
                         root.selectedSlotIndex = root.selectedChannel.selectedSlot.value;
                         root.selectedSlotType = root.selectedChannel.selectedSlot.className;
                         root.selectedClip = root.selectedChannel.selectedClip;
+                        // Take a snapshot of our lastSelectedObj, so we can keep that stable when changing settings
+                        root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
+                        root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value
+                        root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
                         // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
                         _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
                         _private.updateSoloState();
@@ -249,6 +256,10 @@ Zynthian.Popup {
             root.selectedSlotIndex = root.selectedChannel.selectedSlot.value;
             root.selectedSlotType = root.selectedChannel.selectedSlot.className;
             root.selectedClip = root.selectedChannel.selectedClip;
+            // If we're not already recording, take a snapshot of our lastSelectedObj, so we can keep that stable when changing settings
+            root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
+            root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value
+            root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
             // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
             _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
             _private.updateSoloState();
@@ -264,6 +275,10 @@ Zynthian.Popup {
             zynqtgui.sketchpad.selectedTrackId = root.selectedChannel.id;
             applicationWindow().pageStack.getPage("sketchpad").bottomStack.tracksBar.switchToSlot(root.selectedSlotType, root.selectedSlotIndex);
             root.selectedChannel.selectedClip = root.selectedClip;
+            // Restore the lastSelectedObj to also match the previous state
+            zynqtgui.sketchpad.lastSelectedObj.className = root.lastSelectedClassName
+            zynqtgui.sketchpad.lastSelectedObj.value = root.lastSelectedValue
+            zynqtgui.sketchpad.lastSelectedObj.component = root.lastSelectedComponent
             // Switch the track type to whatever the appropriate one is for the recorded sample if...
             // ... the recording was completed while the dialog was open (zynqtgui.sketchpad.isRecording === false)
             // ... we were doing audio recording (this doesn't make sense for midi)

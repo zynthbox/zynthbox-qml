@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import QtGraphicalEffects 1.0
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
@@ -148,15 +149,36 @@ QQC2.AbstractButton {
         }
     }
 
-    background: Rectangle {
-        color: root.backgroundColor
+    background: Item {
 
-        border.width: 1
-        border.color: root.highlightColor
-                        ? root.highlightColor
-                        : root.highlighted
+        Rectangle {
+            anchors.fill: parent
+            visible: !svgBg.visible
+            color: root.backgroundColor
+
+            border.width: 1
+            border.color: root.highlightColor
+                          ? root.highlightColor
+                          : root.highlighted
                             ? Kirigami.Theme.highlightColor
                             : "transparent"
+        }
+
+        PlasmaCore.FrameSvgItem {
+            id: svgBg
+            visible: fromCurrentTheme && highlighted
+            anchors.fill: parent
+
+            property bool highlighted: root.highlighted
+            readonly property real leftPadding: fixedMargins.left
+            readonly property real rightPadding: fixedMargins.right
+            readonly property real topPadding: fixedMargins.top
+            readonly property real bottomPadding: fixedMargins.bottom
+
+            imagePath: "widgets/column-delegate-background"
+            prefix: highlighted ? ["focus", ""] : ""
+            colorGroup: PlasmaCore.Theme.ViewColorGroup
+        }
 
         Rectangle {
             id: progressRect
@@ -188,5 +210,4 @@ QQC2.AbstractButton {
     onActiveFocusChanged: {
         console.log("Item with active Focus :", activeFocus)
     }
-
 }

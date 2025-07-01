@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Zynthian 1.0 as Zynthian
 
@@ -58,10 +59,30 @@ QQC2.AbstractButton {
 
     onPressed: root.forceActiveFocus()
 
-    background: Rectangle { //TODO: plasma theming
-        border.width: (root.highlightOnFocus && root.activeFocus) || root.highlighted ? 1 : 0
-        border.color: Kirigami.Theme.highlightColor
+    background: Item {
+        Rectangle { //TODO: plasma theming
+            anchors.fill: parent
+            visible: !svgBg.visible
+            border.width: (root.highlightOnFocus && root.activeFocus) || root.highlighted ? 1 : 0
+            border.color: Kirigami.Theme.highlightColor
 
-        color: root.color
+            color: root.color
+        }
+
+        PlasmaCore.FrameSvgItem {
+            id: svgBg
+            visible: fromCurrentTheme && highlighted
+            anchors.fill: parent
+
+            property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
+            readonly property real leftPadding: fixedMargins.left
+            readonly property real rightPadding: fixedMargins.right
+            readonly property real topPadding: fixedMargins.top
+            readonly property real bottomPadding: fixedMargins.bottom
+
+            imagePath: "widgets/column-delegate-background"
+            prefix: highlighted ? ["focus", ""] : ""
+            colorGroup: PlasmaCore.Theme.ViewColorGroup
+        }
     }
 }

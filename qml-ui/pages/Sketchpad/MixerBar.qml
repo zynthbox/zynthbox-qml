@@ -384,7 +384,7 @@ QQC2.Pane {
                                                 horizontalAlignment: Text.AlignHCenter
                                                 elide: Text.ElideRight
                                                 text: qsTr("%1 dB").arg(model.channel.gainHandler.gainDb.toFixed(2))
-                                                font.pixelSize: 9
+                                                font.pointSize: 9
 
                                                 MouseArea {
                                                     anchors.fill: parent

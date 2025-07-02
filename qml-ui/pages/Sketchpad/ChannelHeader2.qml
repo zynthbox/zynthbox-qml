@@ -39,27 +39,42 @@ QQC2.AbstractButton {
     property var subText
     property var subSubText
     property QtObject channel
-
     property alias textSize: contents.font.pointSize
     property var subTextSize
     property var subSubTextSize
-
     property color color: Kirigami.Theme.backgroundColor
     property bool highlighted: false
     property bool highlightOnFocus: true
     property color highlightColor: Kirigami.Theme.highlightColor
-
     property bool synthDetailsVisible: true
-
     property bool active: true
+
+    // Emitted when a cell is double pressed
+    signal doublePressed()
 
     contentItem: Item {
         opacity: root.active ? 1 : 0.3
+
+        // An overlay for channel muted state
+        Rectangle {
+            anchors.fill: parent
+            color: Kirigami.Theme.negativeBackgroundColor
+            opacity: root.channel.muted ? 0.7 : 0
+
+            QQC2.Label {
+                anchors.centerIn: parent
+                font.bold: true
+                font.pointSize: 14
+                text: qsTr("M", "Short form for muted")
+            }
+        }
 
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 2
             spacing: 2
+            // Reduce opacity when muted overlay is active to make muted overlay more prominent
+            opacity: !root.channel.muted ? 1 : 0.3
 
             QQC2.Label {
                 id: contents
@@ -315,8 +330,26 @@ QQC2.AbstractButton {
         }
     }
 
+    // Implement a double tap gesture
+    // On released event, start the double tap timer if it is not already running
+    // On pressed event, if the timer is already running then it means the 2nd tap was done within given time and hence a double tap event should be emitted
+    // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
+    Timer {
+        id: doublePressedTimer
+        interval: 100
+        repeat: false
+    }
     onPressed: {
         root.forceActiveFocus()
+        if (doublePressedTimer.running) {
+            root.doublePressed()
+            doublePressedTimer.stop()
+        }
+    }
+    onReleased: {
+        if (!doublePressedTimer.running) {
+            doublePressedTimer.restart()
+        }
     }
 
     background: Item {

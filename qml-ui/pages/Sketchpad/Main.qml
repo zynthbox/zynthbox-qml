@@ -1319,6 +1319,9 @@ Zynthian.ScreenPage {
                                                     onPressed: {
                                                         headerDelegate.switchToThisChannel()
                                                     }
+                                                    onDoublePressed: {
+                                                        channelHeaderDelegate.channel.muted = !channelHeaderDelegate.channel.muted
+                                                    }
                                                 }
 
                                                 Extras.Gauge {

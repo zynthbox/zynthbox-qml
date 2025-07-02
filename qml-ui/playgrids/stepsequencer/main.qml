@@ -242,6 +242,7 @@ Zynthian.BasePlayGrid {
     signal hidePatternsMenu();
     signal showPatternsMenu();
     property bool showPatternSettings: false
+    signal requestClearNotesPopup();
     signal showNoteSettingsPopup(QtObject patternModel, int firstBar, int lastBar, var midiNoteFilter, int firstStep, int lastStep);
     signal hideNoteSettingsPopup();
     property bool noteSettingsPopupVisible: false
@@ -2012,8 +2013,14 @@ Zynthian.BasePlayGrid {
                                 Zynthian.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "clear\n"
+                                    visualPressAndHold: true
                                     onClicked: {
-                                        _private.activeBarModel.parentModel.clearRow(_private.activeBar + _private.bankOffset);
+                                        if (pressingAndHolding === false) {
+                                            _private.activeBarModel.parentModel.clearRow(_private.activeBar + _private.bankOffset);
+                                        }
+                                    }
+                                    onPressAndHold: {
+                                        component.requestClearNotesPopup();
                                     }
                                 }
 
@@ -2863,6 +2870,10 @@ Zynthian.BasePlayGrid {
                         id: clearNotesPopup
                         columns: 2
                         rows: 2
+                        Connections {
+                            target: component
+                            onRequestClearNotesPopup: clearNotesPopup.open()
+                        }
                         actions: [
                             QQC2.Action {
                                 text: component.heardNotes.length > 1

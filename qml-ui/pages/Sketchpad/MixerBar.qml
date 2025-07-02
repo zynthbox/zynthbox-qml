@@ -407,20 +407,19 @@ QQC2.Pane {
                                                     Layout.preferredWidth: (parent.width-parent.spacing)/2
                                                     radius: 2
                                                     font.pointSize: 8
-                                                    checkable: true
                                                     checked: root.song.playChannelSolo === model.channel.id
                                                     text: qsTr("S")
                                                     background: Rectangle {
                                                         radius: parent.radius
                                                         border.width: 1
                                                         border.color: Qt.rgba(50, 50, 50, 0.1)
-                                                        color: parent.down || parent.checked ? "#4caf50" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                                     }
-                                                    onToggled: {
-                                                        if (checked) {
-                                                            root.song.playChannelSolo = model.channel.id
-                                                        } else {
+                                                    onClicked: {
+                                                        if (root.song.playChannelSolo == model.channel.id) {
                                                             root.song.playChannelSolo = -1
+                                                        } else {
+                                                            root.song.playChannelSolo = model.channel.id
                                                         }
                                                     }
                                                 }
@@ -430,16 +429,16 @@ QQC2.Pane {
                                                     Layout.preferredWidth: (parent.width-parent.spacing)/2
                                                     radius: 2
                                                     font.pointSize: 8
-                                                    checkable: true
+                                                    checked: model.channel.muted
                                                     text: qsTr("M")
                                                     background: Rectangle {
                                                         radius: parent.radius
                                                         border.width: 1
                                                         border.color: Qt.rgba(50, 50, 50, 0.1)
-                                                        color: parent.down || parent.checked ? "#f44336" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                                     }
-                                                    onCheckedChanged: {
-                                                        model.channel.muted = checked;
+                                                    onClicked: {
+                                                        model.channel.muted = !model.channel.muted
                                                     }
                                                 }
                                             }

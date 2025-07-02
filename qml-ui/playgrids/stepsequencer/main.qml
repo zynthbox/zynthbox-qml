@@ -246,6 +246,11 @@ Zynthian.BasePlayGrid {
     signal hideNoteSettingsPopup();
     property bool noteSettingsPopupVisible: false
 
+    property bool copyButtonPressed: false
+    property bool ignoreNextCopyButtonPress: false
+    property bool pasteButtonPressed: false
+    property bool ignoreNextPasteButtonPress: false
+
     property bool nudgeOverlayEnabled: false
     property bool nudgePerformed: false
 
@@ -500,8 +505,8 @@ Zynthian.BasePlayGrid {
          * @param endRow The last row you wish to operate on
          */
         function copyRange(description, model, startRow, endRow) {
-            var newClipboardNotes = [];
-            var newClipboardMetadata = []
+            let newClipboardNotes = [];
+            let newClipboardMetadata = []
             for (var row = startRow; row < endRow + 1; ++row) {
                 newClipboardNotes = newClipboardNotes.concat(model.getRow(row));
                 newClipboardMetadata = newClipboardMetadata.concat(model.getRowMetadata(row));
@@ -509,7 +514,8 @@ Zynthian.BasePlayGrid {
             _private.clipBoard = {
                 description: description,
                 notes: newClipboardNotes,
-                velocities: newClipboardMetadata
+                velocities: newClipboardMetadata,
+                patternModel: model
             }
         }
         /**
@@ -522,7 +528,7 @@ Zynthian.BasePlayGrid {
          * @param startRow The position of the first row you wish to replace with clipboard data
          * @param endRow The last row you wish to replace with clipboard data
          */
-        function pasteInPlace(model, startRow, endRow) {
+        function pasteInPlace(model, startRow, endRow, pasteSettings) {
             var noteIndex = 0;
             model.startLongOperation();
             for (var row = startRow; row < endRow + 1; ++row) {
@@ -1181,7 +1187,22 @@ Zynthian.BasePlayGrid {
                                 readonly property color borderColor: foregroundColor
 
                                 onClicked: {
-                                    if (zynqtgui.playButtonPressed) {
+                                    if (component.copyButtonPressed) {
+                                        component.ignoreNextCopyButtonPress = true;
+                                        _private.copyRange(
+                                            "%1%2".arg(clipPicker.clipPattern.sketchpadTrack + 1).arg(clipPicker.clipPattern.clipName),
+                                            clipPicker.clipPattern,
+                                            clipPicker.clipPattern.bankOffset,
+                                            clipPicker.clipPattern.bankOffset + clipPicker.clipPattern.height,
+                                            true
+                                        );
+                                    } else if (component.pasteButtonPressed) {
+                                        component.ignoreNextPasteButtonPress = true;
+                                        if (_private.clipBoard && _private.clipBoard.patternModel != null) {
+                                            // Just in case - someone might try and paste when the clipboard is empty, so let's just make sure we avoid that
+                                            clipPicker.clipPattern.cloneOther(_private.clipBoard.patternModel);
+                                        }
+                                    } else if (zynqtgui.playButtonPressed) {
                                         zynqtgui.ignoreNextPlayButtonPress = true;
                                         clipPicker.clipObject.enabled = true;
                                     } else if (zynqtgui.stopButtonPressed) {
@@ -1210,7 +1231,7 @@ Zynthian.BasePlayGrid {
                                         }
                                         color: clipPicker.foregroundColor
                                         horizontalAlignment: Text.AlignHCenter
-                                        text: _private.workingPatternModel ? "%1%2".arg(_private.workingPatternModel.sketchpadTrack + 1).arg(String.fromCharCode(clipPicker.clipIndex + 97)) : ""
+                                        text: clipPicker.clipPattern ? "%1%2".arg(clipPicker.clipPattern.sketchpadTrack + 1).arg(String.fromCharCode(clipPicker.clipIndex + 97)) : ""
                                     }
                                     Image {
                                         id: patternBarsVisualiser
@@ -1953,13 +1974,21 @@ Zynthian.BasePlayGrid {
                                 Zynthian.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "copy\n"
-                                    onClicked: {
-                                        _private.copyRange(
-                                            (_private.activePattern + 1) + " " + _private.sceneName + "/" + (_private.activeBar + 1),
-                                            _private.activeBarModel.parentModel,
-                                            _private.activeBar + _private.bankOffset,
-                                            _private.activeBar + _private.bankOffset
-                                        );
+                                    onPressed: {
+                                        component.copyButtonPressed = true;
+                                    }
+                                    onReleased: {
+                                        component.copyButtonPressed = false;
+                                        if (component.ignoreNextCopyButtonPress) {
+                                            component.ignoreNextCopyButtonPress = false;
+                                        } else {
+                                            _private.copyRange(
+                                                "%1%2/%3".arg(_private.activePatternModel.sketchpadTrack + 1).arg(_private.activePatternModel.clipName).arg(_private.activeBar + 1),
+                                                _private.activeBarModel.parentModel,
+                                                _private.activeBar + _private.bankOffset,
+                                                _private.activeBar + _private.bankOffset
+                                            );
+                                        }
                                     }
                                 }
 
@@ -1967,8 +1996,16 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
                                     enabled: _private.clipBoard !== undefined
-                                    onClicked: {
-                                        _private.pasteInPlace(_private.activeBarModel.parentModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset);
+                                    onPressed: {
+                                        component.pasteButtonPressed = true;
+                                    }
+                                    onReleased: {
+                                        component.pasteButtonPressed = false;
+                                        if (component.ignoreNextPasteButtonPress) {
+                                            component.ignoreNextPasteButtonPress = false;
+                                        } else {
+                                            _private.pasteInPlace(_private.activeBarModel.parentModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset);
+                                        }
                                     }
                                 }
 
@@ -2058,11 +2095,29 @@ Zynthian.BasePlayGrid {
                                     TouchPoint {
                                         id: patternsBarTouchPoint
                                         onPressedChanged: {
+                                            let barStepIndex = Math.floor(_private.activePatternModel.bankLength * (startX / patternBarsVisualiser.width));
                                             if (patternsBarTouchPoint.pressed) {
-                                                let barStepIndex = _private.activePatternModel.bankLength * (startX / patternBarsVisualiser.width);
                                                 if (barStepIndex < _private.availableBars) {
                                                     _private.activePatternModel.activeBar = barStepIndex;
                                                 }
+                                            } else if (component.copyButtonPressed) {
+                                                component.ignoreNextCopyButtonPress = true;
+                                                if (barStepIndex < _private.availableBars) {
+                                                    // We can only realistically copy a bar that actually is displayed, otherwise it gets a bit weird
+                                                    _private.copyRange(
+                                                        "%1%2/%3".arg(_private.activePatternModel.sketchpadTrack + 1).arg(_private.activePatternModel.clipName).arg(barStepIndex + 1),
+                                                        _private.activePatternModel,
+                                                        barStepIndex + _private.bankOffset,
+                                                        barStepIndex + _private.bankOffset
+                                                    );
+                                                }
+                                            } else if (component.pasteButtonPressed) {
+                                                component.ignoreNextPasteButtonPress = true;
+                                                if (_private.availableBars < barStepIndex + 1) {
+                                                    // If this step is currently outside the pattern's length, let's make sure to fix that
+                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", (barStepIndex + 1) * _private.workingPatternModel.width);
+                                                }
+                                                _private.pasteInPlace(_private.activePatternModel, barStepIndex + _private.bankOffset, barStepIndex + _private.bankOffset);
                                             }
                                         }
                                         onXChanged: {

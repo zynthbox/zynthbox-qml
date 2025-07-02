@@ -832,6 +832,7 @@ class sketchpad_channel(QObject):
             return {"name": self.__name__,
                     "color": self.__color__ if type(self.__color__) == str else self.__color__.name(),
                     "volume": self.__volume__.gainDb(),
+                    "muted": self.__muted__,
                     "audioTypeSettings": self.__audioTypeSettings__,
                     "connectedPattern": self.__connected_pattern__,
                     "chainedSounds": self.__chained_sounds__,
@@ -878,6 +879,8 @@ class sketchpad_channel(QObject):
                     self.set_color(self.zynqtgui.theme_chooser.trackColors[self.__id__])
                 if "volume" in obj:
                     self.set_volume(obj["volume"], True)
+                if "muted" in obj:
+                    self.set_muted(obj["muted"], True)
                 if "connectedPattern" in obj:
                     self.__connected_pattern__ = obj["connectedPattern"]
                     self.set_connected_pattern(self.__connected_pattern__)
@@ -1884,13 +1887,14 @@ class sketchpad_channel(QObject):
     def get_muted(self):
         return self.__muted__
 
-    def set_muted(self, muted):
-        if self.__muted__ != muted:
+    def set_muted(self, muted, force_set=False):
+        if self.__muted__ != muted or force_set:
             logging.debug(f"$$ Setting muted for Track {self.name} to : {muted}")
             self.__muted__ = muted
             self.__trackMixerClient.setMuted(muted)
             self.mutedChanged.emit()
             Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, (1 if self.__muted__ == True else 0))
+            self.__song__.schedule_save()
 
     mutedChanged = Signal()
 

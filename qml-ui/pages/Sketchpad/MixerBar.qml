@@ -377,6 +377,23 @@ QQC2.Pane {
                                                 }
                                             }
 
+                                            QQC2.Label {
+                                                Layout.alignment: Qt.AlignCenter
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: false
+                                                horizontalAlignment: Text.AlignHCenter
+                                                elide: Text.ElideRight
+                                                text: qsTr("%1 dB").arg(model.channel.gainHandler.gainDb.toFixed(2))
+                                                font.pixelSize: 9
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        channelsVolumeRow.handleClick(channel);
+                                                    }
+                                                }
+                                            }
+
                                             RowLayout {
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: false

@@ -846,7 +846,7 @@ ColumnLayout {
                     scrollWidth: 128
                     paramList: [0, 1, 17, 33, 49, 65, 81, 97, 113]
                     paramNames: {
-                        0: "Split Step, Overlap",
+                        0: "Next",
                         1: "Bar 1",
                         17: "Bar 2",
                         33: "Bar 3",

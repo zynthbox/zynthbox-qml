@@ -142,7 +142,14 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 screenId: root.screenIds[0]
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivated: {
+                    if (root.selectedChannel.selectedSlot.value === index) {
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("fx", index);
+                    } else {
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
+                    }
+                    root.itemActivated(screenId, index)
+                }
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                 autoActivateIndexOnChange: true
                 onIconClicked: {

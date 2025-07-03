@@ -72,7 +72,9 @@ class zynthian_gui_sketch_effects_for_channel(zynthian_gui_selector):
         if i < 0 or i >= len(self.list_data):
             return
         selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-        selected_track.selectedSlot.value = i
+        # Doing this here will result in the popup showing immediate when an entry is activated (which isn't the intent)
+        # The value will still be updated, but from the ui *after* the item has been activated
+        # selected_track.selectedSlot.value = i
         selected_track.setCurlayerByType("sketch-fx")
         self.select(i)
         self.fill_list()

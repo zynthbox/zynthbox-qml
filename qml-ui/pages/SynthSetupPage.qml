@@ -364,8 +364,12 @@ Zynthian.ScreenPage {
 
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: {
-                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index);
-                    root.itemActivated(screenId, index)
+                    if (root.selectedChannel.selectedSlot.value === index) {
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("synth", index);
+                    } else {
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index);
+                    }
+                    root.itemActivated(screenId, index);
                 }
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
 

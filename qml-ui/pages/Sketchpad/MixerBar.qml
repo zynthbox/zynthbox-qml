@@ -226,10 +226,13 @@ QQC2.Pane {
                                                     // Disable when muted or channel is not being played in solo mode
                                                     enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
                                                     headerTextVisible: false
-                                                    audioLeveldB: visible && !model.channel.muted
+                                                    inputAudioLeveldB: visible && !model.channel.muted
                                                                   ? Zynthbox.AudioLevels.channels[model.channel.id]
                                                                   : -400
-                                                    inputAudioLevelVisible: false
+                                                    onAudioLeveldBChanged: {
+                                                        console.log("Channel audio level changed to", audioLeveldB)
+                                                    }
+                                                    inputAudioLevelVisible: true
 
                                                     onValueChanged: {
                                                         model.channel.gainHandler.gainDb = slider.value
@@ -485,8 +488,8 @@ QQC2.Pane {
                                         : (Math.round(Zynthbox.AudioLevels.playback) + " (dB)")
 
                             footerText: "Master"
-                            audioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -400
-                            inputAudioLevelVisible: false
+                            inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -400
+                            inputAudioLevelVisible: true
 
                             Binding {
                                 target: masterVolume.slider

@@ -191,7 +191,7 @@ Rectangle {
                             anchors.rightMargin: -8
                             visible: control.inputAudioLeveldB != null
 
-                            minimumValue: -100
+                            minimumValue: -40
                             maximumValue: 20
                             value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
 

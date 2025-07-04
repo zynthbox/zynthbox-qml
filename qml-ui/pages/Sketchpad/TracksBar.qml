@@ -1221,24 +1221,62 @@ QQC2.Pane {
                                                 }
                                             }
 
-                                            QQC2.Button {
-                                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                                            ColumnLayout {
+                                                Layout.fillWidth: false
+                                                Layout.fillHeight: true
+                                                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                                 Layout.alignment: Qt.AlignVCenter
-                                                text: qsTr("Favorite")
-                                                icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
-                                                enabled: infoBar.zynthianLayer != null
-                                                checkable: false
-                                                // Bind to current index to properly update when preset changed from other screen
-                                                checked: infoBar.zynthianLayer != null
-                                                         ? zynqtgui.preset.current_index >= 0 && zynqtgui.preset.current_is_favorite
-                                                         : false
-                                                onClicked: {
-                                                    if (infoBar.zynthianLayer != null) {
-                                                        zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
+
+                                                QQC2.Button {
+                                                    property int midiChannel: root.selectedChannel != null && root.selectedChannel.chainedSounds != null && root.selectedChannel.selectedSlot != null ? root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value] : -1
+                                                    property QtObject synthPassthroughClient: root.selectedChannel != null && midiChannel >= 0 && root.selectedChannel.checkIfLayerExists(midiChannel) && Zynthbox.Plugin.synthPassthroughClients[midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[midiChannel] : null
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    visible: root.selectedChannel.selectedSlot != null && root.selectedChannel.selectedSlot.className == "TracksBar_synthslot"
+                                                    font.pointSize: 9
+                                                    text: qsTr("Mute")
+                                                    enabled: infoBar.zynthianLayer != null
+                                                    checkable: false
+                                                    checked: synthPassthroughClient != null && synthPassthroughClient.muted
+                                                    onClicked: {
+                                                        synthPassthroughClient.muted = !synthPassthroughClient.muted
+                                                    }
+                                                }
+
+                                                QQC2.Button {
+                                                    property QtObject fxPassthroughClient: root.selectedChannel != null && root.selectedChannel.selectedSlot != null && Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][root.selectedChannel.selectedSlot.value] : null
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    visible: root.selectedChannel.selectedSlot != null && root.selectedChannel.selectedSlot.className == "TracksBar_fxslot"
+                                                    font.pointSize: 9
+                                                    text: qsTr("Bypass")
+                                                    enabled: infoBar.zynthianLayer != null
+                                                    checkable: false
+                                                    checked: fxPassthroughClient != null && fxPassthroughClient.bypass
+                                                    onClicked: {
+                                                        fxPassthroughClient.bypass = !fxPassthroughClient.bypass
+                                                    }
+                                                }
+
+                                                QQC2.Button {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    font.pointSize: 9
+                                                    text: qsTr("Fav")
+                                                    icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                                                    enabled: infoBar.zynthianLayer != null
+                                                    checkable: false
+                                                    // Bind to current index to properly update when preset changed from other screen
+                                                    checked: infoBar.zynthianLayer != null
+                                                             ? zynqtgui.preset.current_index >= 0 && zynqtgui.preset.current_is_favorite
+                                                             : false
+                                                    onClicked: {
+                                                        if (infoBar.zynthianLayer != null) {
+                                                            zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
+                                                        }
                                                     }
                                                 }
                                             }
-
                                         }
 
                                         Zynthbox.WaveFormItem {

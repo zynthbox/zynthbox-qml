@@ -135,23 +135,37 @@ Zynthian.ScreenPage {
                     onClicked: zynqtgui.main.visibleCategory = "appimages"
                 }
 
-                Item {
-                    Layout.fillHeight: true
+                QQC2.Button {
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: 0
+                    checkable: true
+                    checked: zynqtgui.main.visibleCategory === "sessions" ||
+                             zynqtgui.main.visibleCategory === "sessions-versions"
+                    text: qsTr("Sketchpads")
+                    onClicked: zynqtgui.main.visibleCategory = "sessions"
                 }
-                Item {
-                    Layout.fillHeight: true
+                QQC2.Button {
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: 0
+                    checkable: true
+                    checked: zynqtgui.main.visibleCategory === "services"
+                    text: qsTr("Services")
+                    onClicked: zynqtgui.main.visibleCategory = "services"
                 }
-                Item {
-                    Layout.fillHeight: true
+
+                QQC2.Button {
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: 0
+                    checkable: true
+                    checked: zynqtgui.main.visibleCategory === "?"
+                    text: qsTr("")
+                    onClicked: zynqtgui.main.visibleCategory = "?"
                 }
 
                 // Disabled these below buttons for now
-                // FIXME : Adding empty Item{} placeholders with fillWidth and fillHeight
-                //         set to true is not taking up equal height somehow
-                //         For now set opacity to 0 and enabled to false
                 // QQC2.Button {
                 //     Layout.fillWidth: true
                 //     Layout.fillHeight: true

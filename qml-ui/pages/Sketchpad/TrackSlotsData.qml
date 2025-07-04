@@ -164,6 +164,46 @@ RowLayout {
             property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[index].cppObjId) : null
             // A property to determine if slot is a sample-loop and is enabled
             property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled
+            property int midiChannel: control.selectedChannel != null ? control.selectedChannel.chainedSounds[index] : -1
+            property QtObject synthPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
+            property QtObject fxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id][index] : null
+            property QtObject sketchFxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
+            property QtObject zynthianLayer: {
+                let layer = null;
+                if (control.selectedChannel != null) {
+                    switch (_private.className) {
+                    case "TracksBar_synthslot":
+                        let midiChannel = control.selectedChannel.chainedSounds[index];
+                        if (midiChannel >= 0 && control.selectedChannel.checkIfLayerExists(midiChannel)) {
+                            layer = zynqtgui.layer.get_layer_by_midi_channel(midiChannel)
+                        }
+                        break;
+                    case "TracksBar_fxslot":
+                        layer = control.selectedChannel.chainedFx[index];
+                        break;
+                    case "TracksBar_sketchfxslot":
+                        layer = control.selectedChannel.chainedSketchFx[index];
+                        break;
+                    }
+                    if (layer == undefined) {
+                        layer = null;
+                    }
+                }
+                return layer;
+            }
+            // This property will be used to determine if a slot makes sound
+            // For synth slots, this will be true if not muted
+            // For fx slots, this will be true if not bypassed
+            property bool slotMakesSound: {
+                if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_synthslot" && slotDelegate.synthPassthroughClient != null) {
+                    return !slotDelegate.synthPassthroughClient.muted
+                } else if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_fxslot" && slotDelegate.fxPassthroughClient != null) {
+                    return !slotDelegate.fxPassthroughClient.bypass
+                } else {
+                    // For all other cases, default value is true
+                    return true
+                }
+            }
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -175,6 +215,7 @@ RowLayout {
             rightInset: 4
             leftInset: 4
 
+            opacity: slotMakesSound ? 1 : 0.3
             background: Item {
 
                 // Show highlighted color on slot border when slot is a sample-loop and is enabled
@@ -298,11 +339,6 @@ RowLayout {
 
             contentItem: Item {
                 id: delegate
-                property int midiChannel: control.selectedChannel != null ? control.selectedChannel.chainedSounds[index] : -1
-                property QtObject synthPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
-                property QtObject fxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id][index] : null
-                property QtObject sketchFxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
-
 
                 // For external mode the first three slots are visible
                 // For other modes all slots are visible
@@ -317,7 +353,7 @@ RowLayout {
                         margins: Kirigami.Units.smallSpacing
                     }
                     Rectangle {
-                        width: delegate.synthPassthroughClient ? parent.width * delegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
+                        width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
                         anchors {
                             left: parent.left
                             top: parent.top
@@ -342,7 +378,7 @@ RowLayout {
                     }
                     Rectangle {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                        width: delegate.fxPassthroughClient && delegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(delegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                         anchors {
                             left: parent.left
                             top: parent.top
@@ -355,7 +391,7 @@ RowLayout {
                     }
                     Rectangle {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                        width: delegate.sketchFxPassthroughClient && delegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(delegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                         anchors {
                             left: parent.left
                             top: parent.top
@@ -451,10 +487,10 @@ RowLayout {
                     onClicked: slotDelegate.switchToThisSlot()
                     onMouseXChanged: {
                         var newVal
-                        if (control.slotType === "synth" && control.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                        if (control.slotType === "synth" && control.selectedChannel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                             delegateMouseArea.dragHappened = true;
-                            let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel]
+                            let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
                             synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
                         } else if (control.slotType == "sample-trig" && control.slotData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);

@@ -2356,43 +2356,6 @@ Zynthian.BasePlayGrid {
                 anchors.fill: parent
 
                 Zynthian.PlayGridButton {
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                    text: _private.sequence
-                        ? _private.sequence.soloPatternObject
-                            ? "Track" + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + "\n"
-                                + "SOLO\n"
-                                + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + _private.sequence.soloPatternObject.clipName
-                            : _private.activePatternModel
-                                ? "Track" + (_private.activePatternModel.sketchpadTrack + 1) + "\n"
-                                    + "Clip"
-                                    + (_private.activePatternModel.sketchpadTrack + 1) + _private.activePatternModel.clipName
-                                : "(no\npat\ntern)"
-                        : "(no\nsequ\nence)"
-                    onClicked: {
-                        component.showPatternSettings = !component.showPatternSettings;
-                    }
-                    Kirigami.Icon {
-                        anchors {
-                            bottom: parent.bottom
-                            right: parent.right
-                        }
-                        height: parent.width * 0.3
-                        width: height
-                        source: "player-volume"
-                        Rectangle {
-                            visible: _private.activePatternModel ? !_private.activePatternModel.enabled : false
-                            anchors.centerIn: parent
-                            rotation: 45
-                            width: parent.width
-                            height: Kirigami.Units.smallSpacing
-                            color: "red"
-                        }
-                    }
-                }
-
-                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
-
-                Zynthian.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "arrow-up"
                     onClicked: {
@@ -2571,11 +2534,37 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                    id:sequencerSettingsBtn
-                    icon.name: "configure"
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                    text: _private.sequence
+                        ? _private.sequence.soloPatternObject
+                            ? "Track" + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + "\n"
+                                + "SOLO\n"
+                                + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + _private.sequence.soloPatternObject.clipName
+                            : _private.activePatternModel
+                                ? "Track" + (_private.activePatternModel.sketchpadTrack + 1) + "\n"
+                                    + "Clip"
+                                    + (_private.activePatternModel.sketchpadTrack + 1) + _private.activePatternModel.clipName
+                                : "(no\npat\ntern)"
+                        : "(no\nsequ\nence)"
                     onClicked: {
                         component.showPatternSettings = !component.showPatternSettings;
+                    }
+                    Kirigami.Icon {
+                        anchors {
+                            bottom: parent.bottom
+                            right: parent.right
+                        }
+                        height: parent.width * 0.3
+                        width: height
+                        source: "player-volume"
+                        Rectangle {
+                            visible: _private.activePatternModel ? !_private.activePatternModel.enabled : false
+                            anchors.centerIn: parent
+                            rotation: 45
+                            width: parent.width
+                            height: Kirigami.Units.smallSpacing
+                            color: "red"
+                        }
                     }
                 }
             }

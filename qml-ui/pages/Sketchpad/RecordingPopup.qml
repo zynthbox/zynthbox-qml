@@ -51,6 +51,22 @@ Zynthian.Popup {
         // This gets called from main when the dialog is not opened, so let's be explicit about what we want in that case
         if (root.opened || acceptedButtonsWhenClosed.indexOf(cuia) > -1) {
             switch (cuia) {
+                case "SCREEN_MAIN_MENU":
+                case "SCREEN_LAYER":
+                case "SCREEN_LAYER_FX":
+                case "SCREEN_BANK":
+                case "SCREEN_PRESET":
+                case "SCREEN_CONTROL":
+                case "SCREEN_SKETCHPAD":
+                case "SCREEN_SONG_MANAGER":
+                case "SCREEN_PLAYGRID":
+                case "SCREEN_ALSA_MIXER":
+                case "SCREEN_EDIT_CONTEXTUAL":
+                    // If someone hits one of the under-screen buttons, just close the thing,
+                    // but also pass the buttons through so we can switch to that screen
+                    root.close();
+                    returnValue = false;
+                    break;
                 case "TRACK_1":
                 case "TRACK_2":
                 case "TRACK_3":

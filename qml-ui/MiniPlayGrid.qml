@@ -199,13 +199,6 @@ RowLayout {
 
             Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            QQC2.Label {
-                text: "Octave"
-                Layout.alignment: Qt.AlignHCenter
-                font.weight: Font.Normal
-                font.pointSize: 10
-            }
-
             QQC2.Control {
                 padding: 1
                 Layout.fillWidth: true
@@ -228,12 +221,10 @@ RowLayout {
                         }
                     }
 
-                    Kirigami.Separator{
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        Kirigami.Theme.inherit: false
+                    QQC2.Label {
+                        text: "Octave"
                         width: parent.width
-                        height: 1
-                        color: Qt.darker(Kirigami.Theme.alternateBackgroundColor, 1.5)
+                        horizontalAlignment: Qt.AlignHCenter
                     }
 
                     QQC2.Button {

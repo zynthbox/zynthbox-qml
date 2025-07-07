@@ -39,8 +39,8 @@ QQC2.Pane
 
     property bool highlighted : false
 
-    Layout.minimumWidth: Kirigami.Units.gridUnit * 12
-    Layout.maximumWidth: Kirigami.Units.gridUnit * 12
+    Layout.minimumWidth: Kirigami.Units.gridUnit * 10
+    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
 
     Layout.fillHeight: true
 

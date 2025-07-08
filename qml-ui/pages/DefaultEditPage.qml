@@ -138,6 +138,15 @@ RowLayout {
                             border.color: zynqtgui.control.selectedPage === index ? "#88ffffff" : "transparent"
                             border.width: 2
                             radius: 2
+
+                            Kirigami.Separator {
+                                height: 1
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                }
+                            }
                         }
 
                         PlasmaCore.FrameSvgItem {
@@ -158,16 +167,6 @@ RowLayout {
                             colorGroup: PlasmaCore.Theme.ButtonColorGroup
                         }
                     }
-
-
-                    // Kirigami.Separator {
-                    //     height: 1
-                    //     anchors {
-                    //         left: parent.left
-                    //         right: parent.right
-                    //         bottom: parent.bottom
-                    //     }
-                    // }
 
                     contentItem : MouseArea {
                         anchors.fill: parent

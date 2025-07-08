@@ -45,20 +45,28 @@ QQC2.ToolButton {
             id: buttonSvg
             imagePath: "widgets/breadcrumb"
             Component.onCompleted: {
-                if (!buttonSvg.isValid()) {
+                if (!buttonSvg.fromCurrentTheme) {
+                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
+                }
+            }
+
+            onFromCurrentThemeChanged: {
+                if (!buttonSvg.fromCurrentTheme) {
                     buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
                 }
             }
         }
-         Connections {
-            target: theme
-            onThemeChangedProxy: {
-                buttonSvg.imagePath = "widgets/breadcrumb"
-                if (!buttonSvg.isValid()) {
-                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
-                }
-            }
-        }
+
+        //This connection is not working. the target "theme" can not be found
+        //  Connections {
+        //     target: theme
+        //     onThemeChangedProxy: {
+        //         buttonSvg.imagePath = "widgets/breadcrumb"
+        //         if (!buttonSvg.fromCurrentTheme) {
+        //             buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
+        //         }
+        //     }
+        // }
 
         PlasmaCore.SvgItem {
             anchors {

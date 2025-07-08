@@ -42,31 +42,14 @@ QQC2.ToolButton {
 
     background: Item {
         PlasmaCore.Svg {
-            id: buttonSvg
+            id: buttonSvg2
             imagePath: "widgets/breadcrumb"
-            Component.onCompleted: {
-                if (!buttonSvg.fromCurrentTheme) {
-                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
-                }
-            }
-
-            onFromCurrentThemeChanged: {
-                if (!buttonSvg.fromCurrentTheme) {
-                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
-                }
-            }
         }
 
-        //This connection is not working. the target "theme" can not be found
-        //  Connections {
-        //     target: theme
-        //     onThemeChangedProxy: {
-        //         buttonSvg.imagePath = "widgets/breadcrumb"
-        //         if (!buttonSvg.fromCurrentTheme) {
-        //             buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
-        //         }
-        //     }
-        // }
+        PlasmaCore.Svg {
+            id: buttonSvg
+            imagePath: Qt.resolvedUrl("./img/breadcrumb.svg")
+        }
 
         PlasmaCore.SvgItem {
             anchors {
@@ -75,7 +58,7 @@ QQC2.ToolButton {
                 bottom: parent.bottom
             }
             width: naturalSize.width * (height/naturalSize.height)
-            svg: buttonSvg
+            svg: buttonSvg2.fromCurrentTheme ? buttonSvg2 : buttonSvg
             elementId: root.highlighted || root.pressed ? "focus-left" : "left"
         }
         PlasmaCore.SvgItem {
@@ -85,7 +68,7 @@ QQC2.ToolButton {
                 top: parent.top
                 bottom: parent.bottom
             }
-            svg: buttonSvg
+            svg: buttonSvg2.fromCurrentTheme ? buttonSvg2 : buttonSvg
             elementId: root.highlighted || root.pressed ? "focus-center" : "center"
         }
         PlasmaCore.SvgItem {
@@ -96,7 +79,7 @@ QQC2.ToolButton {
                 bottom: parent.bottom
             }
             width: naturalSize.width * (height/naturalSize.height)
-            svg: buttonSvg
+            svg: buttonSvg2.fromCurrentTheme ? buttonSvg2 : buttonSvg
             elementId: root.highlighted || root.pressed ? "focus-right" : "right"
         }
     }

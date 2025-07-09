@@ -38,6 +38,7 @@ ColumnLayout {
     property QtObject model
     property bool positionalVelocity
     property bool showChosenPads: true
+    property bool showFirstRow: false
     property Item playgrid
     signal removeNote(QtObject note)
     signal notePressAndHold(QtObject note)
@@ -45,6 +46,7 @@ ColumnLayout {
         model: visible ? component.model : null
         delegate: RowLayout {
             property var row: index
+            visible: row > 0 || component.showFirstRow
             Repeater {
                 model: component.model.columnCount(component.model.index(index, 0))
                 delegate: Zynthian.NotePad {

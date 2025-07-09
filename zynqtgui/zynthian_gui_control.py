@@ -139,6 +139,8 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__all_controls = []
         self.__selected_engine = None
         self.__selected_engine_bypass_controller = None
+        self.__selected_engine_cutoff_controller = None
+        self.__selected_engine_resonance_controller = None
         self.__selected_column = 0
         self.controller0 = None
         self.controller1 = None
@@ -357,6 +359,25 @@ class zynthian_gui_control(zynthian_gui_selector):
             self.__selected_engine_bypass_controller = zynthian_gui_controller(-1, self.__selected_engine.bypassController, self)
         else:
             self.__selected_engine_bypass_controller = None
+        
+        if self.zynqtgui.curlayer and self.zynqtgui.curlayer.track_index != -1 and self.zynqtgui.curlayer.slot_index != -1:
+            track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.curlayer.track_index)
+            match self.zynqtgui.curlayer.slot_type:
+                case "TracksBar_synthslot":
+                    self.__selected_engine_cutoff_controller = track.filterCutoffControllers[self.zynqtgui.curlayer.slot_index]
+                    self.__selected_engine_resonance_controller = track.filterResonanceControllers[self.zynqtgui.curlayer.slot_index]
+                case "TracksBar_fxslot":
+                    self.__selected_engine_cutoff_controller = track.fxFilterCutoffControllers[self.zynqtgui.curlayer.slot_index]
+                    self.__selected_engine_resonance_controller = track.fxFilterResonanceControllers[self.zynqtgui.curlayer.slot_index]
+                case "TracksBar_sketchfxslot":
+                    self.__selected_engine_cutoff_controller = track.sketchFxFilterCutoffControllers[self.zynqtgui.curlayer.slot_index]
+                    self.__selected_engine_resonance_controller = track.sketchFxfilterResonanceControllers[self.zynqtgui.curlayer.slot_index]
+                case _:
+                    self.__selected_engine_cutoff_controller = None
+                    self.__selected_engine_resonance_controller = None
+        else:
+            self.__selected_engine_cutoff_controller = None
+            self.__selected_engine_resonance_controller = None
 
         super().fill_list()
         self.all_controls_changed.emit()
@@ -958,6 +979,12 @@ class zynthian_gui_control(zynthian_gui_selector):
     def get_selected_engine_bypass_controller(self):
         return self.__selected_engine_bypass_controller
 
+    def get_selected_engine_cutoff_controller(self):
+        return self.__selected_engine_cutoff_controller
+
+    def get_selected_engine_resonance_controller(self):
+        return self.__selected_engine_resonance_controller
+
     def get_selectedPage(self):
         return math.floor((self.selectedColumn * 3) / 12)
 
@@ -1008,6 +1035,8 @@ class zynthian_gui_control(zynthian_gui_selector):
     all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
     selectedEngine = Property(QObject, get_selected_engine, notify=all_controls_changed)
     selectedEngineBypassController = Property(QObject, get_selected_engine_bypass_controller, notify=all_controls_changed)
+    selectedEngineCutoffController = Property(QObject, get_selected_engine_cutoff_controller, notify=all_controls_changed)
+    selectedEngineResonanceController = Property(QObject, get_selected_engine_resonance_controller, notify=all_controls_changed)
 
     selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedColumnChanged)
     selectedColumn = Property(int, get_selectedColumn, set_selectedColumn, notify=selectedColumnChanged)

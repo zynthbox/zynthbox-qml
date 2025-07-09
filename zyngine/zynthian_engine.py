@@ -220,6 +220,7 @@ class zynthian_engine(zynthian_basic_engine):
         self.learned_zctrls = {}
 
         self.__bypassController = None
+        self.__volumeController = None
 
 
     def __del__(self):
@@ -589,6 +590,7 @@ class zynthian_engine(zynthian_basic_engine):
                     zctrl.set_options(options)
 
                 if zctrl.symbol.casefold() == "volume" or (self.version_info.volumeControls is not None and zctrl.symbol in self.version_info.volumeControls):
+                    self.setVolumeController(zctrl)
                     # When encountering a volume controller, set it to max, and add to controller list otherwise CC messages do not get sent
                     # This is to handle any CC controllers from any engines other than jalv
                     zctrl.set_value(zctrl.value_max)
@@ -651,6 +653,19 @@ class zynthian_engine(zynthian_basic_engine):
 
     bypassController = Property(QObject, getBypassController, notify=bypassControllerChanged)
     # END Property bypassController
+    
+    # BEGIN Property volumeController
+    def setVolumeController(self, newVolumeController):
+        if self.__volumeController != newVolumeController:
+            self.__volumeController = newVolumeController
+            self.volumeControllerChanged.emit()
+            
+    def getVolumeController(self):
+        return self.__volumeController
+    
+    volumeControllerChanged = Signal()
+    volumeController = Property(QObject, getVolumeController, setVolumeController, notify=volumeControllerChanged)
+    # END Property volumeController
 
     #----------------------------------------------------------------------------
     # MIDI learning

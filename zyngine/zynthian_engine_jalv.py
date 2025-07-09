@@ -402,6 +402,7 @@ class zynthian_engine_jalv(zynthian_engine):
                 if symbol.casefold() == "bypass":
                     self.setBypassController(zctrl)
                 elif symbol.casefold() == "volume" or (self.version_info.volumeControls is not None and symbol in self.version_info.volumeControls):
+                    self.setVolumeController(zctrl)
                     # When encountering a volume controller, set it to max and do not add to controllers list
                     zctrl.set_value(zctrl.value_max)
                 else:

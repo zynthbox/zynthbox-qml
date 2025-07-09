@@ -724,15 +724,19 @@ class sketchpad_channel(QObject):
                     layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
                     synth_controllers_dict = layer.controllers_dict
 
-                    if layer.engine.version_info.cutoffControl is not None and layer.engine.version_info.cutoffControl in synth_controllers_dict:
-                        self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
+                    if layer.engine.version_info.cutoffControls is not None:
+                        for controllerName in layer.engine.version_info.cutoffControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict[controllerName])
                     elif "cutoff" in synth_controllers_dict:
                         self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
                     elif "filter_cutoff" in synth_controllers_dict:
                         self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                    if layer.engine.version_info.resonanceControl is not None and layer.engine.version_info.resonanceControl in synth_controllers_dict:
-                        self.__filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
+                    if layer.engine.version_info.resonanceControls is not None:
+                        for controllerName in layer.engine.version_info.resonanceControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__filter_resonance_controllers[index].add_control(synth_controllers_dict[controllerName])
                     elif "resonance" in synth_controllers_dict:
                         self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
                     elif "filter_resonance" in synth_controllers_dict:
@@ -748,16 +752,19 @@ class sketchpad_channel(QObject):
                 self.__fx_filter_resonance_controllers[index].clear_controls()
                 if layer is not None:
                     synth_controllers_dict = layer.controllers_dict
-
-                    if layer.engine.version_info.cutoffControl is not None and layer.engine.version_info.cutoffControl in synth_controllers_dict:
-                        self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
+                    if layer.engine.version_info.cutoffControls is not None:
+                        for controllerName in layer.engine.version_info.cutoffControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[controllerName])
                     elif "cutoff" in synth_controllers_dict:
                         self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
                     elif "filter_cutoff" in synth_controllers_dict:
                         self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                    if layer.engine.version_info.resonanceControl is not None and layer.engine.version_info.resonanceControl in synth_controllers_dict:
-                        self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
+                    if layer.engine.version_info.resonanceControls is not None:
+                        for controllerName in layer.engine.version_info.resonanceControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict[controllerName])
                     elif "resonance" in synth_controllers_dict:
                         self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
                     elif "filter_resonance" in synth_controllers_dict:
@@ -774,15 +781,19 @@ class sketchpad_channel(QObject):
                 if layer is not None:
                     synth_controllers_dict = layer.controllers_dict
 
-                    if layer.engine.version_info.cutoffControl is not None and layer.engine.version_info.cutoffControl in synth_controllers_dict:
-                        self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.cutoffControl])
+                    if layer.engine.version_info.cutoffControls is not None:
+                        for controllerName in layer.engine.version_info.cutoffControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[controllerName])
                     elif "cutoff" in synth_controllers_dict:
                         self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
                     elif "filter_cutoff" in synth_controllers_dict:
                         self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                    if layer.engine.version_info.resonanceControl is not None and layer.engine.version_info.resonanceControl in synth_controllers_dict:
-                        self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.version_info.resonanceControl])
+                    if layer.engine.version_info.resonanceControls is not None:
+                        for controllerName in layer.engine.version_info.resonanceControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict[controllerName])
                     elif "resonance" in synth_controllers_dict:
                         self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
                     elif "filter_resonance" in synth_controllers_dict:

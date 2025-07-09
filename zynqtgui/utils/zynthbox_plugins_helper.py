@@ -51,8 +51,8 @@ class zynthbox_plugin_version_info(QObject):
         self.zynthboxVersionAdded = version_details["zynthboxVersionAdded"]
         self.url = version_details["url"]
         self.volumeControls = version_details["volumeControls"]
-        self.cutoffControl = version_details["cutoffControl"]
-        self.resonanceControl = version_details["resonanceControl"]
+        self.cutoffControls = version_details["cutoffControls"]
+        self.resonanceControls = version_details["resonanceControls"]
 
 
 class zynthbox_plugin_info(QObject):

@@ -162,8 +162,8 @@ RowLayout {
                             readonly property real topPadding: margins.top
                             readonly property real bottomPadding: margins.bottom
 
-                            imagePath: "widgets/slots-delegate-background"
-                            prefix: highlighted ? ["focus", ""] : ""
+                            imagePath: "widgets/viewitem"
+                            prefix: highlighted ? ["selected", ""] : ""
                             colorGroup: PlasmaCore.Theme.ButtonColorGroup
                         }
                     }

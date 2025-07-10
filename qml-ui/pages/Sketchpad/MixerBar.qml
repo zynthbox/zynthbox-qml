@@ -213,9 +213,13 @@ QQC2.Pane {
 
                                                 MouseArea {
                                                     anchors.fill: parent
-                                                    onClicked: {
-                                                        channelsVolumeRow.handleClick(channel);
-                                                    }
+                                                    onPressed: volumeControl.mouseArea.handlePressed(mouse)
+                                                    onReleased: volumeControl.mouseArea.released(mouse)
+                                                    onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                    onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                    onDoubleClicked: volumeControl.mouseArea.doubleClicked(mouse)
+                                                    onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
                                                 }
 
                                                 VolumeControl {

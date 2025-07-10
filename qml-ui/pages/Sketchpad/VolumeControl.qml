@@ -17,6 +17,7 @@ Rectangle {
     property alias inputAudioLevelVisible: inputAudioLevelGauge.visible
     property alias slider: slider
     property bool enabled: true
+    property alias mouseArea: mouseArea
 
     signal clicked();
     signal doubleClicked();
@@ -213,15 +214,24 @@ Rectangle {
                 MouseArea {
                     id: mouseArea
                     property real initialMouseY
-                    property bool dragHappened: false
+                    property bool dragHappened: false                    
+                    // A workaround to be able to handle pressed signal as MouseArea has a property and a signal named pressed causing conflict
+                    signal handlePressed(var mouse)
 
                     anchors.fill: parent
                     enabled: control.enabled
-                    onPressed: {
+                    onHandlePressed: {
                         mouseArea.initialMouseY = mouse.y
                     }
+                    onPressed: handlePressed(mouse)
                     onReleased: {
                         dragHappenedResetTimer.restart()
+                        if (dblTimer.running) {
+                            dblTimer.stop();
+                            control.doubleClicked();
+                        } else {
+                            dblTimer.restart();
+                        }
                     }
                     onMouseYChanged: {
                         if (mouse.y - mouseArea.initialMouseY != 0) {
@@ -231,17 +241,9 @@ Rectangle {
                             control.valueChanged()
                         }
                     }
-                    onClicked: {
-                        if (dblTimer.running) {
-                            control.doubleClicked();
-                            dblTimer.stop();
-                        } else {
-                            dblTimer.restart();
-                        }
-                    }
                     Timer {
                         id: dblTimer
-                        interval: 150
+                        interval: 200
                         onTriggered: {
                             if (!mouseArea.dragHappened) {
                                 control.clicked();

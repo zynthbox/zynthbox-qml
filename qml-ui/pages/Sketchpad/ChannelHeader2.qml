@@ -336,18 +336,17 @@ QQC2.AbstractButton {
     // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
     Timer {
         id: doublePressedTimer
-        interval: 100
+        interval: 200
         repeat: false
     }
     onPressed: {
         root.forceActiveFocus()
-        if (doublePressedTimer.running) {
-            root.doublePressed()
-            doublePressedTimer.stop()
-        }
     }
     onReleased: {
-        if (!doublePressedTimer.running) {
+        if (doublePressedTimer.running) {
+            doublePressedTimer.stop()
+            root.doublePressed()
+        } else {
             doublePressedTimer.restart()
         }
     }

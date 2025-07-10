@@ -472,6 +472,25 @@ RowLayout {
                     color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                 }
 
+                // Implement a double tap gesture
+                // On released event, start the double tap timer if it is not already running
+                // On pressed event, if the timer is already running then it means the 2nd tap was done within given time and hence a double tap event should be emitted
+                // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
+                Timer {
+                    id: doublePressedTimer
+                    property bool wasAlreadySelected: false
+                    interval: 200
+                    repeat: false
+                    onTriggered: {
+                        // Slot focus is always immediately switching on click
+                        // Do not switch to slot if it was not already selected to prevent opening of the popup
+                        if (wasAlreadySelected) {
+                            // If doublePressedTimergets triggered it means double click did not happen. so, switch to the slot.
+                            slotDelegate.switchToThisSlot();
+                        }
+                    }
+                }
+
                 MouseArea {
                     id: delegateMouseArea
                     property real initialMouseX
@@ -482,9 +501,33 @@ RowLayout {
                         delegateMouseArea.initialMouseX = mouse.x
                     }
                     onReleased: {
-                        dragHappenedResetTimer.restart()
+                        dragHappenedResetTimer.restart();
+                        if (doublePressedTimer.running) {
+                            doublePressedTimer.stop();
+                            // Double press has happened. Toggle mute/bypass state the slot
+                            switch (control.slotType) {
+                                case "synth":
+                                    if (slotDelegate.synthPassthroughClient) {
+                                        slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
+                                    }
+                                    break;
+                                case "sample":
+                                    // TODO : Toggle sample muted state
+                                    break;
+                                case "fx":
+                                    if (slotDelegate.fxPassthroughClient) {
+                                        slotDelegate.fxPassthroughClient.bypass = !slotDelegate.fxPassthroughClient.bypass;
+                                    }
+                                    break;
+                            }
+                        } else {
+                            // Set wasAlreadySelected before starting timer to determine if slot popup needs to be opened if double click did not happen
+                            doublePressedTimer.wasAlreadySelected = slotDelegate.highlighted;
+                            doublePressedTimer.restart();
+                        }
+                        // When clicked, switch focus immediately
+                        slotDelegate.switchToThisSlot(true);
                     }
-                    onClicked: slotDelegate.switchToThisSlot()
                     onMouseXChanged: {
                         var newVal
                         if (control.slotType === "synth" && control.selectedChannel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {

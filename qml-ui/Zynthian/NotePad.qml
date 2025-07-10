@@ -196,6 +196,19 @@ Item {
                 property double slideX: x < 0 ? Math.floor(x) : (x > component.width ? x - component.width : 0)
                 property double slideY: y < 0 ? -Math.floor(y) : (y > component.height ? -(y - component.height) : 0)
                 property var playingNote;
+                function stopNote() {
+                    if (slidePoint.playingNote) {
+                        let note = slidePoint.playingNote;
+                        note.setOff();
+                        component.noteOff(note);
+                        note.sendPitchChange(0);
+                        note = undefined;
+                        Zynthbox.PlayGridManager.modulation = 0;
+                    }
+                }
+                Component.onDestruction: {
+                    slidePoint.stopNote();
+                }
                 function updateInsideBounds() {
                     if (pressed) {
                         if (x > -1 && y > -1 && x < component.width && y < component.height) {
@@ -225,11 +238,7 @@ Item {
                         longPressTimer.restart();
                     } else {
                         // console.log("We've got a playing note set, turn that off");
-                        slidePoint.playingNote.setOff();
-                        component.noteOff(slidePoint.playingNote);
-                        slidePoint.playingNote.sendPitchChange(0);
-                        slidePoint.playingNote = undefined;
-                        Zynthbox.PlayGridManager.modulation = 0;
+                        slidePoint.stopNote();
                         component.pressingAndHolding = false;
                         longPressTimer.stop();
                     }

@@ -29,7 +29,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
-
+import QtGraphicalEffects 1.0
+import org.kde.plasma.core 2.0 as PlasmaCore
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
 
@@ -891,7 +892,9 @@ Zynthian.Popup {
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                        text:"-"
+                                        icon.name: "list-remove-symbolic"
+                                        icon.width: 24
+                                        icon.height: 24
                                         enabled: _private.selectedPattern && _private.selectedPattern.stepLength > _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.stepLength, -1)
                                         onClicked: {
                                             _private.stepLengthDown();
@@ -908,7 +911,10 @@ Zynthian.Popup {
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                        text: "+"
+                                        icon.name: "list-add-symbolic"
+                                        icon.width: 24
+                                        icon.height: 24
+                                        icon.color: Kirigami.Theme.textColor
                                         enabled: _private.selectedPattern && _private.selectedPattern.stepLength < _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.stepLength, 1)
                                         onClicked: {
                                             _private.stepLengthUp();
@@ -925,7 +931,9 @@ Zynthian.Popup {
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        text:"-"
+                                        icon.name: "list-remove-symbolic"
+                                        icon.width: 24
+                                        icon.height: 24
                                         enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount > 0
                                         onClicked: {
                                             _private.patternQuantizingAmountDown();
@@ -937,6 +945,9 @@ Zynthian.Popup {
                                         Layout.preferredHeight: noteLengthLabel.height
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         horizontalAlignment: Text.AlignHCenter
+                                        fontSizeMode: Text.Fit
+                                        minimumPointSize: 6
+                                        wrapMode: Text.NoWrap
                                         text: _private.selectedPattern
                                             ? _private.selectedPattern.liveRecordingQuantizingAmount === 0
                                                 ? qsTr("Quantize To Step")
@@ -970,7 +981,9 @@ Zynthian.Popup {
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        text: "+"
+                                        icon.name: "list-add-symbolic"
+                                        icon.width: 24
+                                        icon.height: 24
                                         enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount < 1536
                                         onClicked: {
                                             _private.patternQuantizingAmountUp();
@@ -983,7 +996,9 @@ Zynthian.Popup {
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        text:"-"
+                                        icon.name: "list-remove-symbolic"
+                                        icon.width: 24
+                                        icon.height: 24
                                         enabled: _private.selectedPattern && _private.selectedPattern.patternLength > _private.selectedPattern.width
                                         onClicked: {
                                             _private.patternLengthDown();
@@ -995,11 +1010,14 @@ Zynthian.Popup {
                                         Layout.preferredHeight: noteLengthLabel.height
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         horizontalAlignment: Text.AlignHCenter
+                                        fontSizeMode: Text.Fit
+                                        minimumPointSize: 6
+                                        wrapMode: Text.NoWrap
                                         text: _private.selectedPattern
-                                            ? _private.selectedPattern.availableBars * _private.selectedPattern.width === _private.selectedPattern.patternLength
+                                              ? _private.selectedPattern.availableBars * _private.selectedPattern.width === _private.selectedPattern.patternLength
                                                 ? qsTr("Pattern Length: %1 Bars").arg(_private.selectedPattern.availableBars)
                                                 : qsTr("Pattern Length: %1.%2 Bars").arg(_private.selectedPattern.availableBars - 1).arg(_private.selectedPattern.patternLength - ((_private.selectedPattern.availableBars - 1) * _private.selectedPattern.width))
-                                            : ""
+                                        : ""
                                         MultiPointTouchArea {
                                             anchors.fill: parent
                                             touchPoints: [
@@ -1025,10 +1043,13 @@ Zynthian.Popup {
                                             ]
                                         }
                                     }
+
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        text: "+"
+                                        icon.name: "list-add-symbolic"
+                                        icon.width: 24
+                                        icon.height: 24
                                         enabled: _private.selectedPattern && _private.selectedPattern.patternLength < (_private.selectedPattern.bankLength * _private.selectedPattern.width)
                                         onClicked: {
                                             _private.patternLengthUp();
@@ -1047,137 +1068,173 @@ Zynthian.Popup {
                     Layout.minimumHeight: Layout.preferredHeight
                     spacing: root.spacing
 
-                    Rectangle {
+                    QQC2.Control {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        color: "#222222"
-                        border.width: 1
-                        border.color: "#ff999999"
-                        radius: 4
+                        // Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                        padding: 1
 
-                        Zynthbox.WaveFormItem {
-                            anchors.fill: parent
-                            color: Kirigami.Theme.textColor
-                            visible: recordingTypeSettingsStack.currentIndex === 0
-                            start: 0
-                            end: length
-                            source: {
-                                if (zynqtgui.sketchpad.isRecording) {
-                                    return "audioLevelsChannel:/ports"
-                                } else if (_private.selectedClip != null && !_private.selectedClip.isEmpty) {
-                                    return _private.selectedClip.path
-                                } else {
-                                    return ""
-                                }
-                            }
-                        }
-                        Image {
-                            id: patternVisualiser
+                        background: Item {
 
-                            visible: _private.selectedPattern !== null && recordingTypeSettingsStack.currentIndex === 1
+                            Rectangle {
+                                visible: !svgBg2.fromCurrentTheme
+                                anchors.fill: parent
+                                border.width: 1
+                                border.color: "#ff999999"
+                                radius: 4
+                                color: "#222222"
+                            }
 
-                            anchors {
-                                fill: parent
-                                margins: Kirigami.Units.smallSpacing
-                            }
-                            smooth: false
-                            asynchronous: true
-                            Timer {
-                                id: patternVisualiserThumbnailUpdater
-                                interval: 10; repeat: false; running: false;
-                                onTriggered: {
-                                    patternVisualiser.source = _private.selectedPattern.thumbnailUrl;
-                                }
-                            }
-                            Connections {
-                                target: _private.selectedPattern
-                                onThumbnailUrlChanged: {
-                                    patternVisualiserThumbnailUpdater.restart();
-                                }
-                            }
-                            Connections {
-                                target: _private
-                                onSelectedPatternChanged: {
-                                    patternVisualiserThumbnailUpdater.restart();
-                                }
-                            }
-                            Rectangle { // Progress
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                }
-                                visible: patternVisualiser.visible && _private.selectedPattern ? _private.selectedPattern.isPlaying : false
-                                color: Kirigami.Theme.highlightColor
-                                width: Math.max(1, Math.floor(widthFactor)) // this way the progress rect is the same width as a step
-                                property double widthFactor: visible ? parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength) : 1
-                                x: visible ? _private.selectedPattern.bankPlaybackPosition * widthFactor : 0
-                            }
-                            QQC2.Label {
-                                anchors {
-                                    top: parent.top
-                                    right: parent.right
-                                    margins: Kirigami.Units.smallSpacing
-                                    rightMargin: patternVisualiser.visible ? parent.width - (_private.selectedPattern.patternLength * (parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength))) : 0
-                                }
-                                text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.patternLength, _private.selectedPattern.stepLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
-                                function patternBarsToSeconds(patternSteps, noteLength, bpm) {
-                                    // Set up the loop points in the new recording
-                                    let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
-                                    // Reset this to beats (rather than pattern subbeats)
-                                    let patternDurationInBeats = patternSteps * noteLength / patternSubbeatToTickMultiplier;
-                                    let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
-                                    return patternDurationInSeconds;
-                                }
+                            PlasmaCore.FrameSvgItem {
+                                id: svgBg2
+                                anchors.fill: parent
+                                readonly property bool highlighted: false
+
+                                imagePath: "widgets/statusinfo_background"
+                                colorGroup: PlasmaCore.Theme.ViewColorGroup
+                                prefix: svgBg2.highlighted ? ["focus", ""] : ""
                             }
                         }
 
-                        ColumnLayout {
-                            anchors.fill: parent
-                            anchors.margins: Kirigami.Units.largeSpacing
-                            spacing: Kirigami.Units.largeSpacing
-                            opacity: 0.7
+                        contentItem: Item {
+                            id: patternVisualiserItem
 
-                            Rectangle {
-                                property real audioLevel: {
-                                    if (root.visible && root.selectedChannel != null) {
-                                        if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
-                                            return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                        } else if (zynqtgui.sketchpad.recordingSource === "external") {
-                                            return Zynthbox.AudioLevels.captureA
-                                        } else {
-                                            return -100
-                                        }
-                                    } else {
-                                        return -100
-                                    }
+                            clip: true
+
+                            layer.enabled: true
+                            layer.effect: OpacityMask
+                            {
+                                maskSource: Rectangle
+                                {
+                                    width: patternVisualiserItem.width
+                                    height: patternVisualiserItem.height
+                                    radius: 4
                                 }
-                                Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
-                                Layout.minimumWidth: Layout.preferredWidth
-                                Layout.maximumWidth: Layout.preferredWidth
-                                Layout.fillHeight: true
-                                color: Kirigami.Theme.highlightColor
-                                radius: 100
                             }
-                            Rectangle {
-                                property real audioLevel: {
-                                    if (root.visible && root.selectedChannel != null) {
-                                        if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
-                                            return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                        } else if (zynqtgui.sketchpad.recordingSource === "external") {
-                                            return Zynthbox.AudioLevels.captureB
+                            Zynthbox.WaveFormItem {
+                                anchors.fill: parent
+                                color: Kirigami.Theme.textColor
+                                visible: recordingTypeSettingsStack.currentIndex === 0
+                                start: 0
+                                end: length
+                                source: {
+                                    if (zynqtgui.sketchpad.isRecording) {
+                                        return "audioLevelsChannel:/ports"
+                                    } else if (_private.selectedClip != null && !_private.selectedClip.isEmpty) {
+                                        return _private.selectedClip.path
+                                    } else {
+                                        return ""
+                                    }
+                                }
+                            }
+                            Image {
+                                id: patternVisualiser
+
+                                visible: _private.selectedPattern !== null && recordingTypeSettingsStack.currentIndex === 1
+
+                                anchors {
+                                    fill: parent
+                                    // margins: Kirigami.Units.smallSpacing
+                                }
+                                smooth: false
+                                asynchronous: true
+                                Timer {
+                                    id: patternVisualiserThumbnailUpdater
+                                    interval: 10; repeat: false; running: false;
+                                    onTriggered: {
+                                        patternVisualiser.source = _private.selectedPattern.thumbnailUrl;
+                                    }
+                                }
+                                Connections {
+                                    target: _private.selectedPattern
+                                    onThumbnailUrlChanged: {
+                                        patternVisualiserThumbnailUpdater.restart();
+                                    }
+                                }
+                                Connections {
+                                    target: _private
+                                    onSelectedPatternChanged: {
+                                        patternVisualiserThumbnailUpdater.restart();
+                                    }
+                                }
+                                Rectangle { // Progress
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                    }
+                                    visible: patternVisualiser.visible && _private.selectedPattern ? _private.selectedPattern.isPlaying : false
+                                    color: Kirigami.Theme.highlightColor
+                                    width: Math.max(1, Math.floor(widthFactor)) // this way the progress rect is the same width as a step
+                                    property double widthFactor: visible ? parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength) : 1
+                                    x: visible ? _private.selectedPattern.bankPlaybackPosition * widthFactor : 0
+                                }
+                                QQC2.Label {
+                                    anchors {
+                                        top: parent.top
+                                        right: parent.right
+                                        margins: Kirigami.Units.smallSpacing
+                                        rightMargin: patternVisualiser.visible ? parent.width - (_private.selectedPattern.patternLength * (parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength))) : 0
+                                    }
+                                    text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.patternLength, _private.selectedPattern.stepLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
+                                    function patternBarsToSeconds(patternSteps, noteLength, bpm) {
+                                        // Set up the loop points in the new recording
+                                        let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
+                                        // Reset this to beats (rather than pattern subbeats)
+                                        let patternDurationInBeats = patternSteps * noteLength / patternSubbeatToTickMultiplier;
+                                        let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
+                                        return patternDurationInSeconds;
+                                    }
+                                }
+                            }
+
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: Kirigami.Units.largeSpacing
+                                spacing: Kirigami.Units.largeSpacing
+                                opacity: 0.7
+
+                                Rectangle {
+                                    property real audioLevel: {
+                                        if (root.visible && root.selectedChannel != null) {
+                                            if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
+                                                return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                            } else if (zynqtgui.sketchpad.recordingSource === "external") {
+                                                return Zynthbox.AudioLevels.captureA
+                                            } else {
+                                                return -100
+                                            }
                                         } else {
                                             return -100
                                         }
-                                    } else {
-                                        return -100
                                     }
+                                    Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.minimumWidth: Layout.preferredWidth
+                                    Layout.maximumWidth: Layout.preferredWidth
+                                    Layout.fillHeight: true
+                                    color: Kirigami.Theme.highlightColor
+                                    radius: 100
                                 }
-                                Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
-                                Layout.minimumWidth: Layout.preferredWidth
-                                Layout.maximumWidth: Layout.preferredWidth
-                                Layout.fillHeight: true
-                                color: Kirigami.Theme.highlightColor
-                                radius: 100
+                                Rectangle {
+                                    property real audioLevel: {
+                                        if (root.visible && root.selectedChannel != null) {
+                                            if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
+                                                return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                            } else if (zynqtgui.sketchpad.recordingSource === "external") {
+                                                return Zynthbox.AudioLevels.captureB
+                                            } else {
+                                                return -100
+                                            }
+                                        } else {
+                                            return -100
+                                        }
+                                    }
+                                    Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.minimumWidth: Layout.preferredWidth
+                                    Layout.maximumWidth: Layout.preferredWidth
+                                    Layout.fillHeight: true
+                                    color: Kirigami.Theme.highlightColor
+                                    radius: 100
+                                }
                             }
                         }
                     }
@@ -1186,26 +1243,26 @@ Zynthian.Popup {
                         Layout.fillHeight: true
                         Layout.preferredWidth: height
                         icon.name: "edit-clear-symbolic"
-                        icon.color: "#ffffffff"
+                        icon.color: Kirigami.Theme.textColor
                         onClicked: {
                             switch(recordingTypeSettingsStack.currentIndex) {
-                                case 0: // Audio Recording
-                                    applicationWindow().confirmClearClip(_private.selectedClip);
-                                    if (_private.selectedClip.path == null) {
-                                        _private.mostRecentlyRecordedClip = null;
-                                    }
-                                    break;
-                                case 1: // MIDI Recording
-                                    if (_private.selectedPattern.hasNotes) {
-                                        applicationWindow().confirmClearPattern(root.selectedChannel, _private.selectedPattern);
-                                    }
-                                    break;
-                                default:
-                                    // Audio Recording has three options:
-                                    // - Clear slot and delete recording
-                                    // - Clear slot and leave recording
-                                    // - Don't clear
-                                    break;
+                            case 0: // Audio Recording
+                                applicationWindow().confirmClearClip(_private.selectedClip);
+                                if (_private.selectedClip.path == null) {
+                                    _private.mostRecentlyRecordedClip = null;
+                                }
+                                break;
+                            case 1: // MIDI Recording
+                                if (_private.selectedPattern.hasNotes) {
+                                    applicationWindow().confirmClearPattern(root.selectedChannel, _private.selectedPattern);
+                                }
+                                break;
+                            default:
+                                // Audio Recording has three options:
+                                // - Clear slot and delete recording
+                                // - Clear slot and leave recording
+                                // - Don't clear
+                                break;
                             }
                         }
                     }
@@ -1241,6 +1298,7 @@ Zynthian.Popup {
         }
         QQC2.Button {
             Layout.fillWidth: true
+            Layout.margins: Kirigami.Units.smallSpacing
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             text: qsTr("Close")
             onClicked: {

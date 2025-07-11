@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
@@ -65,72 +66,72 @@ Zynthian.DialogQuestion {
     cuiaCallback: function(cuia) {
         let returnValue = false;
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
-                component.reject();
-                returnValue = true;
-                break;
-            case "NAVIGATE_LEFT":
-            case "SELECT_DOWN":
-                _private.goLeft();
-                returnValue = true;
-                break;
-            case "NAVIGATE_RIGHT":
-            case "SELECT_UP":
-                _private.goRight();
-                returnValue = true;
-                break;
-            case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
-                _private.select();
-                returnValue = true;
-                break;
-            case "KNOB0_UP":
-                _private.knob0Up();
-                returnValue = true;
-                break;
-            case "KNOB0_DOWN":
-                _private.knob0Down();
-                returnValue = true;
-                break;
-            case "KNOB1_UP":
-                _private.knob1Up();
-                returnValue = true;
-                break;
-            case "KNOB1_DOWN":
-                _private.knob1Down();
-                returnValue = true;
-                break;
-            case "KNOB2_UP":
-                _private.knob2Up();
-                returnValue = true;
-                break;
-            case "KNOB2_DOWN":
-                _private.knob2Down();
-                returnValue = true;
-                break;
-            case "KNOB3_UP":
-                _private.knob3Up();
-                returnValue = true;
-                break;
-            case "KNOB3_DOWN":
-                _private.knob3Down();
-                returnValue = true;
-                break;
-            case "KNOB0_TOUCHED":
-            case "KNOB0_RELEASED":
-            case "KNOB1_TOUCHED":
-            case "KNOB1_RELEASED":
-            case "KNOB2_TOUCHED":
-            case "KNOB2_RELEASED":
-            case "KNOB3_TOUCHED":
-            case "KNOB3_RELEASED":
-                returnValue = true;
-                break;
-            case "SWITCH_MODE_RELEASED":
-                // when this dialog is open, switching tracks or clips would be... a problem in general, so let's not let that happen
-                returnValue = true;
-                break;
+        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_BOLD":
+            component.reject();
+            returnValue = true;
+            break;
+        case "NAVIGATE_LEFT":
+        case "SELECT_DOWN":
+            _private.goLeft();
+            returnValue = true;
+            break;
+        case "NAVIGATE_RIGHT":
+        case "SELECT_UP":
+            _private.goRight();
+            returnValue = true;
+            break;
+        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_BOLD":
+            _private.select();
+            returnValue = true;
+            break;
+        case "KNOB0_UP":
+            _private.knob0Up();
+            returnValue = true;
+            break;
+        case "KNOB0_DOWN":
+            _private.knob0Down();
+            returnValue = true;
+            break;
+        case "KNOB1_UP":
+            _private.knob1Up();
+            returnValue = true;
+            break;
+        case "KNOB1_DOWN":
+            _private.knob1Down();
+            returnValue = true;
+            break;
+        case "KNOB2_UP":
+            _private.knob2Up();
+            returnValue = true;
+            break;
+        case "KNOB2_DOWN":
+            _private.knob2Down();
+            returnValue = true;
+            break;
+        case "KNOB3_UP":
+            _private.knob3Up();
+            returnValue = true;
+            break;
+        case "KNOB3_DOWN":
+            _private.knob3Down();
+            returnValue = true;
+            break;
+        case "KNOB0_TOUCHED":
+        case "KNOB0_RELEASED":
+        case "KNOB1_TOUCHED":
+        case "KNOB1_RELEASED":
+        case "KNOB2_TOUCHED":
+        case "KNOB2_RELEASED":
+        case "KNOB3_TOUCHED":
+        case "KNOB3_RELEASED":
+            returnValue = true;
+            break;
+        case "SWITCH_MODE_RELEASED":
+            // when this dialog is open, switching tracks or clips would be... a problem in general, so let's not let that happen
+            returnValue = true;
+            break;
         }
         return returnValue;
     }
@@ -159,7 +160,7 @@ Zynthian.DialogQuestion {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 24
-            Item {
+            QQC2.Control {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 10
@@ -170,31 +171,31 @@ Zynthian.DialogQuestion {
                     property int slotIndex: 0
                     property int displayedSection: 0
                     property QtObject engineData: selectedChannel === null
-                        ? null
-                        : slotType === "synth"
-                            ? selectedChannel.synthRoutingData[slotIndex]
-                            : slotType === "fx"
-                                ? selectedChannel.fxRoutingData[slotIndex]
-                                : slotType === "sketchfx"
-                                    ? selectedChannel.sketchFxRoutingData[slotIndex]
-                                    : null
+                                                  ? null
+                                                  : slotType === "synth"
+                                                    ? selectedChannel.synthRoutingData[slotIndex]
+                                                    : slotType === "fx"
+                                                      ? selectedChannel.fxRoutingData[slotIndex]
+                                                      : slotType === "sketchfx"
+                                                        ? selectedChannel.sketchFxRoutingData[slotIndex]
+                                                        : null
                     property QtObject slotPassthroughClient: slotType === ""
-                        ? null
-                        : slotType === "sketch"
-                            ? Zynthbox.PlayGridManager.getClipById(slotIndex)
-                            : slotType === "sample"
-                                ? Zynthbox.PlayGridManager.getClipById(slotIndex)
-                                : slotType === "global"
-                                    ? Zynthbox.Plugin.globalPlaybackClient
-                                    : slotType === "track"
-                                        ? Zynthbox.Plugin.trackPassthroughClient(selectedChannel.id, (selectedChannel.trackTypeKey === "sketch" ? 1 : 0), 0)
-                                        : slotType === "synth"
-                                            ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
-                                            : slotType === "fx"
-                                                ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
-                                                : slotType === "sketchfx"
-                                                    ? Zynthbox.Plugin.sketchFxPassthroughClients[selectedChannel.id][slotIndex]
-                                                    : null
+                                                             ? null
+                                                             : slotType === "sketch"
+                                                               ? Zynthbox.PlayGridManager.getClipById(slotIndex)
+                                                               : slotType === "sample"
+                                                                 ? Zynthbox.PlayGridManager.getClipById(slotIndex)
+                                                                 : slotType === "global"
+                                                                   ? Zynthbox.Plugin.globalPlaybackClient
+                                                                   : slotType === "track"
+                                                                     ? Zynthbox.Plugin.trackPassthroughClient(selectedChannel.id, (selectedChannel.trackTypeKey === "sketch" ? 1 : 0), 0)
+                                                                     : slotType === "synth"
+                                                                       ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
+                                                                       : slotType === "fx"
+                                                                         ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
+                                                                         : slotType === "sketchfx"
+                                                                           ? Zynthbox.Plugin.sketchFxPassthroughClients[selectedChannel.id][slotIndex]
+                                                                           : null
                     function getCurrent() {
                         let currentObject = null;
                         if (_private.slotPassthroughClient.compressorSettings.selected === true) {
@@ -365,24 +366,38 @@ Zynthian.DialogQuestion {
                         goLeft();
                     }
                 }
-                Zynthbox.JackPassthroughVisualiserItem {
-                    anchors.fill: parent
-                    source: _private.slotPassthroughClient
-                }
-                Rectangle {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        bottom: parent.bottom
-                        bottomMargin: slidePoint.selectedBand === null ? 0 : Math.min(Math.max(parent.height - slidePoint.y, 0), parent.height)
+
+                background: Item {
+
+                    PlasmaCore.FrameSvgItem {
+                        anchors.fill: parent
+                        readonly property bool highlighted: false
+
+                        imagePath: "widgets/statusinfo_background"
+                        colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        prefix: highlighted ? ["focus", ""] : ""
                     }
-                    height: 1
-                    visible: slidePoint.selectedBand !== null
-                    color: slidePoint.selectedBand === null ? "black" : slidePoint.selectedBand.color
                 }
-                MultiPointTouchArea {
+                contentItem: MultiPointTouchArea {
                     id: graphTouchArea
-                    anchors.fill: parent
+
+                    Rectangle {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            bottom: parent.bottom
+                            bottomMargin: slidePoint.selectedBand === null ? 0 : Math.min(Math.max(parent.height - slidePoint.y, 0), parent.height)
+                        }
+                        height: 1
+                        visible: slidePoint.selectedBand !== null
+                        color: slidePoint.selectedBand === null ? "black" : slidePoint.selectedBand.color
+                    }
+
+                    Zynthbox.JackPassthroughVisualiserItem {
+                        anchors.fill: parent
+                        source: _private.slotPassthroughClient
+                    }
+
                     touchPoints: [
                         TouchPoint {
                             id: slidePoint;
@@ -434,233 +449,249 @@ Zynthian.DialogQuestion {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 18
                 Repeater {
                     model: 6
-                    Item {
+                    QQC2.Control {
                         id: bandDelegate
                         property QtObject filterSettings: _private.slotPassthroughClient === null ? null : _private.slotPassthroughClient.equaliserSettings[model.index]
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 20
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Kirigami.Units.smallSpacing
-                            color: "transparent"
-                            border {
-                                width: 1
-                                color: bandDelegate.filterSettings && bandDelegate.filterSettings.selected ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
+                        padding: Kirigami.Units.largeSpacing
+
+                        background: Item {
+                            Rectangle {
+                                visible: !svgBg2.visible
+                                anchors.fill: parent
+                                radius: Kirigami.Units.smallSpacing
+                                color: "transparent"
+                                border {
+                                    width: 1
+                                    color: bandDelegate.filterSettings && bandDelegate.filterSettings.selected ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
+                                }
+                            }
+
+                            PlasmaCore.FrameSvgItem {
+                                id: svgBg2
+                                visible: fromCurrentTheme
+                                anchors.fill: parent
+                                property bool highlighted : bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                readonly property real leftPadding: fixedMargins.left
+                                readonly property real rightPadding: fixedMargins.right
+                                readonly property real topPadding: fixedMargins.top
+                                readonly property real bottomPadding: fixedMargins.bottom
+
+                                imagePath: "widgets/column-delegate-background"
+                                prefix: highlighted ? ["focus", ""] : ""
+                                colorGroup: PlasmaCore.Theme.ViewColorGroup
                             }
                         }
-                        MouseArea {
-                            anchors.fill: parent
+
+                        contentItem: MouseArea {
                             onClicked: {
                                 _private.slotPassthroughClient.compressorSettings.selected = false;
                                 bandDelegate.filterSettings.selected = true;
                             }
-                        }
-                        ColumnLayout {
-                            anchors {
-                                fill: parent
-                                margins: Kirigami.Units.largeSpacing
-                            }
-                            Kirigami.Heading {
-                                text: bandDelegate.filterSettings ? bandDelegate.filterSettings.name : ""
-                                level: 3
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: Kirigami.Units.gridUnit
-                                Rectangle {
-                                    anchors {
-                                        right: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                    }
-                                    height: parent.paintedHeight
-                                    width: height
-                                    radius: height / 2
-                                    color: bandDelegate.filterSettings ? bandDelegate.filterSettings.color : "black"
-                                }
-                            }
-                            Zynthian.PlayGridButton {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                text: bandDelegate.filterSettings ? bandDelegate.filterSettings.filterTypeName(bandDelegate.filterSettings.filterType) : ""
-                                onClicked: {
-                                    filterTypeCombo.currentIndex = bandDelegate.filterSettings.filterType;
-                                    filterTypeCombo.onClicked()
-                                }
-                                Zynthian.ComboBox {
-                                    id: filterTypeCombo
-                                    visible: false;
-                                    model: bandDelegate.filterSettings ? bandDelegate.filterSettings.filterTypeNames() : 0
-                                    onActivated: {
-                                        bandDelegate.filterSettings.filterType = index
-                                    }
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                                ColumnLayout {
+                            ColumnLayout {
+                                anchors.fill: parent
+                                Kirigami.Heading {
+                                    text: bandDelegate.filterSettings ? bandDelegate.filterSettings.name : ""
+                                    level: 3
                                     Layout.fillWidth: true
-                                    Kirigami.Heading {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                        level: 4
-                                        text: qsTr("Quality")
-                                    }
-                                    Item {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                        QQC2.Dial {
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                                horizontalCenter: parent.horizontalCenter
-                                            }
-                                            width: height
-                                            inputMode: QQC2.Dial.Vertical
-                                            handle: null
-                                            value: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality : 0
-                                            from: 0
-                                            to: 10
-                                            stepSize: 0.1
-                                            onValueChanged: {
-                                                if (bandDelegate.filterSettings) {
-                                                    bandDelegate.filterSettings.quality = value;
-                                                }
-                                            }
-                                            property double lastPressed: 0
-                                            onPressedChanged: {
-                                                if (pressed === false) {
-                                                    let newTimestamp = Date.now();
-                                                    if (newTimestamp - lastPressed < 300) {
-                                                        // The same as the inverseRootTwo default
-                                                        bandDelegate.filterSettings.quality = 0.70710678118654752440;
-                                                    }
-                                                    lastPressed = newTimestamp;
-                                                }
-                                            }
-                                            Zynthian.KnobIndicator {
-                                                visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
-                                                anchors.centerIn: parent
-                                                height: parent.height / 2
-                                                width: height
-                                                knobId: 0
-                                            }
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                                    Rectangle {
+                                        anchors {
+                                            right: parent.right
+                                            verticalCenter: parent.verticalCenter
                                         }
-                                    }
-                                    QQC2.Label {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                                        horizontalAlignment: Text.AlignHCenter
-                                        text: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality.toFixed(2) : ""
+                                        height: parent.paintedHeight
+                                        width: height
+                                        radius: height / 2
+                                        color: bandDelegate.filterSettings ? bandDelegate.filterSettings.color : "black"
                                     }
                                 }
-                                ColumnLayout {
+                                Zynthian.PlayGridButton {
                                     Layout.fillWidth: true
-                                    Kirigami.Heading {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                        level: 4
-                                        text: qsTr("Gain")
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                    text: bandDelegate.filterSettings ? bandDelegate.filterSettings.filterTypeName(bandDelegate.filterSettings.filterType) : ""
+                                    onClicked: {
+                                        filterTypeCombo.currentIndex = bandDelegate.filterSettings.filterType;
+                                        filterTypeCombo.onClicked()
                                     }
-                                    Item {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                        QQC2.Dial {
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                                horizontalCenter: parent.horizontalCenter
-                                            }
-                                            width: height
-                                            inputMode: QQC2.Dial.Vertical
-                                            handle: null
-                                            value: bandDelegate.filterSettings ? bandDelegate.filterSettings.gainAbsolute : 0
-                                            from: 0
-                                            to: 1
-                                            stepSize: 0.01
-                                            onValueChanged: {
-                                                if (bandDelegate.filterSettings && bandDelegate.filterSettings.gainAbsolute !== value) {
-                                                    bandDelegate.filterSettings.gainAbsolute = value;
-                                                }
-                                            }
-                                            property double lastPressed: 0
-                                            onPressedChanged: {
-                                                if (pressed === false) {
-                                                    let newTimestamp = Date.now();
-                                                    if (newTimestamp - lastPressed < 300) {
-                                                        bandDelegate.filterSettings.gain = 1;
-                                                    }
-                                                    lastPressed = newTimestamp;
-                                                }
-                                            }
-                                            Zynthian.KnobIndicator {
-                                                visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
-                                                anchors.centerIn: parent
-                                                height: parent.height / 2
-                                                width: height
-                                                knobId: 1
-                                            }
+                                    Zynthian.ComboBox {
+                                        id: filterTypeCombo
+                                        visible: false;
+                                        model: bandDelegate.filterSettings ? bandDelegate.filterSettings.filterTypeNames() : 0
+                                        onActivated: {
+                                            bandDelegate.filterSettings.filterType = index
                                         }
-                                    }
-                                    QQC2.Label {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                                        horizontalAlignment: Text.AlignHCenter
-                                        text: bandDelegate.filterSettings ? "%1dB".arg(bandDelegate.filterSettings.gainDb.toFixed(2)) : ""
                                     }
                                 }
-                            }
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                                QQC2.Dial {
-                                    anchors {
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                        horizontalCenter: parent.horizontalCenter
-                                    }
-                                    width: height
-                                    inputMode: QQC2.Dial.Vertical
-                                    handle: null
-                                    value: bandDelegate.filterSettings ? bandDelegate.filterSettings.frequency : 0
-                                    stepSize: 1
-                                    from: 20
-                                    to: 20000
-                                    onValueChanged: {
-                                        if (bandDelegate.filterSettings) {
-                                            bandDelegate.filterSettings.frequency = value;
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        Kirigami.Heading {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: false
+                                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                            level: 4
+                                            text: qsTr("Quality")
                                         }
-                                    }
-                                    property double lastPressed: 0
-                                    property var defaultFrequencies: [20, 250, 500, 1000, 5000, 12000]
-                                    onPressedChanged: {
-                                        if (pressed === false) {
-                                            let newTimestamp = Date.now();
-                                            if (newTimestamp - lastPressed < 300) {
-                                                bandDelegate.filterSettings.frequency = defaultFrequencies[model.index];
+                                        Item {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: false
+                                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                            QQC2.Dial {
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                    horizontalCenter: parent.horizontalCenter
+                                                }
+                                                width: height
+                                                inputMode: QQC2.Dial.Vertical
+                                                handle: null
+                                                value: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality : 0
+                                                from: 0
+                                                to: 10
+                                                stepSize: 0.1
+                                                onValueChanged: {
+                                                    if (bandDelegate.filterSettings) {
+                                                        bandDelegate.filterSettings.quality = value;
+                                                    }
+                                                }
+                                                property double lastPressed: 0
+                                                onPressedChanged: {
+                                                    if (pressed === false) {
+                                                        let newTimestamp = Date.now();
+                                                        if (newTimestamp - lastPressed < 300) {
+                                                            // The same as the inverseRootTwo default
+                                                            bandDelegate.filterSettings.quality = 0.70710678118654752440;
+                                                        }
+                                                        lastPressed = newTimestamp;
+                                                    }
+                                                }
+                                                Zynthian.KnobIndicator {
+                                                    visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                                    anchors.centerIn: parent
+                                                    height: parent.height / 2
+                                                    width: height
+                                                    knobId: 0
+                                                }
                                             }
-                                            lastPressed = newTimestamp;
+                                        }
+                                        QQC2.Label {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: false
+                                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                            horizontalAlignment: Text.AlignHCenter
+                                            text: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality.toFixed(2) : ""
                                         }
                                     }
-                                    QQC2.Label {
-                                        anchors.fill: parent
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: bandDelegate.filterSettings
-                                            ?  (bandDelegate.filterSettings.frequency < 1000.0 || zynqtgui.modeButtonPressed)
-                                                ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(0))
-                                                : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        Kirigami.Heading {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: false
+                                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                            level: 4
+                                            text: qsTr("Gain")
+                                        }
+                                        Item {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: false
+                                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                            QQC2.Dial {
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                    horizontalCenter: parent.horizontalCenter
+                                                }
+                                                width: height
+                                                inputMode: QQC2.Dial.Vertical
+                                                handle: null
+                                                value: bandDelegate.filterSettings ? bandDelegate.filterSettings.gainAbsolute : 0
+                                                from: 0
+                                                to: 1
+                                                stepSize: 0.01
+                                                onValueChanged: {
+                                                    if (bandDelegate.filterSettings && bandDelegate.filterSettings.gainAbsolute !== value) {
+                                                        bandDelegate.filterSettings.gainAbsolute = value;
+                                                    }
+                                                }
+                                                property double lastPressed: 0
+                                                onPressedChanged: {
+                                                    if (pressed === false) {
+                                                        let newTimestamp = Date.now();
+                                                        if (newTimestamp - lastPressed < 300) {
+                                                            bandDelegate.filterSettings.gain = 1;
+                                                        }
+                                                        lastPressed = newTimestamp;
+                                                    }
+                                                }
+                                                Zynthian.KnobIndicator {
+                                                    visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                                    anchors.centerIn: parent
+                                                    height: parent.height / 2
+                                                    width: height
+                                                    knobId: 1
+                                                }
+                                            }
+                                        }
+                                        QQC2.Label {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: false
+                                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                            horizontalAlignment: Text.AlignHCenter
+                                            text: bandDelegate.filterSettings ? "%1dB".arg(bandDelegate.filterSettings.gainDb.toFixed(2)) : ""
+                                        }
+                                    }
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                                    QQC2.Dial {
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                            horizontalCenter: parent.horizontalCenter
+                                        }
+                                        width: height
+                                        inputMode: QQC2.Dial.Vertical
+                                        handle: null
+                                        value: bandDelegate.filterSettings ? bandDelegate.filterSettings.frequency : 0
+                                        stepSize: 1
+                                        from: 20
+                                        to: 20000
+                                        onValueChanged: {
+                                            if (bandDelegate.filterSettings) {
+                                                bandDelegate.filterSettings.frequency = value;
+                                            }
+                                        }
+                                        property double lastPressed: 0
+                                        property var defaultFrequencies: [20, 250, 500, 1000, 5000, 12000]
+                                        onPressedChanged: {
+                                            if (pressed === false) {
+                                                let newTimestamp = Date.now();
+                                                if (newTimestamp - lastPressed < 300) {
+                                                    bandDelegate.filterSettings.frequency = defaultFrequencies[model.index];
+                                                }
+                                                lastPressed = newTimestamp;
+                                            }
+                                        }
+                                        QQC2.Label {
+                                            anchors.fill: parent
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                            text: bandDelegate.filterSettings
+                                                  ?  (bandDelegate.filterSettings.frequency < 1000.0 || zynqtgui.modeButtonPressed)
+                                                    ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(0))
+                                                    : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
                                             : ""
                                             Zynthian.KnobIndicator {
                                                 visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
@@ -673,34 +704,35 @@ Zynthian.DialogQuestion {
                                                 width: height
                                                 knobId: 2
                                             }
+                                        }
                                     }
                                 }
-                            }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                Zynthian.PlayGridButton {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    Layout.fillHeight: false
-                                    text: qsTr("S")
-                                    checked: bandDelegate.filterSettings ? bandDelegate.filterSettings.soloed : false
-                                    onClicked: {
-                                        bandDelegate.filterSettings.soloed =!bandDelegate.filterSettings.soloed;
-                                    }
-                                }
-                                Item {
+                                RowLayout {
                                     Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 1
-                                }
-                                Zynthian.PlayGridButton {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    Layout.fillHeight: false
-                                    text: qsTr("A")
-                                    checked: bandDelegate.filterSettings ? bandDelegate.filterSettings.active : false
-                                    onClicked: {
-                                        bandDelegate.filterSettings.active = !bandDelegate.filterSettings.active;
+                                    Zynthian.PlayGridButton {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                        Layout.fillHeight: false
+                                        text: qsTr("S")
+                                        checked: bandDelegate.filterSettings ? bandDelegate.filterSettings.soloed : false
+                                        onClicked: {
+                                            bandDelegate.filterSettings.soloed =!bandDelegate.filterSettings.soloed;
+                                        }
+                                    }
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 1
+                                    }
+                                    Zynthian.PlayGridButton {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                        Layout.fillHeight: false
+                                        text: qsTr("A")
+                                        checked: bandDelegate.filterSettings ? bandDelegate.filterSettings.active : false
+                                        onClicked: {
+                                            bandDelegate.filterSettings.active = !bandDelegate.filterSettings.active;
+                                        }
                                     }
                                 }
                             }
@@ -709,23 +741,42 @@ Zynthian.DialogQuestion {
                 }
             }
         }
-        Item {
+        QQC2.Control {
             id: compressorSettings
             property QtObject filterSettings: null
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-            Rectangle {
-                anchors.fill: parent
-                radius: Kirigami.Units.smallSpacing
-                color: "transparent"
-                border {
-                    width: 1
-                    color: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.selected ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
+            padding: Kirigami.Units.largeSpacing
+
+            background: Item {
+                Rectangle {
+                    visible: svgBg.visible
+                    anchors.fill: parent
+                    radius: Kirigami.Units.smallSpacing
+                    color: "transparent"
+                    border {
+                        width: 1
+                        color: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.selected ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
+                    }
+                }
+                PlasmaCore.FrameSvgItem {
+                    id: svgBg
+                    visible: fromCurrentTheme
+                    anchors.fill: parent
+                    readonly property bool highlighted : _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.selected
+                    readonly property real leftPadding: fixedMargins.left
+                    readonly property real rightPadding: fixedMargins.right
+                    readonly property real topPadding: fixedMargins.top
+                    readonly property real bottomPadding: fixedMargins.bottom
+
+                    imagePath: "widgets/column-delegate-background"
+                    prefix: highlighted ? ["focus", ""] : ""
+                    colorGroup: PlasmaCore.Theme.ViewColorGroup
                 }
             }
-            MouseArea {
-                anchors.fill: parent
+
+            contentItem: MouseArea {
                 onClicked: {
                     let current = _private.getCurrent();
                     if (current !== _private.slotPassthroughClient.compressorSettings) {
@@ -733,66 +784,64 @@ Zynthian.DialogQuestion {
                     }
                     _private.slotPassthroughClient.compressorSettings.selected = true;
                 }
-            }
-            ColumnLayout {
-                anchors {
-                    fill: parent
-                    margins: Kirigami.Units.largeSpacing
-                }
-                Kirigami.Heading {
-                    text: qsTr("Compressor")
-                    level: 3
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit
-                }
-                Zynthian.PlayGridButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                    text: _private.slotPassthroughClient
-                        ? _private.slotPassthroughClient.compressorSidechannelLeft.length > 0
-                            ? "L: %1".arg(sideChainSourcePicker.model[Zynthbox.MidiRouter.model.audioInSourceIndex(_private.slotPassthroughClient.compressorSidechannelLeft)].text)
-                            : qsTr("L: No Sidechannel")
-                        : ""
-                    onClicked: {
-                        sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 0);
+
+                ColumnLayout {
+                    anchors.fill: parent
+
+                    Kirigami.Heading {
+                        text: qsTr("Compressor")
+                        level: 3
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
                     }
-                }
-                Zynthian.PlayGridButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                    text: _private.slotPassthroughClient
-                        ? _private.slotPassthroughClient.compressorSidechannelLeft.length > 0
-                            ? "R: %1".arg(sideChainSourcePicker.model[Zynthbox.MidiRouter.model.audioInSourceIndex(_private.slotPassthroughClient.compressorSidechannelLeft)].text)
-                            : qsTr("R: No Sidechannel")
+                    Zynthian.PlayGridButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        text: _private.slotPassthroughClient
+                              ? _private.slotPassthroughClient.compressorSidechannelLeft.length > 0
+                                ? "L: %1".arg(sideChainSourcePicker.model[Zynthbox.MidiRouter.model.audioInSourceIndex(_private.slotPassthroughClient.compressorSidechannelLeft)].text)
+                                : qsTr("L: No Sidechannel")
                         : ""
-                    onClicked: {
-                        sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 1);
-                    }
-                }
-                Zynthian.ComboBox {
-                    id: sideChainSourcePicker
-                    visible: false;
-                    model: Zynthbox.MidiRouter.model.audioInSources
-                    function pickSource(passthroughClient, channel) {
-                        sideChainSourcePicker.passthroughClient = passthroughClient;
-                        sideChainSourcePicker.channel = channel;
-                        if (channel === 0 && passthroughClient.compressorSidechannelLeft.length > 0) {
-                            sideChainSourcePicker.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(passthroughClient.compressorSidechannelLeft));
-                        } else if (channel === 1 && passthroughClient.compressorSidechannelRight.length > 0) {
-                            sideChainSourcePicker.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(passthroughClient.compressorSidechannelRight));
-                        } else {
-                            sideChainSourcePicker.selectIndex(-1);
+                        onClicked: {
+                            sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 0);
                         }
-                        sideChainSourcePicker.onClicked();
                     }
-                    textRole: "text"
-                    property QtObject passthroughClient: null
-                    property int channel: -1
-                    onActivated: {
-                        let listElement = sideChainSourcePicker.model[index];
-                        switch (sideChainSourcePicker.channel) {
+                    Zynthian.PlayGridButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        text: _private.slotPassthroughClient
+                              ? _private.slotPassthroughClient.compressorSidechannelLeft.length > 0
+                                ? "R: %1".arg(sideChainSourcePicker.model[Zynthbox.MidiRouter.model.audioInSourceIndex(_private.slotPassthroughClient.compressorSidechannelLeft)].text)
+                                : qsTr("R: No Sidechannel")
+                        : ""
+                        onClicked: {
+                            sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 1);
+                        }
+                    }
+                    Zynthian.ComboBox {
+                        id: sideChainSourcePicker
+                        visible: false;
+                        model: Zynthbox.MidiRouter.model.audioInSources
+                        function pickSource(passthroughClient, channel) {
+                            sideChainSourcePicker.passthroughClient = passthroughClient;
+                            sideChainSourcePicker.channel = channel;
+                            if (channel === 0 && passthroughClient.compressorSidechannelLeft.length > 0) {
+                                sideChainSourcePicker.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(passthroughClient.compressorSidechannelLeft));
+                            } else if (channel === 1 && passthroughClient.compressorSidechannelRight.length > 0) {
+                                sideChainSourcePicker.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(passthroughClient.compressorSidechannelRight));
+                            } else {
+                                sideChainSourcePicker.selectIndex(-1);
+                            }
+                            sideChainSourcePicker.onClicked();
+                        }
+                        textRole: "text"
+                        property QtObject passthroughClient: null
+                        property int channel: -1
+                        onActivated: {
+                            let listElement = sideChainSourcePicker.model[index];
+                            switch (sideChainSourcePicker.channel) {
                             case 0:
                                 sideChainSourcePicker.passthroughClient.compressorSidechannelLeft = listElement.value;
                                 break;
@@ -802,379 +851,380 @@ Zynthian.DialogQuestion {
                             default:
                                 console.log("Got an unexpected channel when setting the compressor sidechain:", channel);
                                 break;
-                        }
-                        sideChainSourcePicker.passthroughClient = null;
-                    }
-                }
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Kirigami.Heading {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            level: 4
-                            text: qsTr("Threshold")
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            QQC2.Dial {
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                    horizontalCenter: parent.horizontalCenter
-                                }
-                                width: height
-                                inputMode: QQC2.Dial.Vertical
-                                handle: null
-                                value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.threshold : 0
-                                from: 0
-                                to: 1
-                                stepSize: 0.01
-                                onValueChanged: {
-                                    if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.threshold !== value) {
-                                        _private.slotPassthroughClient.compressorSettings.threshold = value;
-                                    }
-                                }
-                                property double lastPressed: 0
-                                onPressedChanged: {
-                                    if (pressed === false) {
-                                        let newTimestamp = Date.now();
-                                        if (newTimestamp - lastPressed < 300) {
-                                            _private.slotPassthroughClient.compressorSettings.thresholdDB = -10.0;
-                                        }
-                                        lastPressed = newTimestamp;
-                                    }
-                                }
-                                Zynthian.KnobIndicator {
-                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
-                                    anchors.centerIn: parent
-                                    height: parent.height / 2
-                                    width: height
-                                    knobId: 0
-                                }
                             }
-                        }
-                        QQC2.Label {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            text: _private.slotPassthroughClient ? "%1dB".arg(_private.slotPassthroughClient.compressorSettings.thresholdDB.toFixed(2)) : ""
+                            sideChainSourcePicker.passthroughClient = null;
                         }
                     }
-                    ColumnLayout {
+                    RowLayout {
                         Layout.fillWidth: true
-                        Kirigami.Heading {
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            level: 4
-                            text: qsTr("Knee")
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            QQC2.Dial {
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                    horizontalCenter: parent.horizontalCenter
-                                }
-                                width: height
-                                inputMode: QQC2.Dial.Vertical
-                                handle: null
-                                value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.kneeWidth : 0
-                                from: 0
-                                to: 1
-                                stepSize: 0.01
-                                onValueChanged: {
-                                    if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.kneeWidth !== value) {
-                                        _private.slotPassthroughClient.compressorSettings.kneeWidth = value;
+                            Kirigami.Heading {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                level: 4
+                                text: qsTr("Threshold")
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                QQC2.Dial {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
                                     }
-                                }
-                                property double lastPressed: 0
-                                onPressedChanged: {
-                                    if (pressed === false) {
-                                        let newTimestamp = Date.now();
-                                        if (newTimestamp - lastPressed < 300) {
-                                            _private.slotPassthroughClient.compressorSettings.kneeWidthDB = 0;
-                                        }
-                                        lastPressed = newTimestamp;
-                                    }
-                                }
-                                Zynthian.KnobIndicator {
-                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
-                                    anchors.centerIn: parent
-                                    height: parent.height / 2
                                     width: height
-                                    knobId: 0
+                                    inputMode: QQC2.Dial.Vertical
+                                    handle: null
+                                    value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.threshold : 0
+                                    from: 0
+                                    to: 1
+                                    stepSize: 0.01
+                                    onValueChanged: {
+                                        if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.threshold !== value) {
+                                            _private.slotPassthroughClient.compressorSettings.threshold = value;
+                                        }
+                                    }
+                                    property double lastPressed: 0
+                                    onPressedChanged: {
+                                        if (pressed === false) {
+                                            let newTimestamp = Date.now();
+                                            if (newTimestamp - lastPressed < 300) {
+                                                _private.slotPassthroughClient.compressorSettings.thresholdDB = -10.0;
+                                            }
+                                            lastPressed = newTimestamp;
+                                        }
+                                    }
+                                    Zynthian.KnobIndicator {
+                                        visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
+                                        anchors.centerIn: parent
+                                        height: parent.height / 2
+                                        width: height
+                                        knobId: 0
+                                    }
                                 }
                             }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                text: _private.slotPassthroughClient ? "%1dB".arg(_private.slotPassthroughClient.compressorSettings.thresholdDB.toFixed(2)) : ""
+                            }
                         }
-                        QQC2.Label {
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            text: _private.slotPassthroughClient ? "%1dB".arg(_private.slotPassthroughClient.compressorSettings.kneeWidthDB.toFixed(2)) : ""
+                            Kirigami.Heading {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                level: 4
+                                text: qsTr("Knee")
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                QQC2.Dial {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
+                                    }
+                                    width: height
+                                    inputMode: QQC2.Dial.Vertical
+                                    handle: null
+                                    value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.kneeWidth : 0
+                                    from: 0
+                                    to: 1
+                                    stepSize: 0.01
+                                    onValueChanged: {
+                                        if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.kneeWidth !== value) {
+                                            _private.slotPassthroughClient.compressorSettings.kneeWidth = value;
+                                        }
+                                    }
+                                    property double lastPressed: 0
+                                    onPressedChanged: {
+                                        if (pressed === false) {
+                                            let newTimestamp = Date.now();
+                                            if (newTimestamp - lastPressed < 300) {
+                                                _private.slotPassthroughClient.compressorSettings.kneeWidthDB = 0;
+                                            }
+                                            lastPressed = newTimestamp;
+                                        }
+                                    }
+                                    Zynthian.KnobIndicator {
+                                        visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
+                                        anchors.centerIn: parent
+                                        height: parent.height / 2
+                                        width: height
+                                        knobId: 0
+                                    }
+                                }
+                            }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                text: _private.slotPassthroughClient ? "%1dB".arg(_private.slotPassthroughClient.compressorSettings.kneeWidthDB.toFixed(2)) : ""
+                            }
                         }
                     }
-                }
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                    ColumnLayout {
+                    RowLayout {
                         Layout.fillWidth: true
-                        Kirigami.Heading {
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            level: 4
-                            text: qsTr("Attack")
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            QQC2.Dial {
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                    horizontalCenter: parent.horizontalCenter
-                                }
-                                width: height
-                                inputMode: QQC2.Dial.Vertical
-                                handle: null
-                                value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.attack : 0
-                                from: 0
-                                to: 100
-                                stepSize: 0.1
-                                onValueChanged: {
-                                    if (_private.slotPassthroughClient) {
-                                        _private.slotPassthroughClient.compressorSettings.attack = value;
+                            Kirigami.Heading {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                level: 4
+                                text: qsTr("Attack")
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                QQC2.Dial {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
                                     }
-                                }
-                                property double lastPressed: 0
-                                onPressedChanged: {
-                                    if (pressed === false) {
-                                        let newTimestamp = Date.now();
-                                        if (newTimestamp - lastPressed < 300) {
-                                            _private.slotPassthroughClient.compressorSettings.attack = 30;
-                                        }
-                                        lastPressed = newTimestamp;
-                                    }
-                                }
-                                Zynthian.KnobIndicator {
-                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
-                                    anchors.centerIn: parent
-                                    height: parent.height / 2
                                     width: height
-                                    knobId: 1
+                                    inputMode: QQC2.Dial.Vertical
+                                    handle: null
+                                    value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.attack : 0
+                                    from: 0
+                                    to: 100
+                                    stepSize: 0.1
+                                    onValueChanged: {
+                                        if (_private.slotPassthroughClient) {
+                                            _private.slotPassthroughClient.compressorSettings.attack = value;
+                                        }
+                                    }
+                                    property double lastPressed: 0
+                                    onPressedChanged: {
+                                        if (pressed === false) {
+                                            let newTimestamp = Date.now();
+                                            if (newTimestamp - lastPressed < 300) {
+                                                _private.slotPassthroughClient.compressorSettings.attack = 30;
+                                            }
+                                            lastPressed = newTimestamp;
+                                        }
+                                    }
+                                    Zynthian.KnobIndicator {
+                                        visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
+                                        anchors.centerIn: parent
+                                        height: parent.height / 2
+                                        width: height
+                                        knobId: 1
+                                    }
                                 }
                             }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                text: _private.slotPassthroughClient ? "%1ms".arg(_private.slotPassthroughClient.compressorSettings.attack.toFixed(0)) : ""
+                            }
                         }
-                        QQC2.Label {
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            text: _private.slotPassthroughClient ? "%1ms".arg(_private.slotPassthroughClient.compressorSettings.attack.toFixed(0)) : ""
+                            Kirigami.Heading {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                level: 4
+                                text: qsTr("Make Up")
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                QQC2.Dial {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
+                                    }
+                                    width: height
+                                    inputMode: QQC2.Dial.Vertical
+                                    handle: null
+                                    value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.makeUpGain : 0
+                                    from: 0
+                                    to: 1
+                                    stepSize: 0.01
+                                    onValueChanged: {
+                                        if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.makeUpGain !== value) {
+                                            _private.slotPassthroughClient.compressorSettings.makeUpGain = value;
+                                        }
+                                    }
+                                    property double lastPressed: 0
+                                    onPressedChanged: {
+                                        if (pressed === false) {
+                                            let newTimestamp = Date.now();
+                                            if (newTimestamp - lastPressed < 300) {
+                                                _private.slotPassthroughClient.compressorSettings.makeUpGainDB = 0;
+                                            }
+                                            lastPressed = newTimestamp;
+                                        }
+                                    }
+                                    Zynthian.KnobIndicator {
+                                        visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
+                                        anchors.centerIn: parent
+                                        height: parent.height / 2
+                                        width: height
+                                        knobId: 1
+                                    }
+                                }
+                            }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                text: _private.slotPassthroughClient ? "%1dB".arg(_private.slotPassthroughClient.compressorSettings.makeUpGainDB.toFixed(2)) : ""
+                            }
                         }
                     }
-                    ColumnLayout {
+                    RowLayout {
                         Layout.fillWidth: true
-                        Kirigami.Heading {
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            level: 4
-                            text: qsTr("Make Up")
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            QQC2.Dial {
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                    horizontalCenter: parent.horizontalCenter
-                                }
-                                width: height
-                                inputMode: QQC2.Dial.Vertical
-                                handle: null
-                                value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.makeUpGain : 0
-                                from: 0
-                                to: 1
-                                stepSize: 0.01
-                                onValueChanged: {
-                                    if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.makeUpGain !== value) {
-                                        _private.slotPassthroughClient.compressorSettings.makeUpGain = value;
+                            Kirigami.Heading {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                level: 4
+                                text: qsTr("Release")
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                QQC2.Dial {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
                                     }
-                                }
-                                property double lastPressed: 0
-                                onPressedChanged: {
-                                    if (pressed === false) {
-                                        let newTimestamp = Date.now();
-                                        if (newTimestamp - lastPressed < 300) {
-                                            _private.slotPassthroughClient.compressorSettings.makeUpGainDB = 0;
-                                        }
-                                        lastPressed = newTimestamp;
-                                    }
-                                }
-                                Zynthian.KnobIndicator {
-                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
-                                    anchors.centerIn: parent
-                                    height: parent.height / 2
                                     width: height
-                                    knobId: 1
+                                    inputMode: QQC2.Dial.Vertical
+                                    handle: null
+                                    value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.release : 0
+                                    from: 0
+                                    to: 500
+                                    stepSize: 0.1
+                                    onValueChanged: {
+                                        if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.release !== value) {
+                                            _private.slotPassthroughClient.compressorSettings.release = value;
+                                        }
+                                    }
+                                    property double lastPressed: 0
+                                    onPressedChanged: {
+                                        if (pressed === false) {
+                                            let newTimestamp = Date.now();
+                                            if (newTimestamp - lastPressed < 300) {
+                                                _private.slotPassthroughClient.compressorSettings.release = 150;
+                                            }
+                                            lastPressed = newTimestamp;
+                                        }
+                                    }
+                                    Zynthian.KnobIndicator {
+                                        visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
+                                        anchors.centerIn: parent
+                                        height: parent.height / 2
+                                        width: height
+                                        knobId: 2
+                                    }
                                 }
                             }
-                        }
-                        QQC2.Label {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            text: _private.slotPassthroughClient ? "%1dB".arg(_private.slotPassthroughClient.compressorSettings.makeUpGainDB.toFixed(2)) : ""
-                        }
-                    }
-                }
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Kirigami.Heading {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            level: 4
-                            text: qsTr("Release")
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            QQC2.Dial {
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                    horizontalCenter: parent.horizontalCenter
-                                }
-                                width: height
-                                inputMode: QQC2.Dial.Vertical
-                                handle: null
-                                value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.release : 0
-                                from: 0
-                                to: 500
-                                stepSize: 0.1
-                                onValueChanged: {
-                                    if (_private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings.release !== value) {
-                                        _private.slotPassthroughClient.compressorSettings.release = value;
-                                    }
-                                }
-                                property double lastPressed: 0
-                                onPressedChanged: {
-                                    if (pressed === false) {
-                                        let newTimestamp = Date.now();
-                                        if (newTimestamp - lastPressed < 300) {
-                                            _private.slotPassthroughClient.compressorSettings.release = 150;
-                                        }
-                                        lastPressed = newTimestamp;
-                                    }
-                                }
-                                Zynthian.KnobIndicator {
-                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
-                                    anchors.centerIn: parent
-                                    height: parent.height / 2
-                                    width: height
-                                    knobId: 2
-                                }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                text: _private.slotPassthroughClient ? "%1ms".arg(_private.slotPassthroughClient.compressorSettings.release.toFixed(0)) : ""
                             }
                         }
-                        QQC2.Label {
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            text: _private.slotPassthroughClient ? "%1ms".arg(_private.slotPassthroughClient.compressorSettings.release.toFixed(0)) : ""
-                        }
-                    }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Kirigami.Heading {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            level: 4
-                            text: qsTr("Ratio")
-                        }
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            QQC2.Dial {
-                                anchors {
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                    horizontalCenter: parent.horizontalCenter
-                                }
-                                width: height
-                                inputMode: QQC2.Dial.Vertical
-                                handle: null
-                                value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.ratio : 0
-                                from: 1
-                                to: 16
-                                stepSize: 0.1
-                                onValueChanged: {
-                                    if (_private.slotPassthroughClient) {
-                                        _private.slotPassthroughClient.compressorSettings.ratio = value;
+                            Kirigami.Heading {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                level: 4
+                                text: qsTr("Ratio")
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                QQC2.Dial {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
                                     }
-                                }
-                                property double lastPressed: 0
-                                onPressedChanged: {
-                                    if (pressed === false) {
-                                        let newTimestamp = Date.now();
-                                        if (newTimestamp - lastPressed < 300) {
-                                            _private.slotPassthroughClient.compressorSettings.ratio = 4;
-                                        }
-                                        lastPressed = newTimestamp;
-                                    }
-                                }
-                                Zynthian.KnobIndicator {
-                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
-                                    anchors.centerIn: parent
-                                    height: parent.height / 2
                                     width: height
-                                    knobId: 2
+                                    inputMode: QQC2.Dial.Vertical
+                                    handle: null
+                                    value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.ratio : 0
+                                    from: 1
+                                    to: 16
+                                    stepSize: 0.1
+                                    onValueChanged: {
+                                        if (_private.slotPassthroughClient) {
+                                            _private.slotPassthroughClient.compressorSettings.ratio = value;
+                                        }
+                                    }
+                                    property double lastPressed: 0
+                                    onPressedChanged: {
+                                        if (pressed === false) {
+                                            let newTimestamp = Date.now();
+                                            if (newTimestamp - lastPressed < 300) {
+                                                _private.slotPassthroughClient.compressorSettings.ratio = 4;
+                                            }
+                                            lastPressed = newTimestamp;
+                                        }
+                                    }
+                                    Zynthian.KnobIndicator {
+                                        visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
+                                        anchors.centerIn: parent
+                                        height: parent.height / 2
+                                        width: height
+                                        knobId: 2
+                                    }
                                 }
                             }
-                        }
-                        QQC2.Label {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1
-                            horizontalAlignment: Text.AlignHCenter
-                            text: _private.slotPassthroughClient ? "%1:1".arg(_private.slotPassthroughClient.compressorSettings.ratio.toFixed(0)) : ""
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                horizontalAlignment: Text.AlignHCenter
+                                text: _private.slotPassthroughClient ? "%1:1".arg(_private.slotPassthroughClient.compressorSettings.ratio.toFixed(0)) : ""
+                            }
                         }
                     }
                 }

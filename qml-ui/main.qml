@@ -464,21 +464,21 @@ Kirigami.AbstractApplicationWindow {
      */
     function updateMasterVolume(sign) {
         function valueSetter(value) {
-            zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(value, 0, 100)
+            zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(value, -40, 20)
             if (!zynqtgui.globalPopupOpened) {
                 applicationWindow().showOsd({
                                                 parameterName: "master_volume",
                                                 description: qsTr("Master Volume"),
-                                                start: 0,
-                                                stop: 100,
+                                                start: -40,
+                                                stop: 20,
                                                 step: 1,
-                                                defaultValue: null,
+                                                defaultValue: zynqtgui.initialMasterVolume,
                                                 currentValue: zynqtgui.masterVolume,
-                                                valueLabel: parseInt(zynqtgui.masterVolume),
+                                                valueLabel: qsTr("%1 dB").arg(zynqtgui.masterVolume),
                                                 setValueFunction: valueSetter,
                                                 showValueLabel: true,
-                                                showResetToDefault: false,
-                                                showVisualZero: false
+                                                showResetToDefault: true,
+                                                showVisualZero: true
                                             })
             }
         }

@@ -4718,8 +4718,8 @@ class zynthian_gui(QObject):
     def set_masterVolume(self, value):
         if self.__master_volume != value:
             self.__master_volume = value
-            # JackPassthroughClient expects dryAmount to be ranging from 0-1
-            Zynthbox.Plugin.instance().globalPlaybackClient().dryGainHandler().setGainAbsolute(np.interp(value, (0, 100), (0, 1)))
+            # JackPassthroughClient expects gainDb to be ranging from -40 to 20
+            Zynthbox.Plugin.instance().globalPlaybackClient().dryGainHandler().setGainDb(value)
             self.masterVolumeChanged.emit()
 
     masterVolumeChanged = Signal()
@@ -4729,7 +4729,7 @@ class zynthian_gui(QObject):
 
     ### Property initialMasterVolume
     def get_initialMasterVolume(self):
-        return 50
+        return 0
 
     initialMasterVolume = Property(int, get_initialMasterVolume, constant=True)
     ### END Property initialMasterVolume

@@ -565,8 +565,8 @@ QQC2.Pane {
 
                             slider {
                                 value: zynqtgui.masterVolume
-                                from: 0
-                                to: 100
+                                from: -40
+                                to: 20
                                 stepSize: 1
                             }
                             onValueChanged: {

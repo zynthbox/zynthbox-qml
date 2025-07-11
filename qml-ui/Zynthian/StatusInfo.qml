@@ -469,13 +469,13 @@ QQC2.Pane
                                     text: qsTr("Volume")
                                     controlObj: zynqtgui
                                     controlProperty: "masterVolume"
-                                    valueString: qsTr("%1%").arg(dial.value)
+                                    valueString: qsTr("%1 dB").arg(dial.value)
                                     knobId: 3
 
                                     dial {
                                         stepSize: 1
-                                        from: 0
-                                        to: 100
+                                        from: -40
+                                        to: 20
                                     }
                                 }
                             }

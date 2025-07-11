@@ -78,17 +78,66 @@ QQC2.Pane {
             // Eat these two events to stop the OSD from showing up
             return true;
         case "KNOB0_UP":
-            applicationWindow().updateSelectedChannelVolume(1, false)
-            return true;
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "MixerBar_item":
+                    applicationWindow().updateChannelVolume(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                    return true;
+                case "MixerBar_master":
+                    applicationWindow().updateMasterVolume(1)
+                    return true;
+                default:
+                    return false;
+            }
         case "KNOB0_DOWN":
-            applicationWindow().updateSelectedChannelVolume(-1, false)
-            return true;
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "MixerBar_item":
+                    applicationWindow().updateChannelVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                    return true;
+                case "MixerBar_master":
+                    applicationWindow().updateMasterVolume(-1)
+                    return true;
+                default:
+                    return false;
+            }
         case "KNOB1_UP":
-            pageManager.getPage("sketchpad").updateSelectedChannelPan(1)
-            return true;
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "MixerBar_item":
+                    pageManager.getPage("sketchpad").updateChannelPan(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    return true;
+                case "MixerBar_master":
+                    applicationWindow().updateGlobalDelayFXAmount(1);
+                    return true;
+                default:
+                    return false;
+            }
         case "KNOB1_DOWN":
-            pageManager.getPage("sketchpad").updateSelectedChannelPan(-1)
-            return true;
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "MixerBar_item":
+                    pageManager.getPage("sketchpad").updateChannelPan(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    return true;
+                case "MixerBar_master":
+                    applicationWindow().updateGlobalDelayFXAmount(-1);
+                    return true;
+                default:
+                    return false;
+            }
+
+        case "KNOB2_UP":
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "MixerBar_master":
+                    applicationWindow().updateGlobalReverbFXAmount(1);
+                    return true;
+                default:
+                    return false;
+            }
+        case "KNOB2_DOWN":
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "MixerBar_master":
+                    applicationWindow().updateGlobalReverbFXAmount(-1);
+                    return true;
+                default:
+                    return false;
+            }
         }
         
         return false;
@@ -155,12 +204,14 @@ QQC2.Pane {
                                 zynqtgui.sketchpad.selectedTrackId = channel.id;
                                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                 zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id));
                             }
 
                             anchors.fill: parent
                             spacing: 0
 
                             Repeater {
+                                id: mixerItemsRepeater
                                 model: root.song.channelsModel
 
                                 delegate: QQC2.Control {
@@ -458,6 +509,7 @@ QQC2.Pane {
                 }
 
                 QQC2.Control {
+                    id: masterControl
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
@@ -484,6 +536,16 @@ QQC2.Pane {
                     }
 
                     contentItem: Item {
+                        MouseArea {
+                            anchors.fill: parent
+                            onPressed: masterVolume.mouseArea.handlePressed(mouse)
+                            onReleased: masterVolume.mouseArea.released(mouse)
+                            onPressAndHold: masterVolume.mouseArea.pressAndHold(mouse)
+                            onClicked: masterVolume.mouseArea.clicked(mouse)
+                            onDoubleClicked: masterVolume.mouseArea.doubleClicked(mouse)
+                            onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
+                            onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
+                        }
                         VolumeControl {
                             id: masterVolume
                             anchors.fill: parent
@@ -510,6 +572,9 @@ QQC2.Pane {
                             onValueChanged: {
                                 zynqtgui.masterVolume = masterVolume.slider.value;
                                 zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
+                            }
+                            onClicked: {
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
                             }
                             onDoubleClicked: {
                                 zynqtgui.masterVolume = zynqtgui.initialMasterVolume

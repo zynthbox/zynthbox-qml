@@ -602,47 +602,62 @@ Kirigami.AbstractApplicationWindow {
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
     function updateSelectedChannelVolume(sign, showOsd=true) {
+        updateChannelVolume(sign, root.selectedChannel.id, showOsd)
+    }
+    /**
+     * Update volume of channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateChannelVolume(sign, channelId, showOsd=true) {
+        let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
-            root.selectedChannel.gainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
+            selectedChannel.gainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
             if (showOsd) {
                 applicationWindow().showOsd({
                                                 parameterName: "channel_volume",
-                                                description: qsTr("%1 Volume").arg(root.selectedChannel.name),
+                                                description: qsTr("%1 Volume").arg(selectedChannel.name),
                                                 start: 0,
                                                 stop: 1,
                                                 step: 0.01,
-                                                defaultValue: parseFloat(root.selectedChannel.gainHandler.absoluteGainAtZeroDb),
-                                                currentValue: parseFloat(root.selectedChannel.gainHandler.gainAbsolute),
-                                                startLabel: qsTr("%1 dB").arg(root.selectedChannel.gainHandler.minimumDecibel),
-                                                stopLabel: qsTr("%1 dB").arg(root.selectedChannel.gainHandler.maximumDecibel),
-                                                valueLabel: qsTr("%1 dB").arg(root.selectedChannel.gainHandler.gainDb.toFixed(2)),
+                                                defaultValue: parseFloat(selectedChannel.gainHandler.absoluteGainAtZeroDb),
+                                                currentValue: parseFloat(selectedChannel.gainHandler.gainAbsolute),
+                                                startLabel: qsTr("%1 dB").arg(selectedChannel.gainHandler.minimumDecibel),
+                                                stopLabel: qsTr("%1 dB").arg(selectedChannel.gainHandler.maximumDecibel),
+                                                valueLabel: qsTr("%1 dB").arg(selectedChannel.gainHandler.gainDb.toFixed(2)),
                                                 setValueFunction: valueSetter,
                                                 showValueLabel: true,
                                                 showResetToDefault: true,
-                                                visualZero: parseFloat(root.selectedChannel.gainHandler.absoluteGainAtZeroDb),
+                                                visualZero: parseFloat(selectedChannel.gainHandler.absoluteGainAtZeroDb),
                                                 showVisualZero: true
                                             })
             }
         }
 
-        valueSetter(root.selectedChannel.gainHandler.gainAbsolute + sign*0.01)
-    }
-    /**
+        valueSetter(selectedChannel.gainHandler.gainAbsolute + sign*0.01)
+    }    /**
      * Update delay send amount of selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
     function updateSelectedChannelDelaySend(sign) {
+        updateChannelDelaySend(sign, root.selectedChannel.id)
+    }
+    /**
+     * Update delay send amount of channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateChannelDelaySend(sign, channelId) {
+        let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
-            root.selectedChannel.wetFx1Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
+            selectedChannel.wetFx1Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
             applicationWindow().showOsd({
                                             parameterName: "channel_delay_send",
-                                            description: qsTr("%1 Delay FX Send Amount").arg(root.selectedChannel.name),
+                                            description: qsTr("%1 Delay FX Send Amount").arg(selectedChannel.name),
                                             start: 0,
                                             stop: 100,
                                             step: 1,
                                             defaultValue: 100,
-                                            currentValue: root.selectedChannel.wetFx1Amount,
-                                            valueLabel: parseInt(root.selectedChannel.wetFx1Amount),
+                                            currentValue: selectedChannel.wetFx1Amount,
+                                            valueLabel: parseInt(selectedChannel.wetFx1Amount),
                                             setValueFunction: valueSetter,
                                             showValueLabel: true,
                                             showResetToDefault: true,
@@ -650,24 +665,32 @@ Kirigami.AbstractApplicationWindow {
                                         })
         }
 
-        valueSetter(root.selectedChannel.wetFx1Amount + sign)
+        valueSetter(selectedChannel.wetFx1Amount + sign)
     }
     /**
      * Update reverb send amount of selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
     function updateSelectedChannelReverbSend(sign) {
+        updateChannelReverbSend(sign, root.selectedChannel.id)
+    }
+    /**
+     * Update reverb send amount of channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateChannelReverbSend(sign, channelId) {
+        let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
-            root.selectedChannel.wetFx2Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
+            selectedChannel.wetFx2Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
             applicationWindow().showOsd({
                                             parameterName: "channel_reverb_send",
-                                            description: qsTr("%1 Reverb FX Send Amount").arg(root.selectedChannel.name),
+                                            description: qsTr("%1 Reverb FX Send Amount").arg(selectedChannel.name),
                                             start: 0,
                                             stop: 100,
                                             step: 1,
                                             defaultValue: 100,
-                                            currentValue: root.selectedChannel.wetFx2Amount,
-                                            valueLabel: parseInt(root.selectedChannel.wetFx2Amount),
+                                            currentValue: selectedChannel.wetFx2Amount,
+                                            valueLabel: parseInt(selectedChannel.wetFx2Amount),
                                             setValueFunction: valueSetter,
                                             showValueLabel: true,
                                             showResetToDefault: true,
@@ -675,7 +698,7 @@ Kirigami.AbstractApplicationWindow {
                                         })
         }
 
-        valueSetter(root.selectedChannel.wetFx2Amount + sign)
+        valueSetter(selectedChannel.wetFx2Amount + sign)
     }
 
     visible: false

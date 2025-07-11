@@ -234,7 +234,14 @@ Zynthian.ScreenPage {
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
      */
     function updateSelectedChannelPan(sign) {
-        root.selectedChannel.pan = Zynthian.CommonUtils.clamp(root.selectedChannel.pan + sign * 0.05, -1, 1)
+        updateChannelPan(sign, root.selectedChannel.id)
+    }
+    /**
+     * Update channel pan
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
+     */
+    function updateChannelPan(sign, channelId) {
+        applicationWindow().channels[channelId].pan = Zynthian.CommonUtils.clamp(applicationWindow().channels[channelId].pan + sign * 0.05, -1, 1)
     }
     /**
      * Update layer filter cutoff for selected channel
@@ -678,7 +685,7 @@ Zynthian.ScreenPage {
                     break;
                 case "KNOB0_TOUCHED":
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                        applicationWindow().updateSelectedChannelVolume(0);
+                        applicationWindow().updateChannelVolume(0, zynqtgui.sketchpad.lastSelectedObj.value.id);
                     }
                     returnValue = true;
                     break;
@@ -687,42 +694,56 @@ Zynthian.ScreenPage {
                     break;
                 case "KNOB0_UP":
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                        applicationWindow().updateSelectedChannelVolume(1);
+                        applicationWindow().updateChannelVolume(1, zynqtgui.sketchpad.lastSelectedObj.value.id);
                     }
                     returnValue = true;
                     break;
                 case "KNOB0_DOWN":
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                        applicationWindow().updateSelectedChannelVolume(-1);
+                        applicationWindow().updateChannelVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value.id);
                     }
                     returnValue = true;
                     break;
                 case "KNOB1_TOUCHED":
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                        applicationWindow().updateChannelDelaySend(0, zynqtgui.sketchpad.lastSelectedObj.value.id);
+                    }
                     returnValue = true;
                     break;
                 case "KNOB1_RELEASED":
                     returnValue = true;
                     break;
                 case "KNOB1_UP":
-                    // Do nothing
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                        applicationWindow().updateChannelDelaySend(1, zynqtgui.sketchpad.lastSelectedObj.value.id);
+                    }
                     returnValue = true;
                     break;
                 case "KNOB1_DOWN":
-                    // Do nothing
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                        applicationWindow().updateChannelDelaySend(-1, zynqtgui.sketchpad.lastSelectedObj.value.id);
+                    }
                     returnValue = true;
                     break;
                 case "KNOB2_TOUCHED":
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                        applicationWindow().updateChannelReverbSend(0, zynqtgui.sketchpad.lastSelectedObj.value.id);
+                    }
                     returnValue = true;
                     break;
                 case "KNOB2_RELEASED":
                     returnValue = true;
                     break;
                 case "KNOB2_UP":
-                    // Do nothing
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                        applicationWindow().updateChannelReverbSend(1, zynqtgui.sketchpad.lastSelectedObj.value.id);
+                    }
                     returnValue = true;
                     break;
                 case "KNOB2_DOWN":
-                    // Do nothing
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                        applicationWindow().updateChannelReverbSend(-1, zynqtgui.sketchpad.lastSelectedObj.value.id);
+                    }
                     returnValue = true;
                     break;
                 case "KNOB3_TOUCHED":
@@ -1028,23 +1049,25 @@ Zynthian.ScreenPage {
         Rectangle {
             id: lastSelectedObjIndicator
 
-            visible: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"
-                     ? zynqtgui.slotsBarClipsActive
-                     : zynqtgui.sketchpad.lastSelectedObj != null
-                       ? ["sketchpad_segment", "sketchpad_arrangement"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
-                         ? false
-                         : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"
-                           ? !root.displayTrackButtons
-                           : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"
-                             ? !root.displaySceneButtons
-                             : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_scene"
-                               ? root.displaySceneButtons
-                               : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
-                                 ? root.displayTrackButtons
-                                   // : ["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sketchslot", "TracksBar_externalslot", "TracksBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
-                                   // ? zynqtgui.slotsBarChannelActive
-                                 : false
-            : false
+            visible: {
+                let returnVal = false;
+                if (zynqtgui.sketchpad.lastSelectedObj != null) {
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"){
+                        returnVal = zynqtgui.slotsBarClipsActive;
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                        returnVal = !root.displayTrackButtons;
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
+                        returnVal = !root.displaySceneButtons;
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_scene") {
+                        returnVal = root.displaySceneButtons;
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
+                        returnVal = root.displayTrackButtons;
+                    } else if (["MixerBar_item", "MixerBar_master"].includes(zynqtgui.sketchpad.lastSelectedObj.className)) {
+                        returnVal = zynqtgui.slotsBarMixerActive;
+                    }
+                }
+                return returnVal
+            }
 
             z: 1000
             border.width: 2

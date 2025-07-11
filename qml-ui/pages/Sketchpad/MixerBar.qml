@@ -513,15 +513,15 @@ QQC2.Pane {
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                    topPadding: svgBg2.topPadding
-                    bottomPadding: svgBg2.bottomPadding
-                    leftPadding: svgBg2.leftPadding
-                    rightPadding: svgBg2.rightPadding
+                    topPadding: masterSvgBg.topPadding
+                    bottomPadding: masterSvgBg.bottomPadding
+                    leftPadding: masterSvgBg.leftPadding
+                    rightPadding: masterSvgBg.rightPadding
 
                     background: Item {
 
                         PlasmaCore.FrameSvgItem {
-                            id: svgBg2
+                            id: masterSvgBg
                             visible: fromCurrentTheme
                             anchors.fill: parent
 

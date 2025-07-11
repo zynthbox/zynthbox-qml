@@ -55,8 +55,8 @@ QQC2.Pane {
         case "SWITCH_SELECT_SHORT":
             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
             zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-
             bottomStack.slotsBar.bottomBarButton.checked = true
+            zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", root.selectedChannel.id, mixerItemsRepeater.itemAt(root.selectedChannel.id))
 
             return true;
 
@@ -546,38 +546,58 @@ QQC2.Pane {
                             onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
                             onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
                         }
-                        VolumeControl {
-                            id: masterVolume
+                        ColumnLayout {
                             anchors.fill: parent
-                            headerText: root.visible || Zynthbox.AudioLevels.playback <= -40
-                                        ? ""
-                                        : (Math.round(Zynthbox.AudioLevels.playback) + " (dB)")
+                            VolumeControl {
+                                id: masterVolume
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                headerText: root.visible || Zynthbox.AudioLevels.playback <= -40
+                                            ? ""
+                                            : (Math.round(Zynthbox.AudioLevels.playback) + " (dB)")
 
-                            footerText: "Master"
-                            inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -400
-                            inputAudioLevelVisible: true
+                                footerText: "Master"
+                                inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -400
+                                inputAudioLevelVisible: true
 
-                            Binding {
-                                target: masterVolume.slider
-                                property: "value"
-                                value: zynqtgui.masterVolume
+                                Binding {
+                                    target: masterVolume.slider
+                                    property: "value"
+                                    value: zynqtgui.masterVolume
+                                }
+
+                                slider {
+                                    value: zynqtgui.masterVolume
+                                    from: -40
+                                    to: 20
+                                }
+                                onValueChanged: {
+                                    zynqtgui.masterVolume = masterVolume.slider.value;
+                                    zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
+                                }
+                                onClicked: {
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
+                                }
+                                onDoubleClicked: {
+                                    zynqtgui.masterVolume = zynqtgui.initialMasterVolume
+                                }
                             }
 
-                            slider {
-                                value: zynqtgui.masterVolume
-                                from: -40
-                                to: 20
-                                stepSize: 1
-                            }
-                            onValueChanged: {
-                                zynqtgui.masterVolume = masterVolume.slider.value;
-                                zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
-                            }
-                            onClicked: {
-                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
-                            }
-                            onDoubleClicked: {
-                                zynqtgui.masterVolume = zynqtgui.initialMasterVolume
+                            QQC2.Label {
+                                Layout.alignment: Qt.AlignCenter
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                                text: qsTr("%1 dB").arg(zynqtgui.masterVolume.toFixed(2))
+                                font.pointSize: 9
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
+                                    }
+                                }
                             }
                         }
                     }

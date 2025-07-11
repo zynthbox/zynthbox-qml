@@ -342,7 +342,7 @@
           "zynthboxVersionAdded": "1.0",
           "url": null,
           "volumeControls": null,
-          "cutoffControls": null,
+          "cutoffControls": ["filter cutoff"],
           "resonanceControls": null
         }
       }

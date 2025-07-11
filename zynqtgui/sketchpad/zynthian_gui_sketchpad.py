@@ -123,6 +123,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 #        Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
 #        Path('/zynthian/zynthian-my-data/sample-banks/community-samplebanks').mkdir(exist_ok=True, parents=True)
 
+        self.song_changed.connect(lambda: self.lastSelectedObj.reset())
+
     def init(self):
         def _cb():
             Zynthbox.PlayGridManager.instance().metronomeBeat4thChanged.connect(self.metronome_update)

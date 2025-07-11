@@ -199,6 +199,8 @@ RowLayout {
                     return !slotDelegate.synthPassthroughClient.muted
                 } else if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_fxslot" && slotDelegate.fxPassthroughClient != null) {
                     return !slotDelegate.fxPassthroughClient.bypass
+                } else if (_private.className == "TracksBar_sampleslot" && slotDelegate.cppClipObject != null) {
+                    return !slotDelegate.cppClipObject.rootSlice.gainHandler.muted
                 } else {
                     // For all other cases, default value is true
                     return true
@@ -511,8 +513,10 @@ RowLayout {
                                         slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
                                     }
                                     break;
-                                case "sample":
-                                    // TODO : Toggle sample muted state
+                                case "sample-trig":
+                                    if (slotDelegate.cppClipObject) {
+                                        slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
+                                    }
                                     break;
                                 case "fx":
                                     if (slotDelegate.fxPassthroughClient) {

@@ -113,7 +113,7 @@ QQC2.Pane {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: 1
             anchors.fill: parent
 
             BottomStackTabs {
@@ -127,7 +127,7 @@ QQC2.Pane {
             QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-
+                Layout.margins: svgBg.inset.top
                 topPadding: svgBg.topPadding
                 bottomPadding: svgBg.bottomPadding
                 leftPadding: svgBg.leftPadding

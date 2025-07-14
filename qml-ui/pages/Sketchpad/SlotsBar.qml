@@ -296,7 +296,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: Kirigami.Units.smallSpacing
+                spacing: 1
 
                 ColumnLayout {
                     id: buttonsColumn
@@ -437,6 +437,7 @@ QQC2.Pane {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.margins: svgBg.inset.top
 
                     topPadding: svgBg.topPadding
                     bottomPadding: svgBg.bottomPadding

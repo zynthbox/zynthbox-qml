@@ -763,7 +763,7 @@ QQC2.Pane {
 
     contentItem: Item {
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: 1
             anchors.fill: parent
 
             BottomStackTabs {
@@ -778,12 +778,27 @@ QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                padding: Kirigami.Units.smallSpacing
+                Layout.margins: svgBg4.inset.top
 
-                background: Rectangle
-                {
-                    color: Kirigami.Theme.backgroundColor
-                    // border.color: "yellow"
+                padding: svgBg4.visible ? svgBg4.topPadding : Kirigami.Units.smallSpacing
+                // bottomPadding: svgBg4.bottomPadding
+                // leftPadding: svgBg4.leftPadding
+                // rightPadding: svgBg4.rightPadding
+
+                background: Item {
+                    PlasmaCore.FrameSvgItem {
+                        id: svgBg4
+                        visible: fromCurrentTheme
+                        anchors.fill: parent
+
+                        readonly property real leftPadding: fixedMargins.left
+                        readonly property real rightPadding: fixedMargins.right
+                        readonly property real topPadding: fixedMargins.top
+                        readonly property real bottomPadding: fixedMargins.bottom
+
+                        imagePath: "widgets/tracks-background"
+                        colorGroup: PlasmaCore.Theme.ViewColorGroup
+                    }
                 }
 
                 contentItem: Item {

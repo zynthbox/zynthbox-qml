@@ -1123,6 +1123,8 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 9
+                // Layout.margins: svgBg.inset.top
+
                 topPadding: svgBg.topPadding
                 bottomPadding: svgBg.bottomPadding
                 leftPadding: svgBg.leftPadding
@@ -1150,7 +1152,7 @@ Zynthian.ScreenPage {
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: Kirigami.Units.smallSpacing
+                        spacing: 1
 
                         QQC2.Control
                         {
@@ -1196,6 +1198,7 @@ Zynthian.ScreenPage {
                         {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Layout.margins: svgBg2.inset.top
 
                             topPadding: svgBg2.topPadding
                             bottomPadding: svgBg2.bottomPadding

@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 import Zynthian 1.0 as Zynthian
 
 Zynthian.Popup {
@@ -124,21 +125,64 @@ Zynthian.Popup {
         flow: GridLayout.TopToBottom
         Repeater {
             model: component.actions
-            delegate: PlayGridButton {
+            delegate: QQC2.Control {
                 id: delegate
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 12
                 Layout.minimumHeight: Kirigami.Units.gridUnit * 4
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 12
                 Layout.maximumHeight: Kirigami.Units.gridUnit * 4
                 Layout.alignment: Qt.AlignCenter
-                text: modelData != null && modelData.hasOwnProperty("text") ? modelData.text : ""
+                property string text: modelData != null && modelData.hasOwnProperty("text") ? modelData.text : ""
                 visible: modelData != null && modelData.hasOwnProperty("visible") ? modelData.visible : true
                 enabled: modelData != null && modelData.hasOwnProperty("enabled") ? modelData.enabled : true
-                invertBorderColor: true
+                property bool down: false
                 opacity: enabled ? 1 : 0.3
-                onClicked: {
-                    component.close();
-                    modelData.trigger();
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                background: Item {
+                    PlasmaCore.FrameSvgItem {
+                        anchors.fill: parent
+                        imagePath: "widgets/button"
+                        colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                        prefix: delegate.down ? "focus" : "hover"
+                    }
+                }
+                contentItem: Item {
+                    Text {
+                        anchors.centerIn: parent
+                        text: delegate.text
+                        color: Kirigami.Theme.textColor
+                    }
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        enabled: modelData != null && modelData.hasOwnProperty("enabled") ? modelData.enabled : true
+                        touchPoints: [
+                            TouchPoint {
+                                function updateInsideBounds() {
+                                    if (pressed) {
+                                        if (x > -1 && y > -1 && x < delegate.width && y < delegate.height) {
+                                            delegate.down = true;
+                                        } else {
+                                            delegate.down = false;
+                                        }
+                                    }
+                                }
+                                onXChanged: updateInsideBounds();
+                                onYChanged: updateInsideBounds();
+                                onPressedChanged: {
+                                    if (pressed) {
+                                        delegate.down = true;
+                                    } else {
+                                        delegate.down = false;
+                                        if (x > -1 && y > -1 && x < delegate.width && y < delegate.height) {
+                                            component.close();
+                                            modelData.trigger();
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
                 Rectangle {
                     anchors {

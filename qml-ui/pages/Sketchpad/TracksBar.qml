@@ -796,7 +796,7 @@ QQC2.Pane {
                         readonly property real topPadding: fixedMargins.top
                         readonly property real bottomPadding: fixedMargins.bottom
 
-                        imagePath: "widgets/tracks-background"
+                        imagePath: "widgets/statusinfo_background"
                         colorGroup: PlasmaCore.Theme.ViewColorGroup
                     }
                 }

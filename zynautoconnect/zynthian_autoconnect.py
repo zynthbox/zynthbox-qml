@@ -685,9 +685,14 @@ def audio_autoconnect(force=False):
         # Also disconnect all the TrackPassthrough ports
         passthrough_ports.extend(jclient.get_ports("TrackPassthrough", is_audio=True))
         for port in passthrough_ports:
-            for connected_port in zbjack.getAllConnections(get_jack_port_name(port)):
-                # logging.info(f"Disonnecting {connected_port} from {port}")
-                zbjack.disconnectPorts(connected_port, get_jack_port_name(port))
+            port_name = get_jack_port_name(port)
+            if port_name.endswith("-sidechainInputLeft") or port_name.endswith("-sidechainInputRight"):
+                # Don't disconnect the passthrough's sidechain ports, as those are done by the clients internally
+                pass
+            else:
+                for connected_port in zbjack.getAllConnections(port_name):
+                # logging.info(f"Disonnecting {connected_port} from {port_name}")
+                    zbjack.disconnectPorts(connected_port, port_name)
     except Exception as e:
         logging.info(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during passthrough connection clearing. Reported error: {e}")
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
@@ -743,7 +748,11 @@ def audio_autoconnect(force=False):
                             for port in zip(samplerOutputPorts, laneInputs):
                                 # Make sure this is the only connection we've got
                                 for connectedTo in zbjack.getAllConnections(get_jack_port_name(port[0])):
-                                    zbjack.disconnectPorts(get_jack_port_name(port[0]), connectedTo)
+                                    if connectedTo.endswith("-sidechainInputLeft") or connectedTo.endswith("-sidechainInputRight"):
+                                        # Don't disconnect the sidechain ports, though...
+                                        pass
+                                    else:
+                                        zbjack.disconnectPorts(get_jack_port_name(port[0]), connectedTo)
                                 # logging.info(f"Connecting {port[0]} to {port[1]}")
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Handle sample slots
@@ -757,7 +766,11 @@ def audio_autoconnect(force=False):
                             for port in zip(samplerOutputPorts, sketchLaneInputs):
                                 # Make sure this is the only connection we've got
                                 for connectedTo in zbjack.getAllConnections(get_jack_port_name(port[0])):
-                                    zbjack.disconnectPorts(get_jack_port_name(port[0]), connectedTo)
+                                    if connectedTo.endswith("-sidechainInputLeft") or connectedTo.endswith("-sidechainInputRight"):
+                                        # Don't disconnect the sidechain ports, though...
+                                        pass
+                                    else:
+                                        zbjack.disconnectPorts(get_jack_port_name(port[0]), connectedTo)
                                 # logging.info(f"Connecting {port[0]} to {port[1]}")
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Handle sketch slots
@@ -811,26 +824,44 @@ def audio_autoconnect(force=False):
                                                     capture_ports.append("GlobalPlayback:dryOutLeft");
                                                 if inputSource.endswith(":right") or inputSource.endswith(":both"):
                                                     capture_ports.append("GlobalPlayback:dryOutRight");
-                                            elif inputSource.port.startswith("sketchpadTrack:") or inputSource.port.startswith("fxSlot:"):
+                                            elif inputSource.port.startswith("synthSlot:") or inputSource.port.startswith("sampleSlot:") or inputSource.port.startswith("fxSlot:"):
                                                 # hook up to listen to the output of that specific graph port
                                                 splitData = inputSource.split(":")
                                                 portRootName = ""
                                                 theLane = splitData[2][-1] + 1
-                                                if inputSource.port.startswith("sketchpadTrack:"):
-                                                    portRootName = f"FXPassthrough-lane{theLane}:Channel{splitData[1] + 1}"
+                                                theTrack = 1
+                                                if splitData[0] == "same":
+                                                    theTrack = channelId + 1
                                                 else:
-                                                    portRootName = f"TrackPassthrough:Channel{splitData[1] + 1}-lane{theLane}"
-                                                if splitData[2].startswith("dry"):
-                                                    dryOrWet = "dryOut"
-                                                elif splitData[2].starswith("wet"):
-                                                    dryOrWet = "wetOutFx1"
-                                                if splitData[3] == "left" or splitData[3] == "both":
-                                                    capture_ports.append(f"{portRootName}-{dryOrWet}Left")
-                                                if splitData[3] == "right" or splitData[3] == "both":
-                                                    capture_ports.append(f"{portRootName}-{dryOrWet}Right")
+                                                    theTrack = splitData[1] + 1
+                                                if inputSource.port.startswith("synthSlot:"):
+                                                    portRootName = f"TrackPassthrough:Channel{theTrack}-lane{theLane}"
+                                                elif inputSource.port.startswith("sampleSlot:"):
+                                                    portRootName = f"SamplerSynth:channel_{theTrack}-lane{theLane}"
+                                                else:
+                                                    portRootName = f"FXPassthrough-lane{theLane}:Channel{theTrack}"
+                                                if inputSource.port.startswith("sampleSlot:"):
+                                                    # sample slot outputs are named differently to the passthrough outputs, and don't have dry/wet prefixes
+                                                    if splitData[3] == "left" or splitData[3] == "both":
+                                                        capture_ports.append(f"{portRootName}-left")
+                                                    if splitData[3] == "right" or splitData[3] == "both":
+                                                        capture_ports.append(f"{portRootName}-right")
+                                                else:
+                                                    if splitData[2].startswith("dry"):
+                                                        dryOrWet = "dryOut"
+                                                    elif splitData[2].starswith("wet"):
+                                                        dryOrWet = "wetOutFx1"
+                                                    if splitData[3] == "left" or splitData[3] == "both":
+                                                        capture_ports.append(f"{portRootName}-{dryOrWet}Left")
+                                                    if splitData[3] == "right" or splitData[3] == "both":
+                                                        capture_ports.append(f"{portRootName}-{dryOrWet}Right")
                                         # First disconnect anything already hooked up
                                         for connectedTo in zbjack.getAllConnections(audioInPort.jackname):
-                                            zbjack.disconnectPorts(audioInPort.jackname, connectedTo)
+                                            if connectedTo.endswith("-sidechainInputLeft") or connectedTo.endswith("-sidechainInputRight"):
+                                                # Don't disconnect the sidechain ports, though...
+                                                pass
+                                            else:
+                                                zbjack.disconnectPorts(audioInPort.jackname, connectedTo)
                                         # Then hook up what we've been asked to
                                         for capture_port in capture_ports:
                                             zbjack.connectPorts(get_jack_port_name(capture_port), audioInPort.jackname)

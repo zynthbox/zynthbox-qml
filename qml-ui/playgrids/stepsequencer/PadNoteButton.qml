@@ -271,7 +271,7 @@ QQC2.Button {
                 top: parent.bottom
                 margins: 1
             }
-            height:9
+            height: 4
             color: visible && component.patternModel
                 ? component.patternModel.sequence.isPlaying
                     ? component.patternModel.playingRow === component.padNoteRow && component.patternModel.playingColumn === component.padNoteIndex

@@ -53,8 +53,6 @@ class last_selected_obj_dto(QObject):
         self.__value = 0
         self.__component = None
 
-        self.classNameChanged.connect(self.isCopyableChanged.emit)
-
     @Slot()
     def reset(self):
         self.__className = None
@@ -119,9 +117,9 @@ class last_selected_obj_dto(QObject):
 
     ### BEGIN Property isCopyable
     def get_isCopyable(self):
-        return False
-
-    isCopyableChanged = Signal()
+        # If humanReadableClassName returns a valid string, then the slot ican be copy-pasted
+        # Re-use that property value to determine if item can be copy-pasted
+        return len(self.humanReadableClassName) > 0
 
     """
     isCopyable property will return if the current selected object is copyable
@@ -129,8 +127,50 @@ class last_selected_obj_dto(QObject):
 
     isCopyable depends upon className and hence change should be notified when className changes
     """
-    isCopyable = Property(bool, get_isCopyable, notify=isCopyableChanged)
-    ### END Property component
+    isCopyable = Property(bool, get_isCopyable, notify=classNameChanged)
+    ### END Property isCopyable
+
+    ### BEGIN Property humanReadableClassName
+    def get_humanReadableClassName(self):
+        result = ""
+        if self.className != None and self.value != None:
+            match self.className:
+                case "sketchpad_channel":
+                    result = "Track"
+                case "sketchpad_clip":
+                    result = "Clip"
+                case "TracksBar_synthslot":
+                    result = "Synth"
+                case "TracksBar_sampleslot":
+                    result = "Sample"
+                case "TracksBar_sketchslot":
+                    result = "Sketch"
+                case "TracksBar_externalslot":
+                    result = "Ext"
+                case "TracksBar_fxslot":
+                    result = "FX"
+                case "TracksBar_sketchfxslot":
+                    result = "Sketch FX"
+        return result
+
+    humanReadableClassName = Property(str, get_humanReadableClassName, notify=classNameChanged)
+    ### END Property humanReadableClassName
+
+    ### BEGIN Property humanReadableObjName
+    def get_humanReadableObjName(self):
+        result = ""
+        if self.className != None and self.value != None:
+            match self.className:
+                case "sketchpad_channel":
+                    result = f"Track {self.value.name}"
+                case "sketchpad_clip":
+                    result = f"Clip {self.value.name}"
+                case "TracksBar_synthslot" | "TracksBar_sampleslot" | "TracksBar_sketchslot" | "TracksBar_externalslot" | "TracksBar_fxslot" | "TracksBar_sketchfxslot":
+                    result = f"Slot {self.value + 1}"
+        return result
+
+    humanReadableObjName = Property(str, get_humanReadableObjName, notify=valueChanged)
+    ### END Property humanReadableObjName
 
     @Slot(QObject)
     def copyFrom(self, sourceObject):

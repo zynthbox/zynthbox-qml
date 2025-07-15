@@ -58,22 +58,6 @@ Zynthian.ScreenPage {
         onSelectedChannelChanged: selectedChannelThrottle.restart()
     }
 
-    /*
-    Used to temporarily store last clicked object by user
-    If the clicked object is a QObject the object is stored otherwise the index is stored
-    Structure : {
-        "className": "sketchpad_track" | "sketchpad_clip" | obj.className
-        "value": QObject or int depending on the type of selected object
-        "component": QML Component which was clicked to determine co-ordinates of lastSelectedSketchOutline
-    }
-    */
-    //    property var lastSelectedObj: null
-    /*
-    Used to temporarily cache clip/channel object to be copied
-    copySourceObj is copied from lastSelectedObj when copy button is clicked
-    */
-    property var copySourceObj: null
-
     /**
      * Update layer volume of selected fx slot
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
@@ -1052,12 +1036,10 @@ Zynthian.ScreenPage {
             visible: {
                 let returnVal = false;
                 if (zynqtgui.sketchpad.lastSelectedObj != null) {
-                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"){
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"){
                         returnVal = zynqtgui.slotsBarClipsActive;
                     } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
                         returnVal = !root.displayTrackButtons;
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
-                        returnVal = !root.displaySceneButtons;
                     } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_scene") {
                         returnVal = root.displaySceneButtons;
                     } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
@@ -1071,7 +1053,7 @@ Zynthian.ScreenPage {
 
             z: 1000
             border.width: 2
-            border.color: zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips" ? Kirigami.Theme.textColor : Qt.rgba(255, 255, 255, 0.8)
+            border.color: Kirigami.Theme.textColor
             function updateLastSelectedObjIndicatorPosition() {
                 lastSelectedObjIndicatorPositioner.restart();
             }
@@ -1101,14 +1083,12 @@ Zynthian.ScreenPage {
         Rectangle {
             id: copySourceObjIndicator
 
-            visible: root.copySourceObj && root.copySourceObj.className === "sketchpad_clips"
-                     ? zynqtgui.slotsBarClipsActive
-                     : root.copySourceObj
+            visible: false
 
-            width: root.copySourceObj && root.copySourceObj.component ? root.copySourceObj.component.width : 0
-            height: root.copySourceObj && root.copySourceObj.component ? root.copySourceObj.component.height : 0
-            x: root.copySourceObj && root.copySourceObj.component ? root.copySourceObj.component.mapToItem(content, 0, 0).x : 0
-            y: root.copySourceObj && root.copySourceObj.component ? root.copySourceObj.component.mapToItem(content, 0, 0).y : 0
+            width: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.width : 0
+            height: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.height : 0
+            x: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.mapToItem(content, 0, 0).x : 0
+            y: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.mapToItem(content, 0, 0).y : 0
             z: 1000
 
             color: "#882196f3"
@@ -1330,7 +1310,7 @@ Zynthian.ScreenPage {
                                                         delayed: true
 
                                                         value: {
-                                                            if (root.copySourceObj && root.copySourceObj.value === model.channel) {
+                                                            if (zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.value === model.channel) {
                                                                 return "#ff2196f3"
                                                             } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0) {
                                                                 return channelHeaderDelegate.channel.color;
@@ -1564,34 +1544,30 @@ Zynthian.ScreenPage {
 
                             // Common copy button to set the object to copy
                             TableHeader {
+                                id: copyButton
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 highlightOnFocus: false
                                 font.pointSize: 10
-                                enabled: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className
-                                text: qsTr("Copy %1").arg(zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className
-                                                          ? zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"
-                                                            ? qsTr("Clip")
-                                                            : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"
-                                                              ? qsTr("Track")
-                                                              : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
-                                                                ? qsTr("Deprecated Track")
-                                                                : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"
-                                                                  ? qsTr("Clip")
-                                                                  : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment"
-                                                                    ? qsTr("Segment")
-                                                                    : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement"
-                                                                      ? qsTr("Arrangement")
-                                                                      : ""
-                                                          : "")
-                                visible: root.copySourceObj == null
+                                // Button is enabled only if lastSelectedObj can be copy-pasted
+                                enabled: zynqtgui.sketchpad.lastSelectedObj.humanReadableClassName.length > 0
+                                text: qsTr("Copy %1").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableClassName)
+                                // Button is visible only when there is no ongoing copy action
+                                visible: zynqtgui.sketchpad.copySourceObj.humanReadableClassName.length == 0
                                 color: "transparent"
                                 onClicked: {
-                                    // Check and set copy source object from bottombar as bottombar
-                                    // controlObj is the current focused/selected object by user
+                                    zynqtgui.sketchpad.copySourceObj.setTo(zynqtgui.sketchpad.lastSelectedObj.className, zynqtgui.sketchpad.lastSelectedObj.value, zynqtgui.sketchpad.lastSelectedObj.component)
+                                }
 
-                                    root.copySourceObj = zynqtgui.sketchpad.lastSelectedObj
-                                    console.log("Copy", root.copySourceObj)
+                                QQC2.Label {
+                                    anchors {
+                                        horizontalCenter: parent.horizontalCenter
+                                        bottom: parent.bottom
+                                        bottomMargin: Kirigami.Units.smallSpacing
+                                    }
+                                    opacity: 0.5
+                                    text: zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName
+                                    font.pointSize: 8
                                 }
                             }
 
@@ -1602,10 +1578,10 @@ Zynthian.ScreenPage {
                                 highlightOnFocus: false
                                 font.pointSize: 10
                                 text: qsTr("Cancel Copy")
-                                visible: root.copySourceObj != null
+                                visible: !copyButton.visible
                                 color: "transparent"
                                 onPressed: {
-                                    root.copySourceObj = null
+                                    zynqtgui.sketchpad.copySourceObj.reset()
                                 }
                             }
 
@@ -1616,128 +1592,21 @@ Zynthian.ScreenPage {
                                 highlightOnFocus: false
                                 font.pointSize: 10
                                 color: "transparent"
-                                enabled: {
-                                    if (root.copySourceObj != null &&
-                                            root.copySourceObj.value &&
-                                            root.copySourceObj.className) {
-
-                                        // Check if source and destination are same
-                                        if (root.copySourceObj.className === "sketchpad_clip" &&
-                                                root.copySourceObj.value !== root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) &&
-                                                zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
-                                            return true
-                                        } else if (root.copySourceObj.className === "sketchpad_channel" &&
-                                                   root.copySourceObj.value.id !== zynqtgui.sketchpad.selectedTrackId &&
-                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                                            return true
-                                        } else if (root.copySourceObj.className === "sketchpad_track" &&
-                                                   root.copySourceObj.value !== root.song.scenesModel.selectedSketchpadSongIndex &&
-                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
-                                            return true
-                                        } else if (root.copySourceObj.className === "sketchpad_clips" &&
-                                                   root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips") {
-                                            return true
-                                        } else if (root.copySourceObj.className === "sketchpad_segment" &&
-                                                   root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" &&
-                                                   root.copySourceObj.value.sketchId === zynqtgui.sketchpad.lastSelectedObj.value.sketchId) {
-                                            return true
-                                        } else if (root.copySourceObj.className === "sketchpad_arrangement" &&
-                                                   root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement") {
-                                            return true
-                                        }
-                                    }
-
-                                    return false
-                                }
-                                text: qsTr("Paste %1").arg(root.copySourceObj && root.copySourceObj.className
-                                                           ? root.copySourceObj.className === "sketchpad_clip"
-                                                             ? qsTr("Clip")
-                                                             : root.copySourceObj.className === "sketchpad_channel"
-                                                               ? qsTr("Track")
-                                                               : root.copySourceObj.className === "sketchpad_track"
-                                                                 ? qsTr("Deprecated Track")
-                                                                 : root.copySourceObj.className === "sketchpad_clips"
-                                                                   ? qsTr("Clip")
-                                                                   : root.copySourceObj.className === "sketchpad_segment"
-                                                                     ? qsTr("Segment")
-                                                                     : root.copySourceObj.className === "sketchpad_arrangement"
-                                                                       ? qsTr("Arrangement")
-                                                                       : ""
-                                                           : "")
+                                // Button is enabled if there is an ongoing copy action and the selected slot is of the same type
+                                enabled: zynqtgui.sketchpad.copySourceObj.humanReadableClassName.length > 0 && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className
+                                text: qsTr("Paste %1").arg(zynqtgui.sketchpad.copySourceObj.humanReadableClassName)
                                 onPressed: {
-                                    if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clip") {
-                                        var sourceClip = root.copySourceObj.value
-                                        var destClip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                }
 
-                                        // Copy Clip
-                                        destClip.copyFrom(sourceClip)
-                                        // Copy pattern
-                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
-                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destChannel.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
-                                        destPattern.cloneOther(sourcePattern)
-
-                                        root.copySourceObj = null
-                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_channel") {
-                                        zynqtgui.start_loading()
-
-                                        // Copy Channel
-                                        var sourceChannel = root.copySourceObj.value
-                                        var destChannel = root.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
-                                        destChannel.copyFrom(sourceChannel)
-
-                                        for (var clipId=0; clipId<5; clipId++) {
-                                            for (var i=0; i<sourceChannel.clipsModel.count; i++) {
-                                                var sourceClip = sourceChannel.clips[clipId].getClip(i)
-                                                var destClip = destChannel.clips[clipId].getClip(i)
-                                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, clipId)
-                                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, clipId)
-
-                                                destPattern.cloneOther(sourcePattern)
-                                            }
-                                        }
-
-                                        root.copySourceObj = null
-
-                                        zynqtgui.stop_loading()
-                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_track") {
-                                        zynqtgui.start_loading()
-
-                                        // Copy Track
-                                        root.song.scenesModel.copyTrack(root.copySourceObj.value, root.song.scenesModel.selectedSketchpadSongIndex)
-
-                                        for (var i=0; i<root.song.channelsModel.count; i++) {
-                                            var channel = root.song.channelsModel.getChannel(i)
-                                            var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(root.copySourceObj.value === 0 ? "global" : ("global"+(root.copySourceObj.value + 1))).getByClipId(channel.id, channel.selectedClip)
-                                            var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByClipId(channel.id, channel.selectedClip)
-
-                                            destPattern.cloneOther(sourcePattern)
-                                        }
-
-                                        root.copySourceObj = null
-
-                                        zynqtgui.stop_loading()
-                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clips") {
-                                        var sourceClip = root.copySourceObj.value
-                                        var destClip = zynqtgui.sketchpad.lastSelectedObj.value
-
-                                        // Copy Clip
-                                        destClip.copyFrom(sourceClip)
-                                        // Copy pattern
-                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByClipId(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
-                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByClipId(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
-                                        destPattern.cloneOther(sourcePattern)
-
-                                        root.copySourceObj = null
-                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_segment") {
-                                        zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
-                                        root.copySourceObj = null
-                                    } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_arrangement") {
-                                        zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
-                                        root.copySourceObj = null
+                                QQC2.Label {
+                                    anchors {
+                                        horizontalCenter: parent.horizontalCenter
+                                        bottom: parent.bottom
+                                        bottomMargin: Kirigami.Units.smallSpacing
                                     }
+                                    opacity: 0.5
+                                    text: zynqtgui.sketchpad.copySourceObj.humanReadableObjName
+                                    font.pointSize: 8
                                 }
                             }
 
@@ -1747,26 +1616,21 @@ Zynthian.ScreenPage {
                                 highlightOnFocus: false
                                 font.pointSize: 10
                                 color: "transparent"
-
-                                enabled: zynqtgui.sketchpad.lastSelectedObj != null &&
-                                         zynqtgui.sketchpad.lastSelectedObj.className != null &&
-                                         (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip" ||
-                                          zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" ||
-                                          zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement")
-                                text: qsTr("Clear")
+                                // Button is enabled when a copy action is not running and selected slot can be copy-pasted
+                                enabled: copyButton.visible && zynqtgui.sketchpad.lastSelectedObj.humanReadableClassName.length > 0
+                                text: qsTr("Clear %1").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableClassName)
                                 onPressed: {
-                                    if (zynqtgui.sketchpad.lastSelectedObj.value.clear) {
-                                        zynqtgui.sketchpad.lastSelectedObj.value.clear()
-                                    }
+                                }
 
-                                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
-                                        // Try clearing pattern if exists.
-                                        try {
-                                            if (zynqtgui.sketchpad.lastSelectedObj.value.connectedPattern >= 0) {
-                                                Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByClipId(zynqtgui.sketchpad.lastSelectedObj.value.id, zynqtgui.sketchpad.lastSelectedObj.value.selectedClip).clear()
-                                            }
-                                        } catch(e) {}
+                                QQC2.Label {
+                                    anchors {
+                                        horizontalCenter: parent.horizontalCenter
+                                        bottom: parent.bottom
+                                        bottomMargin: Kirigami.Units.smallSpacing
                                     }
+                                    opacity: 0.5
+                                    text: zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName
+                                    font.pointSize: 8
                                 }
                             }
                         }
@@ -1844,12 +1708,12 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             onClicked: {
-                                zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
+                                zynqtgui.sketchpad.lastSelectedObj.className = clipsBar.selectedClipObject.className
                                 zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
                                 zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
                             }
                             onPressAndHold: {
-                                zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
+                                zynqtgui.sketchpad.lastSelectedObj.className = clipsBar.selectedClipObject.className
                                 zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
                                 zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
                             }

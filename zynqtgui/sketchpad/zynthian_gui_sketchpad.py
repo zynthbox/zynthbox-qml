@@ -88,6 +88,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
         self.__last_selected_obj = last_selected_obj_dto(self)
+        self.__copy_source_obj = last_selected_obj_dto(self)
+        self.__copy_source_obj.reset()
         # When starting up, init process will load a sketchpad and hence set it to True by default
         # This will later be set to False once init process loads the sketchpad
         self.__sketchpad_loading_in_progress = True
@@ -340,6 +342,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         return self.__last_selected_obj
 
     lastSelectedObj = Property(QObject, get_lastSelectedObj, constant=True)
+    ### END Property lastSelectedObj
+
+    ### BEGIN Property copySourceObj
+    def get_copySourceObj(self):
+        return self.__copy_source_obj
+
+    copySourceObj = Property(QObject, get_copySourceObj, constant=True)
     ### END Property lastSelectedObj
 
     ### BEGIN Property sketchpadLoadingInProgress

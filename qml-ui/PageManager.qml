@@ -267,6 +267,9 @@ Zynthian.Stack {
             } else {
                 root.switchToPageAfterCacheCreation = page;
             }
+            if (root.currentItem.hasOwnProperty("controlsVisible")) {
+                applicationWindow().controlsVisible = root.currentItem.controlsVisible;
+            }
         }
     }
 }

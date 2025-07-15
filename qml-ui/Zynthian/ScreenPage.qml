@@ -31,6 +31,10 @@ import org.kde.kirigami 2.5 as Kirigami
 
 Kirigami.Page {
     id: root
+
+    // Set this to false to hide the applicationWindow's footer (the bottom control row)
+    property bool controlsVisible: true
+
     // A workaround for StackView in Qt 5.11 not resizing its children properly on resizes
     // Useful for when we toggle the action bar on and off
     anchors.fill: parent

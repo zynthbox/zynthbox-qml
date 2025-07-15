@@ -774,7 +774,7 @@ Zynthian.BasePlayGrid {
                                 Kirigami.Theme.inherit: false
                                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                 readonly property color foregroundColor: Kirigami.Theme.backgroundColor
-                                readonly property color backgroundColor: Kirigami.Theme.textColor
+                                readonly property color backgroundColor: visible && trackPicker.trackIndex === _private.workingPatternModel.sketchpadTrack ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
                                 readonly property color borderColor: foregroundColor
                                 readonly property QtObject trackObject: zynqtgui.sketchpad.song && zynqtgui.sketchpad.song.channelsModel ? zynqtgui.sketchpad.song.channelsModel.getChannel(model.index) : null
 
@@ -855,18 +855,6 @@ Zynthian.BasePlayGrid {
                                     //         }
                                     //     }
                                     // }
-                                    Rectangle {
-                                        anchors {
-                                            left: parent.left
-                                            right: parent.right
-                                            bottom: parent.top
-                                            margins: 1
-                                        }
-                                        height: 9
-                                        color: visible && trackPicker.trackIndex === _private.workingPatternModel.sketchpadTrack
-                                            ? "yellow"
-                                            : "transparent"
-                                    }
                                     Kirigami.Icon {
                                         anchors {
                                             bottom: parent.bottom
@@ -972,7 +960,7 @@ Zynthian.BasePlayGrid {
                                 Kirigami.Theme.inherit: false
                                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                 readonly property color foregroundColor: Kirigami.Theme.backgroundColor
-                                readonly property color backgroundColor: Kirigami.Theme.textColor
+                                readonly property color backgroundColor: visible && clipPicker.clipIndex === _private.workingPatternModel.clipIndex ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
                                 readonly property color borderColor: foregroundColor
 
                                 onClicked: {
@@ -1046,18 +1034,6 @@ Zynthian.BasePlayGrid {
                                     //         x: visible && clipPicker.clipPattern ? clipPicker.clipPattern.bankPlaybackPosition * widthFactor : 0
                                     //     }
                                     // }
-                                    Rectangle {
-                                        anchors {
-                                            left: parent.left
-                                            right: parent.right
-                                            bottom: parent.top
-                                            margins: 1
-                                        }
-                                        height: 9
-                                        color: visible && clipPicker.clipIndex === _private.workingPatternModel.clipIndex
-                                            ? "yellow"
-                                            : "transparent"
-                                    }
                                     Kirigami.Icon {
                                         anchors {
                                             bottom: parent.bottom
@@ -1414,7 +1390,6 @@ Zynthian.BasePlayGrid {
                         anchors.margins: 5
                         spacing: 0
                         visible: !drumPad.channelIsLoopType
-                        clip: true
                         Repeater {
                             id:drumPadRepeater
                             model: _private.activeBarModelWidth

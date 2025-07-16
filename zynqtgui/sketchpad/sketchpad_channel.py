@@ -340,8 +340,6 @@ class sketchpad_channel(QObject):
             for clip in clip_model.__clips__:
                 clip.path_changed.connect(self.sketchSlotsDataChanged.emit)
         self.__layers_snapshot = []
-        self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
-        self.zynqtgui.masterVolumeChanged.connect(lambda: self.master_volume_changed())
         self.__connected_pattern__ = -1
         # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
@@ -860,10 +858,6 @@ class sketchpad_channel(QObject):
                     pass
             else:
                 logging.info("### select_correct_layer : Do not Reselect channel sound since it is not removing current selected channel")
-
-    def master_volume_changed(self):
-        if not self.__song__.__to_be_deleted__:
-            self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
 
     def stopAllClips(self):
         if not self.__song__.__to_be_deleted__:
@@ -1395,7 +1389,7 @@ class sketchpad_channel(QObject):
         return self.__audio_level__
 
     def set_audioLevel(self, leveldB):
-        self.__audio_level__ = leveldB + self.__volume__.gainDb() + self.master_volume
+        self.__audio_level__ = leveldB + self.__volume__.gainDb()
         self.audioLevelChanged.emit()
 
     audioLevel = Property(float, get_audioLevel, set_audioLevel, notify=audioLevelChanged)

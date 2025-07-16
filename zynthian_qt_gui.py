@@ -447,7 +447,6 @@ class zynthian_gui(QObject):
         self.__current_task_message = ""
         self.__show_current_task_message = True
         self.currentTaskMessage = f"Starting Zynthbox"
-        self.__master_volume = -1
 
         self.zynmidi = None
         self.screens = {}
@@ -669,7 +668,7 @@ class zynthian_gui(QObject):
         Zynthbox.MidiRouter.instance().cuiaEvent.connect(self.handleMidiRouterCuiaEvent)
         self.current_screen_id_changed.connect(self.handleCurrentScreenIDChanged)
         # Make sure we initialise the master volume to be what it's supposed to be
-        self.masterVolume = self.get_initialMasterVolume()
+        Zynthbox.Plugin.instance().globalPlaybackClient().dryGainHandler().setGainDb(self.get_initialMasterVolume())
         # Create our webconf communication bridge (must happen late, to ensure we've got most of our things initialised)
         self.__webconf_fifo_handler = webconf_fifo_handler(self)
 
@@ -4710,22 +4709,6 @@ class zynthian_gui(QObject):
 
     isExternalAppActive = Property(bool, get_isExternalAppActive, notify=isExternalAppActiveChanged)
     ### END Property isExternalAppActive
-
-    ### Property masterVolume
-    def get_masterVolume(self):
-        return self.__master_volume
-
-    def set_masterVolume(self, value):
-        if self.__master_volume != value:
-            self.__master_volume = value
-            # JackPassthroughClient expects gainDb to be ranging from -40 to 20
-            Zynthbox.Plugin.instance().globalPlaybackClient().dryGainHandler().setGainDb(value)
-            self.masterVolumeChanged.emit()
-
-    masterVolumeChanged = Signal()
-
-    masterVolume = Property(int, get_masterVolume, set_masterVolume, notify=masterVolumeChanged)
-    ### END Property masterVolume
 
     ### Property initialMasterVolume
     def get_initialMasterVolume(self):

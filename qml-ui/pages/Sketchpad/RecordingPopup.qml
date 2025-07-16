@@ -109,11 +109,11 @@ Zynthian.Popup {
                     returnValue = true;
                     break;
                 case "KNOB2_UP":
-                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume + 1, 0, 100)
+                    applicationWindow().updateMasterVolume(1, false)
                     returnValue = true;
                     break;
                 case "KNOB2_DOWN":
-                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume - 1, 0, 100)
+                    applicationWindow().updateMasterVolume(-1, false)
                     returnValue = true;
                     break;
                 case "KNOB3_UP":
@@ -596,15 +596,17 @@ Zynthian.Popup {
                                     text: qsTr("Master\nVolume")
                                 }
                                 Zynthian.SketchpadDial {
+                                    property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
                                     Layout.fillHeight: true
-                                    controlObj: zynqtgui
-                                    controlProperty: "masterVolume"
-                                    valueString: qsTr("%1%").arg(dial.value)
+                                    controlObj: gainHandler
+                                    controlProperty: "gainDb"
+                                    valueString: qsTr("%1 dB").arg(dial.value.toFixed(2))
                                     fineTuneButtonsVisible: false
+                                    onDoubleClicked: gainHandler.gainDb = zynqtgui.initialMasterVolume
                                     dial {
-                                        stepSize: 1
-                                        from: 0
-                                        to: 100
+                                        stepSize: 0.5
+                                        from: gainHandler.minimumDecibel
+                                        to: gainHandler.maximumDecibel
                                     }
                                 }
                                 Item { Layout.fillHeight: true; Layout.fillWidth: true; }

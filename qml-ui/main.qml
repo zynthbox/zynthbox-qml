@@ -462,19 +462,20 @@ Kirigami.AbstractApplicationWindow {
      * Update master volume
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateMasterVolume(sign) {
+    function updateMasterVolume(sign, showOsd=true) {
+        const gainHandler = Zynthbox.Plugin.globalPlaybackClient.dryGainHandler;
         function valueSetter(value) {
-            zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(value, -40, 20)
-            if (!zynqtgui.globalPopupOpened) {
+            gainHandler.gainDb = Zynthian.CommonUtils.clamp(value, gainHandler.minimumDecibel, gainHandler.maximumDecibel)
+            if (!zynqtgui.globalPopupOpened && showOsd) {
                 applicationWindow().showOsd({
                                                 parameterName: "master_volume",
                                                 description: qsTr("Master Volume"),
-                                                start: -40,
-                                                stop: 20,
-                                                step: 1,
+                                                start: gainHandler.minimumDecibel,
+                                                stop: gainHandler.maximumDecibel,
+                                                step: 0.5,
                                                 defaultValue: zynqtgui.initialMasterVolume,
-                                                currentValue: zynqtgui.masterVolume,
-                                                valueLabel: qsTr("%1 dB").arg(zynqtgui.masterVolume),
+                                                currentValue: gainHandler.gainDb,
+                                                valueLabel: qsTr("%1 dB").arg(gainHandler.gainDb.toFixed(2)),
                                                 setValueFunction: valueSetter,
                                                 showValueLabel: true,
                                                 showResetToDefault: true,
@@ -482,7 +483,7 @@ Kirigami.AbstractApplicationWindow {
                                             })
             }
         }
-        valueSetter(zynqtgui.masterVolume + sign)
+        valueSetter(gainHandler.gainDb + sign*0.5)
     }
     /**
      * Update metronome clip volume
@@ -611,14 +612,14 @@ Kirigami.AbstractApplicationWindow {
     function updateChannelVolume(sign, channelId, showOsd=true) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
-            selectedChannel.gainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
+            selectedChannel.gainHandler.gainDb = Zynthian.CommonUtils.clamp(value, selectedChannel.gainHandler.minimumDecibel, selectedChannel.gainHandler.maximumDecibel)
             if (showOsd) {
                 applicationWindow().showOsd({
                                                 parameterName: "channel_volume",
                                                 description: qsTr("%1 Volume").arg(selectedChannel.name),
                                                 start: 0,
                                                 stop: 1,
-                                                step: 0.01,
+                                                step: 0.5,
                                                 defaultValue: parseFloat(selectedChannel.gainHandler.absoluteGainAtZeroDb),
                                                 currentValue: parseFloat(selectedChannel.gainHandler.gainAbsolute),
                                                 startLabel: qsTr("%1 dB").arg(selectedChannel.gainHandler.minimumDecibel),
@@ -633,7 +634,7 @@ Kirigami.AbstractApplicationWindow {
             }
         }
 
-        valueSetter(selectedChannel.gainHandler.gainAbsolute + sign*0.01)
+        valueSetter(selectedChannel.gainHandler.gainDb + sign*0.5)
     }    /**
      * Update delay send amount of selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size

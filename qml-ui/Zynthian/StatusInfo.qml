@@ -462,20 +462,22 @@ QQC2.Pane
                             ColumnLayout {
                                 anchors.fill: parent
                                 SketchpadDial {
+                                    id: volumeDial
+                                    property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
+
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     Layout.margins: Kirigami.Units.gridUnit
-                                    id: volumeDial
                                     text: qsTr("Volume")
-                                    controlObj: zynqtgui
-                                    controlProperty: "masterVolume"
-                                    valueString: qsTr("%1 dB").arg(dial.value)
+                                    controlObj: gainHandler
+                                    controlProperty: "gainDb"
+                                    valueString: qsTr("%1 dB").arg(dial.value.toFixed(2))
                                     knobId: 3
-
+                                    onDoubleClicked: gainHandler.gainDb = zynqtgui.initialMasterVolume
                                     dial {
-                                        stepSize: 1
-                                        from: -40
-                                        to: 20
+                                        stepSize: 0.5
+                                        from: gainHandler.minimumDecibel
+                                        to: gainHandler.maximumDecibel
                                     }
                                 }
                             }

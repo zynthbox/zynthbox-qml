@@ -83,7 +83,7 @@ QQC2.Pane {
                     applicationWindow().updateChannelVolume(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                     return true;
                 case "MixerBar_master":
-                    applicationWindow().updateMasterVolume(1)
+                    applicationWindow().updateMasterVolume(1, false)
                     return true;
                 default:
                     return false;
@@ -94,7 +94,7 @@ QQC2.Pane {
                     applicationWindow().updateChannelVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                     return true;
                 case "MixerBar_master":
-                    applicationWindow().updateMasterVolume(-1)
+                    applicationWindow().updateMasterVolume(-1, false)
                     return true;
                 default:
                     return false;
@@ -232,7 +232,7 @@ QQC2.Pane {
                                         {
                                             visible: !svgBg2.visible
                                             anchors.fill: parent
-                                            color: mixerColumnDelegate.highlighted ? "#22ffffff" : "transparent"
+                                            color: "transparent"
                                             border.width: 1
                                             border.color: mixerColumnDelegate.highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                         }
@@ -561,32 +561,34 @@ QQC2.Pane {
 
                             VolumeControl {
                                 id: masterVolume
+                                property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
+
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
                                 inputAudioLevelVisible: true
-                                enabled: !Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted
+                                enabled: !gainHandler.muted
 
                                 Binding {
                                     target: masterVolume.slider
-                                    property: "value"
-                                    value: zynqtgui.masterVolume
+                                    property: "gainDb"
+                                    value: masterVolume.gainHandler
                                 }
 
                                 slider {
-                                    value: zynqtgui.masterVolume
-                                    from: -40
-                                    to: 20
+                                    value: masterVolume.gainHandler.gainDb
+                                    from: masterVolume.gainHandler.minimumDecibel
+                                    to: masterVolume.gainHandler.maximumDecibel
                                 }
                                 onValueChanged: {
-                                    zynqtgui.masterVolume = masterVolume.slider.value;
+                                    masterVolume.gainHandler.gainDb = masterVolume.slider.value;
                                     zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
                                 }
                                 onClicked: {
                                     zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
                                 }
                                 onDoubleClicked: {
-                                    zynqtgui.masterVolume = zynqtgui.initialMasterVolume
+                                    masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
                                 }
                             }
 
@@ -627,7 +629,7 @@ QQC2.Pane {
                                 Layout.fillHeight: false
                                 horizontalAlignment: Text.AlignHCenter
                                 elide: Text.ElideRight
-                                text: qsTr("%1 dB").arg(zynqtgui.masterVolume.toFixed(2))
+                                text: qsTr("%1 dB").arg(masterVolume.gainHandler.gainDb.toFixed(2))
                                 font.pointSize: 9
 
                                 MouseArea {
@@ -645,7 +647,7 @@ QQC2.Pane {
                                 Layout.margins: 4
                                 radius: 2
                                 font.pointSize: 8
-                                checked: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted
+                                checked: masterVolume.gainHandler.muted
                                 text: qsTr("M")
                                 contentItem: QQC2.Label {
                                     text: parent.text
@@ -659,7 +661,7 @@ QQC2.Pane {
                                     color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                 }
                                 onClicked: {
-                                    Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted = !Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted
+                                    masterVolume.gainHandler.muted = !masterVolume.gainHandler.muted
                                 }
                             }
                         }

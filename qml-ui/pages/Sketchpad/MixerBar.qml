@@ -558,8 +558,8 @@ QQC2.Pane {
 
                                 Binding {
                                     target: masterVolume.slider
-                                    property: "gainDb"
-                                    value: masterVolume.gainHandler
+                                    property: "value"
+                                    value: masterVolume.gainHandler.gainDb
                                 }
 
                                 slider {

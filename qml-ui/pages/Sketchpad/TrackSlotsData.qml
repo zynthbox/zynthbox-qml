@@ -213,16 +213,8 @@ RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
-            padding: 4
-            bottomInset: 4
-            topInset: 4
-            rightInset: 4
-            leftInset: 4
-
             opacity: slotMakesSound ? 1 : 0.3
             background: Item {
-
                 // Show highlighted color on slot border when slot is a sample-loop and is enabled
                 Rectangle {
                     visible: !svgBg.visible
@@ -247,21 +239,6 @@ RowLayout {
                     imagePath: "widgets/slots-delegate-background"
                     prefix: slotDelegate.isClipEnabled ? ["focus", ""] : ""
                     colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                }
-
-                // Focus rectangle outside the slot border when a slot is clicked
-                // TODO : @camilo Needs theming
-                Rectangle {
-                    anchors {
-                        fill: parent
-                        margins: -4
-                    }
-                    opacity: control.highlightCurrentlySelectedSlot && slotDelegate.highlighted ? 0.8 : 0
-                    color: "transparent"
-                    border {
-                        width: 2
-                        color: "white"
-                    }
                 }
             }
 

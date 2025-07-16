@@ -980,9 +980,12 @@ class sketchpad_clip(QObject):
             self.metadata.clear()
 
         if self.audioSource is not None:
+            # Explicitly unhook, to avoid update potential clashes when we load stuff momentarily
             self.__metadata.unhook()
             try: self.audioSource.disconnect(self)
             except: pass
+            self.audioSource.deleteLater()
+            self.audioSource = None
 
         cleanedUpFilename = self.__filename__.replace("&", "&amp;")
         self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{cleanedUpFilename}"
@@ -994,8 +997,6 @@ class sketchpad_clip(QObject):
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
             self.audioSource.setLaneAffinity(self.__lane__)
-        else:
-            self.audioSource = None
 
         # read() will read all the available metadata and populate default values if not available
         if read_metadata:

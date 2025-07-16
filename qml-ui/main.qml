@@ -701,7 +701,13 @@ Kirigami.AbstractApplicationWindow {
 
         valueSetter(selectedChannel.wetFx2Amount + sign)
     }
-
+    /**
+     * Update global playback client pan
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
+     */
+    function updateGlobalPlaybackPan(sign) {
+        Zynthbox.Plugin.globalPlaybackClient.panAmount = Zynthian.CommonUtils.clamp(Zynthbox.Plugin.globalPlaybackClient.panAmount + sign * 0.05, -1, 1)
+    }
     visible: false
     flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
     minimumWidth: screen.width

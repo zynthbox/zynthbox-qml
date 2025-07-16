@@ -105,7 +105,7 @@ QQC2.Pane {
                     pageManager.getPage("sketchpad").updateChannelPan(1, zynqtgui.sketchpad.lastSelectedObj.value)
                     return true;
                 case "MixerBar_master":
-                    applicationWindow().updateGlobalDelayFXAmount(1);
+                    applicationWindow().updateGlobalPlaybackPan(1);
                     return true;
                 default:
                     return false;
@@ -116,30 +116,12 @@ QQC2.Pane {
                     pageManager.getPage("sketchpad").updateChannelPan(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                     return true;
                 case "MixerBar_master":
-                    applicationWindow().updateGlobalDelayFXAmount(-1);
-                    return true;
-                default:
-                    return false;
-            }
-
-        case "KNOB2_UP":
-            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
-                case "MixerBar_master":
-                    applicationWindow().updateGlobalReverbFXAmount(1);
-                    return true;
-                default:
-                    return false;
-            }
-        case "KNOB2_DOWN":
-            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
-                case "MixerBar_master":
-                    applicationWindow().updateGlobalReverbFXAmount(-1);
+                    applicationWindow().updateGlobalPlaybackPan(-1);
                     return true;
                 default:
                     return false;
             }
         }
-        
         return false;
     }
 
@@ -618,7 +600,7 @@ QQC2.Pane {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        channelsVolumeRow.handleClick(channel);
+                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
                                     }
                                 }
                             }

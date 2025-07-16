@@ -1032,28 +1032,12 @@ Zynthian.ScreenPage {
 
         Rectangle {
             id: lastSelectedObjIndicator
-
-            visible: {
-                let returnVal = false;
-                if (zynqtgui.sketchpad.lastSelectedObj != null) {
-                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"){
-                        returnVal = zynqtgui.slotsBarClipsActive;
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                        returnVal = !root.displayTrackButtons;
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_scene") {
-                        returnVal = root.displaySceneButtons;
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
-                        returnVal = root.displayTrackButtons;
-                    } else if (["MixerBar_item", "MixerBar_master"].includes(zynqtgui.sketchpad.lastSelectedObj.className)) {
-                        returnVal = zynqtgui.slotsBarMixerActive;
-                    }
-                }
-                return returnVal
-            }
-
+            visible: zynqtgui.sketchpad.lastSelectedObj.component && zynqtgui.sketchpad.lastSelectedObj.component.visible
             z: 1000
             border.width: 2
             border.color: Kirigami.Theme.textColor
+            color: "transparent"
+
             function updateLastSelectedObjIndicatorPosition() {
                 lastSelectedObjIndicatorPositioner.restart();
             }
@@ -1076,13 +1060,11 @@ Zynthian.ScreenPage {
                 onHeightChanged: lastSelectedObjIndicator.updateLastSelectedObjIndicatorPosition()
                 onWidthChanged: lastSelectedObjIndicator.updateLastSelectedObjIndicatorPosition()
             }
-
-            color: "transparent"
         }
 
         Rectangle {
             id: copySourceObjIndicator
-            visible: zynqtgui.sketchpad.copySourceObj.component.visible
+            visible: zynqtgui.sketchpad.copySourceObj.component && zynqtgui.sketchpad.copySourceObj.component.visible
             width: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.width : 0
             height: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.height : 0
             x: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.mapToItem(content, 0, 0).x : 0

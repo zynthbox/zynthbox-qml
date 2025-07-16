@@ -1082,16 +1082,14 @@ Zynthian.ScreenPage {
 
         Rectangle {
             id: copySourceObjIndicator
-
-            visible: false
-
+            visible: zynqtgui.sketchpad.copySourceObj.component.visible
             width: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.width : 0
             height: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.height : 0
             x: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.mapToItem(content, 0, 0).x : 0
             y: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.mapToItem(content, 0, 0).y : 0
             z: 1000
-
-            color: "#882196f3"
+            color: Kirigami.Theme.textColor
+            opacity: 0.5
         }
 
         ColumnLayout {

@@ -142,7 +142,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: Kirigami.Units.smallSpacing
+                spacing: 0
 
                 BottomStackTabs {
                     id: buttonsColumn
@@ -506,11 +506,16 @@ QQC2.Pane {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                     topPadding: masterSvgBg.topPadding
                     bottomPadding: masterSvgBg.bottomPadding
-                    leftPadding: masterSvgBg.leftPadding
-                    rightPadding: masterSvgBg.rightPadding
+                    leftPadding: Kirigami.Units.largeSpacing + masterSvgBg.leftPadding
+                    rightPadding: Kirigami.Units.largeSpacing + masterSvgBg.rightPadding
 
                     background: Item {
-
+                        Kirigami.Separator {
+                            height: parent.height
+                            anchors.left: parent.left
+                            width: 1
+                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                        }
                         PlasmaCore.FrameSvgItem {
                             id: masterSvgBg
                             visible: fromCurrentTheme
@@ -649,12 +654,6 @@ QQC2.Pane {
                         }
                     }
                 }
-
-                // Kirigami.Separator {
-                //     Layout.fillHeight: true
-                //     Layout.preferredWidth: 1
-                //     color: "#ff31363b"
-                // }
             }
         }
     }

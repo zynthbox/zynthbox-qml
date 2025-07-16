@@ -280,10 +280,7 @@ QQC2.Pane {
 
                                                     // Disable when muted or channel is not being played in solo mode
                                                     enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
-                                                    headerTextVisible: false
-                                                    inputAudioLeveldB: visible && !model.channel.muted
-                                                                  ? Zynthbox.AudioLevels.channels[model.channel.id]
-                                                                  : -400
+                                                    inputAudioLeveldB: visible && !model.channel.muted ? Zynthbox.AudioLevels.channels[model.channel.id] : -40
                                                     onAudioLeveldBChanged: {
                                                         console.log("Channel audio level changed to", audioLeveldB)
                                                     }
@@ -410,6 +407,8 @@ QQC2.Pane {
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: false
                                                 Layout.preferredHeight: Kirigami.Units.gridUnit
+                                                Layout.leftMargin: Kirigami.Units.smallSpacing
+                                                Layout.rightMargin: Kirigami.Units.smallSpacing
                                                 orientation: Qt.Horizontal
                                                 from: -1.0
                                                 to: 1.0
@@ -467,6 +466,11 @@ QQC2.Pane {
                                                     font.pointSize: 8
                                                     checked: root.song.playChannelSolo === model.channel.id
                                                     text: qsTr("S")
+                                                    contentItem: QQC2.Label {
+                                                        text: parent.text
+                                                        font: parent.font
+                                                        horizontalAlignment: Text.AlignHCenter
+                                                    }
                                                     background: Rectangle {
                                                         radius: parent.radius
                                                         border.width: 1
@@ -489,6 +493,11 @@ QQC2.Pane {
                                                     font.pointSize: 8
                                                     checked: model.channel.muted
                                                     text: qsTr("M")
+                                                    contentItem: QQC2.Label {
+                                                        text: parent.text
+                                                        font: parent.font
+                                                        horizontalAlignment: Text.AlignHCenter
+                                                    }
                                                     background: Rectangle {
                                                         radius: parent.radius
                                                         border.width: 1
@@ -548,17 +557,15 @@ QQC2.Pane {
                         }
                         ColumnLayout {
                             anchors.fill: parent
+                            spacing: Kirigami.Units.smallSpacing
+
                             VolumeControl {
                                 id: masterVolume
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                headerText: root.visible || Zynthbox.AudioLevels.playback <= -40
-                                            ? ""
-                                            : (Math.round(Zynthbox.AudioLevels.playback) + " (dB)")
-
-                                footerText: "Master"
-                                inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -400
+                                inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
                                 inputAudioLevelVisible: true
+                                enabled: !Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted
 
                                 Binding {
                                     target: masterVolume.slider
@@ -583,6 +590,37 @@ QQC2.Pane {
                                 }
                             }
 
+                            Zynthian.ResetableSlider {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit
+                                Layout.leftMargin: Kirigami.Units.smallSpacing
+                                Layout.rightMargin: Kirigami.Units.smallSpacing
+                                orientation: Qt.Horizontal
+                                from: -1.0
+                                to: 1.0
+                                controlObj: Zynthbox.Plugin.globalPlaybackClient
+                                controlProp: "panAmount"
+                                initialValue: 0
+                            }
+
+                            QQC2.Label {
+                                Layout.alignment: Qt.AlignCenter
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.margins: 4
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                                text: "Master"
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        channelsVolumeRow.handleClick(channel);
+                                    }
+                                }
+                            }
+
                             QQC2.Label {
                                 Layout.alignment: Qt.AlignCenter
                                 Layout.fillWidth: true
@@ -597,6 +635,31 @@ QQC2.Pane {
                                     onClicked: {
                                         zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
                                     }
+                                }
+                            }
+
+                            QQC2.RoundButton {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                Layout.margins: 4
+                                radius: 2
+                                font.pointSize: 8
+                                checked: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted
+                                text: qsTr("M")
+                                contentItem: QQC2.Label {
+                                    text: parent.text
+                                    font: parent.font
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                                background: Rectangle {
+                                    radius: parent.radius
+                                    border.width: 1
+                                    border.color: Qt.rgba(50, 50, 50, 0.1)
+                                    color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                }
+                                onClicked: {
+                                    Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted = !Zynthbox.Plugin.globalPlaybackClient.dryGainHandler.muted
                                 }
                             }
                         }

@@ -1112,7 +1112,7 @@ Zynthian.ScreenPage {
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: 1
+                        spacing: 2
 
                         QQC2.Control
                         {

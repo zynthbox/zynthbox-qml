@@ -142,7 +142,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 0
+                spacing: 2
 
                 BottomStackTabs {
                     id: buttonsColumn
@@ -156,6 +156,7 @@ QQC2.Pane {
                     id: mixerContainer
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.margins: svgBg.inset.top
 
                     topPadding: svgBg.topPadding
                     bottomPadding: svgBg.bottomPadding
@@ -210,8 +211,7 @@ QQC2.Pane {
                                             width: 1
                                             color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
                                         }
-                                        Rectangle
-                                        {
+                                        Rectangle  {
                                             visible: !svgBg2.visible
                                             anchors.fill: parent
                                             color: "transparent"
@@ -503,11 +503,12 @@ QQC2.Pane {
                     id: masterControl
                     Layout.fillWidth: false
                     Layout.fillHeight: true
+                    // Layout.margins: masterSvgBg.inset.top
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                    topPadding: masterSvgBg.topPadding
-                    bottomPadding: masterSvgBg.bottomPadding
-                    leftPadding: Kirigami.Units.largeSpacing + masterSvgBg.leftPadding
-                    rightPadding: Kirigami.Units.largeSpacing + masterSvgBg.rightPadding
+                    // topPadding: masterSvgBg.topPadding
+                    // bottomPadding: masterSvgBg.bottomPadding
+                    // leftPadding: Kirigami.Units.largeSpacing + masterSvgBg.leftPadding
+                    // rightPadding: Kirigami.Units.largeSpacing + masterSvgBg.rightPadding
 
                     background: Item {
                         Kirigami.Separator {
@@ -516,19 +517,19 @@ QQC2.Pane {
                             width: 1
                             color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
                         }
-                        PlasmaCore.FrameSvgItem {
-                            id: masterSvgBg
-                            visible: fromCurrentTheme
-                            anchors.fill: parent
+                        // PlasmaCore.FrameSvgItem {
+                        //     id: masterSvgBg
+                        //     visible: fromCurrentTheme
+                        //     anchors.fill: parent
 
-                            readonly property real leftPadding: fixedMargins.left
-                            readonly property real rightPadding: fixedMargins.right
-                            readonly property real topPadding: fixedMargins.top
-                            readonly property real bottomPadding: fixedMargins.bottom
+                        //     readonly property real leftPadding: fixedMargins.left
+                        //     readonly property real rightPadding: fixedMargins.right
+                        //     readonly property real topPadding: fixedMargins.top
+                        //     readonly property real bottomPadding: fixedMargins.bottom
 
-                            imagePath: "widgets/tracks-background"
-                            colorGroup: PlasmaCore.Theme.ViewColorGroup
-                        }
+                        //     imagePath: "widgets/tracks-background"
+                        //     colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        // }
                     }
 
                     contentItem: Item {

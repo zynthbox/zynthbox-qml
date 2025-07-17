@@ -296,7 +296,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 1
+                spacing: 2
 
                 ColumnLayout {
                     id: buttonsColumn

@@ -113,7 +113,7 @@ QQC2.Pane {
         }
 
         RowLayout {
-            spacing: 1
+            spacing: 2
             anchors.fill: parent
 
             BottomStackTabs {

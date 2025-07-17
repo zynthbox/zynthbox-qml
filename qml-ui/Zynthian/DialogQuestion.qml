@@ -122,17 +122,26 @@ Zynthian.Dialog {
         return result;
     }
 
-    header: Kirigami.Heading {
-        level: 2
-        text: component.title
-        QtObject {
-            id: _private
-            property var selectedButton: rejectButton
-            property var allButtons: []
-            readonly property var standardButtons: [rejectButton, acceptButton]
-            function updateAllButtons() {
-                allButtons = standardButtons.concat(component.additionalButtons);
+    header: ColumnLayout {
+        spacing: 0
+        Kirigami.Heading {
+            Layout.fillWidth: true
+            Layout.margins: Kirigami.Units.largeSpacing
+            level: 2
+            text: component.title
+            QtObject {
+                id: _private
+                property var selectedButton: rejectButton
+                property var allButtons: []
+                readonly property var standardButtons: [rejectButton, acceptButton]
+                function updateAllButtons() {
+                    allButtons = standardButtons.concat(component.additionalButtons);
+                }
             }
+        }
+        Kirigami.Separator {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
         }
     }
     contentItem: ColumnLayout {

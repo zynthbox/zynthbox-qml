@@ -1573,9 +1573,13 @@ Zynthian.ScreenPage {
                                 font.pointSize: 10
                                 color: "transparent"
                                 // Button is enabled if there is an ongoing copy action and the selected slot is of the same type
-                                enabled: zynqtgui.sketchpad.copySourceObj.isCopyable && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className
+                                enabled: zynqtgui.sketchpad.copySourceObj.isCopyable && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className && zynqtgui.sketchpad.copySourceObj.value != zynqtgui.sketchpad.lastSelectedObj.value
                                 text: qsTr("Paste %1").arg(zynqtgui.sketchpad.copySourceObj.humanReadableClassName)
                                 onPressed: {
+                                    applicationWindow().confirmer.confirmSomething(qsTr("Confirm Paste"), qsTr("Are you sure that you want to paste %1 to %2? This action is irreversible and will clear all existing contents of %2.").arg(zynqtgui.sketchpad.copySourceObj.humanReadableObjName).arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
+                                        zynqtgui.sketchpad.lastSelectedObj.copyFrom(zynqtgui.sketchpad.copySourceObj)
+                                        zynqtgui.sketchpad.copySourceObj.reset()
+                                    });
                                 }
 
                                 QQC2.Label {
@@ -1600,6 +1604,9 @@ Zynthian.ScreenPage {
                                 enabled: copyButton.visible && zynqtgui.sketchpad.lastSelectedObj.isCopyable
                                 text: qsTr("Clear %1").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableClassName)
                                 onPressed: {
+                                    applicationWindow().confirmer.confirmSomething(qsTr("Confirm Clear"), qsTr("Are you sure that you want to clear %1? This action is irreversible and will clear all existing contents of %1.").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
+                                        zynqtgui.sketchpad.lastSelectedObj.clear()
+                                    });
                                 }
 
                                 QQC2.Label {

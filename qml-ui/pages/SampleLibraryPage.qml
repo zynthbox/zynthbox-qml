@@ -134,167 +134,89 @@ Zynthian.ScreenPage {
 
     cuiaCallback: function(cuia) {
         let returnValue = false;
-        switch (cuia) {
-            case "SCREEN_LAYER":
-            case "SCREEN_PRESET":
-                // Switch to Sounds page when library page is open and F2 is pressed again
-                zynqtgui.show_screen("sound_categories")
-                returnValue = true;
+        switch (_private.selectedColumn) {
+            case 0:
+                returnValue = clipsListView.cuiaCallback(cuia);
                 break;
-            case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
-                switch (_private.selectedColumn) {
-                    case 0:
-                        if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
-                        } else {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
-                        }
-                        break;
-                    case 1:
-                        _private.selectedColumn = 2;
-                        break;
-                    case 2:
-                        filesListView.currentItem.onClicked();
-                        break;
-                }
-                returnValue = true;
+            case 1:
+                returnValue = folderListView.cuiaCallback(cuia);
                 break;
-            case "KNOB0_TOUCHED":
-                if (component.selectedChannel.trackType === "sample-loop") {
-                    pageManager.getPage("sketchpad").updateSelectedSketchGain(0, component.selectedChannel.selectedSlot.value);
-                } else {
-                    pageManager.getPage("sketchpad").updateSelectedSampleGain(0, component.selectedChannel.selectedSlot.value);
-                }
-                // switch (_private.selectedColumn) {
-                //     case 0:
-                //         if (component.selectedChannel.trackType === "sample-loop") {
-                //             pageManager.getPage("sketchpad").updateSelectedSketchGain(0, component.selectedChannel.selectedSlot.value);
-                //         } else {
-                //             pageManager.getPage("sketchpad").updateSelectedSampleGain(0, component.selectedChannel.selectedSlot.value);
-                //         }
-                //         break;
-                //     case 1:
-                //         break;
-                //     case 2:
-                //         break;
-                // }
-                returnValue = true;
+            case 2:
+                returnValue = filesListView.cuiaCallback(cuia);
                 break;
-            case "KNOB0_RELEASED":
-                returnValue = true;
+            default:
                 break;
-            case "KNOB0_UP":
-                if (component.selectedChannel.trackType === "sample-loop") {
-                    pageManager.getPage("sketchpad").updateSelectedSketchGain(1, component.selectedChannel.selectedSlot.value);
-                } else {
-                    pageManager.getPage("sketchpad").updateSelectedSampleGain(1, component.selectedChannel.selectedSlot.value);
-                }
-                // switch (_private.selectedColumn) {
-                //     case 0:
-                //         if (component.selectedChannel.trackType === "sample-loop") {
-                //             pageManager.getPage("sketchpad").updateSelectedSketchGain(1, component.selectedChannel.selectedSlot.value);
-                //         } else {
-                //             pageManager.getPage("sketchpad").updateSelectedSampleGain(1, component.selectedChannel.selectedSlot.value);
-                //         }
-                //         break;
-                //     case 1:
-                //         break;
-                //     case 2:
-                //         break;
-                // }
-                returnValue = true;
-                break;
-            case "KNOB0_DOWN":
-                if (component.selectedChannel.trackType === "sample-loop") {
-                    pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, component.selectedChannel.selectedSlot.value);
-                } else {
-                    pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, component.selectedChannel.selectedSlot.value);
-                }
-                // switch (_private.selectedColumn) {
-                //     case 0:
-                //         if (component.selectedChannel.trackType === "sample-loop") {
-                //             pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, component.selectedChannel.selectedSlot.value);
-                //         } else {
-                //             pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, component.selectedChannel.selectedSlot.value);
-                //         }
-                //         break;
-                //     case 1:
-                //         break;
-                //     case 2:
-                //         break;
-                // }
-                returnValue = true;
-                break;
-            case "SELECT_DOWN":
-            case "KNOB3_UP":
-                switch (_private.selectedColumn) {
-                    case 0:
-                        if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, component.selectedChannel.selectedSlot.value + 1));
-                        } else {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, component.selectedChannel.selectedSlot.value + 1));
-                        }
-                        let selectedClip = component.selectedChannel.trackType === "sample-loop"
-                            ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                            : component.selectedChannel.samples[component.selectedChannel.selectedSlot.value]
-                        if (selectedClip.metadata.originalPath !== "") {
-                            filesListView.selectFile(selectedClip.metadata.originalPath, false);
-                        }
-                        break;
-                    case 1:
-                        folderListView.currentIndex = Math.min(folderListView.count - 1, folderListView.currentIndex + 1);
-                        folderListView.positionViewAtIndex(folderListView.currentIndex, ListView.Center);
-                        break;
-                    case 2:
-                        filesListView.currentIndex = Math.min(filesListView.count - 1, filesListView.currentIndex + 1);
-                        filesListView.positionViewAtIndex(filesListView.currentIndex, ListView.Center);
-                        break;
-                }
-                returnValue = true;
-                break;
-            case "SELECT_UP":
-            case "KNOB3_DOWN":
-                switch (_private.selectedColumn) {
-                    case 0:
-                        if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", Math.max(0, component.selectedChannel.selectedSlot.value - 1));
-                        } else {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.max(0, component.selectedChannel.selectedSlot.value - 1));
-                        }
-                        let selectedClip = component.selectedChannel.trackType === "sample-loop"
-                            ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                            : component.selectedChannel.samples[component.selectedChannel.selectedSlot.value]
-                        if (selectedClip.metadata.originalPath !== "") {
-                            filesListView.selectFile(selectedClip.metadata.originalPath, false);
-                        }
-                        break;
-                    case 1:
-                        folderListView.currentIndex = Math.max(0, folderListView.currentIndex - 1);
-                        folderListView.positionViewAtIndex(folderListView.currentIndex, ListView.Center);
-                        break;
-                    case 2:
-                        filesListView.currentIndex = Math.max(0, filesListView.currentIndex - 1);
-                        filesListView.positionViewAtIndex(filesListView.currentIndex, ListView.Center);
-                        break;
-                }
-                returnValue = true;
-                break;
-            case "NAVIGATE_LEFT":
-                _private.selectedColumn = Math.max(0, _private.selectedColumn - 1);
-                returnValue = true;
-                break;
-            case "NAVIGATE_RIGHT":
-                if (_private.selectedColumn == 2) {
-                    // Then we just kind of... use this as a "play" button style thing for testing samples (toggle the preview playback for whatever is currently selected)
-                    if (filesListView.currentIndex > -1) {
-                        filesListView.currentItem.doPreview();
+        }
+        if (returnValue === false) {
+            switch (cuia) {
+                case "SCREEN_LAYER":
+                case "SCREEN_PRESET":
+                    // Switch to Sounds page when library page is open and F2 is pressed again
+                    zynqtgui.show_screen("sound_categories")
+                    returnValue = true;
+                    break;
+                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_BOLD":
+                    switch (_private.selectedColumn) {
+                        case 0:
+                            if (component.selectedChannel.trackType === "sample-loop") {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
+                            } else {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
+                            }
+                            break;
+                        case 1:
+                            _private.selectedColumn = 2;
+                            break;
+                        case 2:
+                            filesListView.currentItem.onClicked();
+                            break;
                     }
-                } else {
-                    _private.selectedColumn = Math.min(_private.maxColumn, _private.selectedColumn + 1);
-                }
-                returnValue = true;
-                break;
+                    returnValue = true;
+                    break;
+                case "KNOB0_TOUCHED":
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(0, component.selectedChannel.selectedSlot.value);
+                    } else {
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(0, component.selectedChannel.selectedSlot.value);
+                    }
+                    returnValue = true;
+                    break;
+                case "KNOB0_RELEASED":
+                    returnValue = true;
+                    break;
+                case "KNOB0_UP":
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(1, component.selectedChannel.selectedSlot.value);
+                    } else {
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(1, component.selectedChannel.selectedSlot.value);
+                    }
+                    returnValue = true;
+                    break;
+                case "KNOB0_DOWN":
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, component.selectedChannel.selectedSlot.value);
+                    } else {
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, component.selectedChannel.selectedSlot.value);
+                    }
+                    returnValue = true;
+                    break;
+                case "NAVIGATE_LEFT":
+                    _private.selectedColumn = Math.max(0, _private.selectedColumn - 1);
+                    returnValue = true;
+                    break;
+                case "NAVIGATE_RIGHT":
+                    if (_private.selectedColumn == 2) {
+                        // Then we just kind of... use this as a "play" button style thing for testing samples (toggle the preview playback for whatever is currently selected)
+                        if (filesListView.selector.current_index > -1) {
+                            filesListView.currentItem.doPreview();
+                        }
+                    } else {
+                        _private.selectedColumn = Math.min(_private.maxColumn, _private.selectedColumn + 1);
+                    }
+                    returnValue = true;
+                    break;
+            }
         }
         return returnValue;
     }
@@ -395,244 +317,268 @@ Zynthian.ScreenPage {
             }
         ]
     }
-    contentItem: ColumnLayout {
+    contentItem: RowLayout {
         id: layout
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit
-            spacing: Kirigami.Units.gridUnit
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
-                onClicked: {
-                    applicationWindow().libraryTypePicker.open();
-                }
-                contentItem: Kirigami.Heading {
-                    level: 2
-                    text: component.selectedChannel
-                        ? qsTr("Track %1 Samples").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                        : ""
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                onClicked: {
-                    applicationWindow().libraryTypePicker.open();
-                }
-                contentItem: Kirigami.Heading {
-                    level: 2
-                    text: component.selectedChannel
-                        ? qsTr("Track %1 Loops").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                        : ""
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                }
-            }
-            Kirigami.Heading {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                level: 2
-                text: qsTr("Folders")
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
-            }
-            Kirigami.Heading {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                level: 2
-                text: qsTr("Samples In Folder")
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
-            }
-        }
-        RowLayout {
-            Layout.fillWidth: true
+
+        // FIXME : Find a way to correctly expand the columns equally with filLWidth property instead of using manually calculated width value
+        property real columnWidth: width / children.length - spacing/2
+
+        spacing: Kirigami.Units.gridUnit
+
+        ColumnLayout {
+            Layout.fillWidth: false
             Layout.fillHeight: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 14
-            spacing: Kirigami.Units.gridUnit
-            Zynthian.Card {
+            Layout.preferredWidth: layout.columnWidth
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit
+                spacing: Kirigami.Units.gridUnit
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
+                    onClicked: {
+                        applicationWindow().libraryTypePicker.open();
+                    }
+                    contentItem: Kirigami.Heading {
+                        level: 2
+                        text: component.selectedChannel
+                            ? qsTr("Track %1 Samples").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                            : ""
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
+                    onClicked: {
+                        applicationWindow().libraryTypePicker.open();
+                    }
+                    contentItem: Kirigami.Heading {
+                        level: 2
+                        text: component.selectedChannel
+                            ? qsTr("Track %1 Loops").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                            : ""
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    }
+                }
+                Kirigami.Heading {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    level: 2
+                    text: qsTr("Folders")
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+                Kirigami.Heading {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    level: 2
+                    text: qsTr("Samples In Folder")
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+            }
+            RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                highlighted: _private.selectedColumn === 0
-                ColumnLayout {
-                    anchors {
-                        fill: parent
-                        margins: Kirigami.Units.smallSpacing
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 14
+                spacing: Kirigami.Units.gridUnit
+                Zynthian.SelectorView {
+                    id: clipsListView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    highlighted: _private.selectedColumn === 0
+                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                    active: zynqtgui.isBootingComplete
+                    autoActivateIndexOnChange: true
+                    qmlSelector: Zynthian.SelectorWrapper {
+                        selector_list: Zynthbox.Plugin.sketchpadSlotCount
+                        current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? component.selectedChannel.selectedSlot.value : -1
+                        function onItemActivated(screenId, index) {
+                            clipsListView.itemActivated(screenId, index);
+                        }
                     }
-                    Repeater {
-                        model: Zynthbox.Plugin.sketchpadSlotCount
-                        delegate: Zynthian.Card {
-                            id: clipDelegate
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
-                            property QtObject clip: component.selectedChannel
-                                ? component.selectedChannel.trackType === "sample-loop"
-                                    ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                    : component.selectedChannel.samples[index]
-                                : null
-                            property QtObject cppClipObject: clipDelegate.clip && clipDelegate.clip.hasOwnProperty("cppObjId")
-                                ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
-                                : null
-                            property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
-                            contentItem: Item {
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        if (component.selectedChannel.selectedSlot.value === model.index) {
-                                            if (component.selectedChannel.trackType === "sample-loop") {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
-                                            } else {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
+                    onCurrentItemChanged: {
+                        if (currentItem && currentItem.clip.metadata.originalPath != "") {
+                            filesListView.selectFile(currentItem.clip.metadata.originalPath, false);
+                        }
+                    }
+                    onItemActivated: {
+                        if (_private.selectedColumn != 0) {
+                            _private.selectedColumn = 0;
+                        }
+                        qmlSelector.current_index = index;
+                        if (component.selectedChannel.selectedSlot.value === index) {
+                            if (component.selectedChannel.trackType === "sample-loop") {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
+                            } else {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
+                            }
+                        } else {
+                            if (component.selectedChannel.trackType === "sample-loop") {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", index, false);
+                            } else {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
+                            }
+                        }
+                    }
+                    delegate: Zynthian.SelectorDelegate {
+                        id: clipDelegate
+                        height: clipsListView.view.height/5
+                        enabled: true
+                        // highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
+                        property QtObject clip: component.selectedChannel
+                            ? component.selectedChannel.trackType === "sample-loop"
+                                ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                : component.selectedChannel.samples[index]
+                            : null
+                        property QtObject cppClipObject: clipDelegate.clip && clipDelegate.clip.hasOwnProperty("cppObjId")
+                            ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
+                            : null
+                        property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
+                        selector: clipsListView.selector
+                        onItemActivated: clipsListView.itemActivated(screenId, index)
+                        onItemActivatedSecondary: clipsListView.itemActivatedSecondary(screenId, index)
+                        onClicked: {
+                            clipDelegate.selector.activate_index(index);
+                        }
+                        contentItem: ColumnLayout {
+                            RowLayout {
+                                QQC2.Label {
+                                    id: mainLabel
+                                    Layout.fillWidth: true
+                                    text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("Empty Slot"))
+                                    elide: Text.ElideMiddle
+                                }
+                            }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                color: "#222222"
+                                border.width: 1
+                                border.color: "#ff999999"
+                                radius: 4
+                                Zynthbox.WaveFormItem {
+                                    id: waveformItem
+                                    anchors {
+                                        fill: parent
+                                        margins: 1
+                                    }
+                                    color: Kirigami.Theme.textColor
+                                    source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
+                                    start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
+                                    end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
+                                    readonly property real relativeStart: waveformItem.start / waveformItem.length
+                                    readonly property real relativeEnd: waveformItem.end / waveformItem.length
+                                    visible: clipDelegate.clipHasWav
+                                    // SamplerSynth progress dots
+                                    Timer {
+                                        id: dotFetcher
+                                        interval: 1; repeat: false; running: false;
+                                        onTriggered: {
+                                            progressDots.playbackPositions = component.visible && clipDelegate.cppClipObject
+                                                ? clipDelegate.cppClipObject.playbackPositions
+                                                : null
+                                        }
+                                    }
+                                    Connections {
+                                        target: component
+                                        onVisibleChanged: dotFetcher.restart();
+                                    }
+                                    Connections {
+                                        target: component.selectedChannel
+                                        onTrack_type_changed: dotFetcher.restart();
+                                    }
+                                    Connections {
+                                        target: clipDelegate
+                                        onCppClipObjectChanged: dotFetcher.restart();
+                                    }
+                                    Repeater {
+                                        id: progressDots
+                                        model: Zynthbox.Plugin.clipMaximumPositionCount
+                                        property QtObject playbackPositions: null
+                                        delegate: Item {
+                                            property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                                            visible: progressEntry && progressEntry.id > -1
+                                            Rectangle {
+                                                anchors.centerIn: parent
+                                                rotation: 45
+                                                color: Kirigami.Theme.highlightColor
+                                                width: Kirigami.Units.largeSpacing
+                                                height:  Kirigami.Units.largeSpacing
+                                                scale: progressEntry ? 0.5 + progressEntry.gain : 1
                                             }
-                                        } else {
-                                            if (component.selectedChannel.trackType === "sample-loop") {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", model.index, false);
-                                            } else {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index, false);
+                                            anchors {
+                                                top: parent.verticalCenter
+                                                topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                                             }
-                                            if (clipDelegate.clip.metadata.originalPath != "") {
-                                                filesListView.selectFile(clipDelegate.clip.metadata.originalPath, false);
-                                            }
+                                            x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
                                         }
                                     }
                                 }
-                                ColumnLayout {
-                                    anchors.fill: parent
-                                    RowLayout {
-                                        QQC2.Label {
-                                            id: mainLabel
-                                            Layout.fillWidth: true
-                                            text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("Empty Slot"))
-                                            elide: Text.ElideMiddle
-                                        }
+                                Rectangle {
+                                    anchors {
+                                        left: parent.left
+                                        bottom: parent.bottom
                                     }
-                                    Rectangle {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        color: "#222222"
-                                        border.width: 1
-                                        border.color: "#ff999999"
-                                        radius: 4
-                                        Zynthbox.WaveFormItem {
-                                            id: waveformItem
-                                            anchors {
-                                                fill: parent
-                                                margins: 1
-                                            }
-                                            color: Kirigami.Theme.textColor
-                                            source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
-                                            start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
-                                            end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
-                                            readonly property real relativeStart: waveformItem.start / waveformItem.length
-                                            readonly property real relativeEnd: waveformItem.end / waveformItem.length
-                                            visible: clipDelegate.clipHasWav
-                                            // SamplerSynth progress dots
-                                            Timer {
-                                                id: dotFetcher
-                                                interval: 1; repeat: false; running: false;
-                                                onTriggered: {
-                                                    progressDots.playbackPositions = component.visible && clipDelegate.cppClipObject
-                                                        ? clipDelegate.cppClipObject.playbackPositions
-                                                        : null
-                                                }
-                                            }
-                                            Connections {
-                                                target: component
-                                                onVisibleChanged: dotFetcher.restart();
-                                            }
-                                            Connections {
-                                                target: component.selectedChannel
-                                                onTrack_type_changed: dotFetcher.restart();
-                                            }
-                                            Connections {
-                                                target: clipDelegate
-                                                onCppClipObjectChanged: dotFetcher.restart();
-                                            }
-                                            Repeater {
-                                                id: progressDots
-                                                model: Zynthbox.Plugin.clipMaximumPositionCount
-                                                property QtObject playbackPositions: null
-                                                delegate: Item {
-                                                    property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
-                                                    visible: progressEntry && progressEntry.id > -1
-                                                    Rectangle {
-                                                        anchors.centerIn: parent
-                                                        rotation: 45
-                                                        color: Kirigami.Theme.highlightColor
-                                                        width: Kirigami.Units.largeSpacing
-                                                        height:  Kirigami.Units.largeSpacing
-                                                        scale: progressEntry ? 0.5 + progressEntry.gain : 1
-                                                    }
-                                                    anchors {
-                                                        top: parent.verticalCenter
-                                                        topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
-                                                    }
-                                                    x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
-                                                }
-                                            }
-                                        }
-                                        Rectangle {
-                                            anchors {
-                                                left: parent.left
-                                                bottom: parent.bottom
-                                            }
-                                            width: clipDelegate.cppClipObject ? parent.width * clipDelegate.cppClipObject.selectedSliceObject.gainHandler.gainAbsolute : 0
-                                            height: Kirigami.Units.gridUnit * 0.5
-                                            color: Kirigami.Theme.highlightColor
-                                            opacity: 0.7
-                                        }
-                                    }
+                                    width: clipDelegate.cppClipObject ? parent.width * clipDelegate.cppClipObject.selectedSliceObject.gainHandler.gainAbsolute : 0
+                                    height: Kirigami.Units.gridUnit * 0.5
+                                    color: Kirigami.Theme.highlightColor
+                                    opacity: 0.7
                                 }
                             }
                         }
                     }
                 }
-            }
-            Zynthian.Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                highlighted: _private.selectedColumn === 1
-                ListView {
+                Zynthian.SelectorView {
                     id: folderListView
-                    anchors {
-                        fill: parent
-                        margins: Kirigami.Units.smallSpacing
-                    }
-                    model: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                        ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"])
-                        : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"])
-                    onModelChanged: {
-                        currentIndex = 0;
-                    }
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    highlighted: _private.selectedColumn === 1
                     onCurrentItemChanged: {
                         if (folderListView.currentItem) {
                             folderModel.folder = encodeURIComponent(folderListView.currentItem.folder);
                         }
                     }
-                    delegate: Zynthian.BasicDelegate {
+                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                    active: zynqtgui.isBootingComplete
+                    autoActivateIndexOnChange: true
+                    onItemActivated: {
+                        if (_private.selectedColumn != 1) {
+                            _private.selectedColumn = 1;
+                        }
+                        qmlSelector.current_index = index;
+                    }
+                    qmlSelector: Zynthian.SelectorWrapper {
+                        selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
+                            ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"])
+                            : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"])
+                        onSelector_listChanged: {
+                            current_index = 0;
+                        }
+                    }
+                    delegate: Zynthian.SelectorDelegate {
                         id: folderDelegate
                         width: ListView.view.width
-                        height: Kirigami.Units.iconSizes.large
+                        height: Kirigami.Units.iconSizes.medium
+                        enabled: true
                         text: modelData.subpath
                         readonly property string folder: modelData.path
+                        selector: folderListView.selector
+                        onItemActivated: folderListView.itemActivated(screenId, index)
+                        onItemActivatedSecondary: folderListView.itemActivatedSecondary(screenId, index)
                         onClicked: {
-                            if (_private.selectedColumn != 1) {
-                                _private.selectedColumn = 1;
-                            }
-                            folderListView.currentIndex = model.index;
+                            folderDelegate.selector.activate_index(index);
                         }
                         contentItem: RowLayout {
                             Layout.fillWidth: true
@@ -657,21 +603,12 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-            }
-            Zynthian.Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                highlighted: _private.selectedColumn === 2
-                ListView {
+                Zynthian.SelectorView {
                     id: filesListView
-                    anchors {
-                        fill: parent
-                        margins: Kirigami.Units.smallSpacing
-                    }
-                    clip: true
-                    highlightMoveDuration: 0
-                    highlightMoveVelocity: 0
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    highlighted: _private.selectedColumn === 2
                     function selectFile(theFile, changeColumn) {
                         let pathSplit = theFile.lastIndexOf("/");
                         let path = theFile.slice(0, pathSplit);
@@ -679,7 +616,7 @@ Zynthian.ScreenPage {
                         // Select the folder in the middle column, if it exists
                         for (let index = 0; index < folderListView.model.length; ++index) {
                             if (folderListView.model[index].path == path) {
-                                folderListView.currentIndex = index;
+                                folderListView.qmlSelector.current_index = index;
                                 break;
                             }
                         }
@@ -708,35 +645,53 @@ Zynthian.ScreenPage {
                                     if (selectFileAfterLoadingTimer.changeColumn) {
                                         _private.selectedColumn = 2;
                                     }
-                                    filesListView.currentIndex = indexOfFile;
-                                    filesListView.positionViewAtIndex(filesListView.currentIndex, ListView.Center)
+                                    filesListView.selector.current_index = indexOfFile;
+                                    filesListView.view.positionViewAtIndex(filesListView.selector.current_index, ListView.Center)
                                 }
                             }
                         }
                     }
-                    model: Zynthbox.FolderListModel {
-                        id: folderModel
-                        caseSensitive: false
-                        showDirs: false
-                        showDotAndDotDot: false
-                        sortCaseSensitive: false
-                        nameFilters: [ "*.wav" ]
-                        folder: "/zynthian/zynthian-my-data"
-                        onStatusChanged: {
-                            if (folderModel.status == FolderListModel.Ready) {
-                                if (folderModel.count === 0) {
-                                    filesListView.currentIndex = -1;
-                                } else {
-                                    filesListView.currentIndex = 0;
+                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                    active: zynqtgui.isBootingComplete
+                    autoActivateIndexOnChange: true
+                    onItemActivated: {
+                        if (_private.selectedColumn != 2) {
+                            _private.selectedColumn = 2;
+                        }
+                        if (filesListView.selector.current_index != index) {
+                            filesListView.selector.current_index = index;
+                        } else {
+                            sampleSlotAssigner.assignToSlot(currentItem.filePath);
+                        }
+                    }
+                    qmlSelector: Zynthian.SelectorWrapper {
+                        selector_list: Zynthbox.FolderListModel {
+                            id: folderModel
+                            caseSensitive: false
+                            showDirs: false
+                            showDotAndDotDot: false
+                            sortCaseSensitive: false
+                            nameFilters: [ "*.wav" ]
+                            folder: "/zynthian/zynthian-my-data"
+                            onStatusChanged: {
+                                if (folderModel.status == FolderListModel.Ready) {
+                                    if (folderModel.count === 0) {
+                                        filesListView.selector.current_index = -1;
+                                    } else {
+                                        filesListView.selector.current_index = 0;
+                                    }
                                 }
                             }
                         }
                     }
-                    delegate: Zynthian.BasicDelegate {
+                    delegate: Zynthian.SelectorDelegate {
                         id: fileDelegate
                         width: ListView.view.width
                         height: Kirigami.Units.iconSizes.large
+                        enabled: true
+                        selector: filesListView.selector
                         text: model.fileName
+                        readonly property string filePath: model.filePath
                         readonly property bool previewIsPlayingForThisEntry: (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying && _private.filePropertiesHelper.filePath == model.filePath) ? true : false
                         function doPreview() {
                             if (fileDelegate.previewIsPlayingForThisEntry) {
@@ -749,22 +704,15 @@ Zynthian.ScreenPage {
                                 if (_private.selectedColumn != 2) {
                                     _private.selectedColumn = 2;
                                 }
-                                if (filesListView.currentIndex != model.index) {
-                                    filesListView.currentIndex = model.index;
+                                if (filesListView.selector.current_index != model.index) {
+                                    filesListView.selector.current_index = model.index;
                                 }
                                 _private.filePropertiesHelper.filePath = model.filePath;
                                 _private.filePropertiesHelper.playPreview();
                             }
                         }
                         onClicked: {
-                            if (_private.selectedColumn != 2) {
-                                _private.selectedColumn = 2;
-                            }
-                            if (filesListView.currentIndex != model.index) {
-                                filesListView.currentIndex = model.index;
-                            } else {
-                                sampleSlotAssigner.assignToSlot(model.filePath);
-                            }
+                            filesListView.itemActivated(screenId, model.index);
                         }
                         contentItem: ColumnLayout {
                             spacing: 0

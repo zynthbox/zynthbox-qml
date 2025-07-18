@@ -58,6 +58,7 @@ QQC2.AbstractButton {
         // An overlay for channel muted state
         Rectangle {
             anchors.fill: parent
+            anchors.margins: Kirigami.Units.smallSpacing
             color: Kirigami.Theme.negativeBackgroundColor
             opacity: root.channel.muted ? 0.7 : 0
 

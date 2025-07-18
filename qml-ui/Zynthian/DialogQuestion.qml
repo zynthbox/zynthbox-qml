@@ -123,6 +123,7 @@ Zynthian.Dialog {
     }
 
     header: ColumnLayout {
+        visible: component.title != null && component.title.length > 0
         spacing: 0
         Kirigami.Heading {
             Layout.fillWidth: true

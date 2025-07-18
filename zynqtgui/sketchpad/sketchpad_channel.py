@@ -139,6 +139,8 @@ class last_selected_obj_dto(QObject):
                     result = "Track"
                 case "sketchpad_clip":
                     result = "Clip"
+                case "sketchpad_clipoverview":
+                    result = "Midi Clips"
                 case "TracksBar_synthslot":
                     result = "Synth"
                 case "TracksBar_sampleslot":
@@ -163,8 +165,18 @@ class last_selected_obj_dto(QObject):
                     result = f"Track {self.value.name}"
                 case "sketchpad_clip":
                     result = f"Clip {self.value.name}"
-                case "TracksBar_synthslot" | "TracksBar_sampleslot" | "TracksBar_sketchslot" | "TracksBar_externalslot" | "TracksBar_fxslot" | "TracksBar_sketchfxslot":
-                    result = f"Slot {self.value + 1}"
+                case "sketchpad_clipoverview":
+                    result = f"Midi Clips {self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.value).name}"
+                case "TracksBar_synthslot":
+                    result = f"Synth Slot {self.value + 1}"
+                case "TracksBar_sampleslot":
+                    result = f"Sample Slot {self.value + 1}"
+                case "TracksBar_sketchslot":
+                    result = f"Sketch Slot {self.value + 1}"
+                case "TracksBar_fxslot":
+                    result = f"FX Slot {self.value + 1}"
+                case "TracksBar_sketchfxslot":
+                    result = f"Sketch FX Slot {self.value + 1}"
         return result
 
     humanReadableObjName = Property(str, get_humanReadableObjName, notify=valueChanged)
@@ -174,7 +186,7 @@ class last_selected_obj_dto(QObject):
     def copyFrom(self, sourceObject):
         result = False
         match sourceObject.className:
-            case "sketchpad_channel" | "sketchpad_clip":
+            case "sketchpad_channel" | "sketchpad_clip" | "sketchpad_clipoverview":
                 # self.value.copyFrom(sourceObject.value)
                 result = True
             case "TracksBar_synthslot":

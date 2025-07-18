@@ -40,14 +40,18 @@ Item {
                     : 0
         : 0
     property bool autoActivateIndexOnChange: false
+    signal itemActivated(string screenId, int index)
     function activate_index(index) {
         if (component.current_index != index) {
             component.current_index = index;
+            component.itemActivated("", index);
         }
     }
+    signal itemActivatedSecondary(string screenId, int index)
     function activate_index_secondary(index) {
         if (component.current_index != index) {
             component.current_index = index;
+            component.itemActivatedSecondary("", index);
         }
     }
     function select_up(count = 1) {

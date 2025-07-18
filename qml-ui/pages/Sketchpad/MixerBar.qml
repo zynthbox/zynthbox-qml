@@ -397,6 +397,9 @@ QQC2.Pane {
                                                 controlObj: model.channel
                                                 controlProp: "pan"
                                                 initialValue: model.channel.initialPan
+                                                onClicked: {
+                                                    channelsVolumeRow.handleClick(channel);
+                                                }
                                             }
 
                                             QQC2.Label {

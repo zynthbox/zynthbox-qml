@@ -1530,24 +1530,13 @@ Zynthian.ScreenPage {
                                 highlightOnFocus: false
                                 font.pointSize: 10
                                 // Button is enabled only if lastSelectedObj can be copy-pasted
-                                enabled: zynqtgui.sketchpad.lastSelectedObj.isCopyable
-                                text: qsTr("Copy %1").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableClassName)
+                                enabled: zynqtgui.sketchpad.lastSelectedObj.component != null && zynqtgui.sketchpad.lastSelectedObj.component.visible && zynqtgui.sketchpad.lastSelectedObj.isCopyable
+                                text: qsTr("Copy")
                                 // Button is visible only when there is no ongoing copy action
                                 visible: !zynqtgui.sketchpad.copySourceObj.isCopyable
                                 color: "transparent"
                                 onClicked: {
                                     zynqtgui.sketchpad.copySourceObj.setTo(zynqtgui.sketchpad.lastSelectedObj.className, zynqtgui.sketchpad.lastSelectedObj.value, zynqtgui.sketchpad.lastSelectedObj.component)
-                                }
-
-                                QQC2.Label {
-                                    anchors {
-                                        horizontalCenter: parent.horizontalCenter
-                                        bottom: parent.bottom
-                                        bottomMargin: Kirigami.Units.smallSpacing
-                                    }
-                                    opacity: 0.5
-                                    text: zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName
-                                    font.pointSize: 8
                                 }
                             }
 
@@ -1574,23 +1563,12 @@ Zynthian.ScreenPage {
                                 color: "transparent"
                                 // Button is enabled if there is an ongoing copy action and the selected slot is of the same type
                                 enabled: zynqtgui.sketchpad.copySourceObj.isCopyable && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className && zynqtgui.sketchpad.copySourceObj.value != zynqtgui.sketchpad.lastSelectedObj.value
-                                text: qsTr("Paste %1").arg(zynqtgui.sketchpad.copySourceObj.humanReadableClassName)
+                                text: qsTr("Paste")
                                 onPressed: {
                                     applicationWindow().confirmer.confirmSomething(qsTr("Confirm Paste"), qsTr("Are you sure that you want to paste %1 to %2? This action is irreversible and will clear all existing contents of %2.").arg(zynqtgui.sketchpad.copySourceObj.humanReadableObjName).arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
                                         zynqtgui.sketchpad.lastSelectedObj.copyFrom(zynqtgui.sketchpad.copySourceObj)
                                         zynqtgui.sketchpad.copySourceObj.reset()
                                     });
-                                }
-
-                                QQC2.Label {
-                                    anchors {
-                                        horizontalCenter: parent.horizontalCenter
-                                        bottom: parent.bottom
-                                        bottomMargin: Kirigami.Units.smallSpacing
-                                    }
-                                    opacity: 0.5
-                                    text: zynqtgui.sketchpad.copySourceObj.humanReadableObjName
-                                    font.pointSize: 8
                                 }
                             }
 
@@ -1602,22 +1580,11 @@ Zynthian.ScreenPage {
                                 color: "transparent"
                                 // Button is enabled when a copy action is not running and selected slot can be copy-pasted
                                 enabled: copyButton.visible && zynqtgui.sketchpad.lastSelectedObj.isCopyable
-                                text: qsTr("Clear %1").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableClassName)
+                                text: qsTr("Clear")
                                 onPressed: {
                                     applicationWindow().confirmer.confirmSomething(qsTr("Confirm Clear"), qsTr("Are you sure that you want to clear %1? This action is irreversible and will clear all existing contents of %1.").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
                                         zynqtgui.sketchpad.lastSelectedObj.clear()
                                     });
-                                }
-
-                                QQC2.Label {
-                                    anchors {
-                                        horizontalCenter: parent.horizontalCenter
-                                        bottom: parent.bottom
-                                        bottomMargin: Kirigami.Units.smallSpacing
-                                    }
-                                    opacity: 0.5
-                                    text: zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName
-                                    font.pointSize: 8
                                 }
                             }
                         }

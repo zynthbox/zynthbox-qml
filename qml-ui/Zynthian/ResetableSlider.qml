@@ -11,6 +11,7 @@ QQC2.Slider {
 
     signal pressed(var mouse)
     signal released(var mouse)
+    signal clicked()
 
     value: controlObj[controlProp]
     // Set inset values explicitly to calculate height correctly
@@ -39,6 +40,9 @@ QQC2.Slider {
             if (root.initialValue != null) {
                 root.controlObj[root.controlProp] = root.initialValue
             }
+        }
+        onClicked: {
+            root.clicked();
         }
     }
 }

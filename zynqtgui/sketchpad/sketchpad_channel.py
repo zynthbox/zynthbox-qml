@@ -145,8 +145,6 @@ class last_selected_obj_dto(QObject):
                     result = "Sample"
                 case "TracksBar_sketchslot":
                     result = "Sketch"
-                case "TracksBar_externalslot":
-                    result = "Ext"
                 case "TracksBar_fxslot":
                     result = "FX"
                 case "TracksBar_sketchfxslot":
@@ -172,9 +170,25 @@ class last_selected_obj_dto(QObject):
     humanReadableObjName = Property(str, get_humanReadableObjName, notify=valueChanged)
     ### END Property humanReadableObjName
 
-    @Slot(QObject)
+    @Slot(QObject, result=bool)
     def copyFrom(self, sourceObject):
-        pass
+        result = False
+        match sourceObject.className:
+            case "sketchpad_channel" | "sketchpad_clip":
+                # self.value.copyFrom(sourceObject.value)
+                result = True
+            case "TracksBar_synthslot":
+                result = True
+            case "TracksBar_sampleslot":
+                result = True
+            case "TracksBar_sketchslot":
+                result = True
+            case "TracksBar_fxslot":
+                result = True
+            case "TracksBar_sketchfxslot":
+                result = True
+
+        return result
 
 class external_mode_settings(QObject):
     def __init__(self, parent: QObject = None):

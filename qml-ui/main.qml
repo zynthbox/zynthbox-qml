@@ -1705,7 +1705,7 @@ Kirigami.AbstractApplicationWindow {
                                     highlightOnFocus: false
                                     highlighted: (index + channelHeaderDelegate.channelDelta) === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
 
-                                    onPressed: {
+                                    onClicked: {
                                         zynqtgui.sketchpad.selectedTrackId = index + channelHeaderDelegate.channelDelta;
                                     }
                                 }
@@ -1782,7 +1782,7 @@ Kirigami.AbstractApplicationWindow {
                                     highlightOnFocus: false
                                     highlighted: (index + channelHeaderDelegate2.channelDelta) === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
 
-                                    onPressed: {
+                                    onClicked: {
                                         zynqtgui.sketchpad.selectedTrackId = index + channelHeaderDelegate2.channelDelta;
                                     }
                                 }

@@ -460,16 +460,10 @@ RowLayout {
                 // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
                 Timer {
                     id: doublePressedTimer
-                    property bool wasAlreadySelected: false
                     interval: 200
                     repeat: false
                     onTriggered: {
-                        // Slot focus is always immediately switching on click
-                        // Do not switch to slot if it was not already selected to prevent opening of the popup
-                        if (wasAlreadySelected) {
-                            // If doublePressedTimergets triggered it means double click did not happen. so, switch to the slot.
-                            slotDelegate.switchToThisSlot();
-                        }
+                        slotDelegate.switchToThisSlot();
                     }
                 }
 
@@ -505,12 +499,8 @@ RowLayout {
                                     break;
                             }
                         } else {
-                            // Set wasAlreadySelected before starting timer to determine if slot popup needs to be opened if double click did not happen
-                            doublePressedTimer.wasAlreadySelected = slotDelegate.highlighted;
                             doublePressedTimer.restart();
                         }
-                        // When clicked, switch focus immediately
-                        slotDelegate.switchToThisSlot(true);
                     }
                     onMouseXChanged: {
                         var newVal

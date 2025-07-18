@@ -33,9 +33,10 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
-QQC2.AbstractButton {
+QQC2.Control {
     id: root
 
+    property string text
     property var subText
     property var subSubText
     property QtObject channel
@@ -49,11 +50,36 @@ QQC2.AbstractButton {
     property bool synthDetailsVisible: true
     property bool active: true
 
-    // Emitted when a cell is double pressed
-    signal doublePressed()
+    signal clicked()
+    signal doubleClicked()
 
     contentItem: Item {
         opacity: root.active ? 1 : 0.3
+
+        // Implement a double tap gesture
+        // On released event, start the double tap timer if it is not already running
+        // On pressed event, if the timer is already running then it means the 2nd tap was done within given time and hence a double tap event should be emitted
+        // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
+        Timer {
+            id: doublePressedTimer
+            interval: 200
+            repeat: false
+            onTriggered: root.clicked()
+        }
+        MouseArea {
+            anchors.fill: parent
+            onPressed: {
+                root.forceActiveFocus()
+            }
+            onReleased: {
+                if (doublePressedTimer.running) {
+                    doublePressedTimer.stop()
+                    root.doubleClicked()
+                } else {
+                    doublePressedTimer.restart()
+                }
+            }
+        }
 
         // An overlay for channel muted state
         Rectangle {
@@ -328,27 +354,6 @@ QQC2.AbstractButton {
                 //               : ""
                 // }
             }
-        }
-    }
-
-    // Implement a double tap gesture
-    // On released event, start the double tap timer if it is not already running
-    // On pressed event, if the timer is already running then it means the 2nd tap was done within given time and hence a double tap event should be emitted
-    // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
-    Timer {
-        id: doublePressedTimer
-        interval: 200
-        repeat: false
-    }
-    onPressed: {
-        root.forceActiveFocus()
-    }
-    onReleased: {
-        if (doublePressedTimer.running) {
-            doublePressedTimer.stop()
-            root.doublePressed()
-        } else {
-            doublePressedTimer.restart()
         }
     }
 

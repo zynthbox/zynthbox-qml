@@ -1302,10 +1302,10 @@ Zynthian.ScreenPage {
                                                     highlightOnFocus: false
                                                     highlighted: index === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
 
-                                                    onPressed: {
+                                                    onClicked: {
                                                         headerDelegate.switchToThisChannel()
                                                     }
-                                                    onDoublePressed: {
+                                                    onDoubleClicked: {
                                                         channelHeaderDelegate.channel.muted = !channelHeaderDelegate.channel.muted
                                                     }
                                                 }

@@ -166,7 +166,7 @@ class last_selected_obj_dto(QObject):
                 case "sketchpad_clip":
                     result = f"Clip {self.value.name}"
                 case "sketchpad_clipoverview":
-                    result = f"Midi Clips {self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.value).name}"
+                    result = f"Midi Clips {zynthian_gui_config.zynqtgui.sketchpad.song.channelsModel.getChannel(self.value).name}"
                 case "TracksBar_synthslot":
                     result = f"Synth Slot {self.value + 1}"
                 case "TracksBar_sampleslot":

@@ -122,18 +122,11 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
 
-            QQC2.Button {
+            Zynthian.LibraryPagePicker {
+                id: libraryPagePicker
                 Layout.fillWidth: true
-                Layout.preferredHeight: favToggleButton.height
-                contentItem: Kirigami.Heading {
-                    level: 2
-                    text: qsTr("Track %1 Loop FX").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                }
-                onClicked: {
-                    applicationWindow().libraryTypePicker.open();
-                }
+                libraryName: "sketchfx"
+                selectedChannel: root.selectedChannel
             }
 
             Zynthian.SelectorView {
@@ -144,9 +137,9 @@ Zynthian.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: {
                     if (root.selectedChannel.selectedSlot.value === index) {
-                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("fx", index);
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketchfx", index);
                     } else {
-                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketchfx", index);
                     }
                     root.itemActivated(screenId, index)
                 }
@@ -202,12 +195,17 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
 
-            Kirigami.Heading {
-                level: 2
-                text: ""
-                Kirigami.Theme.inherit: false
-                // TODO: this should eventually go to Window and the panels to View
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.minimumHeight: libraryPagePicker.height
+                Layout.maximumHeight: libraryPagePicker.height
+                Kirigami.Heading {
+                    level: 2
+                    text: ""
+                    Kirigami.Theme.inherit: false
+                    // TODO: this should eventually go to Window and the panels to View
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
             }
 
             Zynthian.SelectorView {
@@ -224,6 +222,8 @@ Zynthian.ScreenPage {
 
             RowLayout {
                 Layout.fillWidth: true
+                Layout.minimumHeight: libraryPagePicker.height
+                Layout.maximumHeight: libraryPagePicker.height
                 Kirigami.Heading {
                     level: 2
                     text: qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)
@@ -235,7 +235,6 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                 }
                 QQC2.Button {
-                    id: favToggleButton
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                     text: zynqtgui.preset.show_only_favorites ? qsTr("Show All") : qsTr("Show Favorites")
                     onClicked: {

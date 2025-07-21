@@ -24,6 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.15
+import QtQml 2.15
 
 // Use this in place of a python selector for wrapping data from elsewhere
 Item {
@@ -33,10 +34,13 @@ Item {
     readonly property int effective_count: selector_list
         ? typeof selector_list == "number"
             ? selector_list
-            : selector_list.hasOwnProperty("length")
-                ? selector_list.length
-                : selector_list.hasOwnProperty("count")
-                    ? selector_list.count
+            : selector_list.hasOwnProperty("count")
+                // This hack ensures that, should a FolderListModel be used, and the status changes,
+                // we still want to update this... and without this, that doesn't happen.
+                // Which is silly, but here we are.
+                ? selector_list.status ? selector_list.count : selector_list.count
+                : selector_list.hasOwnProperty("length")
+                    ? selector_list.length
                     : 0
         : 0
     property bool autoActivateIndexOnChange: false
@@ -44,15 +48,15 @@ Item {
     function activate_index(index) {
         if (component.current_index != index) {
             component.current_index = index;
-            component.itemActivated("", index);
         }
+        component.itemActivated("", index);
     }
     signal itemActivatedSecondary(string screenId, int index)
     function activate_index_secondary(index) {
         if (component.current_index != index) {
             component.current_index = index;
-            component.itemActivatedSecondary("", index);
         }
+        component.itemActivatedSecondary("", index);
     }
     function select_up(count = 1) {
         let newIndex = Math.max(0, component.current_index - count);
@@ -78,9 +82,15 @@ Item {
         interval: 50; running: false; repeat: false;
         onTriggered: {
             if (component.current_index != autoActivationTimer.last_auto_activated_index) {
-                component.activate_index(component.current_index);
                 autoActivationTimer.last_auto_activated_index = component.current_index;
+                component.activate_index(component.current_index);
             }
+        }
+    }
+    Connections {
+        target: component
+        onSelector_listChanged: {
+            autoActivationTimer.last_auto_activated_index = -1;
         }
     }
 }

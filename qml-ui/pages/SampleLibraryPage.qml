@@ -403,9 +403,6 @@ Zynthian.ScreenPage {
                     qmlSelector: Zynthian.SelectorWrapper {
                         selector_list: Zynthbox.Plugin.sketchpadSlotCount
                         current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? component.selectedChannel.selectedSlot.value : -1
-                        function onItemActivated(screenId, index) {
-                            clipsListView.itemActivated(screenId, index);
-                        }
                     }
                     onCurrentItemChanged: {
                         if (currentItem && currentItem.clip.metadata.originalPath != "") {
@@ -448,9 +445,6 @@ Zynthian.ScreenPage {
                         selector: clipsListView.selector
                         onItemActivated: clipsListView.itemActivated(screenId, index)
                         onItemActivatedSecondary: clipsListView.itemActivatedSecondary(screenId, index)
-                        onClicked: {
-                            clipDelegate.selector.activate_index(index);
-                        }
                         contentItem: ColumnLayout {
                             RowLayout {
                                 QQC2.Label {
@@ -577,9 +571,6 @@ Zynthian.ScreenPage {
                         selector: folderListView.selector
                         onItemActivated: folderListView.itemActivated(screenId, index)
                         onItemActivatedSecondary: folderListView.itemActivatedSecondary(screenId, index)
-                        onClicked: {
-                            folderDelegate.selector.activate_index(index);
-                        }
                         contentItem: RowLayout {
                             Layout.fillWidth: true
                             Item {
@@ -645,8 +636,12 @@ Zynthian.ScreenPage {
                                     if (selectFileAfterLoadingTimer.changeColumn) {
                                         _private.selectedColumn = 2;
                                     }
-                                    filesListView.selector.current_index = indexOfFile;
-                                    filesListView.view.positionViewAtIndex(filesListView.selector.current_index, ListView.Center)
+                                    filesListView.mostRecentlyActivatedIndex = -1;
+                                    // A touch of juggling to ensure we don't change columns just from activating the thing...
+                                    let currentSelectedColumn = _private.selectedColumn;
+                                    filesListView.selector.activate_index(indexOfFile);
+                                    _private.selectedColumn = currentSelectedColumn;
+                                    filesListView.view.positionViewAtIndex(filesListView.selector.current_index, ListView.Center);
                                 }
                             }
                         }
@@ -654,15 +649,15 @@ Zynthian.ScreenPage {
                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                     active: zynqtgui.isBootingComplete
                     autoActivateIndexOnChange: true
+                    property int mostRecentlyActivatedIndex: -1
                     onItemActivated: {
                         if (_private.selectedColumn != 2) {
                             _private.selectedColumn = 2;
                         }
-                        if (filesListView.selector.current_index != index) {
-                            filesListView.selector.current_index = index;
-                        } else {
+                        if (filesListView.mostRecentlyActivatedIndex === index) {
                             sampleSlotAssigner.assignToSlot(currentItem.filePath);
                         }
+                        filesListView.mostRecentlyActivatedIndex = index;
                     }
                     qmlSelector: Zynthian.SelectorWrapper {
                         selector_list: Zynthbox.FolderListModel {
@@ -673,15 +668,13 @@ Zynthian.ScreenPage {
                             sortCaseSensitive: false
                             nameFilters: [ "*.wav" ]
                             folder: "/zynthian/zynthian-my-data"
-                            onStatusChanged: {
-                                if (folderModel.status == FolderListModel.Ready) {
-                                    if (folderModel.count === 0) {
-                                        filesListView.selector.current_index = -1;
-                                    } else {
-                                        filesListView.selector.current_index = 0;
-                                    }
-                                }
+                            onFolderChanged: {
+                                filesListView.mostRecentlyActivatedIndex = -1;
+                                filesListView.selector.current_index = 0;
                             }
+                        }
+                        onItemActivated: {
+                            filesListView.itemActivated(screenId, index);
                         }
                     }
                     delegate: Zynthian.SelectorDelegate {
@@ -710,9 +703,6 @@ Zynthian.ScreenPage {
                                 _private.filePropertiesHelper.filePath = model.filePath;
                                 _private.filePropertiesHelper.playPreview();
                             }
-                        }
-                        onClicked: {
-                            filesListView.itemActivated(screenId, model.index);
                         }
                         contentItem: ColumnLayout {
                             spacing: 0

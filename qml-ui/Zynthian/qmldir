@@ -63,3 +63,5 @@ BasicDelegate 1.0 BasicDelegate.qml
 BaseExternalEditor 1.0 BaseExternalEditor.qml
 MidiBytePickerPopup 1.0 MidiBytePickerPopup.qml
 SelectorWrapper 1.0 SelectorWrapper.qml
+ActionRow 1.0 ActionRow.qml
+LibraryPagePicker 1.0 LibraryPagePicker.qml

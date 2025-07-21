@@ -48,7 +48,11 @@ ActionRow {
             checked: component.libraryName === "samples"
             onTriggered: {
                 if (zynqtgui.current_screen_id !== "sample_library") {
-                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", 0);
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", 0);
+                    } else {
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", 0);
+                    }
                     zynqtgui.show_screen("sample_library");
                 }
             }

@@ -337,21 +337,11 @@ Zynthian.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
-            RowLayout {
+            Zynthian.LibraryPagePicker {
+                id: libraryPagePicker
                 Layout.fillWidth: true
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                    contentItem: Kirigami.Heading {
-                        level: 2
-                        text: qsTr("Track %1 Synths").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    }
-                    onClicked: {
-                        applicationWindow().libraryTypePicker.open();
-                    }
-                }
+                libraryName: "synths"
+                selectedChannel: root.selectedChannel
             }
             Zynthian.SelectorView {
                 id: layersView
@@ -415,7 +405,7 @@ Zynthian.ScreenPage {
                                     property: "text"
                                     delayed: true
                                     value: mainLabel.visible
-                                        ? (model.metadata ? (index + 1) + " - " + model.display : "")
+                                        ? (model.metadata ? "%1 - %2".arg(index + 1).arg(model.display) : "")
                                         : ""
 //                                    value: mainLabel.visible
 //                                        ? (model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "")
@@ -512,10 +502,8 @@ Zynthian.ScreenPage {
                         }
                         RowLayout {
                             id: fxLayout
-                            implicitWidth: fxLayout.implicitWidth
-                            implicitHeight: fxLayout.implicitHeight
                             Layout.fillWidth: true
-
+                            Layout.fillHeight: true
                             /* QQC2.Label {
                                 text: "|"
                                 opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
@@ -530,6 +518,10 @@ Zynthian.ScreenPage {
                                 }
                                 elide: Text.ElideRight
                             }
+                        }
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                         }
                         Rectangle {
                             Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryGainHandler.gainAbsolute
@@ -552,6 +544,8 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 RowLayout {
                     Layout.fillWidth: true
+                    Layout.minimumHeight: libraryPagePicker.height
+                    Layout.maximumHeight: libraryPagePicker.height
                     Kirigami.Heading {
                         id: banksHeading
                         Layout.fillWidth: true
@@ -621,6 +615,8 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 RowLayout {
                     Layout.fillWidth: true
+                    Layout.minimumHeight: libraryPagePicker.height
+                    Layout.maximumHeight: libraryPagePicker.height
                     Kirigami.Heading {
                         Layout.fillWidth: true
                         level: 2
@@ -689,6 +685,8 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: layout.columnWidth
             RowLayout {
                 Layout.fillWidth: true
+                Layout.minimumHeight: libraryPagePicker.height
+                Layout.maximumHeight: libraryPagePicker.height
                 Kirigami.Heading {
                     id: presetHeading
                     level: 2
@@ -763,113 +761,114 @@ Zynthian.ScreenPage {
                 }
             }
         }
+    }
 
-        Connections {
-            target: applicationWindow()
-            property int lastCurrentIndex
-            property bool currentIndexWasValid
-            onRequestOpenLayerSetupDialog: layerSetupDialog.open()
-            onRequestCloseLayerSetupDialog: layerSetupDialog.reject()
+    Connections {
+        target: applicationWindow()
+        property int lastCurrentIndex
+        property bool currentIndexWasValid
+        onRequestOpenLayerSetupDialog: layerSetupDialog.open()
+        onRequestCloseLayerSetupDialog: layerSetupDialog.reject()
+    }
+
+    Zynthian.Dialog {
+        id: layerSetupDialog
+        parent: applicationWindow().contentItem
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        height: footer.implicitHeight + topMargin + bottomMargin
+        modal: true
+
+        onAccepted: {
+            applicationWindow().layerSetupDialogAccepted();
+        }
+        onRejected: {
+            applicationWindow().layerSetupDialogRejected();
         }
 
-        Zynthian.Dialog {
-            id: layerSetupDialog
-            parent: applicationWindow().contentItem
-            x: Math.round(parent.width/2 - width/2)
-            y: Math.round(parent.height/2 - height/2)
-            height: footer.implicitHeight + topMargin + bottomMargin
-            modal: true
-
-            onAccepted: {
-                applicationWindow().layerSetupDialogAccepted();
-            }
-            onRejected: {
-                applicationWindow().layerSetupDialogRejected();
-            }
-
-            footer: QQC2.Control {
-                leftPadding: layerSetupDialog.leftPadding
-                topPadding: layerSetupDialog.topPadding
-                rightPadding: layerSetupDialog.rightPadding
-                bottomPadding: layerSetupDialog.bottomPadding
-                contentItem: ColumnLayout {
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: qsTr("Pick a Synth")
-                        onClicked: {
-                            layerSetupDialog.accept();
-                            newSynthWorkaroundTimer.restart();
-                            applicationWindow().layerSetupDialogNewSynthClicked();
-                        }
+        footer: QQC2.Control {
+            leftPadding: layerSetupDialog.leftPadding
+            topPadding: layerSetupDialog.topPadding
+            rightPadding: layerSetupDialog.rightPadding
+            bottomPadding: layerSetupDialog.bottomPadding
+            contentItem: ColumnLayout {
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Pick a Synth")
+                    onClicked: {
+                        layerSetupDialog.accept();
+                        newSynthWorkaroundTimer.restart();
+                        applicationWindow().layerSetupDialogNewSynthClicked();
                     }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
-                        text: qsTr("Change preset")
-                        onClicked: {
-                            zynqtgui.current_screen_id = "preset"
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+                    text: qsTr("Change preset")
+                    onClicked: {
+                        zynqtgui.current_screen_id = "preset"
 
-                            layerSetupDialog.accept();
-                            applicationWindow().layerSetupDialogChangePresetClicked();
-                        }
+                        layerSetupDialog.accept();
+                        applicationWindow().layerSetupDialogChangePresetClicked();
                     }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: qsTr("Load A Sound")
-                        onClicked: {
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Load A Sound")
+                    onClicked: {
 //                            pickerDialog.mode = "sound";
 //                            pickerDialog.open();
-                            zynqtgui.show_modal("sound_categories")
+                        zynqtgui.show_modal("sound_categories")
 
-                            layerSetupDialog.accept();
-                            applicationWindow().layerSetupDialogLoadSoundClicked();
+                        layerSetupDialog.accept();
+                        applicationWindow().layerSetupDialogLoadSoundClicked();
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                    visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+                    text: qsTr("Remove Synth")
+                    onClicked: {
+                        layerSetupDialog.accept();
+                        if (root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)) {
+                            root.selectedChannel.remove_and_unchain_sound(zynqtgui.active_midi_channel)
                         }
                     }
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
+                }
+                // As per #299 Hide "Pick Existing.." from new synth popup
+                /*QQC2.Button {
+                    id: pickExistingButton
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Pick Existing...")
+                    onClicked: {
+                        applicationWindow().openSoundsDialog();
+                        layerSetupDialog.accept();
+                        applicationWindow().layerSetupDialogPickSoundClicked();
                     }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        visible: root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
-                        text: qsTr("Remove Synth")
-                        onClicked: {
-                            layerSetupDialog.accept();
-                            if (root.selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)) {
-                                root.selectedChannel.remove_and_unchain_sound(zynqtgui.active_midi_channel)
-                            }
-                        }
-                    }
-                    // As per #299 Hide "Pick Existing.." from new synth popup
-                    /*QQC2.Button {
-                        id: pickExistingButton
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: qsTr("Pick Existing...")
-                        onClicked: {
-                            applicationWindow().openSoundsDialog();
-                            layerSetupDialog.accept();
-                            applicationWindow().layerSetupDialogPickSoundClicked();
-                        }
-                    }*/
-                    Timer { //HACK why is this necessary?
-                        id: newSynthWorkaroundTimer
-                        interval: 200
-                        onTriggered: {
-                            zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id;
-                            zynqtgui.layer.select_engine(zynqtgui.fixed_layers.index_to_midi(zynqtgui.fixed_layers.current_index))
-                            layerSetupDialog.accept();
-                        }
+                }*/
+                Timer { //HACK why is this necessary?
+                    id: newSynthWorkaroundTimer
+                    interval: 200
+                    onTriggered: {
+                        zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id;
+                        zynqtgui.layer.select_engine(zynqtgui.fixed_layers.index_to_midi(zynqtgui.fixed_layers.current_index))
+                        layerSetupDialog.accept();
                     }
                 }
             }
         }
+    }
 
 //        Zynthian.FilePickerDialog {
 //            id: saveDialog
@@ -1049,7 +1048,4 @@ Zynthian.ScreenPage {
 //            footerRightPadding: saveDialog.rightPadding
 //            footerBottomPadding: saveDialog.bottomPadding
 //        }
-    }
 }
-
-

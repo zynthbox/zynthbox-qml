@@ -329,250 +329,375 @@ Zynthian.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
+            Zynthian.LibraryPagePicker {
+                id: libraryPagePicker
+                Layout.fillWidth: true
+                libraryName: "samples"
+                selectedChannel: component.selectedChannel
+            }
+            Zynthian.SelectorView {
+                id: clipsListView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                highlighted: _private.selectedColumn === 0
+                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                active: zynqtgui.isBootingComplete
+                autoActivateIndexOnChange: true
+                qmlSelector: Zynthian.SelectorWrapper {
+                    selector_list: Zynthbox.Plugin.sketchpadSlotCount
+                    current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? component.selectedChannel.selectedSlot.value : -1
+                }
+                onCurrentItemChanged: {
+                    if (currentItem && currentItem.clip.metadata.originalPath != "") {
+                        filesListView.selectFile(currentItem.clip.metadata.originalPath, false);
+                    }
+                }
+                onItemActivated: {
+                    if (_private.selectedColumn != 0) {
+                        _private.selectedColumn = 0;
+                    }
+                    qmlSelector.current_index = index;
+                    if (component.selectedChannel.selectedSlot.value === index) {
+                        if (component.selectedChannel.trackType === "sample-loop") {
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
+                        } else {
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
+                        }
+                    } else {
+                        if (component.selectedChannel.trackType === "sample-loop") {
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", index, false);
+                        } else {
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
+                        }
+                    }
+                }
+                delegate: Zynthian.SelectorDelegate {
+                    id: clipDelegate
+                    height: clipsListView.view.height/5
+                    enabled: true
+                    // highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
+                    property QtObject clip: component.selectedChannel
+                        ? component.selectedChannel.trackType === "sample-loop"
+                            ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                            : component.selectedChannel.samples[index]
+                        : null
+                    property QtObject cppClipObject: clipDelegate.clip && clipDelegate.clip.hasOwnProperty("cppObjId")
+                        ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
+                        : null
+                    property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
+                    selector: clipsListView.selector
+                    onItemActivated: clipsListView.itemActivated(screenId, index)
+                    onItemActivatedSecondary: clipsListView.itemActivatedSecondary(screenId, index)
+                    contentItem: ColumnLayout {
+                        RowLayout {
+                            QQC2.Label {
+                                id: mainLabel
+                                Layout.fillWidth: true
+                                text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("-"))
+                                elide: Text.ElideMiddle
+                            }
+                        }
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "#222222"
+                                border.width: 1
+                                border.color: "#ff999999"
+                                radius: 4
+                                visible: waveformItem.visible
+                            }
+                            Zynthbox.WaveFormItem {
+                                id: waveformItem
+                                anchors {
+                                    fill: parent
+                                    margins: 1
+                                }
+                                color: Kirigami.Theme.textColor
+                                source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
+                                start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
+                                end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
+                                readonly property real relativeStart: waveformItem.start / waveformItem.length
+                                readonly property real relativeEnd: waveformItem.end / waveformItem.length
+                                visible: clipDelegate.clipHasWav
+                                // SamplerSynth progress dots
+                                Timer {
+                                    id: dotFetcher
+                                    interval: 1; repeat: false; running: false;
+                                    onTriggered: {
+                                        progressDots.playbackPositions = component.visible && clipDelegate.cppClipObject
+                                            ? clipDelegate.cppClipObject.playbackPositions
+                                            : null
+                                    }
+                                }
+                                Connections {
+                                    target: component
+                                    onVisibleChanged: dotFetcher.restart();
+                                }
+                                Connections {
+                                    target: component.selectedChannel
+                                    onTrack_type_changed: dotFetcher.restart();
+                                }
+                                Connections {
+                                    target: clipDelegate
+                                    onCppClipObjectChanged: dotFetcher.restart();
+                                }
+                                Repeater {
+                                    id: progressDots
+                                    model: Zynthbox.Plugin.clipMaximumPositionCount
+                                    property QtObject playbackPositions: null
+                                    delegate: Item {
+                                        property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                                        visible: progressEntry && progressEntry.id > -1
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            rotation: 45
+                                            color: Kirigami.Theme.highlightColor
+                                            width: Kirigami.Units.largeSpacing
+                                            height:  Kirigami.Units.largeSpacing
+                                            scale: progressEntry ? 0.5 + progressEntry.gain : 1
+                                        }
+                                        anchors {
+                                            top: parent.verticalCenter
+                                            topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
+                                        }
+                                        x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                                    }
+                                }
+                            }
+                            Rectangle {
+                                anchors {
+                                    left: parent.left
+                                    bottom: parent.bottom
+                                }
+                                width: clipDelegate.cppClipObject ? parent.width * clipDelegate.cppClipObject.selectedSliceObject.gainHandler.gainAbsolute : 0
+                                height: Kirigami.Units.gridUnit * 0.5
+                                color: Kirigami.Theme.highlightColor
+                                opacity: 0.7
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ColumnLayout {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            Layout.preferredWidth: layout.columnWidth
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit
+                Layout.minimumHeight: libraryPagePicker.height
+                Layout.maximumHeight: libraryPagePicker.height
                 spacing: Kirigami.Units.gridUnit
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                    visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
-                    onClicked: {
-                        applicationWindow().libraryTypePicker.open();
-                    }
-                    contentItem: Kirigami.Heading {
-                        level: 2
-                        text: component.selectedChannel
-                            ? qsTr("Track %1 Samples").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                            : ""
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    }
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                    visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                    onClicked: {
-                        applicationWindow().libraryTypePicker.open();
-                    }
-                    contentItem: Kirigami.Heading {
-                        level: 2
-                        text: component.selectedChannel
-                            ? qsTr("Track %1 Loops").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                            : ""
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    }
-                }
                 Kirigami.Heading {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                     level: 2
                     text: qsTr("Folders")
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
+                // The header items want to be rowlayouts, so we can add buttons in later, should we want to
+            }
+            Zynthian.SelectorView {
+                id: folderListView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                highlighted: _private.selectedColumn === 1
+                onCurrentItemChanged: {
+                    if (folderListView.currentItem) {
+                        folderModel.folder = encodeURIComponent(folderListView.currentItem.folder);
+                    }
+                }
+                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                active: zynqtgui.isBootingComplete
+                autoActivateIndexOnChange: true
+                onItemActivated: {
+                    if (_private.selectedColumn != 1) {
+                        _private.selectedColumn = 1;
+                    }
+                    qmlSelector.current_index = index;
+                }
+                qmlSelector: Zynthian.SelectorWrapper {
+                    selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
+                        ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"])
+                        : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"])
+                    onSelector_listChanged: {
+                        current_index = 0;
+                    }
+                }
+                delegate: Zynthian.SelectorDelegate {
+                    id: folderDelegate
+                    width: ListView.view.width
+                    height: Kirigami.Units.iconSizes.medium
+                    enabled: true
+                    text: modelData.subpath
+                    readonly property string folder: modelData.path
+                    selector: folderListView.selector
+                    onItemActivated: folderListView.itemActivated(screenId, index)
+                    onItemActivatedSecondary: folderListView.itemActivatedSecondary(screenId, index)
+                    contentItem: RowLayout {
+                        Layout.fillWidth: true
+                        Item {
+                            Layout.fillHeight: true
+                            Layout.minimumWidth: height
+                            Layout.maximumWidth: height
+                            Kirigami.Icon {
+                                anchors {
+                                    fill: parent
+                                    margins: Kirigami.Units.smallSpacing
+                                }
+                                source: "file-library-symbolic"
+                            }
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            text: folderDelegate.text
+                            elide: Text.ElideLeft
+                        }
+                    }
+                }
+            }
+        }
+        ColumnLayout {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            Layout.preferredWidth: layout.columnWidth
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.minimumHeight: libraryPagePicker.height
+                Layout.maximumHeight: libraryPagePicker.height
+                spacing: Kirigami.Units.gridUnit
                 Kirigami.Heading {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                     level: 2
                     text: qsTr("Samples In Folder")
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
             }
-            RowLayout {
+            Zynthian.SelectorView {
+                id: filesListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 14
-                spacing: Kirigami.Units.gridUnit
-                Zynthian.SelectorView {
-                    id: clipsListView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                    highlighted: _private.selectedColumn === 0
-                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                    active: zynqtgui.isBootingComplete
-                    autoActivateIndexOnChange: true
-                    qmlSelector: Zynthian.SelectorWrapper {
-                        selector_list: Zynthbox.Plugin.sketchpadSlotCount
-                        current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? component.selectedChannel.selectedSlot.value : -1
-                    }
-                    onCurrentItemChanged: {
-                        if (currentItem && currentItem.clip.metadata.originalPath != "") {
-                            filesListView.selectFile(currentItem.clip.metadata.originalPath, false);
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                highlighted: _private.selectedColumn === 2
+                function selectFile(theFile, changeColumn) {
+                    let pathSplit = theFile.lastIndexOf("/");
+                    let path = theFile.slice(0, pathSplit);
+                    let filename = theFile.slice(pathSplit + 1);
+                    // Select the folder in the middle column, if it exists
+                    for (let index = 0; index < folderListView.model.length; ++index) {
+                        if (folderListView.model[index].path == path) {
+                            folderListView.qmlSelector.current_index = index;
+                            break;
                         }
                     }
-                    onItemActivated: {
-                        if (_private.selectedColumn != 0) {
-                            _private.selectedColumn = 0;
-                        }
-                        qmlSelector.current_index = index;
-                        if (component.selectedChannel.selectedSlot.value === index) {
-                            if (component.selectedChannel.trackType === "sample-loop") {
-                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
-                            } else {
-                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
-                            }
-                        } else {
-                            if (component.selectedChannel.trackType === "sample-loop") {
-                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", index, false);
-                            } else {
-                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
-                            }
-                        }
-                    }
-                    delegate: Zynthian.SelectorDelegate {
-                        id: clipDelegate
-                        height: clipsListView.view.height/5
-                        enabled: true
-                        // highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
-                        property QtObject clip: component.selectedChannel
-                            ? component.selectedChannel.trackType === "sample-loop"
-                                ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                : component.selectedChannel.samples[index]
-                            : null
-                        property QtObject cppClipObject: clipDelegate.clip && clipDelegate.clip.hasOwnProperty("cppObjId")
-                            ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
-                            : null
-                        property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
-                        selector: clipsListView.selector
-                        onItemActivated: clipsListView.itemActivated(screenId, index)
-                        onItemActivatedSecondary: clipsListView.itemActivatedSecondary(screenId, index)
-                        contentItem: ColumnLayout {
-                            RowLayout {
-                                QQC2.Label {
-                                    id: mainLabel
-                                    Layout.fillWidth: true
-                                    text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("Empty Slot"))
-                                    elide: Text.ElideMiddle
+                    // Force set the folder to the new path, and then start the timer for re-selecting
+                    // Yes, i realise we *could* wait for the signal to fire, but if it fires too rapidly,
+                    // we would miss it, and this is safer... not that i like it all that much
+                    folderModel.folder = encodeURIComponent(path);
+                    selectFileAfterLoadingTimer.selectThisFile = Qt.resolvedUrl(theFile);
+                    selectFileAfterLoadingTimer.changeColumn = changeColumn;
+                    selectFileAfterLoadingTimer.start();
+                }
+                Timer {
+                    id: selectFileAfterLoadingTimer
+                    property string selectThisFile: ""
+                    property bool changeColumn: false
+                    interval: 50; repeat: true; running: false;
+                    onTriggered: {
+                        if (selectThisFile === "") {
+                            selectFileAfterLoadingTimer.stop();
+                        } else if (folderModel.status == FolderListModel.Ready) {
+                            selectFileAfterLoadingTimer.stop();
+                            // Now the data's loaded, select the file in the right hand column, if it exists
+                            let indexOfFile = folderModel.indexOf(selectFileAfterLoadingTimer.selectThisFile);
+                            if (indexOfFile > -1) {
+                                // Select the right-hand column if the file did exist, otherwise just leave the middle column selected
+                                if (selectFileAfterLoadingTimer.changeColumn) {
+                                    _private.selectedColumn = 2;
                                 }
-                            }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                color: "#222222"
-                                border.width: 1
-                                border.color: "#ff999999"
-                                radius: 4
-                                Zynthbox.WaveFormItem {
-                                    id: waveformItem
-                                    anchors {
-                                        fill: parent
-                                        margins: 1
-                                    }
-                                    color: Kirigami.Theme.textColor
-                                    source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
-                                    start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
-                                    end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
-                                    readonly property real relativeStart: waveformItem.start / waveformItem.length
-                                    readonly property real relativeEnd: waveformItem.end / waveformItem.length
-                                    visible: clipDelegate.clipHasWav
-                                    // SamplerSynth progress dots
-                                    Timer {
-                                        id: dotFetcher
-                                        interval: 1; repeat: false; running: false;
-                                        onTriggered: {
-                                            progressDots.playbackPositions = component.visible && clipDelegate.cppClipObject
-                                                ? clipDelegate.cppClipObject.playbackPositions
-                                                : null
-                                        }
-                                    }
-                                    Connections {
-                                        target: component
-                                        onVisibleChanged: dotFetcher.restart();
-                                    }
-                                    Connections {
-                                        target: component.selectedChannel
-                                        onTrack_type_changed: dotFetcher.restart();
-                                    }
-                                    Connections {
-                                        target: clipDelegate
-                                        onCppClipObjectChanged: dotFetcher.restart();
-                                    }
-                                    Repeater {
-                                        id: progressDots
-                                        model: Zynthbox.Plugin.clipMaximumPositionCount
-                                        property QtObject playbackPositions: null
-                                        delegate: Item {
-                                            property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
-                                            visible: progressEntry && progressEntry.id > -1
-                                            Rectangle {
-                                                anchors.centerIn: parent
-                                                rotation: 45
-                                                color: Kirigami.Theme.highlightColor
-                                                width: Kirigami.Units.largeSpacing
-                                                height:  Kirigami.Units.largeSpacing
-                                                scale: progressEntry ? 0.5 + progressEntry.gain : 1
-                                            }
-                                            anchors {
-                                                top: parent.verticalCenter
-                                                topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
-                                            }
-                                            x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
-                                        }
-                                    }
-                                }
-                                Rectangle {
-                                    anchors {
-                                        left: parent.left
-                                        bottom: parent.bottom
-                                    }
-                                    width: clipDelegate.cppClipObject ? parent.width * clipDelegate.cppClipObject.selectedSliceObject.gainHandler.gainAbsolute : 0
-                                    height: Kirigami.Units.gridUnit * 0.5
-                                    color: Kirigami.Theme.highlightColor
-                                    opacity: 0.7
-                                }
+                                filesListView.mostRecentlyActivatedIndex = -1;
+                                // A touch of juggling to ensure we don't change columns just from activating the thing...
+                                let currentSelectedColumn = _private.selectedColumn;
+                                filesListView.selector.activate_index(indexOfFile);
+                                _private.selectedColumn = currentSelectedColumn;
+                                filesListView.view.positionViewAtIndex(filesListView.selector.current_index, ListView.Center);
                             }
                         }
                     }
                 }
-                Zynthian.SelectorView {
-                    id: folderListView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                    highlighted: _private.selectedColumn === 1
-                    onCurrentItemChanged: {
-                        if (folderListView.currentItem) {
-                            folderModel.folder = encodeURIComponent(folderListView.currentItem.folder);
+                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                active: zynqtgui.isBootingComplete
+                autoActivateIndexOnChange: true
+                property int mostRecentlyActivatedIndex: -1
+                onItemActivated: {
+                    if (_private.selectedColumn != 2) {
+                        _private.selectedColumn = 2;
+                    }
+                    if (filesListView.mostRecentlyActivatedIndex === index) {
+                        sampleSlotAssigner.assignToSlot(currentItem.filePath);
+                    }
+                    filesListView.mostRecentlyActivatedIndex = index;
+                }
+                qmlSelector: Zynthian.SelectorWrapper {
+                    selector_list: Zynthbox.FolderListModel {
+                        id: folderModel
+                        caseSensitive: false
+                        showDirs: false
+                        showDotAndDotDot: false
+                        sortCaseSensitive: false
+                        nameFilters: [ "*.wav" ]
+                        folder: "/zynthian/zynthian-my-data"
+                        onFolderChanged: {
+                            filesListView.mostRecentlyActivatedIndex = -1;
+                            filesListView.selector.current_index = 0;
                         }
                     }
-                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                    active: zynqtgui.isBootingComplete
-                    autoActivateIndexOnChange: true
                     onItemActivated: {
-                        if (_private.selectedColumn != 1) {
-                            _private.selectedColumn = 1;
-                        }
-                        qmlSelector.current_index = index;
+                        filesListView.itemActivated(screenId, index);
                     }
-                    qmlSelector: Zynthian.SelectorWrapper {
-                        selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                            ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"])
-                            : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"])
-                        onSelector_listChanged: {
-                            current_index = 0;
+                }
+                delegate: Zynthian.SelectorDelegate {
+                    id: fileDelegate
+                    width: ListView.view.width
+                    height: Kirigami.Units.iconSizes.large
+                    enabled: true
+                    selector: filesListView.selector
+                    text: model.fileName
+                    readonly property string filePath: model.filePath
+                    readonly property bool previewIsPlayingForThisEntry: (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying && _private.filePropertiesHelper.filePath == model.filePath) ? true : false
+                    function doPreview() {
+                        if (fileDelegate.previewIsPlayingForThisEntry) {
+                            _private.filePropertiesHelper.stopPreview();
+                        } else {
+                            if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
+                                // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
+                                _private.filePropertiesHelper.stopPreview();
+                            }
+                            if (_private.selectedColumn != 2) {
+                                _private.selectedColumn = 2;
+                            }
+                            if (filesListView.selector.current_index != model.index) {
+                                filesListView.selector.current_index = model.index;
+                            }
+                            _private.filePropertiesHelper.filePath = model.filePath;
+                            _private.filePropertiesHelper.playPreview();
                         }
                     }
-                    delegate: Zynthian.SelectorDelegate {
-                        id: folderDelegate
-                        width: ListView.view.width
-                        height: Kirigami.Units.iconSizes.medium
-                        enabled: true
-                        text: modelData.subpath
-                        readonly property string folder: modelData.path
-                        selector: folderListView.selector
-                        onItemActivated: folderListView.itemActivated(screenId, index)
-                        onItemActivatedSecondary: folderListView.itemActivatedSecondary(screenId, index)
-                        contentItem: RowLayout {
+                    contentItem: ColumnLayout {
+                        spacing: 0
+                        Layout.fillWidth: true
+                        RowLayout {
+                            spacing: 0
                             Layout.fillWidth: true
+                            Layout.fillHeight: true
                             Item {
                                 Layout.fillHeight: true
                                 Layout.minimumWidth: height
@@ -582,189 +707,50 @@ Zynthian.ScreenPage {
                                         fill: parent
                                         margins: Kirigami.Units.smallSpacing
                                     }
-                                    source: "file-library-symbolic"
+                                    source: "folder-music-symbolic"
                                 }
                             }
                             QQC2.Label {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                text: folderDelegate.text
-                                elide: Text.ElideLeft
-                            }
-                        }
-                    }
-                }
-                Zynthian.SelectorView {
-                    id: filesListView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                    highlighted: _private.selectedColumn === 2
-                    function selectFile(theFile, changeColumn) {
-                        let pathSplit = theFile.lastIndexOf("/");
-                        let path = theFile.slice(0, pathSplit);
-                        let filename = theFile.slice(pathSplit + 1);
-                        // Select the folder in the middle column, if it exists
-                        for (let index = 0; index < folderListView.model.length; ++index) {
-                            if (folderListView.model[index].path == path) {
-                                folderListView.qmlSelector.current_index = index;
-                                break;
-                            }
-                        }
-                        // Force set the folder to the new path, and then start the timer for re-selecting
-                        // Yes, i realise we *could* wait for the signal to fire, but if it fires too rapidly,
-                        // we would miss it, and this is safer... not that i like it all that much
-                        folderModel.folder = encodeURIComponent(path);
-                        selectFileAfterLoadingTimer.selectThisFile = Qt.resolvedUrl(theFile);
-                        selectFileAfterLoadingTimer.changeColumn = changeColumn;
-                        selectFileAfterLoadingTimer.start();
-                    }
-                    Timer {
-                        id: selectFileAfterLoadingTimer
-                        property string selectThisFile: ""
-                        property bool changeColumn: false
-                        interval: 50; repeat: true; running: false;
-                        onTriggered: {
-                            if (selectThisFile === "") {
-                                selectFileAfterLoadingTimer.stop();
-                            } else if (folderModel.status == FolderListModel.Ready) {
-                                selectFileAfterLoadingTimer.stop();
-                                // Now the data's loaded, select the file in the right hand column, if it exists
-                                let indexOfFile = folderModel.indexOf(selectFileAfterLoadingTimer.selectThisFile);
-                                if (indexOfFile > -1) {
-                                    // Select the right-hand column if the file did exist, otherwise just leave the middle column selected
-                                    if (selectFileAfterLoadingTimer.changeColumn) {
-                                        _private.selectedColumn = 2;
-                                    }
-                                    filesListView.mostRecentlyActivatedIndex = -1;
-                                    // A touch of juggling to ensure we don't change columns just from activating the thing...
-                                    let currentSelectedColumn = _private.selectedColumn;
-                                    filesListView.selector.activate_index(indexOfFile);
-                                    _private.selectedColumn = currentSelectedColumn;
-                                    filesListView.view.positionViewAtIndex(filesListView.selector.current_index, ListView.Center);
-                                }
-                            }
-                        }
-                    }
-                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                    active: zynqtgui.isBootingComplete
-                    autoActivateIndexOnChange: true
-                    property int mostRecentlyActivatedIndex: -1
-                    onItemActivated: {
-                        if (_private.selectedColumn != 2) {
-                            _private.selectedColumn = 2;
-                        }
-                        if (filesListView.mostRecentlyActivatedIndex === index) {
-                            sampleSlotAssigner.assignToSlot(currentItem.filePath);
-                        }
-                        filesListView.mostRecentlyActivatedIndex = index;
-                    }
-                    qmlSelector: Zynthian.SelectorWrapper {
-                        selector_list: Zynthbox.FolderListModel {
-                            id: folderModel
-                            caseSensitive: false
-                            showDirs: false
-                            showDotAndDotDot: false
-                            sortCaseSensitive: false
-                            nameFilters: [ "*.wav" ]
-                            folder: "/zynthian/zynthian-my-data"
-                            onFolderChanged: {
-                                filesListView.mostRecentlyActivatedIndex = -1;
-                                filesListView.selector.current_index = 0;
-                            }
-                        }
-                        onItemActivated: {
-                            filesListView.itemActivated(screenId, index);
-                        }
-                    }
-                    delegate: Zynthian.SelectorDelegate {
-                        id: fileDelegate
-                        width: ListView.view.width
-                        height: Kirigami.Units.iconSizes.large
-                        enabled: true
-                        selector: filesListView.selector
-                        text: model.fileName
-                        readonly property string filePath: model.filePath
-                        readonly property bool previewIsPlayingForThisEntry: (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying && _private.filePropertiesHelper.filePath == model.filePath) ? true : false
-                        function doPreview() {
-                            if (fileDelegate.previewIsPlayingForThisEntry) {
-                                _private.filePropertiesHelper.stopPreview();
-                            } else {
-                                if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
-                                    // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
-                                    _private.filePropertiesHelper.stopPreview();
-                                }
-                                if (_private.selectedColumn != 2) {
-                                    _private.selectedColumn = 2;
-                                }
-                                if (filesListView.selector.current_index != model.index) {
-                                    filesListView.selector.current_index = model.index;
-                                }
-                                _private.filePropertiesHelper.filePath = model.filePath;
-                                _private.filePropertiesHelper.playPreview();
-                            }
-                        }
-                        contentItem: ColumnLayout {
-                            spacing: 0
-                            Layout.fillWidth: true
-                            RowLayout {
-                                spacing: 0
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                Item {
-                                    Layout.fillHeight: true
-                                    Layout.minimumWidth: height
-                                    Layout.maximumWidth: height
-                                    Kirigami.Icon {
-                                        anchors {
-                                            fill: parent
-                                            margins: Kirigami.Units.smallSpacing
-                                        }
-                                        source: "folder-music-symbolic"
-                                    }
-                                }
-                                QQC2.Label {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    text: fileDelegate.text
-                                    fontSizeMode: Text.Fit
-                                    minimumPointSize: 5
-                                    wrapMode: Text.Wrap
-                                    maximumLineCount: 3
-                                    elide: Text.ElideRight
-                                }
-                                Item {
-                                    Layout.fillHeight: true
-                                    Layout.minimumWidth: height
-                                    Layout.maximumWidth: height
-                                    Kirigami.Icon {
-                                        anchors {
-                                            fill: parent
-                                            margins: Kirigami.Units.smallSpacing
-                                        }
-                                        source: fileDelegate.previewIsPlayingForThisEntry ? "media-playback-stop" : "media-playback-start"
-                                    }
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            fileDelegate.doPreview();
-                                        }
-                                    }
-                                }
+                                text: fileDelegate.text
+                                fontSizeMode: Text.Fit
+                                minimumPointSize: 5
+                                wrapMode: Text.Wrap
+                                maximumLineCount: 3
+                                elide: Text.ElideRight
                             }
                             Item {
-                                Layout.fillWidth: true
-                                Layout.minimumHeight: 1
-                                Layout.maximumHeight: 1
-                                Rectangle {
+                                Layout.fillHeight: true
+                                Layout.minimumWidth: height
+                                Layout.maximumWidth: height
+                                Kirigami.Icon {
                                     anchors {
-                                        top: parent.top
-                                        left: parent.left
-                                        bottom: parent.bottom
+                                        fill: parent
+                                        margins: Kirigami.Units.smallSpacing
                                     }
-                                    width: fileDelegate.previewIsPlayingForThisEntry ? parent.width * (_private.filePropertiesHelper.previewClip.position) : 0
-                                    color: Kirigami.Theme.textColor
+                                    source: fileDelegate.previewIsPlayingForThisEntry ? "media-playback-stop" : "media-playback-start"
                                 }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        fileDelegate.doPreview();
+                                    }
+                                }
+                            }
+                        }
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 1
+                            Layout.maximumHeight: 1
+                            Rectangle {
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    bottom: parent.bottom
+                                }
+                                width: fileDelegate.previewIsPlayingForThisEntry ? parent.width * (_private.filePropertiesHelper.previewClip.position) : 0
+                                color: Kirigami.Theme.textColor
                             }
                         }
                     }

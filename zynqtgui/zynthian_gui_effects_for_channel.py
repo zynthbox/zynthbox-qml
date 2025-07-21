@@ -57,7 +57,10 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         try:
             selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             for index in range(5):
-                self.list_data.append((str(index+1), index, f"{index+1} - {selected_track.chainedFxNames[index]}", selected_track.chainedFx[index]))
+                if selected_track.chainedFxNames[index] == "":
+                    self.list_data.append((str(index+1), index, f"{index+1} - -", selected_track.chainedFx[index]))
+                else:
+                    self.list_data.append((str(index+1), index, f"{index+1} - {selected_track.chainedFxNames[index]}", selected_track.chainedFx[index]))
             self.select(selected_track.selectedSlot.value)
         except:
             # fill_list might fail when sketchpad is yet to be loaded. Do nothing as it will fill list again when curlayer changes

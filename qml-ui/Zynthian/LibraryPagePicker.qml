@@ -35,7 +35,7 @@ ActionRow {
     actions: [
         Kirigami.Action {
             text: qsTr("Synths")
-            visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
+            visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop" && component.selectedChannel.trackType !== "external"
             checked: component.libraryName === "synths"
             onTriggered: {
                 if (zynqtgui.current_screen_id !== "preset") {
@@ -45,6 +45,7 @@ ActionRow {
             }
         }, Kirigami.Action {
             text: component.selectedChannel && component.selectedChannel.trackType === "sample-loop" ? qsTr("Loops") : qsTr("Samples")
+            visible: component.selectedChannel && component.selectedChannel.trackType !== "external"
             checked: component.libraryName === "samples"
             onTriggered: {
                 if (zynqtgui.current_screen_id !== "sample_library") {
@@ -68,7 +69,7 @@ ActionRow {
             }
         }, Kirigami.Action {
             text: qsTr("FX")
-            visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
+            visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.trackType !== "external"
             checked: component.libraryName === "sketchfx"
             onTriggered: {
                 if (zynqtgui.current_screen_id !== "sketch_effect_preset") {

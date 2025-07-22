@@ -185,19 +185,19 @@ class last_selected_obj_dto(QObject):
     @Slot(QObject, result=bool)
     def copyFrom(self, sourceObject):
         result = False
+        selected_track = zynthian_gui_config.zynqtgui.sketchpad.song.channelsModel.getChannel(zynthian_gui_config.zynqtgui.sketchpad.selectedTrackId)
         match sourceObject.className:
             case "sketchpad_channel" | "sketchpad_clip" | "sketchpad_clipoverview":
                 # self.value.copyFrom(sourceObject.value)
                 result = True
             case "TracksBar_synthslot":
+                selected_track.copySlot("synth", sourceObject.value, self.value)
                 result = True
             case "TracksBar_sampleslot":
-                result = True
-            case "TracksBar_sketchslot":
+                selected_track.copySlot("sample-trig", sourceObject.value, self.value)
                 result = True
             case "TracksBar_fxslot":
-                result = True
-            case "TracksBar_sketchfxslot":
+                selected_track.copySlot("fx", sourceObject.value, self.value)
                 result = True
 
         return result
@@ -3359,8 +3359,12 @@ class sketchpad_channel(QObject):
 
     def setClipSourceFromSnapshotSlot(self, snapshot: str, snapshotIndex: int, clip):
         def task():
-            snapshot_obj = json.loads(snapshot)
-            if snapshotIndex < len(snapshot_obj):
+            if type(snapshot) is str:
+                # Consider the passed snapshot to be an json string
+                snapshot_obj = json.loads(snapshot)
+            else:
+                # Consider the passed snapshot to be an obj
+                snapshot_obj = snapshot
                 for index, key in enumerate(snapshot_obj):
                     if index == snapshotIndex: # key isn't just an index, so... let's do this thing
                         filename = snapshot_obj[key]["filename"]
@@ -3426,7 +3430,12 @@ class sketchpad_channel(QObject):
         def task():
             # Reset the favourites display to everything when loading from a snapshot
             self.zynqtgui.preset.show_only_favorites = False
-            snapshot_obj = json.loads(snapshot)
+            if type(snapshot) is str:
+                # Consider the passed snapshot to be an json string
+                snapshot_obj = json.loads(snapshot)
+            else:
+                # Consider the passed snapshot to be an obj
+                snapshot_obj = snapshot
             source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)
 
             def post_removal_task():
@@ -3719,6 +3728,23 @@ class sketchpad_channel(QObject):
         newOrder[slot1] = slot2
         newOrder[slot2] = slot1
         self.reorderChainedSketchFx(newOrder)
+
+    """
+    A Helper method to copy a slot to another
+    """
+    @Slot(str, int, int)
+    def copySlot(self, slotType, sourceSlot, destinationSlot):
+        logging.debug(f"Copying {slotType} slot {sourceSlot} to {destinationSlot}")
+        match slotType:
+            case "synth" | "TracksBar_synthslot":
+                snapshot = self.zynqtgui.layer.generate_snapshot(self)
+                self.setChannelSoundFromSnapshotSlot(snapshot, "synth", destinationSlot, sourceSlot)
+            case "sample-trig" | "TracksBar_sampleslot":
+                snapshot = self.getChannelSampleSnapshot()
+                self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot)
+            case "fx" | "TracksBar_fxslot":
+                snapshot = self.zynqtgui.layer.generate_snapshot(self)
+                self.setChannelSoundFromSnapshotSlot(snapshot, "fx", destinationSlot, sourceSlot)
 
     slotsReordered = Signal()
     className = Property(str, className, constant=True)

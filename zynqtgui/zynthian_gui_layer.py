@@ -1846,7 +1846,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
     @Slot(str, result='QVariantList')
     def load_layer_channels_from_json(self, snapshot):
         result = []
-        snapshot_obj = json.loads(snapshot)
+        if type(snapshot) is str:
+            # Consider the snapshot argument to be an json string
+            snapshot_obj = json.loads(snapshot)
+        else:
+            # Consider the snapshot argument to be an obj
+            snapshot_obj = snapshot
         try:
             if not isinstance(snapshot_obj, dict):
                 return

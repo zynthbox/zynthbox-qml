@@ -3365,30 +3365,30 @@ class sketchpad_channel(QObject):
             else:
                 # Consider the passed snapshot to be an obj
                 snapshot_obj = snapshot
-                for index, key in enumerate(snapshot_obj):
-                    if index == snapshotIndex: # key isn't just an index, so... let's do this thing
-                        filename = snapshot_obj[key]["filename"]
-                        # Clear out the existing sample, whether or not there's a new sample to go into that spot
-                        clip.clear()
-                        # If the filename is an empty string, nothing to load
-                        if len(filename) > 0:
-                            # Store the new sample in a temporary file
-                            with tempfile.TemporaryDirectory() as tmp:
-                                temporaryFile = Path(tmp) / filename
-                                with open(temporaryFile, "wb") as file:
-                                    file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
-                                # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
-                                clip.set_path(str(temporaryFile), should_copy=True)
-                                # Restore the metadata, if it's been saved to the snapshot (otherwise load it from disk)
-                                clip.metadata.clear()
-                                if "metadata" in snapshot_obj[key]:
-                                    if len(snapshot_obj[key]["metadata"]) > 0:
-                                        self.__samples__[index].metadata.deserialize(snapshot_obj[key]["metadata"])
-                                else:
-                                    # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
-                                    if clip.audioSource is not None:
-                                        clip.metadata.read()
-                        break
+            if snapshotIndex < len(snapshot_obj):
+                # Key in the snapshot obj is a string
+                key = f"{snapshotIndex}"
+                filename = snapshot_obj[key]["filename"]
+                # Clear out the existing sample, whether or not there's a new sample to go into that spot
+                clip.clear()
+                # If the filename is an empty string, nothing to load
+                if len(filename) > 0:
+                    # Store the new sample in a temporary file
+                    with tempfile.TemporaryDirectory() as tmp:
+                        temporaryFile = Path(tmp) / filename
+                        with open(temporaryFile, "wb") as file:
+                            file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
+                        # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
+                        clip.set_path(str(temporaryFile), should_copy=True)
+                        # Restore the metadata, if it's been saved to the snapshot (otherwise load it from disk)
+                        clip.metadata.clear()
+                        if "metadata" in snapshot_obj[key]:
+                            if len(snapshot_obj[key]["metadata"]) > 0:
+                                clip.metadata.deserialize(snapshot_obj[key]["metadata"])
+                        else:
+                            # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
+                            if clip.audioSource is not None:
+                                clip.metadata.read()    
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, f"Loading sample data from snapshot into slot {clip.id} on Track {self.name}")
 

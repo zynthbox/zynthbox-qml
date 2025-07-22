@@ -40,36 +40,36 @@ PlasmaCore.FrameSvgItem {
 
     imagePath: "widgets/background"
     prefix: highlighted ? ["focus", ""] : ""
-    //colorGroup: PlasmaCore.Theme.ViewColorGroup
+    colorGroup: PlasmaCore.Theme.ViewColorGroup
 
-    Timer { //HACK AND BUG WORKAROUND
-        id: updateTimer
-        interval: 200
-        onTriggered: {
-            root.imagePath = "invalid"
-            root.imagePath = "widgets/background"
-            root.margins.marginsChanged()
-        }
-    }
-    Connections {
-        target: theme
-        onThemeChangedProxy: {
-            updateTimer.restart()
-        }
-    }
+    // Timer { //HACK AND BUG WORKAROUND
+    //     id: updateTimer
+    //     interval: 200
+    //     onTriggered: {
+    //         root.imagePath = "invalid"
+    //         root.imagePath = "widgets/background"
+    //         root.margins.marginsChanged()
+    //     }
+    // }
+    // Connections {
+    //     target: theme
+    //     onThemeChangedProxy: {
+    //         updateTimer.restart()
+    //     }
+    // }
 
-    Rectangle {
-        anchors {
-            fill: parent
-            leftMargin: parent.margins.left
-            topMargin: parent.margins.top
-            rightMargin: parent.margins.right
-            bottomMargin: parent.margins.bottom
-        }
-        visible: parent.highlighted && parent.usedPrefix !== "focus"
-        color: "transparent"
-        border.color: Kirigami.Theme.highlightColor
-        radius: Kirigami.Units.smallSpacing
-    }
+    // Rectangle {
+    //     anchors {
+    //         fill: parent
+    //         leftMargin: parent.margins.left
+    //         topMargin: parent.margins.top
+    //         rightMargin: parent.margins.right
+    //         bottomMargin: parent.margins.bottom
+    //     }
+    //     visible: parent.highlighted && parent.usedPrefix !== "focus"
+    //     color: "transparent"
+    //     border.color: Kirigami.Theme.highlightColor
+    //     radius: Kirigami.Units.smallSpacing
+    // }
 }
 

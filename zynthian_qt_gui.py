@@ -38,7 +38,6 @@ import logging
 import threading
 
 import numpy as np
-import rpi_ws281x
 import time
 from datetime import datetime
 from threading import Thread, Lock, Event

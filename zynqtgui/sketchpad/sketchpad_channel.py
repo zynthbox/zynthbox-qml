@@ -210,13 +210,13 @@ class last_selected_obj_dto(QObject):
                 # self.value.copyFrom(sourceObject.value)
                 result = True
             case "TracksBar_synthslot":
-                selected_track.copySlot("synth", sourceObject.value, self.value)
+                selected_track.copySlot("synth", sourceObject.track, sourceObject.value, self.value)
                 result = True
             case "TracksBar_sampleslot":
-                selected_track.copySlot("sample-trig", sourceObject.value, self.value)
+                selected_track.copySlot("sample-trig", sourceObject.track, sourceObject.value, self.value)
                 result = True
             case "TracksBar_fxslot":
-                selected_track.copySlot("fx", sourceObject.value, self.value)
+                selected_track.copySlot("fx", sourceObject.track, sourceObject.value, self.value)
                 result = True
 
         return result
@@ -3752,17 +3752,17 @@ class sketchpad_channel(QObject):
     A Helper method to copy a slot to another
     """
     @Slot(str, int, int)
-    def copySlot(self, slotType, sourceSlot, destinationSlot):
+    def copySlot(self, slotType, sourceTrack, sourceSlot, destinationSlot):
         logging.debug(f"Copying {slotType} slot {sourceSlot} to {destinationSlot}")
         match slotType:
             case "synth" | "TracksBar_synthslot":
-                snapshot = self.zynqtgui.layer.generate_snapshot(self)
+                snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
                 self.setChannelSoundFromSnapshotSlot(snapshot, "synth", destinationSlot, sourceSlot)
             case "sample-trig" | "TracksBar_sampleslot":
-                snapshot = self.getChannelSampleSnapshot()
+                snapshot = sourceTrack.getChannelSampleSnapshot()
                 self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot)
             case "fx" | "TracksBar_fxslot":
-                snapshot = self.zynqtgui.layer.generate_snapshot(self)
+                snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
                 self.setChannelSoundFromSnapshotSlot(snapshot, "fx", destinationSlot, sourceSlot)
 
     slotsReordered = Signal()

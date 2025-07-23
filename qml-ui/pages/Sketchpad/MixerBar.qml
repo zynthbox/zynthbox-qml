@@ -56,7 +56,7 @@ QQC2.Pane {
             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
             zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
             bottomStack.slotsBar.bottomBarButton.checked = true
-            zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", root.selectedChannel.id, mixerItemsRepeater.itemAt(root.selectedChannel.id))
+            zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", root.selectedChannel.id, mixerItemsRepeater.itemAt(root.selectedChannel.id), root.selectedChannel)
 
             return true;
 
@@ -187,7 +187,7 @@ QQC2.Pane {
                                 zynqtgui.sketchpad.selectedTrackId = channel.id;
                                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                 zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id));
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
                             }
 
                             anchors.fill: parent
@@ -576,7 +576,7 @@ QQC2.Pane {
                                     zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
                                 }
                                 onClicked: {
-                                    zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
                                 }
                                 onDoubleClicked: {
                                     masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
@@ -609,7 +609,7 @@ QQC2.Pane {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
+                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
                                     }
                                 }
                             }
@@ -626,7 +626,7 @@ QQC2.Pane {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem)
+                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
                                     }
                                 }
                             }

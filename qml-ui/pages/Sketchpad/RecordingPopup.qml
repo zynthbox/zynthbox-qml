@@ -43,6 +43,7 @@ Zynthian.Popup {
     property string lastSelectedClassName
     property QtObject lastSelectedValue
     property QtObject lastSelectedComponent
+    property QtObject lastSelectedTrack
 
     spacing: Kirigami.Units.gridUnit * 0.5
 
@@ -160,6 +161,7 @@ Zynthian.Popup {
                         root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
                         root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value
                         root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
+                        root.lastSelectedTrack = zynqtgui.sketchpad.lastSelectedObj.track
                         // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
                         _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
                         _private.updateSoloState();
@@ -277,6 +279,7 @@ Zynthian.Popup {
             root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
             root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value
             root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
+            root.lastSelectedTrack = zynqtgui.sketchpad.lastSelectedObj.track
             // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
             _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
             _private.updateSoloState();
@@ -293,7 +296,7 @@ Zynthian.Popup {
             applicationWindow().pageStack.getPage("sketchpad").bottomStack.tracksBar.switchToSlot(root.selectedSlotType, root.selectedSlotIndex);
             root.selectedChannel.selectedClip = root.selectedClip;
             // Restore the lastSelectedObj to also match the previous state
-            zynqtgui.sketchpad.lastSelectedObj.setTo(root.lastSelectedClassName, root.lastSelectedValue, root.lastSelectedComponent)
+            zynqtgui.sketchpad.lastSelectedObj.setTo(root.lastSelectedClassName, root.lastSelectedValue, root.lastSelectedComponent, root.lastSelectedTrack)
             // Switch the track type to whatever the appropriate one is for the recorded sample if...
             // ... the recording was completed while the dialog was open (zynqtgui.sketchpad.isRecording === false)
             // ... we were doing audio recording (this doesn't make sense for midi)

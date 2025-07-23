@@ -249,7 +249,7 @@ RowLayout {
             function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                 if (control.performSlotInteractions) {
                     let wasAlreadySelected = slotDelegate.highlighted
-                    root.selectedChannel.selectedSlot.setTo(_private.className, index, slotDelegate);
+                    root.selectedChannel.selectedSlot.setTo(_private.className, index, slotDelegate, root.selectedChannel);
                     if (onlySelectSlot == false) {
                         if (wasAlreadySelected == false || onlyFocus) {
                             let className = "TracksBar_synthslot"
@@ -280,7 +280,7 @@ RowLayout {
                                 root.selectedChannel.displayFx = false;
                                 break;
                             }
-                            zynqtgui.sketchpad.lastSelectedObj.setTo(className, index, slotDelegate);
+                            zynqtgui.sketchpad.lastSelectedObj.setTo(className, index, slotDelegate, control.selectedChannel);
                             control.selectedChannel.selectedSlotRow = index;
                         } else {
                             if (control.slotType === "external") {

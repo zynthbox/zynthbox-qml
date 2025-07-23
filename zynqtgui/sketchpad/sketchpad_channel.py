@@ -52,26 +52,31 @@ class last_selected_obj_dto(QObject):
         self.__className = "TracksBar_synthslot"
         self.__value = 0
         self.__component = None
+        self.__track = None
 
     @Slot()
     def reset(self):
         self.__className = None
         self.__value = 0
         self.__component = None
+        self.__track = None
 
         self.classNameChanged.emit()
         self.valueChanged.emit()
         self.componentChanged.emit()
+        self.trackChanged.emit()
 
-    @Slot(str, 'QVariant', QObject)
-    def setTo(self,className, value, component):
+    @Slot(str, 'QVariant', QObject, QObject)
+    def setTo(self,className, value, component, track):
         if self.__className != className or self.__value != value or self.__component != component:
             self.__className = className
             self.__value = value
             self.__component = component
+            self.__track = track
             self.classNameChanged.emit()
             self.valueChanged.emit()
             self.componentChanged.emit()
+            self.trackChanged.emit()
 
     ### BEGIN Property className
     def get_className(self):
@@ -114,6 +119,20 @@ class last_selected_obj_dto(QObject):
 
     component = Property(QObject, get_component, set_component, notify=componentChanged)
     ### END Property component
+
+    ### BEGIN Property track
+    def get_track(self):
+        return self.__track
+
+    def set_track(self, val):
+        if self.__track != val:
+            self.__track = val
+            self.trackChanged.emit()
+
+    trackChanged = Signal()
+
+    track = Property(QObject, get_track, set_track, notify=trackChanged)
+    ### END Property track
 
     ### BEGIN Property isCopyable
     def get_isCopyable(self):
@@ -1116,41 +1135,41 @@ class sketchpad_channel(QObject):
             if self.trackType == "synth" or self.trackType == "sample-trig":
                 for slotIndex, chainedSound in enumerate(self.__chained_sounds__):
                     if chainedSound > -1:
-                        self.__selected_slot_obj.setTo("TracksBar_synthslot", slotIndex, None)
+                        self.__selected_slot_obj.setTo("TracksBar_synthslot", slotIndex, None, self)
                         pickedASlot = True
                         break
                 if pickedASlot == False:
                     for slotIndex, sample in enumerate(self.__samples__):
                         if sample.path is not None and len(sample.path) > 0:
-                            self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None)
+                            self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None, self)
                             pickedASlot = True
                             break
                 if pickedASlot == False:
                     for slotIndex, fx in enumerate(self.__chained_fx):
                         if fx is not None:
-                            self.__selected_slot_obj.setTo("TracksBar_fxslot", slotIndex, None)
+                            self.__selected_slot_obj.setTo("TracksBar_fxslot", slotIndex, None, self)
                             pickedASlot = True
                             break
                 if pickedASlot == False:
-                    self.__selected_slot_obj.setTo("TracksBar_synthslot", 0, None)
+                    self.__selected_slot_obj.setTo("TracksBar_synthslot", 0, None, self)
             elif self.trackType == "sample-loop":
                 for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     clips_model = self.getClipsModelById(slotIndex)
                     clip = clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
                     if clip.path is not None and len(clip.path) > 0:
-                        self.__selected_slot_obj.setTo("TracksBar_sketchslot", slotIndex, None)
+                        self.__selected_slot_obj.setTo("TracksBar_sketchslot", slotIndex, None, self)
                         pickedASlot = True
                         break
                 if pickedASlot == False:
                     for slotIndex, fx in enumerate(self.__chained_sketch_fx):
                         if fx is not None:
-                            self.__selected_slot_obj.setTo("TracksBar_sketchfxslot", slotIndex, None)
+                            self.__selected_slot_obj.setTo("TracksBar_sketchfxslot", slotIndex, None, self)
                             pickedASlot = True
                             break
                 if pickedASlot == False:
-                    self.__selected_slot_obj.setTo("TracksBar_sketchslot", 0, None)
+                    self.__selected_slot_obj.setTo("TracksBar_sketchslot", 0, None, self)
             elif self.trackType == "external":
-                self.__selected_slot_obj.setTo("TracksBar_externalslot", 0, None)
+                self.__selected_slot_obj.setTo("TracksBar_externalslot", 0, None, self)
 
     def set_layers_snapshot(self, snapshot):
         if not self.__song__.__to_be_deleted__:

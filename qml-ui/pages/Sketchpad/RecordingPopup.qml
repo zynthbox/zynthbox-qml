@@ -293,9 +293,7 @@ Zynthian.Popup {
             applicationWindow().pageStack.getPage("sketchpad").bottomStack.tracksBar.switchToSlot(root.selectedSlotType, root.selectedSlotIndex);
             root.selectedChannel.selectedClip = root.selectedClip;
             // Restore the lastSelectedObj to also match the previous state
-            zynqtgui.sketchpad.lastSelectedObj.className = root.lastSelectedClassName
-            zynqtgui.sketchpad.lastSelectedObj.value = root.lastSelectedValue
-            zynqtgui.sketchpad.lastSelectedObj.component = root.lastSelectedComponent
+            zynqtgui.sketchpad.lastSelectedObj.setTo(root.lastSelectedClassName, root.lastSelectedValue, root.lastSelectedComponent)
             // Switch the track type to whatever the appropriate one is for the recorded sample if...
             // ... the recording was completed while the dialog was open (zynqtgui.sketchpad.isRecording === false)
             // ... we were doing audio recording (this doesn't make sense for midi)

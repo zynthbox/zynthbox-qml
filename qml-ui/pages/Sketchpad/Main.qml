@@ -1229,9 +1229,7 @@ Zynthian.ScreenPage {
                                                 property QtObject channel: root.song.channelsModel.getChannel(index)
                                                 function switchToThisChannel() {
                                                     // If song mode is not active, clicking on cells should activate that channel
-                                                    zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
-                                                    zynqtgui.sketchpad.lastSelectedObj.value = channelHeaderDelegate.channel
-                                                    zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
+                                                    zynqtgui.sketchpad.lastSelectedObj.setTo(channelHeaderDelegate.channel.className, channelHeaderDelegate.channel, channelHeaderDelegate)
                                                     zynqtgui.sketchpad.selectedTrackId = index;
                                                     Qt.callLater(function() {
                                                         // Open TracksBar and switch to channel
@@ -1363,9 +1361,7 @@ Zynthian.ScreenPage {
                                                     } else {
                                                         // Clip overview is not selected. Open clips grid view
                                                         bottomStack.slotsBar.clipsButton.checked = true
-                                                        zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clipoverview"
-                                                        zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                        zynqtgui.sketchpad.lastSelectedObj.component = clipCell
+                                                        zynqtgui.sketchpad.lastSelectedObj.setTo("sketchpad_clipoverview", index, clipCell)
                                                         zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id
                                                     }
                                                 }
@@ -1662,14 +1658,10 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             onClicked: {
-                                zynqtgui.sketchpad.lastSelectedObj.className = clipsBar.selectedClipObject.className
-                                zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
-                                zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
+                                zynqtgui.sketchpad.lastSelectedObj.setTo(clipsBar.selectedClipObject.className, clipsBar.selectedClipObject, clipsBar.selectedComponent)
                             }
                             onPressAndHold: {
-                                zynqtgui.sketchpad.lastSelectedObj.className = clipsBar.selectedClipObject.className
-                                zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
-                                zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
+                                zynqtgui.sketchpad.lastSelectedObj.setTo(clipsBar.selectedClipObject.className, clipsBar.selectedClipObject, clipsBar.selectedComponent)
                             }
                         }
 

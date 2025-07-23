@@ -252,36 +252,35 @@ RowLayout {
                     root.selectedChannel.selectedSlot.setTo(_private.className, index, slotDelegate);
                     if (onlySelectSlot == false) {
                         if (wasAlreadySelected == false || onlyFocus) {
+                            let className = "TracksBar_synthslot"
                             switch (control.slotType) {
                             case "synth":
-                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                                className = "TracksBar_synthslot";
                                 break;
                             case "sample-trig":
-                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
+                                className = "TracksBar_sampleslot";
                                 break;
                             case "sample-loop":
-                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
+                                className = "TracksBar_sketchslot";
                                 break;
                             case "external":
-                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
+                                className = "TracksBar_externalslot";
                                 break;
                             case "fx":
-                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
+                                className = "TracksBar_fxslot";
                                 break;
                             case "sketch-fx":
-                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchfxslot";
+                                className = "TracksBar_sketchfxslot";
                                 break;
                             case "text":
                                 // Do nothing for text slots
                                 break;
                             default:
                                 console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
-                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
                                 root.selectedChannel.displayFx = false;
                                 break;
                             }
-                            zynqtgui.sketchpad.lastSelectedObj.value = index;
-                            zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate;
+                            zynqtgui.sketchpad.lastSelectedObj.setTo(className, index, slotDelegate);
                             control.selectedChannel.selectedSlotRow = index;
                         } else {
                             if (control.slotType === "external") {

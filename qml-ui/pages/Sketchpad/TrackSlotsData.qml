@@ -466,7 +466,9 @@ RowLayout {
                     interval: 200
                     repeat: false
                     onTriggered: {
-                        slotDelegate.switchToThisSlot();
+                        if (!delegateMouseArea.dragHappened) {
+                            slotDelegate.switchToThisSlot();
+                        }
                     }
                 }
 
@@ -563,7 +565,7 @@ RowLayout {
                     }
                     Timer {
                         id: dragHappenedResetTimer
-                        interval: 100
+                        interval: 300
                         repeat: false
                         onTriggered: {
                             delegateMouseArea.dragHappened = false

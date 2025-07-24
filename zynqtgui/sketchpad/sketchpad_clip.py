@@ -1036,7 +1036,7 @@ class sketchpad_clip(QObject):
         self.progressChanged.emit()
 
     @Slot(None)
-    def clear(self, loop=True):
+    def clear(self):
         self.stop()
         # TODO : Metadata Clear metadata
         if self.audioSource is not None:
@@ -1048,6 +1048,9 @@ class sketchpad_clip(QObject):
         self.__filename__ = ""
         if self.is_channel_sample:
             self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
+        elif self.zynqtgui.sketchpad.song is not None and self.clipChannel is not None:
+            # Clear patterns if not a sample
+            Zynthbox.PlayGridManager.instance().getSequenceModel(self.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(self.clipChannel.id, self.id).workingModel().clear()
 
         self.__song__.schedule_save()
 
@@ -1165,10 +1168,12 @@ class sketchpad_clip(QObject):
     @Slot(QObject)
     def copyFrom(self, clip):
         self.clear()
-        sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
-        sourcePattern = sequenceModel.getByClipId(clip.clipChannel.id, clip.id)
-        destinationPattern = sequenceModel.getByClipId(self.clipChannel.id, self.id)
-        destinationPattern.cloneOther(sourcePattern)
+        if not self.isChannelSample:
+            # Copy patterns if not a sample
+            sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+            sourcePattern = sequenceModel.getByClipId(clip.clipChannel.id, clip.id)
+            destinationPattern = sequenceModel.getByClipId(self.clipChannel.id, self.id)
+            destinationPattern.cloneOther(sourcePattern)
         self.set_path(clip.path, True, True)
         # Using the serialisation logic here which, while simply copying the properties directly would be faster, this is consistent
         self.__metadata.deserialize(clip.metadata.serialize())

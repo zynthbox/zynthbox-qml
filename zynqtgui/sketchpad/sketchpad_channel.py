@@ -957,7 +957,7 @@ class sketchpad_channel(QObject):
                     "sketchFxSlotsData": self.sketchFxSlotsData, # sketchFxSlotsData is a list of strings. Just what we need
                     "externalSlotsData": self.externalSlotsData} # externalSlotsData is a list of strings. Just what we need
 
-    def deserialize(self, obj, load_autosave=True):
+    def deserialize(self, obj, load_autosave=True, load_settings_only=False):
         if not self.__song__.__to_be_deleted__:
             logging.debug(f"channel_deserialize : {load_autosave}")
             try:
@@ -974,7 +974,7 @@ class sketchpad_channel(QObject):
                 if "connectedPattern" in obj:
                     self.__connected_pattern__ = obj["connectedPattern"]
                     self.set_connected_pattern(self.__connected_pattern__)
-                if "chainedSounds" in obj:
+                if not load_settings_only and "chainedSounds" in obj:
                     self.__chained_sounds__ = [-1, -1, -1, -1, -1] # When loading, we need to reset this forcibly to ensure things are updated fully
                     self.set_chained_sounds(obj["chainedSounds"])
 
@@ -1046,10 +1046,11 @@ class sketchpad_channel(QObject):
                         entry.clear()
                 self.chainedSoundsKeyzonesChanged.emit()
 
-                if "targetTrack" in obj:
-                    Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(obj["targetTrack"]))
-                else:
-                    Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(self.__id__))
+                if not load_settings_only:
+                    if "targetTrack" in obj:
+                        Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(obj["targetTrack"]))
+                    else:
+                        Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(self.__id__))
 
                 if "externalMidiChannel" in obj:
                     self.set_externalMidiChannel(obj["externalMidiChannel"])
@@ -1067,7 +1068,7 @@ class sketchpad_channel(QObject):
                     self.__externalSettings__.selectedModule = obj["externalSelectedModule"]
                 if "externalMidiOutDevice" in obj:
                     self.__externalSettings__.midiOutDevice = obj["externalMidiOutDevice"]
-                if not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
+                if not load_settings_only and not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
                     # TODO : `sample-bank.json` file is deprecated. sample data is now stored in sketchpad json. Remove this fallback later
                     # Read sample-bank.json and inject sample data to all saved versions as it should have with new latest sketchpad structure
                     warnings.warn("`sample-bank.json` is deprecated (will be removed soon) and is now stored in sketchpad json. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
@@ -1086,7 +1087,7 @@ class sketchpad_channel(QObject):
                     obj["samples"] = samples_obj
                     # Delete sample-bank.json as we now have modified existing sketchpad files
                     (Path(self.bankDir) / "sample-bank.json").unlink(missing_ok=True)
-                if "samples" in obj:
+                if not load_settings_only and "samples" in obj:
                     bank_dir = Path(self.bankDir)
                     for i, clip in enumerate(obj["samples"]):
                         if clip is None:
@@ -1094,7 +1095,7 @@ class sketchpad_channel(QObject):
                         else:
                             self.__samples__[i].deserialize(clip)
                     self.samples_changed.emit()
-                if "clips" in obj:
+                if not load_settings_only and "clips" in obj:
                     for clipId, clip_model in enumerate(self.__clips_model__):
                         self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId)
                         for clip in clip_model.__clips__:
@@ -1456,6 +1457,7 @@ class sketchpad_channel(QObject):
     def copyFrom(self, source):
         def task():
             for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                self.deserialize(source.serialize(), load_autosave=True, load_settings_only=True)
                 self.copySlot("synth", source, slotIndex, slotIndex, showLoadingScreen=False)
                 self.copySlot("sample-trig", source, slotIndex, slotIndex, showLoadingScreen=False)
                 self.copySlot("fx", source, slotIndex, slotIndex, showLoadingScreen=False)
@@ -3497,7 +3499,7 @@ class sketchpad_channel(QObject):
                         # Run autoconnect after completing loading sounds
                         self.zynqtgui.zynautoconnect()
                     else:
-                        logging.error(f"There is nothing to restore from the slot we were asked to restore from. The snapshot is: {snapshot}")
+                        logging.info(f"There is nothing to restore from the slot we were asked to restore from.")
                 if showLoadingScreen:
                     self.zynqtgui.end_long_task()
             if slotType == "synth":

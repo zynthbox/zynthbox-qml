@@ -1334,8 +1334,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     layer_snapshot["equalizer_settings"] = equalizer_settings
                     snapshot['layers'].append(layer_snapshot)
 
-            if zynthian_gui_config.snapshot_mixer_settings and self.amixer_layer:
-                snapshot['layers'].append(self.amixer_layer.get_snapshot())
+            # Ignore this, as it really only confuses the data, and we don't need this stored
+            # if zynthian_gui_config.snapshot_mixer_settings and self.amixer_layer:
+            #     snapshot['layers'].append(self.amixer_layer.get_snapshot())
 
             #Clone info
             for i in range(0,16):

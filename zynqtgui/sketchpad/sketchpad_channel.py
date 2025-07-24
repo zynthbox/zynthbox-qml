@@ -170,6 +170,8 @@ class last_selected_obj_dto(QObject):
                     result = "FX"
                 case "TracksBar_sketchfxslot":
                     result = "Sketch FX"
+                case "MixerBar_item":
+                    result = "Mixer"
         return result
 
     humanReadableClassName = Property(str, get_humanReadableClassName, notify=classNameChanged)
@@ -196,6 +198,8 @@ class last_selected_obj_dto(QObject):
                     result = f"FX Slot {self.value + 1}"
                 case "TracksBar_sketchfxslot":
                     result = f"Sketch FX Slot {self.value + 1}"
+                case "MixerBar_item":
+                    result = f"Mixer {self.track.name}"
         return result
 
     humanReadableObjName = Property(str, get_humanReadableObjName, notify=valueChanged)
@@ -224,6 +228,12 @@ class last_selected_obj_dto(QObject):
             case "TracksBar_fxslot":
                 selected_track.copySlot("fx", sourceObject.track, sourceObject.value, self.value)
                 result = True
+            case "MixerBar_item":
+                selected_track.gainHandler.setGainDb(sourceObject.track.gainHandler.gainDb())
+                selected_track.pan = sourceObject.track.pan
+                selected_track.wetFx1Amount = sourceObject.track.wetFx1Amount
+                selected_track.wetFx2Amount = sourceObject.track.wetFx2Amount
+                result = True
         return result
 
     @Slot()
@@ -247,6 +257,12 @@ class last_selected_obj_dto(QObject):
                 result = True
             case "TracksBar_fxslot":
                 selected_track.clearSlot("fx", self.value)
+                result = True
+            case "MixerBar_item":
+                selected_track.gainHandler.setGainDb(selected_track.initialVolume)
+                selected_track.pan = selected_track.initialPan
+                selected_track.wetFx1Amount = 0
+                selected_track.wetFx2Amount = 0
                 result = True
         return result
 

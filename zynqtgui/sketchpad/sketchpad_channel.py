@@ -3455,7 +3455,6 @@ class sketchpad_channel(QObject):
             else:
                 # Consider the passed snapshot to be an obj
                 snapshot_obj = snapshot
-            source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)
 
             def post_removal_task():
                 free_layers = self.getFreeLayers()
@@ -3465,15 +3464,21 @@ class sketchpad_channel(QObject):
                     # Populate new chained sounds and update channel
                     limitedSnapshot = {"layers": []}
                     for index, snapshotEntry in enumerate(snapshot_obj["layers"]):
-                        if snapshotEntry["slot_index"] == snapshotIndex:
+                        # Match slot type and slot index to determine if current snapshot layer is the one that needs to be restored
+                        if slotType == "synth" and snapshotEntry["slot_type"] == "TracksBar_synthslot" and snapshotEntry["slot_index"] == snapshotIndex:
                             snapshotEntry["track_index"] = self.id
                             snapshotEntry["slot_index"] = slotIndex
-                            if slotType == "synth":
-                                # Repopulate after removing current channel layers
-                                free_layers = self.getFreeLayers()
-                                new_chained_sounds = self.chainedSounds
-                                new_chained_sounds[slotIndex] = free_layers[0]
-                                snapshotEntry["midi_chan"] = free_layers[index]
+                            # Repopulate after removing current channel layers
+                            free_layers = self.getFreeLayers()
+                            new_chained_sounds = self.chainedSounds
+                            new_chained_sounds[slotIndex] = free_layers[0]
+                            snapshotEntry["midi_chan"] = free_layers[index]
+                            limitedSnapshot["layers"].append(snapshotEntry)
+                            break
+                        elif slotType == "fx" and snapshotEntry["slot_type"] == "TracksBar_fxslot" and snapshotEntry["slot_index"] == snapshotIndex:
+                            snapshotEntry["track_index"] = self.id
+                            snapshotEntry["slot_index"] = slotIndex
+                            snapshotEntry["midi_chan"] = 15
                             limitedSnapshot["layers"].append(snapshotEntry)
                             break
                     if len(limitedSnapshot["layers"]) > 0:
@@ -3485,9 +3490,13 @@ class sketchpad_channel(QObject):
                     else:
                         logging.error(f"There is nothing to restore from the slot we were asked to restore from. The snapshot is: {snapshot}")
                 self.zynqtgui.end_long_task()
-            if self.chainedSounds[slotIndex] > -1:
-                self.remove_and_unchain_sound(self.chainedSounds[slotIndex], post_removal_task)
-            else:
+            if slotType == "synth":
+                if self.chainedSounds[slotIndex] > -1:
+                    self.remove_and_unchain_sound(self.chainedSounds[slotIndex], post_removal_task)
+                else:
+                    post_removal_task()
+            elif slotType == "fx":
+                self.removeFxFromChain(slotIndex, showLoadingScreen=False)
                 post_removal_task()
         self.zynqtgui.do_long_task(task, f"Loading {slotType} {snapshotIndex + 1} into slot {slotIndex + 1} on Track {self.name}")
 

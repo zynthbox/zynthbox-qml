@@ -206,9 +206,15 @@ class last_selected_obj_dto(QObject):
         result = False
         selected_track = zynthian_gui_config.zynqtgui.sketchpad.song.channelsModel.getChannel(zynthian_gui_config.zynqtgui.sketchpad.selectedTrackId)
         match sourceObject.className:
-            case "sketchpad_channel" | "sketchpad_clip" | "sketchpad_clipoverview":
+            case "sketchpad_channel" | "sketchpad_clip":
                 self.value.copyFrom(sourceObject.value)
                 result = True
+            case "sketchpad_clipoverview":
+                for clipId in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    sketchpadSongIndex = zynthian_gui_config.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex
+                    sourceClip = sourceObject.track.getClipsModelById(clipId).getClip(sketchpadSongIndex)
+                    destinationClip = selected_track.getClipsModelById(clipId).getClip(sketchpadSongIndex)
+                    destinationClip.copyFrom(sourceClip)
             case "TracksBar_synthslot":
                 selected_track.copySlot("synth", sourceObject.track, sourceObject.value, self.value)
                 result = True

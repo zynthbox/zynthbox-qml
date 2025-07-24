@@ -224,7 +224,30 @@ class last_selected_obj_dto(QObject):
             case "TracksBar_fxslot":
                 selected_track.copySlot("fx", sourceObject.track, sourceObject.value, self.value)
                 result = True
+        return result
 
+    @Slot()
+    def clear(self):
+        result = False
+        selected_track = zynthian_gui_config.zynqtgui.sketchpad.song.channelsModel.getChannel(zynthian_gui_config.zynqtgui.sketchpad.selectedTrackId)
+        match self.className:
+            case "sketchpad_channel" | "sketchpad_clip":
+                self.value.clear()
+                result = True
+            case "sketchpad_clipoverview":
+                for clipId in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    sketchpadSongIndex = zynthian_gui_config.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex
+                    clip = self.track.getClipsModelById(clipId).getClip(sketchpadSongIndex)
+                    clip.clear()
+            case "TracksBar_synthslot":
+                selected_track.clearSlot("synth", self.value)
+                result = True
+            case "TracksBar_sampleslot":
+                selected_track.clearSlot("sample-trig", self.value)
+                result = True
+            case "TracksBar_fxslot":
+                selected_track.clearSlot("fx", self.value)
+                result = True
         return result
 
 class external_mode_settings(QObject):
@@ -1306,17 +1329,18 @@ class sketchpad_channel(QObject):
     @Slot(None)
     def clear(self):
         if not self.__song__.__to_be_deleted__:
-            channel = self.__song__.channelsModel.getChannel(self.__id__)
-            clipsModel = channel.clipsModel
+            def task():
+                for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    sketchpadSongIndex = zynthian_gui_config.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex
+                    clip = self.getClipsModelById(slotIndex).getClip(sketchpadSongIndex)
+                    clip.clear()
 
-            logging.debug(f"Channel {channel} ClipsModel {clipsModel}")
+                    self.clearSlot("synth", slotIndex, showLoadingScreen=False)
+                    self.clearSlot("sample-trig", slotIndex, showLoadingScreen=False)
+                    self.clearSlot("fx", slotIndex, showLoadingScreen=False)
+                self.zynqtgui.end_long_task()
+            self.zynqtgui.do_long_task(task, f"Clearing Track {self.name}")
 
-            for clip_index in range(0, clipsModel.count):
-                logging.debug(f"Channel {self.__id__} Clip {clip_index}")
-                clip: sketchpad_clip = clipsModel.getClip(clip_index)
-                logging.debug(
-                    f"Clip : clip.row({clip.row}), clip.col({clip.col}), clip({clip})")
-                clip.clear()
 
     ### BEGIN Property name
     @Signal
@@ -1464,6 +1488,12 @@ class sketchpad_channel(QObject):
         def task():
             for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 self.deserialize(source.serialize(), load_autosave=True, load_settings_only=True)
+
+                sketchpadSongIndex = zynthian_gui_config.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex
+                sourceClip = source.getClipsModelById(slotIndex).getClip(sketchpadSongIndex)
+                destinationClip = self.getClipsModelById(slotIndex).getClip(sketchpadSongIndex)
+                destinationClip.copyFrom(sourceClip)
+
                 self.copySlot("synth", source, slotIndex, slotIndex, showLoadingScreen=False)
                 self.copySlot("sample-trig", source, slotIndex, slotIndex, showLoadingScreen=False)
                 self.copySlot("fx", source, slotIndex, slotIndex, showLoadingScreen=False)
@@ -1625,18 +1655,19 @@ class sketchpad_channel(QObject):
     @Slot(int)
     def remove_and_unchain_sound(self, chan, cb=None, showLoadingScreen=True):
         def task():
-            self.zynqtgui.screens['layers_for_channel'].fill_list()
-            layer_to_delete = self.zynqtgui.layer.layer_midi_map[chan]
-            self.zynqtgui.layer.remove_root_layer(self.zynqtgui.layer.root_layers.index(layer_to_delete))
-            self.select_correct_layer()
-            # Ensure we clear the passthrough (or it'll retain its value)
-            passthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[chan]
-            self.__song__.clearPassthroughClient(passthroughClient)
-            passthroughClient.setPanAmount(self.__initial_pan__)
-            passthroughClient.setDryAmount(1)
-            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
-            self.__song__.schedule_save()
-            self.chained_sounds_changed.emit()
+            if chan >= 0 and self.checkIfLayerExists(chan):
+                self.zynqtgui.screens['layers_for_channel'].fill_list()
+                layer_to_delete = self.zynqtgui.layer.layer_midi_map[chan]
+                self.zynqtgui.layer.remove_root_layer(self.zynqtgui.layer.root_layers.index(layer_to_delete))
+                self.select_correct_layer()
+                # Ensure we clear the passthrough (or it'll retain its value)
+                passthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[chan]
+                self.__song__.clearPassthroughClient(passthroughClient)
+                passthroughClient.setPanAmount(self.__initial_pan__)
+                passthroughClient.setDryAmount(1)
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+                self.__song__.schedule_save()
+                self.chained_sounds_changed.emit()
             if cb is not None:
                 cb()
             if showLoadingScreen:
@@ -3797,10 +3828,29 @@ class sketchpad_channel(QObject):
             if showLoadingScreen:
                 self.zynqtgui.end_long_task()
         if showLoadingScreen:
-            self.zynqtgui.do_long_task(task, f"Copying {slotType} slot {sourceSlot} to {destinationSlot}")
+            self.zynqtgui.do_long_task(task, f"Copying {slotType} slot {sourceSlot + 1} to {destinationSlot + 1}")
         else:
             task()
 
+    """
+    A Helper method to clear a slot
+    """
+    @Slot(str, int, int)
+    def clearSlot(self, slotType, slotIndex, showLoadingScreen=True):
+        def task():
+            match slotType:
+                case "synth" | "TracksBar_synthslot":
+                    self.remove_and_unchain_sound(self.chainedSounds[slotIndex], None, showLoadingScreen=False)
+                case "sample-trig" | "TracksBar_sampleslot":
+                    self.samples[slotIndex].clear()
+                case "fx" | "TracksBar_fxslot":
+                    self.removeFxFromChain(slotIndex, showLoadingScreen=False)
+            if showLoadingScreen:
+                self.zynqtgui.end_long_task()
+        if showLoadingScreen:
+            self.zynqtgui.do_long_task(task, f"Clear {slotType} slot {slotIndex + 1}")
+        else:
+            task()
 
     slotsReordered = Signal()
     className = Property(str, className, constant=True)

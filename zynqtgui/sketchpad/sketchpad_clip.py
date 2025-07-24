@@ -1165,6 +1165,10 @@ class sketchpad_clip(QObject):
     @Slot(QObject)
     def copyFrom(self, clip):
         self.clear()
+        sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+        sourcePattern = sequenceModel.getByClipId(clip.clipChannel.id, clip.id)
+        destinationPattern = sequenceModel.getByClipId(self.clipChannel.id, self.id)
+        destinationPattern.cloneOther(sourcePattern)
         self.set_path(clip.path, True, True)
         # Using the serialisation logic here which, while simply copying the properties directly would be faster, this is consistent
         self.__metadata.deserialize(clip.metadata.serialize())

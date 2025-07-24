@@ -160,7 +160,7 @@ RowLayout {
         model: Zynthbox.Plugin.sketchpadSlotCount
         delegate: QQC2.Control {
             id: slotDelegate
-            property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null && zynqtgui.sketchpad.lastSelectedObj.className == _private.className && zynqtgui.sketchpad.lastSelectedObj.value === index
+            property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null && zynqtgui.sketchpad.lastSelectedObj.track == root.selectedChannel && zynqtgui.sketchpad.lastSelectedObj.className == _private.className && zynqtgui.sketchpad.lastSelectedObj.value === index
             property int slotIndex: index
             property bool isSketchpadClip: control.slotData && control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
             property QtObject clip: isSketchpadClip ? control.slotData[index] : null

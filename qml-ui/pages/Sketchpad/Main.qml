@@ -1032,7 +1032,14 @@ Zynthian.ScreenPage {
 
         Rectangle {
             id: lastSelectedObjIndicator
-            visible: zynqtgui.sketchpad.lastSelectedObj.component && zynqtgui.sketchpad.lastSelectedObj.component.visible
+            visible: {
+                // If lastSelectedObj is a TracksBar slot, then do not display selected indicator when another slot is selected
+                if (zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_")) {
+                    return zynqtgui.sketchpad.lastSelectedObj.track == root.selectedChannel && zynqtgui.sketchpad.lastSelectedObj.component && zynqtgui.sketchpad.lastSelectedObj.component.visible
+                } else {
+                    return zynqtgui.sketchpad.lastSelectedObj.component && zynqtgui.sketchpad.lastSelectedObj.component.visible
+                }
+            }
             z: 1000
             border.width: 2
             border.color: Kirigami.Theme.textColor
@@ -1064,7 +1071,14 @@ Zynthian.ScreenPage {
 
         Rectangle {
             id: copySourceObjIndicator
-            visible: zynqtgui.sketchpad.copySourceObj.component && zynqtgui.sketchpad.copySourceObj.component.visible
+            visible: {
+                // If copySourceObj is a TracksBar slot, then to not show copySourceObjIndicator if current track is not the same as copySourceObj
+                if (zynqtgui.sketchpad.copySourceObj.className.startsWith("TracksBar_")) {
+                    return zynqtgui.sketchpad.copySourceObj.track == root.selectedChannel && zynqtgui.sketchpad.copySourceObj.component && zynqtgui.sketchpad.copySourceObj.component.visible
+                } else {
+                    return zynqtgui.sketchpad.copySourceObj.component && zynqtgui.sketchpad.copySourceObj.component.visible
+                }
+            }
             width: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.width : 0
             height: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.height : 0
             x: zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.component ? zynqtgui.sketchpad.copySourceObj.component.mapToItem(content, 0, 0).x : 0
@@ -1558,7 +1572,18 @@ Zynthian.ScreenPage {
                                 font.pointSize: 10
                                 color: "transparent"
                                 // Button is enabled if there is an ongoing copy action and the selected slot is of the same type
-                                enabled: zynqtgui.sketchpad.copySourceObj.isCopyable && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className && zynqtgui.sketchpad.copySourceObj.value != zynqtgui.sketchpad.lastSelectedObj.value
+                                enabled: {
+                                    // If copySourceObj is a TracksBar slot, allow pasting to same slot index of track is different
+                                    if (zynqtgui.sketchpad.copySourceObj.className.startsWith("TracksBar_")) {
+                                        if (root.selectedChannel == zynqtgui.sketchpad.copySourceObj.track) {
+                                            return zynqtgui.sketchpad.copySourceObj.isCopyable && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className && zynqtgui.sketchpad.copySourceObj.value != zynqtgui.sketchpad.lastSelectedObj.value
+                                        } else {
+                                            return zynqtgui.sketchpad.copySourceObj.isCopyable && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className
+                                        }
+                                    } else {
+                                        return zynqtgui.sketchpad.copySourceObj.isCopyable && zynqtgui.sketchpad.copySourceObj.className == zynqtgui.sketchpad.lastSelectedObj.className && zynqtgui.sketchpad.copySourceObj.value != zynqtgui.sketchpad.lastSelectedObj.value
+                                    }
+                                }
                                 text: qsTr("Paste")
                                 onPressed: {
                                     applicationWindow().confirmer.confirmSomething(qsTr("Confirm Paste"), qsTr("Are you sure that you want to paste %1 to %2? This action is irreversible and will clear all existing contents of %2.").arg(zynqtgui.sketchpad.copySourceObj.humanReadableObjName).arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {

@@ -207,7 +207,7 @@ class last_selected_obj_dto(QObject):
         selected_track = zynthian_gui_config.zynqtgui.sketchpad.song.channelsModel.getChannel(zynthian_gui_config.zynqtgui.sketchpad.selectedTrackId)
         match sourceObject.className:
             case "sketchpad_channel" | "sketchpad_clip" | "sketchpad_clipoverview":
-                # self.value.copyFrom(sourceObject.value)
+                self.value.copyFrom(sourceObject.value)
                 result = True
             case "TracksBar_synthslot":
                 selected_track.copySlot("synth", sourceObject.track, sourceObject.value, self.value)
@@ -1454,13 +1454,14 @@ class sketchpad_channel(QObject):
     # source : Source sketchpad_channel object
     @Slot(QObject)
     def copyFrom(self, source):
-        for clipId in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
-            # Copy all clips from source channel to self
-            for songIndex in range(0, self.clips[clipId].count):
-                self.clips[clipId].getClip(songIndex).copyFrom(source.clips[clipId].getClip(songIndex))
+        def task():
+            for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                self.copySlot("synth", source, slotIndex, slotIndex, showLoadingScreen=False)
+                self.copySlot("sample-trig", source, slotIndex, slotIndex, showLoadingScreen=False)
+                self.copySlot("fx", source, slotIndex, slotIndex, showLoadingScreen=False)
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, f"Copying Track {source.name} into Track {self.name}")
 
-        for sample_id in range(5):
-            self.samples[sample_id].copyFrom(source.samples[sample_id])
 
     @Slot(int, result=bool)
     def createChainedSoundInNextFreeLayer(self, index):
@@ -1614,7 +1615,7 @@ class sketchpad_channel(QObject):
         return self.__chained_sounds__
 
     @Slot(int)
-    def remove_and_unchain_sound(self, chan, cb=None):
+    def remove_and_unchain_sound(self, chan, cb=None, showLoadingScreen=True):
         def task():
             self.zynqtgui.screens['layers_for_channel'].fill_list()
             layer_to_delete = self.zynqtgui.layer.layer_midi_map[chan]
@@ -1630,9 +1631,13 @@ class sketchpad_channel(QObject):
             self.chained_sounds_changed.emit()
             if cb is not None:
                 cb()
-            self.zynqtgui.end_long_task()
+            if showLoadingScreen:
+                self.zynqtgui.end_long_task()
         self.__chained_sounds_keyzones__[self.selectedSlotRow].clear()
-        self.zynqtgui.do_long_task(task, f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}")
+        if showLoadingScreen:
+            self.zynqtgui.do_long_task(task, f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}")
+        else:
+            task()
 
     def updateSynthRoutingData(self):
         self.__synthRoutingDataUpdaterThrottle__.start()
@@ -3365,10 +3370,10 @@ class sketchpad_channel(QObject):
         self.zynqtgui.do_long_task(task, "Loading samples")
 
     @Slot(str, int, int)
-    def setChannelSampleFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int):
+    def setChannelSampleFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int, showLoadingScreen=True):
         if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
             sampleClip = self.__samples__[slotIndex]
-            self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sampleClip)
+            self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sampleClip, showLoadingScreen)
 
     @Slot(str, int, int)
     def setSketchFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int):
@@ -3376,7 +3381,7 @@ class sketchpad_channel(QObject):
             sketch = self.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sketch)
 
-    def setClipSourceFromSnapshotSlot(self, snapshot: str, snapshotIndex: int, clip):
+    def setClipSourceFromSnapshotSlot(self, snapshot: str, snapshotIndex: int, clip, showLoadingScreen=True):
         def task():
             if type(snapshot) is str:
                 # Consider the passed snapshot to be an json string
@@ -3407,9 +3412,13 @@ class sketchpad_channel(QObject):
                         else:
                             # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
                             if clip.audioSource is not None:
-                                clip.metadata.read()    
-            self.zynqtgui.end_long_task()
-        self.zynqtgui.do_long_task(task, f"Loading sample data from snapshot into slot {clip.id} on Track {self.name}")
+                                clip.metadata.read()
+            if showLoadingScreen:
+                self.zynqtgui.end_long_task()
+        if showLoadingScreen:
+            self.zynqtgui.do_long_task(task, f"Loading sample data from snapshot into slot {clip.id} on Track {self.name}")
+        else:
+            task()
 
     @Slot(None, result=str)
     def getChannelSampleSnapshot(self):
@@ -3438,7 +3447,7 @@ class sketchpad_channel(QObject):
         return self.__sound_json_snapshot__
 
     @Slot(str, str, int, int, result=None)
-    def setChannelSoundFromSnapshotSlot(self, snapshot, slotType, slotIndex:int, snapshotIndex:int):
+    def setChannelSoundFromSnapshotSlot(self, snapshot, slotType, slotIndex:int, snapshotIndex:int, showLoadingScreen=True):
         if not (slotType == "synth" or slotType == "fx"):
             return
         if slotIndex < 0 or Zynthbox.Plugin.instance().sketchpadSlotCount() - 1 < slotIndex:
@@ -3472,7 +3481,7 @@ class sketchpad_channel(QObject):
                             free_layers = self.getFreeLayers()
                             new_chained_sounds = self.chainedSounds
                             new_chained_sounds[slotIndex] = free_layers[0]
-                            snapshotEntry["midi_chan"] = free_layers[index]
+                            snapshotEntry["midi_chan"] = free_layers[0]
                             limitedSnapshot["layers"].append(snapshotEntry)
                             break
                         elif slotType == "fx" and snapshotEntry["slot_type"] == "TracksBar_fxslot" and snapshotEntry["slot_index"] == snapshotIndex:
@@ -3489,16 +3498,20 @@ class sketchpad_channel(QObject):
                         self.zynqtgui.zynautoconnect()
                     else:
                         logging.error(f"There is nothing to restore from the slot we were asked to restore from. The snapshot is: {snapshot}")
-                self.zynqtgui.end_long_task()
+                if showLoadingScreen:
+                    self.zynqtgui.end_long_task()
             if slotType == "synth":
                 if self.chainedSounds[slotIndex] > -1:
-                    self.remove_and_unchain_sound(self.chainedSounds[slotIndex], post_removal_task)
+                    self.remove_and_unchain_sound(self.chainedSounds[slotIndex], post_removal_task, showLoadingScreen)
                 else:
                     post_removal_task()
             elif slotType == "fx":
-                self.removeFxFromChain(slotIndex, showLoadingScreen=False)
+                self.removeFxFromChain(slotIndex, showLoadingScreen)
                 post_removal_task()
-        self.zynqtgui.do_long_task(task, f"Loading {slotType} {snapshotIndex + 1} into slot {slotIndex + 1} on Track {self.name}")
+        if showLoadingScreen:
+            self.zynqtgui.do_long_task(task, f"Loading {slotType} {snapshotIndex + 1} into slot {slotIndex + 1} on Track {self.name}")
+        else:
+            task()
 
     @Slot(str, result=None)
     def setChannelSoundFromSnapshot(self, snapshot):
@@ -3761,18 +3774,25 @@ class sketchpad_channel(QObject):
     A Helper method to copy a slot to another
     """
     @Slot(str, int, int)
-    def copySlot(self, slotType, sourceTrack, sourceSlot, destinationSlot):
-        logging.debug(f"Copying {slotType} slot {sourceSlot} to {destinationSlot}")
-        match slotType:
-            case "synth" | "TracksBar_synthslot":
-                snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
-                self.setChannelSoundFromSnapshotSlot(snapshot, "synth", destinationSlot, sourceSlot)
-            case "sample-trig" | "TracksBar_sampleslot":
-                snapshot = sourceTrack.getChannelSampleSnapshot()
-                self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot)
-            case "fx" | "TracksBar_fxslot":
-                snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
-                self.setChannelSoundFromSnapshotSlot(snapshot, "fx", destinationSlot, sourceSlot)
+    def copySlot(self, slotType, sourceTrack, sourceSlot, destinationSlot, showLoadingScreen=True):
+        def task():
+            match slotType:
+                case "synth" | "TracksBar_synthslot":
+                    snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
+                    self.setChannelSoundFromSnapshotSlot(snapshot, "synth", destinationSlot, sourceSlot, showLoadingScreen=False)
+                case "sample-trig" | "TracksBar_sampleslot":
+                    snapshot = sourceTrack.getChannelSampleSnapshot()
+                    self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot, showLoadingScreen=False)
+                case "fx" | "TracksBar_fxslot":
+                    snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
+                    self.setChannelSoundFromSnapshotSlot(snapshot, "fx", destinationSlot, sourceSlot, showLoadingScreen=False)
+            if showLoadingScreen:
+                self.zynqtgui.end_long_task()
+        if showLoadingScreen:
+            self.zynqtgui.do_long_task(task, f"Copying {slotType} slot {sourceSlot} to {destinationSlot}")
+        else:
+            task()
+
 
     slotsReordered = Signal()
     className = Property(str, className, constant=True)

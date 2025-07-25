@@ -304,6 +304,8 @@ QQC2.Pane {
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
+                    spacing: 1
 
                     //// INVISIBLE BUTTONS
                     QQC2.Button {

@@ -30,6 +30,8 @@ ColumnLayout {
     id: root
 
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
+    spacing: 1
+    Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
 
     QQC2.Button {
         Layout.fillWidth: true

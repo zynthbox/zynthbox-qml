@@ -1138,7 +1138,7 @@ Zynthian.ScreenPage {
                                 ColumnLayout {
                                     id: sketchpadSketchHeadersColumn
                                     anchors.fill: parent
-                                    spacing: 1
+                                    spacing: 2
 
                                     TableHeader {
                                         Layout.fillWidth: true
@@ -1159,9 +1159,12 @@ Zynthian.ScreenPage {
                                     }
 
                                     // Placeholder item of same size to have 2 rows in here
-                                    Item {
+                                    TableHeader {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
+                                        text: ""
+                                        highlightOnFocus: false
+                                        highlighted: false
                                     }
                                 }
                             }
@@ -1255,6 +1258,7 @@ Zynthian.ScreenPage {
 
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
+                                                Layout.topMargin: 1 // Without this magic number, the top of header row doesn't match with left side scenes button or right side copy button
                                                 state: root.displaySceneButtons
                                                        ? "SceneMode"
                                                        : "ChannelMode"
@@ -1378,9 +1382,9 @@ Zynthian.ScreenPage {
                                                         zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id
                                                     }
                                                 }
-
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
+                                                Layout.bottomMargin: 1 // Without this magic number, the bottom of clips row doesn't match with left side scenes button or right side copy button
                                                 state: bottomStack.slotsBar.mixerButton.checked
                                                        ? "MixerMode"
                                                        : "ClipsMode"
@@ -1529,7 +1533,7 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: false
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                            spacing: 1
+                            spacing: 2
 
                             // Common copy button to set the object to copy
                             TableHeader {

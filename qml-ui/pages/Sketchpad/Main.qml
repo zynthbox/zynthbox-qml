@@ -1599,7 +1599,7 @@ Zynthian.ScreenPage {
                                 highlightOnFocus: false
                                 font.pointSize: 10
                                 // Button is enabled when a copy action is not running and selected slot can be copy-pasted
-                                enabled: copyButton.visible && zynqtgui.sketchpad.lastSelectedObj.isCopyable
+                                enabled: copyButton.visible && copyButton.enabled && zynqtgui.sketchpad.lastSelectedObj.isCopyable
                                 text: qsTr("Clear")
                                 onPressed: {
                                     applicationWindow().confirmer.confirmSomething(qsTr("Confirm Clear"), qsTr("Are you sure that you want to clear %1? This action is irreversible and will clear all existing contents of %1.").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {

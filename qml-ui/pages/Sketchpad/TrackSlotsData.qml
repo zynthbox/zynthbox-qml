@@ -211,13 +211,10 @@ RowLayout {
             }
 
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.fillHeight: false
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             opacity: slotMakesSound ? 1 : 0.3
-            topPadding: 4
-            bottomPadding: 4
-            topInset: 4
-            bottomInset: 4
             background: Item {
                 // Show highlighted color on slot border when slot is a sample-loop and is enabled
                 Rectangle {

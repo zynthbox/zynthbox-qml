@@ -1090,7 +1090,8 @@ Zynthian.ScreenPage {
 
         ColumnLayout {
             anchors.fill: parent
-            spacing: 1
+            anchors.bottomMargin: Kirigami.Units.largeSpacing
+            spacing: 2
 
             QQC2.Control {
                 Layout.fillWidth: true

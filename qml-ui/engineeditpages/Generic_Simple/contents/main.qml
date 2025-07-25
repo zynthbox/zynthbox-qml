@@ -24,6 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.10
+import QtQml 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
@@ -34,6 +35,15 @@ import QtGraphicalEffects 1.15
 
 Item {
     id: root
+
+    readonly property var synthMap : {
+        'synthv1': {'cutoff': ['Synth 1 - DCF1#1|1','Synth 2 - DCF2#1|1'], 'filterAttack' : []},
+        'Obxd': {'cutoff': ['Ctrls#12|0'], 'filterAttack' : []},
+        'Helm': {'cutoff': ['Ctrls#4|2'], 'filterAttack' : []},
+        'Nekobi': {'cutoff': ['Ctrls#1|2'], 'filterAttack' : []},
+        'Surge': {'cutoff': ['Ctrls#51|0', 'Ctrls#52|2','Ctrls#118|3','Ctrls#120|1'], 'filterAttack' : []},
+        'Calf Monosynth': {'cutoff': ['Ctrls#3|1'], 'filterAttack' : []}
+    }
 
     QQC2.Control {
 
@@ -75,9 +85,9 @@ Item {
                     }
 
                     QQC2.Label {
-                        text: zynqtgui.control.selectedEngineCutoffController ? zynqtgui.control.selectedEngineCutoffController.title : ""
+                        text: zynqtgui.curlayerEngineName
                         Layout.alignment: Qt.AlignTop
-                        font.capitalization: Font.AllUppercase
+                        // font.capitalization: Font.AllUppercase
                         font.weight: Font.ExtraBold
                         font.family: "Hack"
                         font.pointSize: 20
@@ -134,17 +144,47 @@ Item {
                             anchors.fill: parent
                             spacing: 5
 
-                            Here.DialControl {
-                                objectName: "Cutoff"
-                                // highlightColor: "#ff8113"
+                            // Here.DialControl {
+                            //     objectName: "Cutoff"
+                            //     // highlightColor: "#ff8113"
+                            //     Layout.alignment: Qt.AlignCenter
+                            //     Layout.fillHeight: true
+                            //     Layout.fillWidth: true
+                            //     // controller : zynqtgui.control.selectedEngineCutoffController
+                            //     controller {
+                            //         // ctrl: zynqtgui.control.getAllControlAt(root.synthMap[zynqtgui.curlayerEngineName].cutoff[0])
+                            //         category: root.synthMap[zynqtgui.curlayerEngineName].cutoff[0].split("|")[0]
+                            //         index:  root.synthMap[zynqtgui.curlayerEngineName].cutoff[0].split("|")[1]
+                            //     }
+                            // }
+
+                            Here.MultiController {
+                                id: _multiCutoffController
+                                // highlightColor: "#de20ff"
+                                title: "Cutoff"
                                 Layout.alignment: Qt.AlignCenter
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
-                                // controller : zynqtgui.control.selectedEngineCutoffController
-                                controller {
-                                    ctrl: zynqtgui.control.selectedEngineCutoffController
-                                    // category: "Ctrls#1"
-                                    // index: 0
+                                // highlighted : _cutoffDial.pressed
+                                controllersIds: root.synthMap[zynqtgui.curlayerEngineName] ? root.synthMap[zynqtgui.curlayerEngineName].cutoff : []
+                                onValueChanged: _cutoffDial.value = Qt.binding(()=>{return _multiCutoffController.value})
+
+                                Here.Dial {
+                                    id: _cutoffDial
+                                    text: _multiCutoffController.displayText
+                                    Layout.fillHeight: true
+                                    implicitWidth: height
+                                    Layout.alignment: Qt.AlignCenter
+                                    // orientation: Qt.Vertical
+                                    highlightColor: _multiCutoffController.highlightColor
+                                    from:_multiCutoffController.from
+                                    to: _multiCutoffController.to
+                                    value: _multiCutoffController.value > 0 ?_multiCutoffController.value  : 0
+                                    onMoved:_multiCutoffController.setValue(value)
+
+                                    Component.onCompleted: {
+                                        _cutoffDial.value = Qt.binding(()=>{return _multiCutoffController.value})
+                                    }
                                 }
                             }
 
@@ -218,6 +258,10 @@ Item {
                 }
             }
         }
+    }
+
+    Component.onCompleted: {
+        _cutoffDial.value = Qt.binding(()=>{return _multiCutoffController.value})
     }
 }
 

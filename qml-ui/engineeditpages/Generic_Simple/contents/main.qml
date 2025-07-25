@@ -37,7 +37,12 @@ Item {
     id: root
 
     readonly property var synthMap : {
-        'synthv1': {'cutoff': ['Synth 1 - DCF1#1|1','Synth 2 - DCF2#1|1'], 'filterAttack' : []},
+        'synthv1': {
+            'cutoff': ['Synth 1 - DCF1#1|1','Synth 2 - DCF2#1|1'],
+            'filterAttack' : ['Synth 1 - DCF1#2|2', 'Synth 2 - DCF2#2|2'],
+            'filterRelease' : ['Synth 1 - DCF1#3|1', 'Synth 2 - DCF2#3|1'],
+            'ampAttack' : ['Synth 1 - DCA1#1|1', 'Synth 2 - DCA2#1|1'],
+            'ampRelease' : ['Synth 1 - DCA1#2|0', 'Synth 2 - DCA2#2|0']},
         'Obxd': {'cutoff': ['Ctrls#12|0'], 'filterAttack' : []},
         'Helm': {'cutoff': ['Ctrls#4|2'], 'filterAttack' : []},
         'Nekobi': {'cutoff': ['Ctrls#1|2'], 'filterAttack' : []},
@@ -72,7 +77,7 @@ Item {
                     Layout.fillWidth: true
                     QQC2.Label {
 
-                        text: "Generic"
+                        text: _multiCutoffController.value
                         font.capitalization: Font.AllUppercase
                         font.weight: Font.ExtraBold
                         font.family: "Hack"
@@ -99,40 +104,63 @@ Item {
                     Layout.fillHeight: true
                     spacing: 5
 
-                    // Item {
-                    //     Layout.fillWidth: true
-                    //     Layout.fillHeight: true
-                    //     Layout.margins: 5
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.margins: 5
 
-                    //     RowLayout {
-                    //         anchors.fill: parent
-                    //         spacing: 5
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: 5
 
-                    //         Here.SliderControl {
-                    //             objectName: "FilterAttack"
-                    //             Layout.fillHeight: true
-                    //             Layout.fillWidth: true
-                    //             slider.orientation: Qt.Vertical
-                    //             highlightColor: "#de20ff"
-                    //             controller {
-                    //                 category: "Ctrls#7"
-                    //                 index: 1
-                    //             }
-                    //         }
+                            Here.MultiController {
+                                id: _multiFilterAttackController
+                                highlightColor: "#de20ff"
+                                title: "Filter Attack"
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlighted : _slider.pressed
+                                controllersIds: root.synthMap[zynqtgui.curlayerEngineName].filterAttack ? root.synthMap[zynqtgui.curlayerEngineName].filterAttack : []
 
-                    //         Here.SliderControl {
-                    //             objectName: "FilterRelease"
-                    //             Layout.fillWidth: true
-                    //             Layout.fillHeight: true
-                    //             slider.orientation: Qt.Vertical
-                    //             highlightColor: "#de20ff"
-                    //             controller {
-                    //                 category: "Ctrls#8"
-                    //                 index: 0
-                    //             }
-                    //         }
-                    //     }
-                    // }
+                                Here.Slider {
+                                    id: _slider
+                                    objectName: "FilterAttack"
+                                    Layout.fillHeight: true
+                                    Layout.alignment: Qt.AlignCenter
+                                    orientation: Qt.Vertical
+                                    highlightColor: _multiFilterAttackController.highlightColor
+                                    from:_multiFilterAttackController.from
+                                    to:_multiFilterAttackController.to
+                                    value: _multiFilterAttackController.value
+                                    onMoved:_multiFilterAttackController.setValue(value)
+                                }
+                            }
+
+                            Here.MultiController {
+                                id: _multiFilterReleaseController
+                                highlightColor: "#de20ff"
+                                title: "Filter Release"
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlighted : _sliderFRel.pressed
+                                controllersIds: root.synthMap[zynqtgui.curlayerEngineName].filterRelease ? root.synthMap[zynqtgui.curlayerEngineName].filterRelease : []
+
+
+                                Here.Slider {
+                                    id: _sliderFRel
+                                    objectName: "FilterAttack"
+                                    Layout.fillHeight: true
+                                    Layout.alignment: Qt.AlignCenter
+                                    orientation: Qt.Vertical
+                                    highlightColor: _multiFilterReleaseController.highlightColor
+                                    from:_multiFilterReleaseController.from
+                                    to:_multiFilterReleaseController.to
+                                    value: _multiFilterReleaseController.value
+                                    onMoved:_multiFilterReleaseController.setValue(value)
+                                }
+                            }
+                        }
+                    }
 
                     Item {
                         Layout.fillWidth: true
@@ -144,20 +172,6 @@ Item {
                             anchors.fill: parent
                             spacing: 5
 
-                            // Here.DialControl {
-                            //     objectName: "Cutoff"
-                            //     // highlightColor: "#ff8113"
-                            //     Layout.alignment: Qt.AlignCenter
-                            //     Layout.fillHeight: true
-                            //     Layout.fillWidth: true
-                            //     // controller : zynqtgui.control.selectedEngineCutoffController
-                            //     controller {
-                            //         // ctrl: zynqtgui.control.getAllControlAt(root.synthMap[zynqtgui.curlayerEngineName].cutoff[0])
-                            //         category: root.synthMap[zynqtgui.curlayerEngineName].cutoff[0].split("|")[0]
-                            //         index:  root.synthMap[zynqtgui.curlayerEngineName].cutoff[0].split("|")[1]
-                            //     }
-                            // }
-
                             Here.MultiController {
                                 id: _multiCutoffController
                                 // highlightColor: "#de20ff"
@@ -167,91 +181,119 @@ Item {
                                 Layout.fillWidth: true
                                 // highlighted : _cutoffDial.pressed
                                 controllersIds: root.synthMap[zynqtgui.curlayerEngineName] ? root.synthMap[zynqtgui.curlayerEngineName].cutoff : []
-                                onValueChanged: _cutoffDial.value = Qt.binding(()=>{return _multiCutoffController.value})
 
                                 Here.Dial {
                                     id: _cutoffDial
                                     text: _multiCutoffController.displayText
-                                    Layout.fillHeight: true
                                     implicitWidth: height
+                                    Layout.fillHeight: true
                                     Layout.alignment: Qt.AlignCenter
                                     // orientation: Qt.Vertical
                                     highlightColor: _multiCutoffController.highlightColor
-                                    from:_multiCutoffController.from
+                                    from: _multiCutoffController.from
                                     to: _multiCutoffController.to
                                     value: _multiCutoffController.value > 0 ?_multiCutoffController.value  : 0
                                     onMoved:_multiCutoffController.setValue(value)
+
+                                    onVisibleChanged: {
+                                        _cutoffDial.value = Qt.binding(()=>{return _multiCutoffController.value})
+                                    }
 
                                     Component.onCompleted: {
                                         _cutoffDial.value = Qt.binding(()=>{return _multiCutoffController.value})
                                     }
                                 }
+
                             }
-
-                            // RowLayout {
-                            //     Layout.fillWidth: true
-                            //     Layout.preferredHeight: 150
-                            //     Layout.maximumHeight: 150
-
-                            //     Here.DialControl {
-                            //         objectName: "Resonance"
-                            //         Layout.fillHeight: true
-                            //         Layout.fillWidth: true
-                            //         implicitWidth: height
-                            //         // highlightColor: "#ff8113"
-                            //         controller {
-                            //             category: "Ctrls#21"
-                            //             index: 2
-                            //         }
-                            //     }
-
-                            //     // Here.DialControl {
-                            //     //     objectName: "FilterType"
-                            //     //     Layout.fillHeight: true
-                            //     //     Layout.fillWidth: true
-                            //     //     implicitWidth: height
-                            //     //     highlightColor: "#de20ff"
-                            //     //     controller {
-                            //     //         category: "Synth 1 - DCF1#1"
-                            //     //         index: 3
-                            //     //     }
-                            //     // }
-                            // }
-                            // }
                         }
 
-                        // Item {
+                        // RowLayout {
                         //     Layout.fillWidth: true
-                        //     Layout.fillHeight: true
-                        //     Layout.margins: 5
+                        //     Layout.preferredHeight: 150
+                        //     Layout.maximumHeight: 150
 
-                        //     RowLayout {
-                        //         anchors.fill: parent
-                        //         spacing: 5
-                        //         Here.SliderControl {
-                        //             objectName: "AmpAttack"
-                        //             Layout.fillHeight: true
-                        //             Layout.fillWidth: true
-                        //             slider.orientation: Qt.Vertical
-
-                        //             controller {
-                        //                 category: "Ctrls#1"
-                        //                 index: 1
-                        //             }
-                        //         }
-
-                        //         Here.SliderControl {
-                        //             objectName: "AmpRelease"
-                        //             Layout.fillHeight: true
-                        //             Layout.fillWidth: true
-                        //             slider.orientation: Qt.Vertical
-
-                        //             controller {
-                        //                 category: "Ctrls#1"
-                        //                 index: 3
-                        //             }
+                        //     Here.DialControl {
+                        //         objectName: "Resonance"
+                        //         Layout.fillHeight: true
+                        //         Layout.fillWidth: true
+                        //         implicitWidth: height
+                        //         // highlightColor: "#ff8113"
+                        //         controller {
+                        //             category: "Ctrls#21"
+                        //             index: 2
                         //         }
                         //     }
+
+                        //     // Here.DialControl {
+                        //     //     objectName: "FilterType"
+                        //     //     Layout.fillHeight: true
+                        //     //     Layout.fillWidth: true
+                        //     //     implicitWidth: height
+                        //     //     highlightColor: "#de20ff"
+                        //     //     controller {
+                        //     //         category: "Synth 1 - DCF1#1"
+                        //     //         index: 3
+                        //     //     }
+                        //     // }
+                        // }
+                        // }
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.margins: 5
+
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: 5
+                            Here.MultiController {
+                                id: _multiAmpAttackController
+                                highlightColor: "#de20ff"
+                                title: "Amp Attack"
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlighted : _sliderAAtack.pressed
+                                controllersIds: root.synthMap[zynqtgui.curlayerEngineName].ampAttack ? root.synthMap[zynqtgui.curlayerEngineName].ampAttack : []
+
+                                Here.Slider {
+                                    id: _sliderAAtack
+                                    objectName: "FilterAttack"
+                                    Layout.fillHeight: true
+                                    Layout.alignment: Qt.AlignCenter
+                                    orientation: Qt.Vertical
+                                    highlightColor: _multiAmpAttackController.highlightColor
+                                    from:_multiAmpAttackController.from
+                                    to:_multiAmpAttackController.to
+                                    value: _multiAmpAttackController.value
+                                    onMoved:_multiAmpAttackController.setValue(value)
+                                }
+                            }
+
+                            Here.MultiController {
+                                id: _multiAmpReleaseController
+                                highlightColor: "#de20ff"
+                                title: "Amp Release"
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                highlighted : _sliderARel.pressed
+                                controllersIds: root.synthMap[zynqtgui.curlayerEngineName].ampRelease  ? root.synthMap[zynqtgui.curlayerEngineName].ampRelease : []
+
+
+                                Here.Slider {
+                                    id: _sliderARel
+                                    objectName: "FilterAttack"
+                                    Layout.fillHeight: true
+                                    Layout.alignment: Qt.AlignCenter
+                                    orientation: Qt.Vertical
+                                    highlightColor: _multiAmpReleaseController.highlightColor
+                                    from:_multiAmpReleaseController.from
+                                    to:_multiAmpReleaseController.to
+                                    value: _multiAmpReleaseController.value
+                                    onMoved:_multiAmpReleaseController.setValue(value)
+                                }
+                            }
+                        }
 
 
                     }
@@ -259,9 +301,6 @@ Item {
             }
         }
     }
-
-    Component.onCompleted: {
-        _cutoffDial.value = Qt.binding(()=>{return _multiCutoffController.value})
-    }
 }
+
 

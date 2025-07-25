@@ -74,7 +74,25 @@ QQC2.Control {
             readonly property var value : controller.ctrl.value
             readonly property QtObject ctrl : controller.ctrl
 
-            onCtrlChanged: calculate()
+            onCtrlChanged: {
+
+                var fromValue = 0.0
+                var toValue = 0.0
+
+                var i = 0
+                for (i; i < watcher.count; i++) {
+                    var item = watcher.itemAt(i)
+                    fromValue += item.ctrl.value0
+                    toValue += item.ctrl.max_value
+                }
+
+                root.from = fromValue/i
+                root.to = toValue/i
+
+                calculate()
+
+            }
+
             onValueChanged: {
                 if(root.visible)
                     calculate()
@@ -232,26 +250,18 @@ QQC2.Control {
             return;
 
         var sumValue = 0.0
-        var fromValue = 0.0
-        var toValue = 0.0
-
         var i = 0
         for (i; i < watcher.count; i++) {
             var item = watcher.itemAt(i)
             sumValue += item.ctrl.value
             console.log("Calculating medium controllers value", sumValue, item.objectName )
-            fromValue += item.ctrl.value0
-            toValue += item.ctrl.max_value
         }
 
         var mediumValue = sumValue / i
         root.value = mediumValue
         root.valueChanged()
 
-        root.from = fromValue/i
-        root.to = toValue/i
         console.log("Calculating medium controllers value", sumValue, root.from, root.to )
-
         console.log("Calculating medium controllers value", mediumValue)
 
     }

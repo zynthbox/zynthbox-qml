@@ -1143,7 +1143,6 @@ Zynthian.ScreenPage {
                                     TableHeader {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        color: "transparent"
                                         text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
                                         highlightOnFocus: false
                                         highlighted: root.displaySceneButtons
@@ -1544,7 +1543,6 @@ Zynthian.ScreenPage {
                                 text: qsTr("Copy")
                                 // Button is visible only when there is no ongoing copy action
                                 visible: !zynqtgui.sketchpad.copySourceObj.isCopyable
-                                color: "transparent"
                                 onClicked: {
                                     zynqtgui.sketchpad.copySourceObj.setTo(zynqtgui.sketchpad.lastSelectedObj.className, zynqtgui.sketchpad.lastSelectedObj.value, zynqtgui.sketchpad.lastSelectedObj.component, zynqtgui.sketchpad.lastSelectedObj.track)
                                 }
@@ -1558,7 +1556,6 @@ Zynthian.ScreenPage {
                                 font.pointSize: 10
                                 text: qsTr("Cancel Copy")
                                 visible: !copyButton.visible
-                                color: "transparent"
                                 onPressed: {
                                     zynqtgui.sketchpad.copySourceObj.reset()
                                 }
@@ -1570,7 +1567,6 @@ Zynthian.ScreenPage {
                                 Layout.fillHeight: true
                                 highlightOnFocus: false
                                 font.pointSize: 10
-                                color: "transparent"
                                 // Button is enabled if there is an ongoing copy action and the selected slot is of the same type
                                 enabled: {
                                     // If copySourceObj is a TracksBar slot, allow pasting to same slot index of track is different
@@ -1598,7 +1594,6 @@ Zynthian.ScreenPage {
                                 Layout.fillHeight: true
                                 highlightOnFocus: false
                                 font.pointSize: 10
-                                color: "transparent"
                                 // Button is enabled when a copy action is not running and selected slot can be copy-pasted
                                 enabled: copyButton.visible && zynqtgui.sketchpad.lastSelectedObj.isCopyable
                                 text: qsTr("Clear")

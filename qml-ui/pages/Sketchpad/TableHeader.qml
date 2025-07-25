@@ -35,6 +35,8 @@ import Zynthian 1.0 as Zynthian
 
 QQC2.AbstractButton {
     id: root
+    Kirigami.Theme.inherit: false
+    Kirigami.Theme.colorSet: Kirigami.Theme.Button
 
     property alias subText: contents.text2
     property alias subSubText: contents.text3

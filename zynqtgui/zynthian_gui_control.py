@@ -268,11 +268,13 @@ class zynthian_gui_control(zynthian_gui_selector):
                 for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
                     if module_dir.is_dir():
                         metadatapath = module_dir.path + "/metadata.json";
+                        logging.error("JSON MODS {}".format(metadatapath))
                         try:
+                            logging.error('Parsing mod metadatafile')
                             fh = open(metadatapath, "r")
                             json = fh.read()
                             metadata = JSONDecoder().decode(json)
-                            if metadata["Engine"] == engine:
+                            if metadata["Engine"] == engine or engine in metadata["Engines"]:
                                 entries.append({"display": metadata["Name"],
                                                 "path": module_dir.path})
                         except:
@@ -283,7 +285,6 @@ class zynthian_gui_control(zynthian_gui_selector):
             if Path(path).exists():
                 entries.append({"display": f"{engine} Mod", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name})
             entries.append({"display": "Zynthian", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/Zynthian"})
-            entries.append({"display": "Generic", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/Generic_Simple"})
             entries.append({"display": "Default", "path": ""})
             self.__control_pages_model.set_entries(entries)
         else:

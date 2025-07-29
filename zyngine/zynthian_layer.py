@@ -398,13 +398,14 @@ class zynthian_layer(QObject):
             else:
                 set_engine_needed = False
 
+            returnVal = True
             if set_engine and set_engine_needed:
                 #TODO => Review this!!
                 #self.load_ctrl_config()
-                return self.engine.set_preset(self, self.preset_info,force_immediate=force_immediate)
+                returnVal = self.engine.set_preset(self, self.preset_info,force_immediate=force_immediate)
 
             self.presetChanged.emit()
-            return True
+            return returnVal
         return False
 
 

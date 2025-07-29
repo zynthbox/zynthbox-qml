@@ -181,8 +181,10 @@ class zynthian_gui_control(zynthian_gui_selector):
         if self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self:
             for ctrl in self.zgui_controllers:
                 ctrl.show()
+                ctrl.zctrl_sync()
             for ctrl in self.zgui_custom_controllers_map.values():
                 ctrl.show()
+                ctrl.zctrl_sync()
         else:
             for ctrl in self.zgui_controllers:
                 ctrl.hide()
@@ -480,6 +482,7 @@ class zynthian_gui_control(zynthian_gui_selector):
                 os.fsync(fh.fileno())
         except Exception as e:
             logging.error("Can't save config '/zynthian/config/control_page.conf': %s" % (e))
+        self.sync_selectors_visibility()
 
     def get_default_custom_control_page(self):
         if self.zynqtgui.curlayer is None or self.zynqtgui.curlayer.engine is None:
@@ -996,6 +999,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         if self.__selected_column != column:
             self.__selected_column = column
             self.selectedColumnChanged.emit()
+            self.sync_selectors_visibility()
 
     def get_selectedColumn(self):
         return self.__selected_column

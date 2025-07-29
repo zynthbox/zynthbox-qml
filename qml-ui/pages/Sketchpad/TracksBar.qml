@@ -1454,37 +1454,29 @@ QQC2.Pane {
                                         }
 
                                         MouseArea {
+                                            property var lastMouseX
+                                            property var lastMouseY
+                                            property int horizontalDrag: 0
+                                            property int verticalDrag: 0
+                                            property int dragDeltaThreshold: 50
                                             anchors.fill: parent
-                                            enabled: waveformContainer.showWaveform
-                                            onClicked: {
-
-                                                // Show waveform on click as well as longclick instead of opening picker dialog
-                                                /*if (waveformContainer.showWaveform) {
-                                                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType === "synth" ? "sample-trig" : "sample-loop")
-                                                }*/
-                                                if (waveformContainer.showWaveform) {
-                                                    if (root.selectedChannel.trackType === "sample-loop") {
-                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                                            zynqtgui.bottomBarControlObj = waveformContainer.clip;
-                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                            Qt.callLater(function() {
-                                                                bottomStack.bottomBar.waveEditorAction.trigger();
-                                                            })
-                                                        }
-                                                    } else {
-                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                                            zynqtgui.bottomBarControlObj = root.selectedChannel;
-                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                            Qt.callLater(function() {
-                                                                bottomStack.bottomBar.channelWaveEditorAction.trigger();
-                                                            })
-                                                        }
-                                                    }
+                                            onPressed: {
+                                                lastMouseX = mouse.x;
+                                                lastMouseY = mouse.y;
+                                            }
+                                            onMouseXChanged: {
+                                                const dx = mouse.x - lastMouseX;
+                                                if (verticalDrag == 0 && Math.abs(dx) > dragDeltaThreshold) {
+                                                    horizontalDrag = Math.floor(dx/dragDeltaThreshold);
                                                 }
                                             }
-                                            onPressAndHold: {
+                                            onMouseYChanged: {
+                                                const dy = lastMouseY - mouse.y;
+                                                if (horizontalDrag == 0 && Math.abs(dy) > dragDeltaThreshold) {
+                                                    verticalDrag = Math.floor(dy/dragDeltaThreshold);
+                                                }
+                                            }
+                                            onClicked: {
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.trackType === "sample-loop") {
                                                         if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
@@ -1505,6 +1497,15 @@ QQC2.Pane {
                                                             })
                                                         }
                                                     }
+                                                } else {
+                                                    if (horizontalDrag > 0) {
+                                                        root.selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                                                    } else if (horizontalDrag < 0) {
+                                                        root.selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                                                    }
+
+                                                    horizontalDrag = 0;
+                                                    verticalDrag = 0;
                                                 }
                                             }
                                         }

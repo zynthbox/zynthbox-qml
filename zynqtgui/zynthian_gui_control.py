@@ -32,6 +32,7 @@ from string import Template
 from datetime import datetime
 from pathlib import Path
 from json import JSONEncoder, JSONDecoder
+import json
 
 # Zynthian specific modules
 from zyngine import zynthian_controller
@@ -129,6 +130,10 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.zgui_custom_controllers_map={}
         self.custom_controller_id_start = 100
 
+        Path("/zynthian/zynthian-my-data/mods/community-mods").mkdir(exist_ok=True, parents=True)
+        Path("/zynthian/zynthian-my-data/mods/default-mods").mkdir(exist_ok=True, parents=True)
+        Path("/zynthian/zynthian-my-data/mods/my-mods").mkdir(exist_ok=True, parents=True)
+        self.loadRegistry()
         self.__last_custom_control_page = None
         self.__control_pages_model = control_pages_list_model(self)
         self.__custom_control_page = None
@@ -253,6 +258,76 @@ class zynthian_gui_control(zynthian_gui_selector):
 #            self._active_custom_controller.setup_zyncoder()
 #        self.active_custom_controller_changed.emit()
 
+    # This updates the internal registry for mods, and saves that registry to disk for load_registry to load
+    # The mod registry contains a flat list of all the mods, with all entries containing the following keys:
+    # - display: The human-readable display name
+    # - path: The on-disk path for the folder containing the mod (that is, the folder which contains the manifest file)
+    # - engines: A list of the plugin IDs for the engines this mod supports (if empty, assume all engines are supported). Note that "type" will supersede this
+    # - type: A number from 0 through 2: 0 meaning "supports all engine types", 1 meaning "synth engines only", 2 meaning "fx engines only". 0 is the default, and fallback for invalid values
+    @Slot(None)
+    def updateRegistry(self):
+        self.__mod_registry__ = []
+        # The mods are expected to exist in my-data, underneath the mods folder, inside which are three further folders, one for the defaults, one for the user's own ones, and one for community ones (which then has the extra subfolders store-userID/productID/), and finally for any built-ins
+        # Each of these searched folders then in turn has either folders with mods in, or mod-packs (which is a folder, which has mods or mod-packs in it). That is, a mod-pack can be recursive, but mods cannot
+        searchRoots = ["/zynthian/zynthian-my-data/mods/community-mods", "/zynthian/zynthian-my-data/mods/default-mods", "/zynthian/zynthian-my-data/mods/my-mods", "/zynthian/zynthbox-qml/qml-ui/engineeditpages"]
+        def searchThroughModPack(modPackRoot):
+            discoveredMods = []
+            if Path(modPackRoot).exists():
+                for folder in [f for f in os.scandir(modPackRoot) if f.is_dir()]:
+                    metadataPath = folder.path + "/metadata.json"
+                    if Path(metadataPath).exists():
+                        try:
+                            logging.error(f"Found a mod, with the metadata file path {metadataPath} - loading")
+                            with open(metadataPath, "r") as f:
+                                obj = json.loads(f.read())
+
+                                modName = folder.name
+                                if "Name" in obj:
+                                    modName = obj["Name"]
+
+                                modEngines = []
+                                if "Engines" in obj:
+                                    modEngines = obj["Engines"]
+                                # If defined, but actually empty, then don't add anything
+                                if "Engine" in obj and obj["Engine"] != "":
+                                    modEngines.append(obj["Engine"])
+
+                                modType = 0
+                                if "Type" in obj:
+                                    if obj["Type"] == 1 or obj["Type"] == 2:
+                                        modType = obj["Type"]
+
+                                discoveredMods.append({
+                                        "display": modName,
+                                        "path": folder.path,
+                                        "engines": modEngines,
+                                        "type": modType
+                                    })
+                                logging.error(f"Added entry to the registry: {discoveredMods[-1]}")
+                        except Error as e:
+                            logging.error(f"Error while handling manifest: {e}")
+                            continue
+                    else:
+                        # If there is no metadata file, then this is not a mod, and we can assume it's a mod pack, so try and look deeper
+                        discoveredMods.extend(searchThroughModPack(folder.path))
+            else:
+                logging.error(f"The given mod pack root does not exist on disk: {modPackRoot}")
+            return discoveredMods
+        # Recurse through the directory structures, treating each of the roots as a mod pack (which we can do, since we assume that the only place a mod pack ends is at the discovery of a mod, or we run out of directories)
+        for searchRoot in searchRoots:
+            self.__mod_registry__.extend(searchThroughModPack(searchRoot))
+        logging.error(f"Mod registry now contains:\n{self.__mod_registry__}")
+        # Finally, save the registry to disk
+
+    # This loads the registry from disk (and if there isn't one, creates that registry)
+    def loadRegistry(self):
+        self.__mod_registry__ = []
+        # Load registry from disk
+        
+        # Test whether the registry is still length 0, at which point, fix that
+        if len(self.__mod_registry__) == 0:
+            self.updateRegistry()
+
     def show(self):
         super().show()
 
@@ -261,34 +336,57 @@ class zynthian_gui_control(zynthian_gui_selector):
 
         # logging.error("SHOWING {}".format(time.time() * 1000))
         if self.zynqtgui.curlayer:
-            path = "/root/.local/share/zynthbox/engineeditpages/"
+            # Run through all the entries in the registry and test the filters against the current layer's engine
             entries = []
-            engine = self.zynqtgui.curlayer.engine.nickname
+            engine = self.zynqtgui.curlayer.engine
             if self.__single_effect_engine != None:
                 engine = self.__single_effect_engine
-            if Path(path).exists():
-                for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
-                    if module_dir.is_dir():
-                        metadatapath = module_dir.path + "/metadata.json";
-                        logging.error("JSON MODS {}".format(metadatapath))
-                        try:
-                            logging.error('Parsing mod metadatafile')
-                            fh = open(metadatapath, "r")
-                            json = fh.read()
-                            metadata = JSONDecoder().decode(json)
-                            if metadata["Engine"] == engine or engine in metadata["Engines"]:
-                                entries.append({"display": metadata["Name"],
-                                                "path": module_dir.path})
-                        except:
-                            continue
+            engineId = engine.version_info.plugin_info.id if engine.version_info is not None else None
+            engineType = 0
+            if engine.type == "MIDI Synth":
+                engineType = 1
+            elif engine.type == "Audio Effect":
+                engineType = 2
+            # elif engine.type == "MIDI Effect":
+                # engineType = 3
+            for modEntry in self.__mod_registry__:
+                if len(modEntry["engines"]) == 0 or engineId in modEntry["engines"]:
+                    if modEntry["type"] == 0 or modEntry["type"] == engineType:
+                        entries.append(modEntry)
 
-            engine_folder_name = engine.replace("/", "_").replace(" ", "_")
-            path = "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
-            if Path(path).exists():
-                entries.append({"display": f"{engine} Mod", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name})
-            entries.append({"display": "Zynthian", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/Zynthian"})
+            # Finally, append the default mod, which we always have available, no matter what
             entries.append({"display": "Default", "path": ""})
+
             self.__control_pages_model.set_entries(entries)
+
+            # path = "/root/.local/share/zynthbox/engineeditpages/"
+            # entries = []
+            # engine = self.zynqtgui.curlayer.engine.nickname
+            # if self.__single_effect_engine != None:
+            #     engine = self.__single_effect_engine
+            # if Path(path).exists():
+            #     for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
+            #         if module_dir.is_dir():
+            #             metadatapath = module_dir.path + "/metadata.json";
+            #             logging.error("JSON MODS {}".format(metadatapath))
+            #             try:
+            #                 logging.error('Parsing mod metadatafile')
+            #                 fh = open(metadatapath, "r")
+            #                 json = fh.read()
+            #                 metadata = JSONDecoder().decode(json)
+            #                 if metadata["Engine"] == engine or engine in metadata["Engines"]:
+            #                     entries.append({"display": metadata["Name"],
+            #                                     "path": module_dir.path})
+            #             except:
+            #                 continue
+
+            # engine_folder_name = engine.replace("/", "_").replace(" ", "_")
+            # path = "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
+            # if Path(path).exists():
+            #     entries.append({"display": f"{engine} Mod", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name})
+            # entries.append({"display": "Zynthian", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/Zynthian"})
+            # entries.append({"display": "Default", "path": ""})
+            # self.__control_pages_model.set_entries(entries)
         else:
             self.__control_pages_model.set_entries([])
 

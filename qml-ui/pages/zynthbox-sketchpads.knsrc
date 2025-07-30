@@ -1,8 +1,9 @@
 [KNewStuff3]
 Name=Sketchpads
-ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/providers.xml
 Categories=679
 AbsoluteInstallPath=/zynthian/zynthian-my-data/sketchpads/community-sketchpads/
 Uncompress=always
 RemoveDeadEntries=true
 AuthorSubdir=name
+EntrySubdir=nameandid

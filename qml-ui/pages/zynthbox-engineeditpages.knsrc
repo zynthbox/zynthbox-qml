@@ -1,7 +1,9 @@
 [KNewStuff3]
 Name=Themes
-ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/providers.xml
 Categories=667
-XdgTargetDir=zynthbox/engineeditpages
+AbsoluteInstallPath=/zynthian/zynthian-my-data/mods/community-mods/
 Uncompress=always
 RemoveDeadEntries=true
+AuthorSubdir=name
+EntrySubdir=nameandid

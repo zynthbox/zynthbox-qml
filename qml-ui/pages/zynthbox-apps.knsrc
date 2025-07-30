@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Zynthbox Apps
-ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/providers.xml
 Categories=671
 XdgTargetDir=zynthbox/apps
 Uncompress=never

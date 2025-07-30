@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Soundsets
-ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/providers.xml
 Categories=681
 AbsoluteInstallPath=/zynthian/zynthian-my-data/soundsets/community-soundsets/
 Uncompress=never

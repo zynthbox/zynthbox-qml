@@ -137,10 +137,10 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__custom_controller_mode = False
         self._active_custom_controller = None
         self.__all_controls = []
+        # A dict to index all_controls by name for fast lookup
+        self.__all_controls_index_by_symbol = {}
         self.__selected_engine = None
         self.__selected_engine_bypass_controller = None
-        self.__selected_engine_cutoff_controller = None
-        self.__selected_engine_resonance_controller = None
         self.__selected_column = 0
         self.controller0 = None
         self.controller1 = None
@@ -311,6 +311,7 @@ class zynthian_gui_control(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
         self.__all_controls = []
+        self.__all_controls_index_by_symbol = {}
 
         if self.zynqtgui.curlayer:
             self.__selected_engine = self.zynqtgui.curlayer.engine
@@ -345,6 +346,7 @@ class zynthian_gui_control(zynthian_gui_selector):
                                 "index": index,
                                 "control": ctrl
                             })
+                            self.__all_controls_index_by_symbol[ctrl.symbol] = index
                     i += 1
                     j += 1
             if self.__single_effect_engine == None:
@@ -1022,6 +1024,13 @@ class zynthian_gui_control(zynthian_gui_selector):
         else:
             return None
 
+    @Slot(str, result=QObject)
+    def getAllControlBySymbol(self, symbol):
+        if symbol in self.__all_controls_index_by_symbol:
+            return self.getAllControlAt(self.__all_controls_index_by_symbol[symbol])
+        else:
+            return None
+
     controllers_changed = Signal()
     controllers_count_changed = Signal()
     custom_control_page_changed = Signal()
@@ -1041,8 +1050,6 @@ class zynthian_gui_control(zynthian_gui_selector):
     all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
     selectedEngine = Property(QObject, get_selected_engine, notify=all_controls_changed)
     selectedEngineBypassController = Property(QObject, get_selected_engine_bypass_controller, notify=all_controls_changed)
-    selectedEngineCutoffController = Property(QObject, get_selected_engine_cutoff_controller, notify=all_controls_changed)
-    selectedEngineResonanceController = Property(QObject, get_selected_engine_resonance_controller, notify=all_controls_changed)
 
     selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedColumnChanged)
     selectedColumn = Property(int, get_selectedColumn, set_selectedColumn, notify=selectedColumnChanged)

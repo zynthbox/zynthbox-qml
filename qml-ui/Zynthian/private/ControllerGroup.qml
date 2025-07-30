@@ -33,25 +33,32 @@ QtObject {
     id: root
     property string category
     property int index: -1
+    property string symbol: ""
     property QtObject ctrl
 
     onCategoryChanged: internal.syncCtrl()
     onIndexChanged: internal.syncCtrl()
+    onSymbolChanged: internal.syncCtrl()
     Component.onCompleted: internal.syncCtrl()
 
     property Connections _internal: Connections {
         id: internal
         function syncCtrl() {
-            if (index < 0) {
-                return;
-            }
-            if (category.length > 0 && category.indexOf("amixer_") === 0) {
-                root.ctrl = zynqtgui.control.amixer_controller_by_category(root.category.substring(7), root.index);
-                print(root.ctrl)
-            } else if (category.length > 0) {
-                root.ctrl = zynqtgui.control.controller_by_category(root.category, root.index);
+            if (symbol.length > 0) {
+                // If name is not null, try getting controller by name and ignore category
+                root.ctrl = zynqtgui.control.getAllControlBySymbol(root.symbol);
             } else {
-                root.ctrl = zynqtgui.control.controller(root.index);
+                if (index < 0) {
+                    return;
+                }
+                if (category.length > 0 && category.indexOf("amixer_") === 0) {
+                    root.ctrl = zynqtgui.control.amixer_controller_by_category(root.category.substring(7), root.index);
+                    print(root.ctrl)
+                } else if (category.length > 0) {
+                    root.ctrl = zynqtgui.control.controller_by_category(root.category, root.index);
+                } else {
+                    root.ctrl = zynqtgui.control.controller(root.index);
+                }
             }
         }
         target: zynqtgui.control

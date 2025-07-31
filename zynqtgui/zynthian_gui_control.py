@@ -304,7 +304,7 @@ class zynthian_gui_control(zynthian_gui_selector):
                                         "type": modType
                                     })
                                 logging.error(f"Added entry to the registry: {discoveredMods[-1]}")
-                        except Error as e:
+                        except Exception as e:
                             logging.error(f"Error while handling manifest: {e}")
                             continue
                     else:

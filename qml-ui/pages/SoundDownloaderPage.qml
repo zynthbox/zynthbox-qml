@@ -58,8 +58,8 @@ Zynthian.NewStuffPage {
         _private.installedBeforeUpdate = [];
     }
     onItemUninstalled: function(itemData) {
-        // When uninstalling a sound, we'll want to inform the library about that
-        Zynthbox.SndLibrary.processSndFiles([itemData[NewStuff.ItemsModel.UninstalledFilesRole]]);
+        // When uninstalling a sound, we'll want to inform the library about that (and we need to use both of these, otherwise we might end up missing something...)
+        Zynthbox.SndLibrary.processSndFiles([itemData[NewStuff.ItemsModel.UnInstalledFilesRole], itemData[NewStuff.ItemsModel.InstalledFilesRole]]);
     }
     onItemUpdating: function(itemData) {
         // Since we're updating one of our sounds, we will need to first remove

@@ -117,6 +117,14 @@ Zynthian.ScreenPage {
     QQC2.Menu {
         id: customControlsMenu
         y: -height
+        QQC2.MenuItem {
+            height: Kirigami.Units.gridUnit * 2
+            text: qsTr("Update Mod List")
+            onClicked: {
+                zynqtgui.control.updateRegistry();
+            }
+        }
+        QQC2.MenuSeparator { }
         Repeater {
             model: zynqtgui.control.control_pages_model
             delegate: QQC2.MenuItem {

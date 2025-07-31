@@ -278,6 +278,9 @@ class zynthian_gui_controller(QObject):
     def get_step_size(self):
         return self.step
 
+    def get_symbol(self):
+        return self.zctrl.symbol
+
 
     def config(self, zctrl):
         #logging.debug("CONFIG CONTROLLER %s => %s" % (self.index,zctrl.name))
@@ -399,6 +402,7 @@ class zynthian_gui_controller(QObject):
         self.value0_changed.emit()
         self.value_type_changed.emit()
         self.step_size_changed.emit()
+        self.symbol_changed.emit()
 
         #logging.debug("labels: "+str(zctrl.labels))
         #logging.debug("ticks: "+str(zctrl.ticks))
@@ -594,6 +598,7 @@ class zynthian_gui_controller(QObject):
     value_type_changed = Signal()
     step_size_changed = Signal()
     visible_changed = Signal()
+    symbol_changed = Signal()
 
     encoder_index = Property(int, get_index, set_index, notify = index_changed)
     title = Property(str, get_title, notify = title_changed)
@@ -606,5 +611,6 @@ class zynthian_gui_controller(QObject):
     max_value = Property(float, get_max_value, notify = max_value_changed)
     value_type = Property(str, get_value_type, notify = value_type_changed)
     step_size= Property(float, get_step_size, notify = step_size_changed)
+    symbol = Property(str, get_symbol, notify = symbol_changed)
 
 #------------------------------------------------------------------------------

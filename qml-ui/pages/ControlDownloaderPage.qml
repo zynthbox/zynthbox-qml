@@ -41,18 +41,27 @@ Zynthian.NewStuffPage {
         console.log("Using a mod/modpack", installedFiles);
     }
     onItemInstalled: function(itemData) {
-        console.log("Installed item:", itemData[NewStuff.ItemsModel.InstalledFilesRole]);
-        zynqtgui.control.updateRegistry();
+        // console.log("Installed item:", itemData[NewStuff.ItemsModel.InstalledFilesRole]);
+        for (let installedFile of itemData[NewStuff.ItemsModel.InstalledFilesRole]) {
+            zynqtgui.control.updateRegistryPartial(installedFile);
+        }
     }
     onItemUninstalled: function(itemData) {
         // For some reason i don't quite understand, the uninstalled files role doesn't actually tell us what was removed,
         // and the installed files role retains its information... not sure what's up with that, but, it means we "simply"
         // need to use both when updating things.
-        console.log("Uninstalled item:", itemData[NewStuff.ItemsModel.UnInstalledFilesRole], itemData[NewStuff.ItemsModel.InstalledFilesRole]);
-        zynqtgui.control.updateRegistry();
+        // console.log("Uninstalled item:", itemData[NewStuff.ItemsModel.UnInstalledFilesRole], itemData[NewStuff.ItemsModel.InstalledFilesRole]);
+        for (let uninstalledFile of itemData[NewStuff.ItemsModel.UnInstalledFilesRole]) {
+            zynqtgui.control.updateRegistryPartial(uninstalledFile);
+        }
+        for (let uninstalledFile of itemData[NewStuff.ItemsModel.InstalledFilesRole]) {
+            zynqtgui.control.updateRegistryPartial(uninstalledFile);
+        }
     }
     onItemUpdating: function(itemData) {
-        console.log("Updated item:", itemData[NewStuff.ItemsModel.InstalledFilesRole]);
-        zynqtgui.control.updateRegistry();
+        // console.log("Updated item:", itemData[NewStuff.ItemsModel.InstalledFilesRole]);
+        for (let updatedFile of itemData[NewStuff.ItemsModel.InstalledFilesRole]) {
+            zynqtgui.control.updateRegistryPartial(updatedFile);
+        }
     }
 }

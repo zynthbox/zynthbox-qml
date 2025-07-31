@@ -235,6 +235,72 @@ class zynthian_gui_control(zynthian_gui_selector):
     def get_single_effect_engine(self):
         return self.__single_effect_engine
 
+    def searchThroughModPack(modPackRoot):
+        discoveredMods = []
+        discoveredModpacks = []
+        if Path(modPackRoot).exists():
+            for folder in [f for f in os.scandir(modPackRoot) if f.is_dir()]:
+                manifestPath = folder.path + "/manifest.json"
+                metadataPath = folder.path + "/metadata.json"
+                if Path(manifestPath).exists():
+                    try:
+                        logging.debug(f"Found a mod-pack, with metadata in file path {manifestPath} - loading")
+                        with open(manifestPath, "r") as f:
+                            obj = json.loads(f.read())
+                            modPackName = folder.name
+                            if "Name" in obj:
+                                modPackName = obj["Name"]
+                            discoveredModpacks.append({
+                                    "display": modPackName,
+                                    "path": folder.path
+                                })
+                            mods, modpacks = searchThroughModPack(folder.path)
+                            discoveredMods.extend(mods)
+                            discoveredModpacks.extend(modpacks)
+                    except Exception as e:
+                        logging.error(f"Error while handling mod-pack manifest for {manifestPath}: {e}")
+                        continue
+                elif Path(metadataPath).exists():
+                    try:
+                        logging.debug(f"Found a mod, with the metadata file path {metadataPath} - loading")
+                        with open(metadataPath, "r") as f:
+                            obj = json.loads(f.read())
+
+                            modName = folder.name
+                            if "Name" in obj:
+                                modName = obj["Name"]
+
+                            modEngines = []
+                            if "Engines" in obj:
+                                modEngines = obj["Engines"]
+                            # If defined, but actually empty, then don't add anything
+                            if "Engine" in obj and obj["Engine"] != "":
+                                modEngines.append(obj["Engine"])
+
+                            modType = 0
+                            if "Type" in obj:
+                                if obj["Type"] == 1 or obj["Type"] == 2:
+                                    modType = obj["Type"]
+
+                            discoveredMods.append({
+                                    "display": modName,
+                                    "path": folder.path,
+                                    "engines": modEngines,
+                                    "type": modType
+                                })
+                            logging.error(f"Added entry to the registry: {discoveredMods[-1]}")
+                    except Exception as e:
+                        logging.error(f"Error while handling manifest: {e}")
+                        continue
+                else:
+                    # If there is no metadata file, then this is not a mod, and we can assume it's a mod pack, so try and look deeper
+                    mods, modpacks = zynthian_gui_control.searchThroughModPack(folder.path)
+                    discoveredMods.extend(mods)
+                    discoveredModpacks.extend(modpacks)
+        else:
+            logging.error(f"The given mod pack root does not exist on disk: {modPackRoot}")
+        return discoveredMods, discoveredModpacks
+
     # This updates the internal registry for mods, and saves that registry to disk for load_registry to load
     # The mod registry contains a flat list of all the mods, with all entries containing the following keys:
     # - display: The human-readable display name
@@ -248,74 +314,9 @@ class zynthian_gui_control(zynthian_gui_selector):
         # The mods are expected to exist in my-data, underneath the mods folder, inside which are three further folders, one for the defaults, one for the user's own ones, and one for community ones (which then has the extra subfolders store-userID/productID/), and finally for any built-ins
         # Each of these searched folders then in turn has either folders with mods in, or mod-packs (which is a folder, which has mods or mod-packs in it). That is, a mod-pack can be recursive, but mods cannot
         searchRoots = ["/zynthian/zynthian-my-data/mods/community-mods", "/zynthian/zynthian-my-data/mods/default-mods", "/zynthian/zynthian-my-data/mods/my-mods", "/zynthian/zynthbox-qml/qml-ui/engineeditpages"]
-        def searchThroughModPack(modPackRoot):
-            discoveredMods = []
-            discoveredModpacks = []
-            if Path(modPackRoot).exists():
-                for folder in [f for f in os.scandir(modPackRoot) if f.is_dir()]:
-                    manifestPath = folder.path + "/manifest.json"
-                    metadataPath = folder.path + "/metadata.json"
-                    if Path(manifestPath).exists():
-                        try:
-                            logging.debug(f"Found a mod-pack, with metadata in file path {manifestPath} - loading")
-                            with open(manifestPath, "r") as f:
-                                obj = json.loads(f.read())
-                                modPackName = folder.name
-                                if "Name" in obj:
-                                    modPackName = obj["Name"]
-                                discoveredModpacks.append({
-                                        "display": modPackName,
-                                        "path": folder.path
-                                    })
-                                mods, modpacks = searchThroughModPack(folder.path)
-                                discoveredMods.extend(mods)
-                                discoveredModpacks.extend(modpacks)
-                        except Exception as e:
-                            logging.error(f"Error while handling mod-pack manifest for {manifestPath}: {e}")
-                            continue
-                    elif Path(metadataPath).exists():
-                        try:
-                            logging.debug(f"Found a mod, with the metadata file path {metadataPath} - loading")
-                            with open(metadataPath, "r") as f:
-                                obj = json.loads(f.read())
-
-                                modName = folder.name
-                                if "Name" in obj:
-                                    modName = obj["Name"]
-
-                                modEngines = []
-                                if "Engines" in obj:
-                                    modEngines = obj["Engines"]
-                                # If defined, but actually empty, then don't add anything
-                                if "Engine" in obj and obj["Engine"] != "":
-                                    modEngines.append(obj["Engine"])
-
-                                modType = 0
-                                if "Type" in obj:
-                                    if obj["Type"] == 1 or obj["Type"] == 2:
-                                        modType = obj["Type"]
-
-                                discoveredMods.append({
-                                        "display": modName,
-                                        "path": folder.path,
-                                        "engines": modEngines,
-                                        "type": modType
-                                    })
-                                logging.error(f"Added entry to the registry: {discoveredMods[-1]}")
-                        except Exception as e:
-                            logging.error(f"Error while handling manifest: {e}")
-                            continue
-                    else:
-                        # If there is no metadata file, then this is not a mod, and we can assume it's a mod pack, so try and look deeper
-                        mods, modpacks = searchThroughModPack(folder.path)
-                        discoveredMods.extend(mods)
-                        discoveredModpacks.extend(modpacks)
-            else:
-                logging.error(f"The given mod pack root does not exist on disk: {modPackRoot}")
-            return discoveredMods, discoveredModpacks
         # Recurse through the directory structures, treating each of the roots as a mod pack (which we can do, since we assume that the only place a mod pack ends is at the discovery of a mod, or we run out of directories)
         for searchRoot in searchRoots:
-            mods, modpacks = searchThroughModPack(searchRoot)
+            mods, modpacks = zynthian_gui_control.searchThroughModPack(searchRoot)
             self.__mod_registry__.extend(mods)
             self.__modpack_registry__.extend(modpacks)
         logging.debug(f"Mod registry now contains:\n{self.__mod_registry__}")
@@ -353,6 +354,34 @@ class zynthian_gui_control(zynthian_gui_selector):
         else:
             self.modsChanged.emit()
             self.modpacksChanged.emit()
+
+    # Call this to force an update of anything beneath the given path
+    @Slot(str)
+    def updateRegistryPartial(self, subPath):
+        # Ensure our path is sane (kns will give us a path with a /* at the end, so let's just handle that gracefully here)
+        testPath = subPath[:-1] if subPath.endswith("*") else subPath
+        testPath = testPath[:-1] if testPath.endswith("*") else testPath
+        logging.error(f"Performing a partial registry update for {testPath}")
+        # First, remove any entry whose path begins with the given path
+        self.__mod_registry__ = [entry for entry in self.__mod_registry__ if entry["path"].startswith(testPath) == False]
+        self.__modpack_registry__ = [entry for entry in self.__modpack_registry__ if entry["path"].startswith(testPath) == False]
+        # Now, scan the sub path for any new bits
+        mods, modpacks = zynthian_gui_control.searchThroughModPack(testPath)
+        self.__mod_registry__.extend(mods)
+        self.__modpack_registry__.extend(mods)
+        # Save the registry to disk
+        modregistryFile = "/zynthian/config/control_page.modregistry"
+        try:
+            with open("/zynthian/config/control_page.modregistry", "w") as f:
+                data = json.dumps({"mods": self.__mod_registry__, "modpacks": self.__modpack_registry__})
+                f.write(data)
+                f.flush()
+                os.fsync(f.fileno())
+        except Exception as e:
+            logging.error(f"Error while writing mod registry: {e}")
+        # Finally, tell everybody the thing changed
+        self.modsChanged.emit()
+        self.modpacksChanged.emit()
 
     ### BEGIN Property mods
     def get_mods(self):

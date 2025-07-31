@@ -3319,6 +3319,94 @@ class sketchpad_channel(QObject):
             self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
             self.chainedFxNamesChanged.emit()
 
+    @Slot(int)
+    def selectPreviousSynthBank(self, slot_index):
+        midi_channel = self.chainedSounds[slot_index]
+
+        if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
+            layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+            if layer.bank_index > 0:
+                prev_volume = None
+                try:
+                    prev_volume = self.zynqtgui.fixed_layers.volumeControllers[midi_channel].value
+                except Exception: pass
+
+                layer.set_bank(layer.bank_index - 1)
+                layer.set_preset(0)
+                self.zynqtgui.fixed_layers.update_mixers()
+
+                if prev_volume is not None:
+                    try:
+                        self.zynqtgui.fixed_layers.volumeControllers[midi_channel].value = prev_volume
+                    except Exception: pass
+
+                self.zynqtgui.bank.select(layer.bank_index)
+                self.zynqtgui.preset.select(0)
+                self.zynqtgui.layer.emit_layer_preset_changed(layer)
+                self.zynqtgui.screens['control'].show()
+                self.zynqtgui.layer.fill_list()
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+                self.chainedSoundsNamesChanged.emit()
+
+    @Slot(int)
+    def selectNextSynthBank(self, slot_index):
+        midi_channel = self.chainedSounds[slot_index]
+
+        if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
+            layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+            if layer.bank_index < len(layer.bank_list) - 1:
+                prev_volume = None
+                try:
+                    prev_volume = self.zynqtgui.fixed_layers.volumeControllers[midi_channel].value
+                except Exception: pass
+
+                layer.set_bank(layer.bank_index + 1)
+                layer.set_preset(0)
+                self.zynqtgui.fixed_layers.update_mixers()
+
+                if prev_volume is not None:
+                    try:
+                        self.zynqtgui.fixed_layers.volumeControllers[midi_channel].value = prev_volume
+                    except Exception: pass
+
+                self.zynqtgui.bank.select(layer.bank_index)
+                self.zynqtgui.preset.select(0)
+                self.zynqtgui.layer.emit_layer_preset_changed(layer)
+                self.zynqtgui.screens['control'].show()
+                self.zynqtgui.layer.fill_list()
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+                self.chainedSoundsNamesChanged.emit()
+
+    @Slot(int)
+    def selectPreviousFxBank(self, slot_index):
+        layer = self.chainedFx[slot_index]
+
+        if layer is not None and layer.bank_index > 0:
+            layer.set_bank(layer.bank_index - 1)
+            layer.set_preset(0)
+            self.zynqtgui.bank.select(layer.bank_index)
+            self.zynqtgui.preset.select(0)
+            self.zynqtgui.layer.emit_layer_preset_changed(layer)
+            self.zynqtgui.screens['control'].show()
+            self.zynqtgui.layer.fill_list()
+            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+            self.chainedFxNamesChanged.emit()
+
+    @Slot(int)
+    def selectNextFxBank(self, slot_index):
+        layer = self.chainedFx[slot_index]
+
+        if layer is not None and layer.bank_index < len(layer.bank_list) - 1:
+            layer.set_bank(layer.bank_index - 1)
+            layer.set_preset(0)
+            self.zynqtgui.bank.select(layer.bank_index)
+            self.zynqtgui.preset.select(0)
+            self.zynqtgui.layer.emit_layer_preset_changed(layer)
+            self.zynqtgui.screens['control'].show()
+            self.zynqtgui.layer.fill_list()
+            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+            self.chainedFxNamesChanged.emit()
+
     @Slot(None, result=QObject)
     def getClipToRecord(self):
         if self.selectedSlot.className == "TracksBar_sketchslot":

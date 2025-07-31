@@ -39,6 +39,8 @@ Zynthian.NewStuffPage {
         zynqtgui.main.registerAppImage(itemData[NewStuff.ItemsModel.InstalledFilesRole][0])
     }
     onItemUninstalled: {
+        // For some reason, we're not being given the uninstalled files via the relevant role. Deal with that for now.
+        zynqtgui.main.unregisterAppImage(itemData[NewStuff.ItemsModel.InstalledFilesRole][0])
         zynqtgui.main.unregisterAppImage(itemData[NewStuff.ItemsModel.UnInstalledFilesRole][0])
     }
     onItemUpdating: {

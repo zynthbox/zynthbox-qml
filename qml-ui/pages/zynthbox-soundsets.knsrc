@@ -5,3 +5,5 @@ Categories=681
 AbsoluteInstallPath=/zynthian/zynthian-my-data/soundsets/community-soundsets/
 Uncompress=never
 RemoveDeadEntries=true
+AuthorSubdir=name
+EntrySubdir=nameandid

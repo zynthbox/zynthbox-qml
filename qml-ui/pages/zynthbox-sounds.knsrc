@@ -19,4 +19,4 @@ AuthorSubdir=name
 # - id (the entry's ID)
 # - name (the entry's human-readable name)
 # - nameandid (the entry's human-readable name, then a period, and then the entry's ID)
-EntrySubdir=name
+EntrySubdir=nameandid

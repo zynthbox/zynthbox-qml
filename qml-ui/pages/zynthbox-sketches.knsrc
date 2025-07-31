@@ -6,3 +6,4 @@ AbsoluteInstallPath=/zynthian/zynthian-my-data/sketches/community-sketches/
 Uncompress=archive
 RemoveDeadEntries=true
 AuthorSubdir=name
+EntrySubdir=nameandid

@@ -6,3 +6,4 @@ XdgTargetDir=zynthbox/apps
 Uncompress=never
 RemoveDeadEntries=true
 AuthorSubdir=name
+EntrySubdir=nameandid

@@ -24,11 +24,11 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.15
-import QtQuick.Layouts 1.4
+import QtQuick.Layouts 1.15
 import QtMultimedia 5.15 as QMM
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import org.kde.newstuff 1.0 as NewStuff
+import org.kde.newstuff 1.91 as NewStuff
 import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import Zynthian 1.0 as Zynthian
@@ -170,6 +170,7 @@ Item {
         id: newStuffEngine
         configFile: component.configFile
     }
+    NewStuff.QuestionAsker {}
     property bool isLoading: false
     property bool initialisingCompleted: false
     property string message: ""

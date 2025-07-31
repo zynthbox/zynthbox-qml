@@ -1476,7 +1476,7 @@ QQC2.Pane {
                                                     verticalDrag = Math.floor(dy/dragDeltaThreshold);
                                                 }
                                             }
-                                            onClicked: {
+                                            onReleased: {
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.trackType === "sample-loop") {
                                                         if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
@@ -1499,9 +1499,43 @@ QQC2.Pane {
                                                     }
                                                 } else {
                                                     if (horizontalDrag > 0) {
-                                                        root.selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
+
                                                     } else if (horizontalDrag < 0) {
-                                                        root.selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
+                                                    }
+                                                    if (verticalDrag > 0) {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
+                                                    } else if (verticalDrag < 0) {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
                                                     }
 
                                                     horizontalDrag = 0;

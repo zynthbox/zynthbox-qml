@@ -156,6 +156,13 @@ class zynthian_basic_engine(QObject):
 
     processRestartedAfterCrash = Signal()
 
+    def get_pluginID(self):
+        if self.version_info is not None and self.version_info.plugin_info is not None:
+            return self.version_info.plugin_info.id
+        return self.nickname
+    pluginIDChanged = Signal()
+    pluginID = Property(str, get_pluginID, notify=pluginIDChanged)
+
 #------------------------------------------------------------------------------
 # Synth Engine Base Class
 #------------------------------------------------------------------------------

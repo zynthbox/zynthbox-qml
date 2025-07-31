@@ -129,7 +129,7 @@ class zynthian_basic_engine(QObject):
     def proc_cmd(self, cmd:str, wait_for_output=False):
         out = ""
         if self.proc is not None and self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
-            logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
+            # logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
             if wait_for_output:
                 transaction = self.proc.call(cmd)
                 if transaction is not None:
@@ -139,7 +139,7 @@ class zynthian_basic_engine(QObject):
                 transaction = self.proc.send(cmd)
                 if transaction is not None:
                     transaction.release()
-            logging.debug(f"{self.name} proc command output: {out}")
+            # logging.debug(f"{self.name} proc command output: {out}")
         return out
 
     # This will return the transaction rather than the transaction's output, which can

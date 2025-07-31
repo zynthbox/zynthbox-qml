@@ -423,7 +423,7 @@ class zynthian_gui_control(zynthian_gui_selector):
             engine = self.zynqtgui.curlayer.engine
             if self.__single_effect_engine != None:
                 engine = self.__single_effect_engine
-            engineId = engine.version_info.plugin_info.id if engine.version_info is not None else None
+            engineId = engine.pluginID
             engineType = 0
             if engine.type == "MIDI Synth":
                 engineType = 1
@@ -440,35 +440,6 @@ class zynthian_gui_control(zynthian_gui_selector):
             entries.append({"display": "Default", "path": ""})
 
             self.__control_pages_model.set_entries(entries)
-
-            # path = "/root/.local/share/zynthbox/engineeditpages/"
-            # entries = []
-            # engine = self.zynqtgui.curlayer.engine.nickname
-            # if self.__single_effect_engine != None:
-            #     engine = self.__single_effect_engine
-            # if Path(path).exists():
-            #     for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
-            #         if module_dir.is_dir():
-            #             metadatapath = module_dir.path + "/metadata.json";
-            #             logging.error("JSON MODS {}".format(metadatapath))
-            #             try:
-            #                 logging.error('Parsing mod metadatafile')
-            #                 fh = open(metadatapath, "r")
-            #                 json = fh.read()
-            #                 metadata = JSONDecoder().decode(json)
-            #                 if metadata["Engine"] == engine or engine in metadata["Engines"]:
-            #                     entries.append({"display": metadata["Name"],
-            #                                     "path": module_dir.path})
-            #             except:
-            #                 continue
-
-            # engine_folder_name = engine.replace("/", "_").replace(" ", "_")
-            # path = "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
-            # if Path(path).exists():
-            #     entries.append({"display": f"{engine} Mod", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name})
-            # entries.append({"display": "Zynthian", "path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/Zynthian"})
-            # entries.append({"display": "Default", "path": ""})
-            # self.__control_pages_model.set_entries(entries)
         else:
             self.__control_pages_model.set_entries([])
 
@@ -657,15 +628,53 @@ class zynthian_gui_control(zynthian_gui_selector):
             self.__last_custom_control_page = None
             return None
 
-
+    @Slot(str, result=str)
+    def get_custom_control_page_for_plugin(self, pluginID):
+        customControlPage = ""
+        # If we've got a custom control page specified for this plugin specifically, use that
+        # FIXME We need to port the custom control page logic to plugin IDs instead of engine nicknames...
+        engineType = 0 # Also, we need to get the engine from the plugin ID, and then work out the type from that...
+        if self.__custom_control_page == None:
+            # If we've got a preferred mod pack, test whether this engine has a match in that mod pack
+            testPack = self.__preferred_modpack__
+            # If that is empty, look through our default mods
+            if testPack == "":
+                # testPack = "/zynthian/zynthian-my-data/mods/default-mods"
+                testPack = "/zynthian/zynthbox-qml/qml-ui/engineeditpages"
+            # Note that mod pack contents are matched very simply by their paths. So, just cycle through and match all those,
+            # - test for engine matches
+            # - then match-type
+            # - then match-all
+            # - and only then fall through to the default
+            engineMatch = ""
+            typeMatch = ""
+            allMatch = ""
+            for entry in self.__mod_registry__:
+                if entry["path"].startswith(testPack):
+                    if pluginID in entry["engines"]:
+                        engineMatch = entry["path"]
+                        # Since we've got an actual match on engine, just break out now
+                        break
+                    if entry["type"] == engineType:
+                        typeMatch = entry["path"]
+                    if entry["type"] == 0 and len(entry["engines"]) == 0:
+                        allMatch = entry["path"]
+            if engineMatch != "":
+                customControlPage = engineMatch + "/content/main.qml"
+            elif typeMatch != "":
+                customControlPage = typeMatch + "/content/main.qml"
+            elif allMatch != "":
+                customControlPage = typeMatch + "/content/main.qml"
+            if customControlPage == "":
+                customControlPage = self.get_default_custom_control_page()
+        else:
+            customControlPage = self.__custom_control_page
+        return customControlPage
 
     def get_custom_control_page(self):
         if self.zynqtgui.curlayer is None or self.zynqtgui.curlayer.engine is None:
             return None
-        if self.__custom_control_page == None:
-            return self.get_default_custom_control_page()
-        else:
-            return self.__custom_control_page
+        return self.get_custom_control_page_for_plugin(self.zynqtgui.curlayer.engine.pluginID)
 
     def lock_controllers(self):
         self.controllers_lock = True

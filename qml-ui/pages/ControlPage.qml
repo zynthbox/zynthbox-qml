@@ -184,6 +184,37 @@ Zynthian.ScreenPage {
         }
     }
     property string currentControlPage
+    property var controlPageCache: ({})
+    function getControlPage(page) {
+        let actualPage = page;
+        let defaultParams = {/*"width": root.width, "height": root.height,*/ visible: false};
+        if (actualPage == "") {
+            actualPage = "defaultPage";
+            if (root.controlPageCache.hasOwnProperty("defaultPage") == false) {
+                root.controlPageCache[actualPage] = {
+                    ttl: 0,
+                    url: "DefaultEditPage.qml",
+                    params: defaultParams,
+                    errorString: "",
+                    pageObject: defaultPage.createObject(applicationWindow(), defaultParams)
+                };
+            }
+        } else if (root.controlPageCache[actualPage] == null) {
+            console.log("Page cache not found for actualPage :", actualPage)
+            console.log("Instantiating page", actualPage, ":", actualPage);
+            var cache = Zynthian.CommonUtils.instantiateComponent(actualPage, defaultParams);
+
+            if (cache.errorString != "") {
+                console.log("Error instantiating page", cache.url, ":", cache.errorString);
+                actualPage = "defaultPage";
+                // Ensure we cache the default page, and then fall back appropriately...
+                getControlPage(actualPage);
+            } else {
+                root.controlPageCache[actualPage] = cache;
+            }
+        }
+        return root.controlPageCache[actualPage].pageObject;
+    }
     Connections {
         target: zynqtgui.control
         onCustom_control_pageChanged: {
@@ -195,14 +226,14 @@ Zynthian.ScreenPage {
                     if (stack.currentItem != null) {
                         stack.currentItem.visible = false
                     }
-                    stack.replace(zynqtgui.control.custom_control_page);
+                    stack.replace(root.getControlPage(zynqtgui.control.custom_control_page));
                     root.currentControlPage = zynqtgui.control.custom_control_page;
                 }
             } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
                 if (stack.currentItem != null) {
                     stack.currentItem.visible = false
                 }
-                stack.replace(defaultPage);
+                stack.replace(root.getControlPage(""));
                 root.currentControlPage = "defaultPage";
             }
         }

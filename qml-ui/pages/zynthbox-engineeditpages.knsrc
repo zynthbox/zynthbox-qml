@@ -2,7 +2,7 @@
 Name=Themes
 ProvidersUrl=https://autoconfig.zynthbox.io/ocs/providers.xml
 Categories=667
-AbsoluteInstallPath=/zynthian/zynthian-my-data/mods/community-mods/
+AbsoluteInstallPath=/zynthian/zynthian-my-data/mods/community-mods
 Uncompress=always
 RemoveDeadEntries=true
 AuthorSubdir=name

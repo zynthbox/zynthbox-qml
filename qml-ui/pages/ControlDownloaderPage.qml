@@ -24,6 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.10
+import org.kde.newstuff 1.0 as NewStuff
 
 import Zynthian 1.0 as Zynthian
 
@@ -33,4 +34,25 @@ Zynthian.NewStuffPage {
     title: qsTr("Edit Pages Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
     configFile: Qt.resolvedUrl("zynthbox-engineeditpages.knsrc").toString().slice(7)
+
+    showUseThis: true
+    onUseThis: function(installedFiles) {
+        // This needs a touch of clever going on, to detect whether we're attempting to use a mod-pack, or a mod
+        console.log("Using a mod/modpack", installedFiles);
+    }
+    onItemInstalled: function(itemData) {
+        console.log("Installed item:", itemData[NewStuff.ItemsModel.InstalledFilesRole]);
+        zynqtgui.control.updateRegistry();
+    }
+    onItemUninstalled: function(itemData) {
+        // For some reason i don't quite understand, the uninstalled files role doesn't actually tell us what was removed,
+        // and the installed files role retains its information... not sure what's up with that, but, it means we "simply"
+        // need to use both when updating things.
+        console.log("Uninstalled item:", itemData[NewStuff.ItemsModel.UnInstalledFilesRole], itemData[NewStuff.ItemsModel.InstalledFilesRole]);
+        zynqtgui.control.updateRegistry();
+    }
+    onItemUpdating: function(itemData) {
+        console.log("Updated item:", itemData[NewStuff.ItemsModel.InstalledFilesRole]);
+        zynqtgui.control.updateRegistry();
+    }
 }

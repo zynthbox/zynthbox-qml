@@ -23,27 +23,24 @@
 # 
 #******************************************************************************
 
-import sys
 import logging
 import math
 import os
 from time import sleep
-from string import Template
 from datetime import datetime
 from pathlib import Path
 from json import JSONEncoder, JSONDecoder
 import json
 
 # Zynthian specific modules
-from zyngine import zynthian_controller
 from . import zynthian_gui_config
 from . import zynthian_gui_controller
 from . import zynthian_gui_selector
 
 # Qt modules
-from PySide2.QtCore import QMetaObject, QTimer, Qt, QObject, Slot, Signal, Property, QAbstractListModel, QModelIndex, \
-    QByteArray
-import time
+from PySide2.QtCore import QTimer, Qt, QObject, Slot, Signal, Property, QAbstractListModel, QModelIndex, QByteArray
+
+
 #------------------------------------------------------------------------------
 # Zynthian Instrument Controller GUI Class
 #------------------------------------------------------------------------------
@@ -238,26 +235,6 @@ class zynthian_gui_control(zynthian_gui_selector):
     def get_single_effect_engine(self):
         return self.__single_effect_engine
 
-#    def get_active_custom_controller(self):
-#        return self._active_custom_controller
-
-#    def set_active_custom_controller(self, controller):
-#        # If there is no custom control page, do not update values of selected controller with Big knob
-#        if self.custom_control_page == "":
-#            return
-
-#        if self._active_custom_controller == controller:
-#            return
-#        if self._active_custom_controller:
-#            self._active_custom_controller.index = self._active_custom_controller.old_index
-#            self._active_custom_controller.setup_zyncoder()
-#        self._active_custom_controller = controller
-#        if controller:
-#            self._active_custom_controller.old_index = self._active_custom_controller.index
-#            self._active_custom_controller.index = zynthian_gui_config.select_ctrl
-#            self._active_custom_controller.setup_zyncoder()
-#        self.active_custom_controller_changed.emit()
-
     # This updates the internal registry for mods, and saves that registry to disk for load_registry to load
     # The mod registry contains a flat list of all the mods, with all entries containing the following keys:
     # - display: The human-readable display name
@@ -398,9 +375,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 
     def hide(self):
         super().hide()
-        #if self.shown:
-        #    for zc in self.zgui_controllers: zc.hide()
-        #    if self.zselector: self.zselector.hide()
 
     def preload(self):
         super().preload()
@@ -463,25 +437,6 @@ class zynthian_gui_control(zynthian_gui_selector):
             self.__selected_engine_bypass_controller = zynthian_gui_controller(-1, self.__selected_engine.bypassController, self)
         else:
             self.__selected_engine_bypass_controller = None
-        
-        if self.zynqtgui.curlayer and self.zynqtgui.curlayer.track_index != -1 and self.zynqtgui.curlayer.slot_index != -1:
-            track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.curlayer.track_index)
-            match self.zynqtgui.curlayer.slot_type:
-                case "TracksBar_synthslot":
-                    self.__selected_engine_cutoff_controller = track.filterCutoffControllers[self.zynqtgui.curlayer.slot_index]
-                    self.__selected_engine_resonance_controller = track.filterResonanceControllers[self.zynqtgui.curlayer.slot_index]
-                case "TracksBar_fxslot":
-                    self.__selected_engine_cutoff_controller = track.fxFilterCutoffControllers[self.zynqtgui.curlayer.slot_index]
-                    self.__selected_engine_resonance_controller = track.fxFilterResonanceControllers[self.zynqtgui.curlayer.slot_index]
-                case "TracksBar_sketchfxslot":
-                    self.__selected_engine_cutoff_controller = track.sketchFxFilterCutoffControllers[self.zynqtgui.curlayer.slot_index]
-                    self.__selected_engine_resonance_controller = track.sketchFxfilterResonanceControllers[self.zynqtgui.curlayer.slot_index]
-                case _:
-                    self.__selected_engine_cutoff_controller = None
-                    self.__selected_engine_resonance_controller = None
-        else:
-            self.__selected_engine_cutoff_controller = None
-            self.__selected_engine_resonance_controller = None
 
         super().fill_list()
         self.all_controls_changed.emit()
@@ -1083,12 +1038,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 
     def get_selected_engine_bypass_controller(self):
         return self.__selected_engine_bypass_controller
-
-    def get_selected_engine_cutoff_controller(self):
-        return self.__selected_engine_cutoff_controller
-
-    def get_selected_engine_resonance_controller(self):
-        return self.__selected_engine_resonance_controller
 
     def get_selectedPage(self):
         return math.floor((self.selectedColumn * 3) / 12)

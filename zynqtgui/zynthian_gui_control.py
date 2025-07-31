@@ -418,7 +418,7 @@ class zynthian_gui_control(zynthian_gui_selector):
                                 "index": index,
                                 "control": ctrl
                             })
-                            self.__all_controls_index_by_symbol[ctrl.symbol] = index
+                            self.__all_controls_index_by_symbol[ctrl.symbol] = len(self.__all_controls) - 1
                     i += 1
                     j += 1
             if self.__single_effect_engine == None:

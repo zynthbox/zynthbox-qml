@@ -639,41 +639,48 @@ class zynthian_gui_control(zynthian_gui_selector):
         # If we've got a custom control page specified for this plugin specifically, use that
         # FIXME We need to port the custom control page logic to plugin IDs instead of engine nicknames...
         engineType = 0 # Also, we need to get the engine from the plugin ID, and then work out the type from that...
-        if self.__custom_control_page == None:
-            # If we've got a preferred mod pack, test whether this engine has a match in that mod pack
-            testPack = self.__preferred_modpack__
-            # If that is empty, look through our default mods
-            if testPack == "":
-                # testPack = "/zynthian/zynthian-my-data/mods/default-mods"
-                testPack = "/zynthian/zynthbox-qml/qml-ui/engineeditpages"
-            # Note that mod pack contents are matched very simply by their paths. So, just cycle through and match all those,
-            # - test for engine matches
-            # - then match-type
-            # - then match-all
-            # - and only then fall through to the default
-            engineMatch = ""
-            typeMatch = ""
-            allMatch = ""
-            for entry in self.__mod_registry__:
-                if entry["path"].startswith(testPack):
-                    if pluginID in entry["engines"]:
-                        engineMatch = entry["path"]
-                        # Since we've got an actual match on engine, just break out now
-                        break
-                    if entry["type"] == engineType:
-                        typeMatch = entry["path"]
-                    if entry["type"] == 0 and len(entry["engines"]) == 0:
-                        allMatch = entry["path"]
-            if engineMatch != "":
-                customControlPage = engineMatch + "/content/main.qml"
-            elif typeMatch != "":
-                customControlPage = typeMatch + "/content/main.qml"
-            elif allMatch != "":
-                customControlPage = typeMatch + "/content/main.qml"
+        userControlPage = self.__custom_control_page # Port this so we can use plugin IDs here...
+        # logging.error(f"Testing if {pluginID} has a known control page...");
+        if userControlPage == None:
+            # First test against the preferred mod pack, if we've got one, then fall back to the default pages, and *then* finally fall back to just the default page
+            # packsToTest = ["/zynthian/zynthian-my-data/mods/default-mods"]
+            packsToTest = ["/zynthian/zynthbox-qml/qml-ui/engineeditpages"]
+            # If we've got a preferred mod pack, add that first on the list, so we test against that first
+            if self.__preferred_modpack__ != "":
+                packsToTest = [self.__preferred_modpack__].extend(packsToTest)
+            for testPack in packsToTest:
+                # Note that mod pack contents are matched very simply by their paths. So, just cycle through and match all those,
+                # - test for engine matches
+                # - then match-type
+                # - then match-all
+                # - and only then fall through to the default, and only once all potential packs are exhausted
+                engineMatch = ""
+                typeMatch = ""
+                allMatch = ""
+                for entry in self.__mod_registry__:
+                    if entry["path"].startswith(testPack):
+                        if pluginID in entry["engines"]:
+                            engineMatch = entry["path"]
+                            # Since we've got an actual match on engine, just break out now
+                            break
+                        if entry["type"] == engineType:
+                            typeMatch = entry["path"]
+                        if entry["type"] == 0 and len(entry["engines"]) == 0:
+                            allMatch = entry["path"]
+                if engineMatch != "":
+                    customControlPage = engineMatch + "/content/main.qml"
+                elif typeMatch != "":
+                    customControlPage = typeMatch + "/content/main.qml"
+                elif allMatch != "":
+                    customControlPage = typeMatch + "/content/main.qml"
+                if customControlPage != "":
+                    # If we have found a control page to use, break out and use that
+                    break
             if customControlPage == "":
+                # logging.error(f"No match found, using default control page getter...")
                 customControlPage = self.get_default_custom_control_page()
         else:
-            customControlPage = self.__custom_control_page
+            customControlPage = userControlPage
         return customControlPage
 
     def get_custom_control_page(self):

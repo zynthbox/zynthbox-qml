@@ -240,7 +240,7 @@ class zynthian_gui_control(zynthian_gui_selector):
     def get_single_effect_engine(self):
         return self.__single_effect_engine
 
-    def searchThroughModPack(modPackRoot):
+    def searchThroughModPack(self, modPackRoot):
         discoveredMods = []
         discoveredModpacks = []
         if Path(modPackRoot).exists():
@@ -259,7 +259,7 @@ class zynthian_gui_control(zynthian_gui_selector):
                                     "display": modPackName,
                                     "path": folder.path
                                 })
-                            mods, modpacks = searchThroughModPack(folder.path)
+                            mods, modpacks = self.searchThroughModPack(folder.path)
                             discoveredMods.extend(mods)
                             discoveredModpacks.extend(modpacks)
                     except Exception as e:
@@ -299,7 +299,7 @@ class zynthian_gui_control(zynthian_gui_selector):
                         continue
                 else:
                     # If there is no metadata file, then this is not a mod, and we can assume it's a mod pack, so try and look deeper
-                    mods, modpacks = zynthian_gui_control.searchThroughModPack(folder.path)
+                    mods, modpacks = self.searchThroughModPack(folder.path)
                     discoveredMods.extend(mods)
                     discoveredModpacks.extend(modpacks)
         else:

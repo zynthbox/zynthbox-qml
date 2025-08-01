@@ -151,7 +151,7 @@ class zynthian_layer(QObject):
 
     engineChanged = Signal()
     engineName = Property(str, get_engine_name, notify=engineChanged)
-    engineObject = Property(str, get_engine_object, notify=engineChanged)
+    engineObject = Property(QObject, get_engine_object, notify=engineChanged)
 
     def get_soundInfo(self):
         result = {

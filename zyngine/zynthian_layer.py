@@ -146,8 +146,12 @@ class zynthian_layer(QObject):
         else:
             return ""
 
+    def get_engine_object(self):
+        return self.engine
+
     engineChanged = Signal()
     engineName = Property(str, get_engine_name, notify=engineChanged)
+    engineObject = Property(str, get_engine_object, notify=engineChanged)
 
     def get_soundInfo(self):
         result = {

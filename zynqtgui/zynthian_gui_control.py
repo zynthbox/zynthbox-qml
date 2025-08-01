@@ -127,6 +127,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.zgui_custom_controllers_map={}
         self.custom_controller_id_start = 100
 
+        self.__preferred_modpack__ = ""
         Path("/zynthian/zynthian-my-data/mods/community-mods").mkdir(exist_ok=True, parents=True)
         Path("/zynthian/zynthian-my-data/mods/default-mods").mkdir(exist_ok=True, parents=True)
         Path("/zynthian/zynthian-my-data/mods/my-mods").mkdir(exist_ok=True, parents=True)

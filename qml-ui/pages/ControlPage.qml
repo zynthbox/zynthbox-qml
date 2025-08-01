@@ -269,7 +269,7 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        console.log("Cache operation completion");
+        // console.log("Cache operation completion");
     }
     Connections {
         target: zynqtgui.sketchpad.song

@@ -39,30 +39,30 @@ Zynthian.ScreenPage {
     title: qsTr("Track Wave Editor")
 
     property bool isVisible:zynqtgui.current_screen_id === "channel_wave_editor"
-    property QtObject selectedChannel: null
-    Timer {
-        id: selectedChannelThrottle
-        interval: 1; running: false; repeat: false;
-        onTriggered: {
-            component.selectedChannel = null;
-            component.selectedChannel = applicationWindow().selectedChannel;
-        }
-    }
-    Connections {
-        target: applicationWindow()
-        onSelectedChannelChanged: selectedChannelThrottle.restart()
-    }
-    Connections {
-        target: zynqtgui.sketchpad
-        onSongChanged: selectedChannelThrottle.restart()
-    }
-    Connections {
-        target: zynqtgui.sketchpad.song
-        onIsLoadingChanged: selectedChannelThrottle.restart()
-    }
-    Component.onCompleted: {
-        selectedChannelThrottle.restart()
-    }
+    property QtObject selectedChannel: applicationWindow().selectedChannel
+//    Timer {
+//        id: selectedChannelThrottle
+//        interval: 1; running: false; repeat: false;
+//        onTriggered: {
+//            component.selectedChannel = null;
+//            component.selectedChannel = applicationWindow().selectedChannel;
+//        }
+//    }
+//    Connections {
+//        target: applicationWindow()
+//        onSelectedChannelChanged: selectedChannelThrottle.restart()
+//    }
+//    Connections {
+//        target: zynqtgui.sketchpad
+//        onSongChanged: selectedChannelThrottle.restart()
+//    }
+//    Connections {
+//        target: zynqtgui.sketchpad.song
+//        onIsLoadingChanged: selectedChannelThrottle.restart()
+//    }
+//    Component.onCompleted: {
+//        selectedChannelThrottle.restart()
+//    }
     property QtObject selectedClip: component.selectedChannel
                                     ? component.selectedChannel.trackType === "sample-loop"
                                         ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
@@ -87,7 +87,7 @@ Zynthian.ScreenPage {
     }
     onSelectedClipChanged: selectedClipHasWavThrottle.restart()
     onIsVisibleChanged: {
-        selectedChannelThrottle.restart();
+//        selectedChannelThrottle.restart();
         selectedClipHasWavThrottle.restart();
     }
 

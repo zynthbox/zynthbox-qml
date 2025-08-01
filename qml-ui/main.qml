@@ -1240,11 +1240,11 @@ Kirigami.AbstractApplicationWindow {
     }
 
     // Listen to selected_track_id_changed signal to
-    Connections {
-        target: zynqtgui.sketchpad
-        onSelected_track_id_changed: selectedChannelThrottle.restart()
-        onSong_changed: selectedChannelThrottle.restart()
-    }
+//    Connections {
+//        target: zynqtgui.sketchpad
+//        onSelected_track_id_changed: selectedChannelThrottle.restart()
+//        onSong_changed: selectedChannelThrottle.restart()
+//    }
     Connections {
         target: zynqtgui.sketchpad.song
         onIsLoadingChanged: {
@@ -1254,15 +1254,15 @@ Kirigami.AbstractApplicationWindow {
         }
     }
     function handleLoadingDone() {
-        root.selectedChannel = root.channels[zynqtgui.sketchpad.selectedTrackId];
+        root.selectedChannel = Qt.binding(function() { return root.channels[zynqtgui.sketchpad.selectedTrackId] });
     }
-    Timer {
-        id: selectedChannelThrottle
-        interval: 0; repeat: false; running: false;
-        onTriggered: {
-            root.selectedChannel = root.channels[zynqtgui.sketchpad.selectedTrackId]
-        }
-    }
+//    Timer {
+//        id: selectedChannelThrottle
+//        interval: 0; repeat: false; running: false;
+//        onTriggered: {
+//            root.selectedChannel = root.channels[zynqtgui.sketchpad.selectedTrackId]
+//        }
+//    }
 
     PageManager {
         id: pageManager

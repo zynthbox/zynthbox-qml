@@ -156,6 +156,7 @@ from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
 from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
+from zynqtgui.zynthian_gui_ui_settings import zynthian_gui_ui_settings
 from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.zynthian_osd import zynthian_osd
 from zynqtgui.utils.webconf_fifo_handler import webconf_fifo_handler
@@ -1218,6 +1219,7 @@ class zynthian_gui(QObject):
         self.screens["network"] = zynthian_gui_network(self)
         self.screens["network_info"] = self.screens["network"]
         self.screens["hardware"] = zynthian_gui_hardware(self)
+        self.screens["ui_settings"] = zynthian_gui_ui_settings(self)
         self.screens["test_knobs"] = zynthian_gui_test_knobs(self)
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)
 
@@ -3946,6 +3948,9 @@ class zynthian_gui(QObject):
     def hardware(self):
         return self.screens["hardware"]
 
+    def ui_settings(self):
+        return self.screens["ui_settings"]
+
     def song_manager(self):
         return self.screens["song_manager"]
 
@@ -4821,6 +4826,7 @@ class zynthian_gui(QObject):
     snapshots_menu = Property(QObject, snapshots_menu, constant=True)
     network = Property(QObject, network, constant=True)
     hardware = Property(QObject, hardware, constant=True)
+    ui_settings = Property(QObject, ui_settings, constant=True)
     song_manager = Property(QObject, song_manager, constant=True)
     sound_categories = Property(QObject, sound_categories, constant=True)
     led_config = Property(QObject, led_config, constant=True)

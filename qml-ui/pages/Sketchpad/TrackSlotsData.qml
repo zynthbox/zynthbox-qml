@@ -460,7 +460,7 @@ RowLayout {
                 // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
                 Timer {
                     id: doublePressedTimer
-                    interval: 200
+                    interval: zynqtgui.ui_settings.doubleClickThreshhold
                     repeat: false
                     onTriggered: {
                         if (!delegateMouseArea.dragHappened) {

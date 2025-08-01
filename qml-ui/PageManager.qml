@@ -50,6 +50,7 @@ Zynthian.Stack {
         "snapshots_menu":"SnapshotsMenuPage.qml",
         "network":"NetworkPage.qml",
         "hardware":"HardwarePage.qml",
+        "ui_settings":"UiSettingsPage.qml",
         "playgrid": "PlayGrid.qml",
         "playgrid_downloader": "PlayGridDownloaderPage.qml",
         "channel_external_setup": "ChannelExternalSetup.qml",

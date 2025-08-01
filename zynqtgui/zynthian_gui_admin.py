@@ -74,6 +74,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
         self.list_metadata.append({"icon": "network-wireless", "large": True });
         self.list_data.append((self.hardware, 0, "Hardware"))
         self.list_metadata.append({"icon": "audio-card", "large": True });
+        self.list_data.append((self.ui_settings, 0, "UI Settings"))
+        self.list_metadata.append({"icon": "video-display", "large": True });
         self.list_data.append((None, 0, "-----------------------------"))
         self.list_metadata.append({"icon": "", "large": False });
         self.list_data.append((self.check_for_updates, 0, "Check for software updates"))
@@ -716,6 +718,9 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def hardware(self):
         logging.info("Hardware")
         self.zynqtgui.show_modal("hardware")
+
+    def ui_settings(self):
+        self.zynqtgui.show_modal("ui_settings")
 
     def test_audio(self):
         logging.info("TESTING AUDIO")

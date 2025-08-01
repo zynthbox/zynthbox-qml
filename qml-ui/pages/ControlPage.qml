@@ -23,11 +23,11 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Window 2.10
-import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.7 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
@@ -120,6 +120,13 @@ Zynthian.ScreenPage {
         y: -height
         QQC2.MenuItem {
             height: Kirigami.Units.gridUnit * 2
+            text: qsTr("Select Preferred Mod-pack")
+            onClicked: {
+                modPackPicker.open();
+            }
+        }
+        QQC2.MenuItem {
+            height: Kirigami.Units.gridUnit * 2
             text: qsTr("Update Mod List")
             onClicked: {
                 zynqtgui.control.updateRegistry();
@@ -202,8 +209,8 @@ Zynthian.ScreenPage {
                 };
             }
         } else if (root.controlPageCache[actualPage] == null) {
-            console.log("Page cache not found for actualPage :", actualPage)
-            console.log("Instantiating page", actualPage, ":", actualPage);
+            // console.log("Page cache not found for actualPage :", actualPage)
+            // console.log("Instantiating page", actualPage, ":", actualPage);
             var cache = Zynthian.CommonUtils.instantiateComponent(actualPage, defaultParams);
 
             if (cache.errorString != "") {
@@ -309,6 +316,37 @@ Zynthian.ScreenPage {
         DefaultEditPage {
             id: defaultPageRoot
             objectName: "defaultPage"
+        }
+    }
+
+    Zynthian.ActionPickerPopup {
+        id: modPackPicker
+        actions: [
+            QQC2.Action {
+                text: "Default"
+                checked: zynqtgui.control.preferredModpack === ""
+                onTriggered: {
+                    zynqtgui.control.preferredModpack = "";
+                }
+            }
+        ]
+    }
+    Instantiator {
+        id: modPackPickerActionInstantiator
+        model: zynqtgui.control.modpacks
+        delegate: QQC2.Action {
+            readonly property var theModPack: zynqtgui.control.modpacks[index]
+            text: theModPack.display
+            checked: zynqtgui.control.preferredModpack = theModPack.path
+            onTriggered: {
+                zynqtgui.control.preferredModpack = theModPack.path;
+            }
+        }
+        onObjectAdded: {
+            modPackPicker.actions.push(object);
+        }
+        onObjectRemoved: {
+            modPackPicker.actions.pop(object);
         }
     }
 

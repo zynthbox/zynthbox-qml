@@ -30,6 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.ScreenPage {
     id: root
@@ -147,6 +148,7 @@ Zynthian.ScreenPage {
 
     Component.onCompleted: {
        // mainView.forceActiveFocus()
+        root.ensurePageCache();
         //HACK
         if (!root.visible) {
             return;
@@ -243,6 +245,50 @@ Zynthian.ScreenPage {
         target: zynqtgui
         onCurrent_screen_idChanged: {
             root.visible = zynqtgui.current_screen_id === "control";
+        }
+    }
+    function ensurePageCache() {
+        for (let trackIndex = 0; trackIndex < Zynthbox.Plugin.sketchpadTrackCount; ++trackIndex) {
+            let track = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
+            let chainedSounds = track.chainedSounds;
+            for (let i = 0; i < chainedSounds.length; ++i) {
+                let midiChannel = chainedSounds[i];
+                // console.log("Testing chained sound", i, "on track", trackIndex, "which has midi channel", midiChannel, "which exists?", track.checkIfLayerExists(midiChannel));
+                if (midiChannel > -1 && track.checkIfLayerExists(midiChannel)) {
+                    let layer = zynqtgui.layer.get_layer_by_midi_channel(midiChannel);
+                    let customControlPage = zynqtgui.control.get_custom_control_page_for_plugin(layer.engineObject.pluginID);
+                    root.getControlPage(customControlPage);
+                }
+            }
+            let chainedFx = track.chainedFx;
+            for (let i = 0; i < chainedFx.length; ++i) {
+                let layer = chainedFx[i];
+                if (layer) {
+                    let customControlPage = zynqtgui.control.get_custom_control_page_for_plugin(layer.engineObject.pluginID);
+                    root.getControlPage(customControlPage);
+                }
+            }
+        }
+        console.log("Cache operation completion");
+    }
+    Connections {
+        target: zynqtgui.sketchpad.song
+        onIsLoadingChanged: {
+            if (zynqtgui.sketchpad.song.isLoading == false) {
+                // When we're done loading a song, ensure we've got all the control pages for synths and fx cached
+                root.ensurePageCache();
+            }
+        }
+    }
+    Repeater {
+        model: zynqtgui.sketchpad.song.channelsModel
+        delegate: Item {
+            Connections {
+                target: zynqtgui.sketchpad.song.channelsModel.getChannel(model.index)
+                // When the sounds and fx change, ensure we've got all the control pages for synths and fx cached
+                onChained_sounds_changed: root.ensurePageCache()
+                onChainedFxChanged: root.ensurePageCache()
+            }
         }
     }
 

@@ -169,6 +169,11 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.show()
         self.sync_selectors_visibility()
 
+        # When the mods change, make sure we also adjust the list to match
+        self.modsChanged.connect(self.show)
+        # Also ensure we refetch the custom control page, in case the current one was deleted
+        self.modsChanged.connect(self.custom_control_page_changed)
+
     def __selected_track_id_changed_handler_timer_timeout(self):
         if "sketchpad" in self.zynqtgui.screens:
             self.zynqtgui.sketchpad.selected_track_id_changed.connect(self.__selected_track_id_changed_handler)

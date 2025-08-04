@@ -322,7 +322,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         searchRoots = ["/zynthian/zynthian-my-data/mods/community-mods", "/zynthian/zynthian-my-data/mods/default-mods", "/zynthian/zynthian-my-data/mods/my-mods", "/zynthian/zynthbox-qml/qml-ui/engineeditpages"]
         # Recurse through the directory structures, treating each of the roots as a mod pack (which we can do, since we assume that the only place a mod pack ends is at the discovery of a mod, or we run out of directories)
         for searchRoot in searchRoots:
-            mods, modpacks = zynthian_gui_control.searchThroughModPack(searchRoot)
+            mods, modpacks = self.searchThroughModPack(searchRoot)
             self.__mod_registry__.extend(mods)
             self.__modpack_registry__.extend(modpacks)
         logging.debug(f"Mod registry now contains:\n{self.__mod_registry__}")
@@ -372,7 +372,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__mod_registry__ = [entry for entry in self.__mod_registry__ if entry["path"].startswith(testPath) == False]
         self.__modpack_registry__ = [entry for entry in self.__modpack_registry__ if entry["path"].startswith(testPath) == False]
         # Now, scan the sub path for any new bits
-        mods, modpacks = zynthian_gui_control.searchThroughModPack(testPath)
+        mods, modpacks = self.searchThroughModPack(testPath)
         self.__mod_registry__.extend(mods)
         self.__modpack_registry__.extend(mods)
         # Save the registry to disk

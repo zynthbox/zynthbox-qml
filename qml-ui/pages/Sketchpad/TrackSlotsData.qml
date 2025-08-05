@@ -46,20 +46,6 @@ RowLayout {
     property bool highlightCurrentlySelectedSlot: true
 
     property QtObject selectedChannel: applicationWindow().selectedChannel
-//    Timer {
-//        id: selectedChannelThrottle
-//        interval: 1; running: false; repeat: false;
-//        onTriggered: {
-//            control.selectedChannel = applicationWindow().selectedChannel;
-//        }
-//    }
-//    Connections {
-//        target: applicationWindow()
-//        onSelectedChannelChanged: selectedChannelThrottle.restart()
-//    }
-//    Component.onCompleted: {
-//        selectedChannelThrottle.restart()
-//    }
 
     /**
      * \brief Emitted whenever the user clicks on the slot

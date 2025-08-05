@@ -595,6 +595,9 @@ QQC2.Pane {
                                         singleClickEnabled: false
                                         doubleClickEnabled: false
                                         clickAndHoldEnabled: false
+                                        onSlotClicked: {
+                                            zynqtgui.sketchpad.selectedTrackId = channel.id
+                                        }
                                     }
                                 }
                             }

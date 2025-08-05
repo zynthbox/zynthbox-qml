@@ -52,6 +52,22 @@ GridLayout {
      * \brief Set the channel that TrackSlotsData should operate on
      */
     property QtObject channel: applicationWindow().selectedChannel
+    /**
+     * \brief Set to true if single click action should happen after focus
+     */
+    property bool singleClickEnabled: true
+    /**
+     * \brief Set to true if click and hold action should happen
+     */
+    property bool clickAndHoldEnabled: true
+    /**
+     * \brief Set to true if double click action should happen
+     */
+    property bool doubleClickEnabled: true
+    /**
+     * \brief Set to true if drag action should happen
+     */
+    property bool dragEnabled: true
 
     rows: {
         if (control.orientation == Qt.Horizontal) {
@@ -266,6 +282,11 @@ GridLayout {
 
             function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                 if (control.performSlotInteractions) {
+                    if (!control.singleClickEnabled) {
+                        // If single click is disable, set onlyFocus to true so that clicks are not passed to slotsBar to handle popups
+                        onlyFocus = true;
+                    }
+
                     let wasAlreadySelected = slotDelegate.highlighted
                     control.channel.selectedSlot.setTo(_private.className, index, slotDelegate, control.channel);
                     if (onlySelectSlot == false) {
@@ -355,6 +376,7 @@ GridLayout {
                         fill: parent
                         margins: Kirigami.Units.smallSpacing
                     }
+                    visible: control.dragEnabled
                     Rectangle {
                         width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
                         anchors {
@@ -497,59 +519,69 @@ GridLayout {
 
                     anchors.fill: parent
                     onPressed: {
-                        delegateMouseArea.initialMouseX = mouse.x
+                        if (control.dragEnabled) {
+                            delegateMouseArea.initialMouseX = mouse.x
+                        }
                     }
                     onReleased: {
-                        dragHappenedResetTimer.restart();
-                        if (doublePressedTimer.running) {
-                            doublePressedTimer.stop();
-                            // Double press has happened. Toggle mute/bypass state the slot
-                            switch (control.slotType) {
-                                case "synth":
-                                    if (slotDelegate.synthPassthroughClient) {
-                                        slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
-                                    }
-                                    break;
-                                case "sample-trig":
-                                    if (slotDelegate.cppClipObject) {
-                                        slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
-                                    }
-                                    break;
-                                case "fx":
-                                    if (slotDelegate.fxPassthroughClient) {
-                                        slotDelegate.fxPassthroughClient.bypass = !slotDelegate.fxPassthroughClient.bypass;
-                                    }
-                                    break;
+                        if (control.dragEnabled) {
+                            dragHappenedResetTimer.restart();
+                        }
+                        if (control.doubleClickEnabled) {
+                            if (doublePressedTimer.running) {
+                                doublePressedTimer.stop();
+                                // Double press has happened. Toggle mute/bypass state the slot
+                                switch (control.slotType) {
+                                    case "synth":
+                                        if (slotDelegate.synthPassthroughClient) {
+                                            slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
+                                        }
+                                        break;
+                                    case "sample-trig":
+                                        if (slotDelegate.cppClipObject) {
+                                            slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
+                                        }
+                                        break;
+                                    case "fx":
+                                        if (slotDelegate.fxPassthroughClient) {
+                                            slotDelegate.fxPassthroughClient.bypass = !slotDelegate.fxPassthroughClient.bypass;
+                                        }
+                                        break;
+                                }
+                            } else {
+                                doublePressedTimer.restart();
                             }
                         } else {
-                            doublePressedTimer.restart();
+                            slotDelegate.switchToThisSlot();
                         }
                     }
                     onMouseXChanged: {
-                        var newVal
-                        if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                            newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                            delegateMouseArea.dragHappened = true;
-                            let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
-                            synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
-                        } else if (control.slotType == "sample-trig" && control.slotData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                            newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                            delegateMouseArea.dragHappened = true;
-                            slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
-                        } else if (control.slotType == "fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                            newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                            delegateMouseArea.dragHappened = true;
-                            // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                            control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
-                        } else if (control.slotType == "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                            newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                            delegateMouseArea.dragHappened = true;
-                            // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                            control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                        if (control.dragEnabled) {
+                            var newVal
+                            if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                delegateMouseArea.dragHappened = true;
+                                let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
+                                synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
+                            } else if (control.slotType == "sample-trig" && control.slotData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                delegateMouseArea.dragHappened = true;
+                                slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
+                            } else if (control.slotType == "fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                delegateMouseArea.dragHappened = true;
+                                // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
+                                control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                            } else if (control.slotType == "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                delegateMouseArea.dragHappened = true;
+                                // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
+                                control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                            }
                         }
                     }
                     onPressAndHold: {
-                        if (!delegateMouseArea.dragHappened) {
+                        if (!delegateMouseArea.dragHappened && control.clickAndHoldEnabled) {
                             if (control.slotType === "sample-loop") {
                                 // If channel type is sample-loop open clip wave editor
                                 if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {

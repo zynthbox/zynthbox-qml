@@ -565,6 +565,7 @@ QQC2.Pane {
 
                                     contentItem: TrackSlotsData {
                                         id: synthsRow
+                                        columnSpacing: Kirigami.Units.gridUnit * 0.7
                                         channel: channelDelegate.channel
                                         slotData: {
                                             if (synthsButton.checked) {
@@ -588,9 +589,12 @@ QQC2.Pane {
                                                 return "synth" // Fallback to synths when none of the tab buttons are checked
                                             }
                                         }
-                                        showSlotTypeLabel: false
                                         orientation: Qt.Vertical
-                                        columnSpacing: Kirigami.Units.gridUnit * 0.7
+                                        showSlotTypeLabel: false
+                                        dragEnabled: false
+                                        singleClickEnabled: false
+                                        doubleClickEnabled: false
+                                        clickAndHoldEnabled: false
                                     }
                                 }
                             }

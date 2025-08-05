@@ -1034,7 +1034,7 @@ Zynthian.ScreenPage {
             id: lastSelectedObjIndicator
             visible: {
                 // If lastSelectedObj is a TracksBar slot, then do not display selected indicator when another slot is selected
-                if (zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_")) {
+                if (zynqtgui.slotsBarChannelActive) {
                     return zynqtgui.sketchpad.lastSelectedObj.track == root.selectedChannel && zynqtgui.sketchpad.lastSelectedObj.component && zynqtgui.sketchpad.lastSelectedObj.component.visible
                 } else {
                     return zynqtgui.sketchpad.lastSelectedObj.component && zynqtgui.sketchpad.lastSelectedObj.component.visible
@@ -1073,7 +1073,7 @@ Zynthian.ScreenPage {
             id: copySourceObjIndicator
             visible: {
                 // If copySourceObj is a TracksBar slot, then to not show copySourceObjIndicator if current track is not the same as copySourceObj
-                if (zynqtgui.sketchpad.copySourceObj.className.startsWith("TracksBar_")) {
+                if (zynqtgui.slotsBarChannelActive) {
                     return zynqtgui.sketchpad.copySourceObj.track == root.selectedChannel && zynqtgui.sketchpad.copySourceObj.component && zynqtgui.sketchpad.copySourceObj.component.visible
                 } else {
                     return zynqtgui.sketchpad.copySourceObj.component && zynqtgui.sketchpad.copySourceObj.component.visible

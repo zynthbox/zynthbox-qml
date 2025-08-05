@@ -7,7 +7,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
-RowLayout {
+GridLayout {
     id: control
     /**
       * An array of 5 elements containing data that needs to be displayed on the slots
@@ -44,8 +44,43 @@ RowLayout {
      * \brief If set to false, the slot will not use the currentSlot value to highlight whatever the currently selected slot for the track is
      */
     property bool highlightCurrentlySelectedSlot: true
+    /**
+     * \brief Allow setting the orientation of the layout
+     */
+    property int orientation: Qt.Horizontal
+    /**
+     * \brief Set the channel that TrackSlotsData should operate on
+     */
+    property QtObject channel: applicationWindow().selectedChannel
 
-    property QtObject selectedChannel: applicationWindow().selectedChannel
+    rows: {
+        if (control.orientation == Qt.Horizontal) {
+            return 1
+        } else if (control.orientation == Qt.Vertical) {
+            return Zynthbox.Plugin.sketchpadSlotCount + (control.showSlotTypeLabel ? 1 : 0) // +1 row for label if label is visible
+        } else {
+            return 1 // Fallback to horizontal
+        }
+    }
+    columns: {
+        if (control.orientation == Qt.Horizontal) {
+            return Zynthbox.Plugin.sketchpadSlotCount + (control.showSlotTypeLabel ? 1 : 0) // +1 col for label if label is visible
+        } else if (control.orientation == Qt.Vertical) {
+            return 1
+        } else {
+            return Zynthbox.Plugin.sketchpadSlotCount + (control.showSlotTypeLabel ? 1 : 0) // Fallback to horizontal
+        }
+    }
+    flow: {
+        if (control.orientation == Qt.Horizontal) {
+            return GridLayout.LeftToRight
+        } else if (control.orientation == Qt.Vertical) {
+            return GridLayout.TopToBottom
+        } else {
+            return GridLayout.LeftToRight // Fallback to horizontal
+        }
+    }
+    layoutDirection: Qt.LeftToRight
 
     /**
      * \brief Emitted whenever the user clicks on the slot
@@ -146,32 +181,32 @@ RowLayout {
         model: Zynthbox.Plugin.sketchpadSlotCount
         delegate: QQC2.Control {
             id: slotDelegate
-            property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null && zynqtgui.sketchpad.lastSelectedObj.track == root.selectedChannel && zynqtgui.sketchpad.lastSelectedObj.className == _private.className && zynqtgui.sketchpad.lastSelectedObj.value === index
+            property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null && zynqtgui.sketchpad.lastSelectedObj.track == control.channel && zynqtgui.sketchpad.lastSelectedObj.className == _private.className && zynqtgui.sketchpad.lastSelectedObj.value === index
             property int slotIndex: index
             property bool isSketchpadClip: control.slotData && control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
             property QtObject clip: isSketchpadClip ? control.slotData[index] : null
             property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[index].cppObjId) : null
             // A property to determine if slot is a sample-loop and is enabled
             property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled
-            property int midiChannel: control.selectedChannel != null ? control.selectedChannel.chainedSounds[index] : -1
-            property QtObject synthPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
-            property QtObject fxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id][index] : null
-            property QtObject sketchFxPassthroughClient: control.selectedChannel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
+            property int midiChannel: control.channel != null ? control.channel.chainedSounds[index] : -1
+            property QtObject synthPassthroughClient: control.channel != null && Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
+            property QtObject fxPassthroughClient: control.channel != null && Zynthbox.Plugin.fxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.channel.id][index] : null
+            property QtObject sketchFxPassthroughClient: control.channel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id][index] : null
             property QtObject zynthianLayer: {
                 let layer = null;
-                if (control.selectedChannel != null) {
+                if (control.channel != null) {
                     switch (_private.className) {
                     case "TracksBar_synthslot":
-                        let midiChannel = control.selectedChannel.chainedSounds[index];
-                        if (midiChannel >= 0 && control.selectedChannel.checkIfLayerExists(midiChannel)) {
+                        let midiChannel = control.channel.chainedSounds[index];
+                        if (midiChannel >= 0 && control.channel.checkIfLayerExists(midiChannel)) {
                             layer = zynqtgui.layer.get_layer_by_midi_channel(midiChannel)
                         }
                         break;
                     case "TracksBar_fxslot":
-                        layer = control.selectedChannel.chainedFx[index];
+                        layer = control.channel.chainedFx[index];
                         break;
                     case "TracksBar_sketchfxslot":
-                        layer = control.selectedChannel.chainedSketchFx[index];
+                        layer = control.channel.chainedSketchFx[index];
                         break;
                     }
                     if (layer == undefined) {
@@ -232,7 +267,7 @@ RowLayout {
             function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                 if (control.performSlotInteractions) {
                     let wasAlreadySelected = slotDelegate.highlighted
-                    root.selectedChannel.selectedSlot.setTo(_private.className, index, slotDelegate, root.selectedChannel);
+                    control.channel.selectedSlot.setTo(_private.className, index, slotDelegate, control.channel);
                     if (onlySelectSlot == false) {
                         if (wasAlreadySelected == false || onlyFocus) {
                             let className = "TracksBar_synthslot"
@@ -260,11 +295,11 @@ RowLayout {
                                 break;
                             default:
                                 console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
-                                root.selectedChannel.displayFx = false;
+                                control.channel.displayFx = false;
                                 break;
                             }
-                            zynqtgui.sketchpad.lastSelectedObj.setTo(className, index, slotDelegate, control.selectedChannel);
-                            control.selectedChannel.selectedSlotRow = index;
+                            zynqtgui.sketchpad.lastSelectedObj.setTo(className, index, slotDelegate, control.channel);
+                            control.channel.selectedSlotRow = index;
                         } else {
                             if (control.slotType === "external") {
                                 // If channel type is external, then it has 2 slots visible
@@ -280,25 +315,25 @@ RowLayout {
                             }
                         }
                         // FIXME This needs refactoring away... everything should be using the selectedSlot logic instead
-                        root.selectedChannel.selectedSlotRow = index;
-                        root.selectedChannel.selectedFxSlotRow = index;
+                        control.channel.selectedSlotRow = index;
+                        control.channel.selectedFxSlotRow = index;
 
                         if (control.slotType == "synth") {
-                            control.selectedChannel.setCurlayerByType("synth")
+                            control.channel.setCurlayerByType("synth")
                         } else if (control.slotType == "sample-trig") {
-                            control.selectedChannel.setCurlayerByType("sample")
+                            control.channel.setCurlayerByType("sample")
                         } else if (control.slotType == "sample-loop") {
-                            control.selectedChannel.setCurlayerByType("loop")
+                            control.channel.setCurlayerByType("loop")
                         } else if (control.slotType == "external") {
-                            control.selectedChannel.setCurlayerByType("external")
+                            control.channel.setCurlayerByType("external")
                         } else if (control.slotType == "fx") {
-                            control.selectedChannel.setCurlayerByType("fx")
+                            control.channel.setCurlayerByType("fx")
                         } else if (control.slotType == "sketch-fx") {
-                            control.selectedChannel.setCurlayerByType("sketch-fx")
+                            control.channel.setCurlayerByType("sketch-fx")
                         } else if (control.slotType == "text") {
                             // Do nothing for text slots
                         } else {
-                            control.selectedChannel.setCurlayerByType("")
+                            control.channel.setCurlayerByType("")
                         }
                     }
                 }
@@ -313,7 +348,7 @@ RowLayout {
                 enabled: (control.slotType !== "external") || (control.slotType === "external" && (index === 0 || index === 1 || index === 2))
                 opacity: enabled ? 1 : 0
                 visible: enabled
-                readonly property bool isSelectedSlot: control.selectedChannel != null && control.selectedChannel.selectedSlot.className === _private.className && control.selectedChannel.selectedSlot.value === slotDelegate.slotIndex
+                readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
                 Item {
                     id: slotDelegateVisualsContainer
                     anchors {
@@ -492,7 +527,7 @@ RowLayout {
                     }
                     onMouseXChanged: {
                         var newVal
-                        if (control.slotType === "synth" && control.selectedChannel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                        if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                             delegateMouseArea.dragHappened = true;
                             let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
@@ -505,12 +540,12 @@ RowLayout {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                             delegateMouseArea.dragHappened = true;
                             // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                            control.selectedChannel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                            control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
                         } else if (control.slotType == "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                             delegateMouseArea.dragHappened = true;
                             // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                            control.selectedChannel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                            control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
                         }
                     }
                     onPressAndHold: {
@@ -529,7 +564,7 @@ RowLayout {
                                 // If channel type is sample then open channel wave editor
                                 if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    zynqtgui.bottomBarControlObj = control.selectedChannel;
+                                    zynqtgui.bottomBarControlObj = control.channel;
                                     bottomStack.slotsBar.bottomBarButton.checked = true;
                                     Qt.callLater(function() {
                                         bottomStack.bottomBar.channelWaveEditorAction.trigger();
@@ -537,8 +572,8 @@ RowLayout {
                                 }
                             } else if (control.slotType === "synth") {
                                 // If channel type is synth open synth edit page
-                                if (control.selectedChannel.checkIfLayerExists(control.selectedChannel.chainedSounds[index])) {
-                                    zynqtgui.fixed_layers.activate_index(control.selectedChannel.chainedSounds[index])
+                                if (control.channel.checkIfLayerExists(control.channel.chainedSounds[index])) {
+                                    zynqtgui.fixed_layers.activate_index(control.channel.chainedSounds[index])
                                     zynqtgui.control.single_effect_engine = null;
                                     zynqtgui.current_screen_id = "control";
                                     zynqtgui.forced_screen_back = "sketchpad"

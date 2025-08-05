@@ -695,15 +695,17 @@ QQC2.Pane {
                                 }
                                 wrapMode: Text.WrapAnywhere
                                 font.pointSize: 8
-                                text: root.selectedSlotRowItem
-                                      ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                        ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
-                                        : fxButton.checked
-                                          ? root.selectedSlotRowItem.channel.chainedFxNames[root.selectedSlotRowItem.channel.selectedFxSlotRow]
-                                          : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
-                                            ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
-                                            : ""
-                                : ""
+                                text: {
+                                    if (synthsButton.checked) {
+                                        return root.selectedChannel.synthSlotsData[root.selectedChannel.selectedSlot.value]
+                                    } else if (samplesButton.checked) {
+                                        return root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].filename
+                                    } else if (fxButton.checked) {
+                                        return root.selectedChannel.fxSlotsData[root.selectedChannel.selectedSlot.value]
+                                    } else {
+                                        return ""
+                                    }
+                                }
                             }
 
                             onClicked: {

@@ -592,7 +592,7 @@ QQC2.Pane {
                                         orientation: Qt.Vertical
                                         showSlotTypeLabel: false
                                         dragEnabled: false
-                                        singleClickEnabled: false
+                                        singleClickEnabled: true
                                         doubleClickEnabled: false
                                         clickAndHoldEnabled: false
                                         onSlotClicked: {

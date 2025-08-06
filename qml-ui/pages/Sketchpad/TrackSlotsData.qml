@@ -46,6 +46,9 @@ GridLayout {
     property bool highlightCurrentlySelectedSlot: true
     /**
      * \brief Allow setting the orientation of the layout
+     * The value can be one of the following :
+     * \value Qt.Horizontal (default)
+     * \value Qt.Vertical
      */
     property int orientation: Qt.Horizontal
     /**

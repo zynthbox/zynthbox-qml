@@ -214,7 +214,7 @@ Rectangle {
                 MouseArea {
                     id: mouseArea
                     property real initialMouseY
-                    property bool dragHappened: false                    
+                    property bool dragHappened: false
                     // A workaround to be able to handle pressed signal as MouseArea has a property and a signal named pressed causing conflict
                     signal handlePressed(var mouse)
 
@@ -243,7 +243,7 @@ Rectangle {
                     }
                     Timer {
                         id: dblTimer
-                        interval: 200
+                        interval: zynqtgui.ui_settings.doubleClickThreshold
                         onTriggered: {
                             if (!mouseArea.dragHappened) {
                                 control.clicked();

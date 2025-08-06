@@ -77,7 +77,7 @@ ColumnLayout {
                 } else {
                     shouldClick = false;
                     let thisClickTime = Date.now();
-                    if (thisClickTime - mostRecentClickTime < 300) {
+                    if (thisClickTime - mostRecentClickTime < zynqtgui.ui_settings.doubleClickThreshold) {
                         root.doubleClicked();
                     } else {
                         root.clicked();

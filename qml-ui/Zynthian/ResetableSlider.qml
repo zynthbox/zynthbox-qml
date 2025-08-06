@@ -21,12 +21,22 @@ QQC2.Slider {
     MouseArea {
         id: mouseArea
         property real xValPerPixel: Math.abs(root.to - root.from) / root.width
+        property var mostRecentClickTime
 
         anchors.fill: root
-
         onPressed: root.pressed(mouse)
-        onReleased: root.released(mouse)
-
+        onReleased: {
+            root.released(mouse)
+            let thisClickTime = Date.now();
+            if (thisClickTime - mostRecentClickTime < zynqtgui.ui_settings.doubleClickThreshold) {
+                if (root.initialValue != null) {
+                    root.controlObj[root.controlProp] = root.initialValue
+                }
+            } else {
+                root.clicked();
+            }
+            mostRecentClickTime = thisClickTime;
+        }
         onPositionChanged: {
             var positionX = Math.max(0, Math.min(mapToItem(root, mouse.x, mouse.y).x, root.x + root.width))
             if (root.orientation == Qt.Horizontal) {
@@ -34,15 +44,6 @@ QQC2.Slider {
             } else if (root.orientation == Qt.Vertical) {
                 // TODO : Implement vertical slider drag
             }
-        }
-
-        onDoubleClicked: {
-            if (root.initialValue != null) {
-                root.controlObj[root.controlProp] = root.initialValue
-            }
-        }
-        onClicked: {
-            root.clicked();
         }
     }
 }

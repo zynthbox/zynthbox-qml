@@ -67,7 +67,7 @@ AbstractController {
             } else {
                 shouldClick = false;
                 let thisClickTime = Date.now();
-                if (thisClickTime - mostRecentClickTime < 300) {
+                if (thisClickTime - mostRecentClickTime < zynqtgui.ui_settings.doubleClickThreshold) {
                     if (root.controller && root.controller.ctrl) {
                         root.controller.ctrl.value = root.controller.ctrl.value_default;
                     }

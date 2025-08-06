@@ -251,7 +251,6 @@ QQC2.Pane {
                                                     onReleased: volumeControl.mouseArea.released(mouse)
                                                     onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
                                                     onClicked: volumeControl.mouseArea.clicked(mouse)
-                                                    onDoubleClicked: volumeControl.mouseArea.doubleClicked(mouse)
                                                     onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
                                                     onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
                                                 }
@@ -544,7 +543,6 @@ QQC2.Pane {
                                 onReleased: masterVolume.mouseArea.released(mouse)
                                 onPressAndHold: masterVolume.mouseArea.pressAndHold(mouse)
                                 onClicked: masterVolume.mouseArea.clicked(mouse)
-                                onDoubleClicked: masterVolume.mouseArea.doubleClicked(mouse)
                                 onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
                                 onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
                             }

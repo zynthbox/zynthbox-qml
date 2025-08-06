@@ -729,12 +729,17 @@ QQC2.Pane {
                         visible: synthsButton.checked
                         enabled: chainedSound >= 0 &&
                                  (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
-                        value: synthPassthroughClient ? synthPassthroughClient.dryAmount : 0
+                        value: volumeSlider.synthPassthroughClient ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
                         stepSize: 0.01
-                        from: 0
-                        to: 1
+                        from: volumeSlider.synthPassthroughClient.dryGainHandler.minimumDecibel
+                        to: volumeSlider.synthPassthroughClient.dryGainHandler.maximumDecibel
                         onMoved: {
-                            root.selectedChannel.set_passthroughValue("synthPassthrough", root.selectedSlotRow, "dryAmount", value);
+                            volumeSlider.synthPassthroughClient.dryGainHandler.gainDb = volumeSlider.value;
+                        }
+                        Binding {
+                            target: volumeSlider
+                            property: "value"
+                            value: volumeSlider.synthPassthroughClient.dryGainHandler.gainDb
                         }
                     }
 

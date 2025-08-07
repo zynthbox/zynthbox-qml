@@ -307,7 +307,7 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     Layout.alignment: Qt.AlignVCenter
                     readOnly: true
-                    text: qsTr("192.168.0.0")
+                    text: ""
                 }
             }
         }

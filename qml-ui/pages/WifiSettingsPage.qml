@@ -35,6 +35,24 @@ Zynthian.ScreenPage {
 
     signal openCaptivePortal(string url)
 
+    function getWifiIconNameBySignalStrength(signalStrength) {
+        let iconName = "network-wireless-signal-%1-symbolic"
+        if (signalStrength <= 20) {
+            iconName = qsTr(iconName).arg("none")
+        } else if (signalStrength > 20 && signalStrength <= 40) {
+            iconName = qsTr(iconName).arg("weak")
+        } else if (signalStrength > 40 && signalStrength <= 60) {
+            iconName = qsTr(iconName).arg("ok")
+        } else if (signalStrength > 60 && signalStrength <= 80) {
+            iconName = qsTr(iconName).arg("good")
+        } else if (signalStrength > 80) {
+            iconName = qsTr(iconName).arg("excellent")
+        } else {
+            iconName = qsTr(iconName).arg("none")
+        }
+        return iconName;
+    }
+
     title: qsTr("Wifi Settings")
     screenId: "wifi_settings"    
     contextualActions: [
@@ -75,6 +93,9 @@ Zynthian.ScreenPage {
         width: Math.round(Math.max(implicitWidth, root.width * 0.4))
         height: Math.round(Math.max(implicitHeight, root.height * 0.4))
         closePolicy: QQC2.Popup.CloseOnPressOutside
+        onClosed: {
+            passwordField.text = ""
+        }
         header: ColumnLayout {
             Kirigami.Heading {
                 Layout.fillWidth: true
@@ -95,8 +116,8 @@ Zynthian.ScreenPage {
                 text: qsTr("Connect")
                 Layout.alignment: Qt.AlignRight
                 onClicked: {
-                    connectDialog.close()
                     zynqtgui.wifi_settings.connect(connectDialog.ssid, passwordField.text)
+                    connectDialog.close()
                 }
             }
         }
@@ -258,7 +279,15 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     Layout.alignment: Qt.AlignVCenter
                     readOnly: true
-                    text: qsTr("Disconnected")
+                    text: {
+                        if (zynqtgui.wifi_settings.wifiMode == "on") {
+                            return qsTr("Connected")
+                        } else if (zynqtgui.wifi_settings.wifiMode == "off") {
+                            return qsTr("Disconnected")
+                        } else {
+                            return qsTr("Unknown")
+                        }
+                    }
                 }
             }
 
@@ -317,11 +346,24 @@ Zynthian.ScreenPage {
                     height: Kirigami.Units.gridUnit * 2
                     contentItem: RowLayout {
                         QQC2.Label {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignCenter
+                            text: "%1 -".arg(index + 1)
+                        }
+                        Kirigami.Icon {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: height
+                            Layout.leftMargin: 2
+                            Layout.rightMargin: 2
+                            source: root.getWifiIconNameBySignalStrength(modelData.quality)
+                        }
+                        QQC2.Label {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignCenter
-                            text: qsTr("%1 - %2").arg(index + 1).arg(modelData.ssid)
-                            elide: Text.ElideRight
+                            text: modelData.ssid
                         }
                         QQC2.Button {
                             Layout.fillWidth: false
@@ -364,8 +406,6 @@ Zynthian.ScreenPage {
                 anchors.fill: parent
                 qmlSelector: Zynthian.SelectorWrapper {
                     selector_list: zynqtgui.wifi_settings.savedWifiNetworks
-                    current_index: -1
-                    autoActivateIndexOnChange: false
                 }
                 delegate: QQC2.ItemDelegate {
                     id: savedNetworkDelegate
@@ -384,7 +424,7 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: height * 2
                             icon.name: "delete-symbolic"
                             onClicked: {
-                                // TODO delete saved network
+                                zynqtgui.wifi_settings.remove_network(modelData.ssid)
                             }
                         }
                         QQC2.Button {

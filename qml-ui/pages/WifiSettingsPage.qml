@@ -294,6 +294,7 @@ Zynthian.ScreenPage {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
+                opacity: 0
 
                 QQC2.Label {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -339,6 +340,7 @@ Zynthian.ScreenPage {
                 anchors.fill: parent
                 qmlSelector: Zynthian.SelectorWrapper {
                     selector_list: zynqtgui.wifi_settings.availableWifiNetworks
+                    current_index: -1
                 }
                 delegate: QQC2.ItemDelegate {
                     id: availableNetworkDelegate
@@ -408,6 +410,7 @@ Zynthian.ScreenPage {
                 anchors.fill: parent
                 qmlSelector: Zynthian.SelectorWrapper {
                     selector_list: zynqtgui.wifi_settings.savedWifiNetworks
+                    current_index: -1
                 }
                 delegate: QQC2.ItemDelegate {
                     id: savedNetworkDelegate

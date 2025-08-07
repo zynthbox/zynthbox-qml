@@ -301,6 +301,8 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
             # Save state if mode change was successful
             if result:
                 self.zynqtgui.global_settings.setValue("Wifi/state", mode)
+                self.connectedNetworkSsidChanged.emit()
+                self.connectedNetworkIpChanged.emit()
             return result
 
         if showLoadingScreen:
@@ -333,5 +335,39 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
 
     savedWifiNetworks = Property('QVariantList', get_savedWifiNetworks, notify=savedWifiNetworksChanged)
     ### END Property savedWifiNetworks
+
+    ### Property connectedNetworkSsid
+    def get_connectedNetworkSsid(self):
+        ssid = None
+        for line_byte in check_output("iwconfig", shell=True).splitlines():
+            line = line_byte.decode("utf-8")
+            if line.find('ESSID') >= 0:
+                matchResult = re.match('.*ESSID:"(.*)"', line, re.M | re.I)
+                if matchResult:
+                    ssid = matchResult.group(1)
+                break
+        return ssid
+
+    connectedNetworkSsidChanged = Signal()
+
+    connectedNetworkSsid = Property(str, get_connectedNetworkSsid, notify=connectedNetworkSsidChanged)
+    ### END Property connectedNetworkSsid
+
+    ### Property connectedNetworkIp
+    def get_connectedNetworkIp(self):
+        ip = ""
+        for line_byte in check_output("ip -f inet addr show wlan0", shell=True).splitlines():
+            line = line_byte.decode("utf-8")
+            if line.find('inet ') >= 0:
+                matchResult = re.match('inet (.*)/', line, re.M | re.I)
+                if matchResult:
+                    ip = matchResult.group(1)
+                break
+        return ip
+
+    connectedNetworkIpChanged = Signal()
+
+    connectedNetworkIp = Property(str, get_connectedNetworkIp, notify=connectedNetworkIpChanged)
+    ### END Property connectedNetworkIp
 
     openCaptivePortal = Signal(str)

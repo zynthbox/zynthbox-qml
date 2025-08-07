@@ -281,7 +281,7 @@ Zynthian.ScreenPage {
                     readOnly: true
                     text: {
                         if (zynqtgui.wifi_settings.wifiMode == "on") {
-                            return qsTr("Connected")
+                            return qsTr("Connected to %1").arg(zynqtgui.wifi_settings.connectedNetworkSsid)
                         } else if (zynqtgui.wifi_settings.wifiMode == "off") {
                             return qsTr("Disconnected")
                         } else {
@@ -294,7 +294,7 @@ Zynthian.ScreenPage {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
-                opacity: 0
+                opacity: 0 // zynqtgui.wifi_settings.wifiMode == "on" ? 1 : 0
 
                 QQC2.Label {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -308,7 +308,7 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     Layout.alignment: Qt.AlignVCenter
                     readOnly: true
-                    text: ""
+                    text: zynqtgui.wifi_settings.connectedNetworkIpChanged
                 }
             }
         }
@@ -435,7 +435,7 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                            text: zynqtgui.wifi_settings.wifiMode == "on" ? qsTr("Disconnect") : qsTr("Connect")
+                            text: zynqtgui.wifi_settings.wifiMode == "on" && zynqtgui.wifi_settings.connectedNetworkSsid == modelData.ssid ? qsTr("Disconnect") : qsTr("Connect")
                             onClicked: {
                                 // TODO Connect to saved network
                                 if (zynqtgui.wifi_settings.wifiMode == "on") {

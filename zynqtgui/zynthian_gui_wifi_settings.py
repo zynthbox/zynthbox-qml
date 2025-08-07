@@ -22,22 +22,18 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+
+
 import base64
 import os
 import re
+import logging
+import requests
+import zynconf
 from collections import OrderedDict
 from subprocess import check_output
-
-import requests
-from PySide2.QtCore import Property, QTimer, Signal, Slot
-
-import logging
-
-import zynconf
-import zyngine
+from PySide2.QtCore import Property, Signal, Slot
 from . import zynthian_qt_gui_base
-
-from zyncoder import *
 
 
 class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):

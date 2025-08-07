@@ -432,10 +432,14 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                            text: qsTr("Connect")
+                            text: zynqtgui.wifi_settings.wifiMode == "on" ? qsTr("Disconnect") : qsTr("Connect")
                             onClicked: {
                                 // TODO Connect to saved network
-                                zynqtgui.wifi_settings.wifiMode = "on"
+                                if (zynqtgui.wifi_settings.wifiMode == "on") {
+                                    zynqtgui.wifi_settings.wifiMode = "off"
+                                } else {
+                                    zynqtgui.wifi_settings.wifiMode = "on"
+                                }
                             }
                         }
                     }

@@ -44,6 +44,9 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
         self.available_wifi_networks = []
         self.saved_wifi_networks = []
 
+        # Restore previous wifi state
+        self.set_wifiMode(self.zynqtgui.global_settings.value("Wifi/state", "off"), showLoadingScreen=False)
+
     def show(self):
         pass
 
@@ -198,6 +201,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
                 wpa_supplicant_header += m.group(0)
 
         self.save_wpa_supplicant_config(wpa_supplicant_header)
+        self.reloadLists()
 
     def update_network_options(self, updSSID, options):
         logging.info("Update Network Options: {}".format(updSSID))
@@ -261,23 +265,30 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(str, str)
     def connect(self, ssid, password):
-        logging.error(f"Connect to wifi : {ssid}, {password}")
-        self.add_new_network(ssid, password)
-        self.set_wifiMode("on", f"Attempting to connect to wifi : {ssid}")
+        def task():
+            logging.error(f"Connect to wifi : {ssid}, {password}")
+            self.add_new_network(ssid, password)
+            self.set_wifiMode("on", showLoadingScreen=False)
+            self.reloadLists()
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, f"Attempting to connect to wifi : {ssid}")
 
     ### Property wifiMode
     def get_wifiMode(self):
         return zynconf.get_current_wifi_mode()
 
-    def set_wifiMode(self, mode, message=None):
+    def set_wifiMode(self, mode, message=None, showLoadingScreen=True):
         def task():
+            result = False
             try:
                 if mode == "on":
-                    self.startWifi()
+                    self.zynqtgui.currentTaskMessage = "Attempting to connect to wifi"
+                    result = self.startWifi()
                 elif mode == "hotspot":
-                    self.startHotspot()
+                    result = self.startHotspot()
                 elif mode == "off":
-                    self.stopWifi()
+                    self.zynqtgui.currentTaskMessage = "Turning off wifi"
+                    result = self.stopWifi()
                 else:
                     # Do nothing if wifi mode is none of the above handled ones
                     pass
@@ -285,12 +296,20 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
                 logging.error(f"Error setting wifi mode : {str(e)}")
 
             self.wifiModeChanged.emit()
-            self.zynqtgui.end_long_task()
+            if showLoadingScreen:
+                self.zynqtgui.end_long_task()
+            # Save state if mode change was successful
+            if result:
+                self.zynqtgui.global_settings.setValue("Wifi/state", mode)
+            return result
 
-        if message is None:
-            self.zynqtgui.do_long_task(task, f"Changing wifi mode to {mode}")
+        if showLoadingScreen:
+            if message is None:
+                self.zynqtgui.do_long_task(task)
+            else:
+                self.zynqtgui.do_long_task(task, message)
         else:
-            self.zynqtgui.do_long_task(task, message)
+            return task()
 
     wifiModeChanged = Signal()
 

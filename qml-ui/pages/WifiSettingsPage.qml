@@ -372,6 +372,8 @@ Zynthian.ScreenPage {
                             text: qsTr("Connect")
                             onClicked: {
                                 // TODO Connect to new available network
+                                connectDialog.ssid = modelData.ssid
+                                connectDialog.open()
                             }
                         }
                     }
@@ -433,6 +435,7 @@ Zynthian.ScreenPage {
                             text: qsTr("Connect")
                             onClicked: {
                                 // TODO Connect to saved network
+                                zynqtgui.wifi_settings.wifiMode = "on"
                             }
                         }
                     }

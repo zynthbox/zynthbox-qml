@@ -305,7 +305,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
 
         if showLoadingScreen:
             if message is None:
-                self.zynqtgui.do_long_task(task)
+                self.zynqtgui.do_long_task(task, f"Setting wifi mode to {mode}")
             else:
                 self.zynqtgui.do_long_task(task, message)
         else:

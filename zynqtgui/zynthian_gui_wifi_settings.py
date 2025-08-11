@@ -356,13 +356,14 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
     ### Property connectedNetworkIp
     def get_connectedNetworkIp(self):
         ip = ""
-        for line_byte in check_output("ip -f inet addr show wlan0", shell=True).splitlines():
-            line = line_byte.decode("utf-8")
-            if line.find('inet ') >= 0:
-                matchResult = re.match('inet (.*)/', line, re.M | re.I)
-                if matchResult:
-                    ip = matchResult.group(1)
-                break
+        if self.wifiMode == "on":
+            for line_byte in check_output("ip -f inet addr show wlan0", shell=True).splitlines():
+                line = line_byte.decode("utf-8")
+                if line.find('inet ') >= 0:
+                    matchResult = re.match('.*inet (.*)\/', line, re.M | re.I)
+                    if matchResult:
+                        ip = matchResult.group(1)
+                    break
         return ip
 
     connectedNetworkIpChanged = Signal()

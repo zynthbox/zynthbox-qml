@@ -268,6 +268,8 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: false
 
                 QQC2.Label {
+                    Layout.fillWidth: false
+                    Layout.fillHeight: false
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                     horizontalAlignment: Qt.AlignHCenter
                     text: qsTr("Status")
@@ -292,11 +294,13 @@ Zynthian.ScreenPage {
             }
 
             RowLayout {
-                Layout.fillWidth: true
+                Layout.fillWidth: false
                 Layout.fillHeight: false
-                opacity: 0 // zynqtgui.wifi_settings.wifiMode == "on" ? 1 : 0
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 16
 
                 QQC2.Label {
+                    Layout.fillWidth: false
+                    Layout.fillHeight: false
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                     horizontalAlignment: Qt.AlignHCenter
                     text: qsTr("IP")
@@ -307,8 +311,9 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: false
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     Layout.alignment: Qt.AlignVCenter
+                    horizontalAlignment: Qt.AlignHCenter
                     readOnly: true
-                    text: zynqtgui.wifi_settings.connectedNetworkIpChanged
+                    text: zynqtgui.wifi_settings.connectedNetworkIp
                 }
             }
         }

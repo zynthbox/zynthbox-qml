@@ -260,6 +260,8 @@ GridLayout {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             opacity: slotMakesSound ? 1 : 0.3
             background: Item {
+                id: backgroundItem
+                property bool highlightBorder: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === index)
                 // Show highlighted color on slot border when slot is a sample-loop and is enabled
                 Rectangle {
                     visible: !svgBg.visible
@@ -267,7 +269,8 @@ GridLayout {
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     color: Kirigami.Theme.backgroundColor
-                    border.color: slotDelegate.isClipEnabled ? Kirigami.Theme.highlightColor : "#ff999999"
+                    // If slot is a enabled clip or slot is selectedSlot, show highlighted border
+                    border.color: backgroundItem.highlightBorder ? Kirigami.Theme.highlightColor : "#ff999999"
                     border.width: 2
                     radius: 4
                 }
@@ -282,7 +285,7 @@ GridLayout {
                     readonly property real bottomPadding: margins.bottom
 
                     imagePath: "widgets/slots-delegate-background"
-                    prefix: slotDelegate.isClipEnabled ? ["focus", ""] : ""
+                    prefix: backgroundItem.highlightBorder ? ["focus", ""] : ""
                     colorGroup: PlasmaCore.Theme.ButtonColorGroup
                 }
             }

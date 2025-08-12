@@ -588,35 +588,9 @@ GridLayout {
                         }
                     }
                     onPressAndHold: {
-                        if (!delegateMouseArea.dragHappened && control.clickAndHoldEnabled) {
-                            if (control.slotType === "sample-loop") {
-                                // If channel type is sample-loop open clip wave editor
-                                if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                    zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
-                                    zynqtgui.bottomBarControlObj = waveformContainer.clip;
-                                    bottomStack.slotsBar.bottomBarButton.checked = true;
-                                    Qt.callLater(function() {
-                                        bottomStack.bottomBar.waveEditorAction.trigger();
-                                    })
-                                }
-                            } else if (control.slotType.startsWith("sample")) {
-                                // If channel type is sample then open channel wave editor
-                                if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    zynqtgui.bottomBarControlObj = control.channel;
-                                    bottomStack.slotsBar.bottomBarButton.checked = true;
-                                    Qt.callLater(function() {
-                                        bottomStack.bottomBar.channelWaveEditorAction.trigger();
-                                    })
-                                }
-                            } else if (control.slotType === "synth") {
-                                // If channel type is synth open synth edit page
-                                if (control.channel.checkIfLayerExists(control.channel.chainedSounds[index])) {
-                                    zynqtgui.fixed_layers.activate_index(control.channel.chainedSounds[index])
-                                    zynqtgui.control.single_effect_engine = null;
-                                    zynqtgui.current_screen_id = "control";
-                                    zynqtgui.forced_screen_back = "sketchpad"
-                                }
+                        if (control.clickAndHoldEnabled && slotDelegate.highlighted && !delegateMouseArea.dragHappened) {
+                            if (!control.channel.selectedSlot.isEmpty()) {
+                                zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
                             }
                         }
                     }

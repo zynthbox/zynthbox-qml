@@ -1477,25 +1477,14 @@ QQC2.Pane {
                                                 }
                                             }
                                             onReleased: {
-                                                if (waveformContainer.showWaveform) {
-                                                    if (root.selectedChannel.trackType === "sample-loop") {
-                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                                            zynqtgui.bottomBarControlObj = waveformContainer.clip;
-                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                            Qt.callLater(function() {
-                                                                bottomStack.bottomBar.waveEditorAction.trigger();
-                                                            })
-                                                        }
-                                                    } else {
-                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                                            zynqtgui.bottomBarControlObj = root.selectedChannel;
-                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                            Qt.callLater(function() {
-                                                                bottomStack.bottomBar.channelWaveEditorAction.trigger();
-                                                            })
-                                                        }
+                                                if (horizontalDrag == 0 && verticalDrag == 0) {
+                                                    // Drag action did not happen. Perform single press action
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_sampleslot":
+                                                            if (!root.selectedChannel.selectedSlot.isEmpty()) {
+                                                                root.selectedChannel.samples[root.selectedChannel.selectedSlot.value].play()
+                                                            }
+                                                            break;
                                                     }
                                                 } else {
                                                     if (horizontalDrag > 0) {

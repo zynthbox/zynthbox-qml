@@ -205,6 +205,35 @@ class last_selected_obj_dto(QObject):
     humanReadableObjName = Property(str, get_humanReadableObjName, notify=valueChanged)
     ### END Property humanReadableObjName
 
+    @Slot(result=bool)
+    def isEmpty(self):
+        result = False
+        match (self.className):
+            case "sketchpad_channel":
+                result = self.value.isEmpty()
+            case "sketchpad_clip":
+                result = self.value.isEmpty
+            case "sketchpad_clipoverview":
+                # TODO
+                pass
+            case "TracksBar_synthslot":
+                if self.track is not None:
+                    midiChannel = self.track.chainedSounds[self.value]
+                    result = midiChannel == -1 or not self.track.checkIfLayerExists(midiChannel)
+            case "TracksBar_sampleslot":
+                if self.track is not None:
+                    result = self.track.samples[self.value].isEmpty
+            case "TracksBar_sketchslot":
+                # TODO
+                pass
+            case "TracksBar_fxslot":
+                if self.track is not None:
+                    result = self.track.chainedFx[self.value] is None
+            case "TracksBar_sketchfxslot":
+                if self.track is not None:
+                    result = self.track.chainedSketchFx[self.value] is None
+        return result
+
     @Slot(QObject, result=bool)
     def copyFrom(self, sourceObject):
         result = False

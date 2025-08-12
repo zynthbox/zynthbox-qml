@@ -1542,6 +1542,17 @@ QQC2.Pane {
                                                     verticalDrag = 0;
                                                 }
                                             }
+                                            onPressAndHold: {
+                                                switch (root.selectedChannel.selectedSlot.className) {
+                                                    case "TracksBar_synthslot":
+                                                    case "TracksBar_sampleslot":
+                                                    case "TracksBar_fxslot":
+                                                        if (!root.selectedChannel.selectedSlot.isEmpty()) {
+                                                            zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                                                        }
+                                                        break;
+                                                }
+                                            }
                                         }
                                     }
                                 }

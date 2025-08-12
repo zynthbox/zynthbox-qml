@@ -1068,9 +1068,16 @@ class sketchpad_clip(QObject):
             #         if clip.isPlaying:
             #             clip.stop()
 
-        if self.channel is None:
-            # if channel is none, it means this clip is a sample rather than a clip and needs to be just... played
-            self.play_audio(True)
+        if self.isChannelSample:
+            # This clip is a sample and needs to be just... played
+            if self.audioSource:
+                logging.info(f"Playing CAS : {self.audioSource}")
+                looping = self.audioSource.rootSlice().looping()
+                self.audioSource.rootSlice().setLooping(False)
+                # When forceLooping is set to False, it falls back to rootSlice.looping
+                # So set rootSlice looping to false before playing otherwise sample will keep looping
+                self.audioSource.play(False)
+                self.audioSource.rootSlice().setLooping(looping)
         else:
             # logging.info(f"Setting Clip To Play from the beginning at the top of the next bar {self} track {self.channel.id} clip {self.id}")
             # Until we work out what to actually do with the whole "more than one songs" thing, this will do
@@ -1080,7 +1087,7 @@ class sketchpad_clip(QObject):
     @Slot(None)
     def stop(self):
         # logging.info(f"Setting Clip to Stop at the top of the next bar {self}")
-        if self.channel is None:
+        if self.isChannelSample:
             # if channel is none, it means this clip is a sample rather than a clip and needs to be just... stopped
             self.stop_audio()
         else:

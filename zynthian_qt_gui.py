@@ -1605,6 +1605,7 @@ class zynthian_gui(QObject):
         self.screens["main_layers_view"].sync_index_from_curlayer()
         self.curLayerChanged.emit()
         self.curlayerEngineNameChanged.emit()
+        self.curlayerEngineIdChanged.emit()
         self.curlayerPresetNameChanged.emit()
         self.curlayerIsFXChanged.emit()
 
@@ -4731,6 +4732,18 @@ class zynthian_gui(QObject):
     curlayerEngineNameChanged = Signal()
 
     curlayerEngineName = Property(str, get_curlayerEngineName, notify=curlayerEngineNameChanged)
+    ### END Property curlayerEngineName
+
+    ### Property curlayerEngineId
+    def get_curlayerEngineId(self):
+        try:
+            return self.curlayer.engine.pluginID
+        except:
+            return ""
+
+    curlayerEngineIdChanged = Signal()
+
+    curlayerEngineId = Property(str, get_curlayerEngineId, notify=curlayerEngineIdChanged)
     ### END Property curlayerEngineName
 
     ### Property curlayerPresetName

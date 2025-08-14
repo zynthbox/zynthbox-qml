@@ -85,7 +85,7 @@ Zynthian.ScreenPage {
         onCurrent_screen_idChanged: {
             if (zynqtgui.current_screen_id === root.screenId) {
                 // Reload wifi list
-                zynqtgui.wifi_settings.reloadLists()
+                zynqtgui.wifi_settings.reloadLists();
             }
         }
     }
@@ -204,6 +204,35 @@ Zynthian.ScreenPage {
                     horizontalAlignment: Qt.AlignHCenter
                     readOnly: true
                     text: zynqtgui.wifi_settings.connectedNetworkIp
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+            spacing: Kirigami.Units.largeSpacing
+
+            QQC2.Label {
+                Layout.fillWidth: false
+                Layout.fillHeight: false
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                horizontalAlignment: Qt.AlignHCenter
+                text: qsTr("Country")
+            }
+
+            Zynthian.ComboBox {
+                id: countryCodesCombo
+                Layout.fillWidth: false
+                Layout.fillHeight: false
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                Layout.alignment: Qt.AlignVCenter
+                currentIndex: zynqtgui.wifi_settings.selectedCountryDetail.index
+                model: zynqtgui.wifi_settings.countryDetailsModel
+                textRole: "countryName"
+                onActivated: {
+                    zynqtgui.wifi_settings.selectedCountryDetail = countryCodesCombo.model[index]
                 }
             }
         }

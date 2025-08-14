@@ -33,8 +33,27 @@ import requests
 import zynconf
 from collections import OrderedDict
 from subprocess import check_output
-from PySide2.QtCore import Property, Signal, Slot
+from PySide2.QtCore import QObject, Property, Signal, Slot
 from . import zynthian_qt_gui_base
+
+
+class country_detail(QObject):
+    def __init__(self, index, country_code, country_name, parent):
+        super(country_detail, self).__init__(parent)
+        self.__index = index
+        self.__country_code = country_code
+        self.__country_name = country_name
+
+    def get_index(self):
+        return self.__index
+    def get_countryCode(self):
+        return self.__country_code
+    def get_countryName(self):
+        return self.__country_name
+
+    index = Property(int, get_index, constant=True)
+    countryCode = Property(str, get_countryCode, constant=True)
+    countryName = Property(str, get_countryName, constant=True)
 
 
 class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
@@ -54,12 +73,24 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
         else:
             self.saved_wifi_networks = json.loads(base64.b64decode(savedNetworks).decode("utf-8"))
 
+        selected_country_code = self.zynqtgui.global_settings.value("WifiSettings/country", "DE")
+        self.selected_country_detail = None
+        self.country_details = []
         with open("/zynthian/zynthbox-qml/config/ISO3166-1.alpha2.json", "r") as f:
-            self.country_codes = json.load(f)
+            country_codes = json.load(f)
+            for id, country_code in enumerate(country_codes):
+                detail = country_detail(id, country_code, country_codes[country_code], self)
+                self.country_details.append(detail)
+                # Set selected country object
+                if country_code == selected_country_code:
+                    self.selected_country_detail = detail
+            self.country_details = sorted(self.country_details, key=lambda x: x.countryName.casefold())
+            # If no country was selected, set the first country as default
+            if self.selected_country_detail is None:
+                self.selected_country_detail = self.country_details[0]
 
         # Restore previous wifi state
         self.set_wifiMode(self.zynqtgui.global_settings.value("WifiSettings/state", "off"), showLoadingScreen=False)
-        self.country = self.zynqtgui.global_settings.value("WifiSettings/country", "DE")
 
     def show(self):
         pass
@@ -277,26 +308,27 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
     connectedNetworkIp = Property(str, get_connectedNetworkIp, notify=connectedNetworkIpChanged)
     ### END Property connectedNetworkIp
 
-    ### Property selectedCountry
-    def get_selectedCountry(self):
-        return self.country
+    ### Property selectedCountryDetail
+    def get_selectedCountryDetail(self):
+        return self.selected_country_detail
 
-    def set_selectedCountry(self, value):
-        if value != self.country:
-            self.zynqtgui.global_settings.setValue("WifiSettings/country", value)
-            self.selectedCountryChanged.emit()
+    def set_selectedCountryDetail(self, value):
+        if value != self.selected_country_detail:
+            self.selected_country_detail = value
+            self.zynqtgui.global_settings.setValue("WifiSettings/country", value.countryCode)
+            self.selectedCountryDetailChanged.emit()
 
-    selectedCountryChanged = Signal()
+    selectedCountryDetailChanged = Signal()
 
-    selectedCountry = Property(str, get_selectedCountry, set_selectedCountry, notify=selectedCountryChanged)
-    ### END Property selectedCountry
+    selectedCountryDetail = Property(QObject, get_selectedCountryDetail, set_selectedCountryDetail, notify=selectedCountryDetailChanged)
+    ### END Property selectedCountryDetail
 
-    ### Property countryCodes
-    def get_countryCodes(self):
-        return self.country_codes
+    ### Property countryDetailsModel
+    def get_countryDetailsModel(self):
+        return self.country_details
 
-    countryCodes = Property('QVariant', get_countryCodes, constant=True)
-    ### END Property countryCodes
+    countryDetailsModel = Property('QVariantList', get_countryDetailsModel, constant=True)
+    ### END Property countryDetailsModel
 
     @Slot(None)
     def reloadLists(self):
@@ -313,7 +345,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
     @Slot(str)
     def connectSavedNetwork(self, ssid):
         def task():
-            self.generate_wpa_supplicant_conf(self.selectedCountry, ssid, self.saved_wifi_networks[ssid]["password"])
+            self.generate_wpa_supplicant_conf(self.selectedCountryDetail.countryCode, ssid, self.saved_wifi_networks[ssid]["password"])
             self.set_wifiMode("on", showLoadingScreen=False)
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, f"Attempting to connect to wifi : {ssid}")

@@ -35,17 +35,19 @@ Zynthian.ScreenPage {
 
     signal openCaptivePortal(string url)
 
-    function getWifiIconNameBySignalStrength(signalStrength) {
+    function getWifiIconNameByQuality(quality) {
         let iconName = "network-wireless-signal-%1-symbolic"
-        if (signalStrength <= 20) {
+        if (quality < 0) {
+            iconName = "network-wireless-disconnected-symbolic"
+        } else if (quality >= 0 && quality <= 20) {
             iconName = qsTr(iconName).arg("none")
-        } else if (signalStrength > 20 && signalStrength <= 40) {
+        } else if (quality > 20 && quality <= 40) {
             iconName = qsTr(iconName).arg("weak")
-        } else if (signalStrength > 40 && signalStrength <= 60) {
+        } else if (quality > 40 && quality <= 60) {
             iconName = qsTr(iconName).arg("ok")
-        } else if (signalStrength > 60 && signalStrength <= 80) {
+        } else if (quality > 60 && quality <= 80) {
             iconName = qsTr(iconName).arg("good")
-        } else if (signalStrength > 80) {
+        } else if (quality > 80) {
             iconName = qsTr(iconName).arg("excellent")
         } else {
             iconName = qsTr(iconName).arg("none")
@@ -54,12 +56,19 @@ Zynthian.ScreenPage {
     }
 
     title: qsTr("Wifi Settings")
-    screenId: "wifi_settings"    
+    screenId: "wifi_settings"
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Refresh")
             onTriggered: {
                 zynqtgui.wifi_settings.reloadLists()
+            }
+        },
+        Kirigami.Action {
+            text: qsTr("Disconnect")
+            visible: zynqtgui.wifi_settings.wifiMode == "on"
+            onTriggered: {
+                zynqtgui.wifi_settings.wifiMode = "off"
             }
         }
     ]
@@ -116,7 +125,7 @@ Zynthian.ScreenPage {
                 text: qsTr("Connect")
                 Layout.alignment: Qt.AlignRight
                 onClicked: {
-                    zynqtgui.wifi_settings.connect(connectDialog.ssid, passwordField.text)
+                    zynqtgui.wifi_settings.connectNewNetwork(connectDialog.ssid, passwordField.text)
                     connectDialog.close()
                 }
             }
@@ -133,125 +142,6 @@ Zynthian.ScreenPage {
             }
         }
     }
-
-//            RowLayout {
-//                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-
-//                QQC2.Label {
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    Layout.leftMargin: Kirigami.Units.gridUnit
-//                    horizontalAlignment: TextInput.AlignLeft
-//                    text: qsTr("Wifi")
-//                }
-
-//                QQC2.Switch {
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*4
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    checked: zynqtgui.wifi_settings.wifiMode === "on"
-//                    onToggled: {
-//                        if (checked) {
-//                            zynqtgui.wifi_settings.wifiMode = "on"
-//                        } else {
-//                            zynqtgui.wifi_settings.wifiMode = "off"
-//                        }
-//                    }
-//                }
-//            }
-
-//            RowLayout {
-//                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-
-//                QQC2.Label {
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    Layout.leftMargin: Kirigami.Units.gridUnit
-//                    horizontalAlignment: TextInput.AlignLeft
-//                    text: qsTr("Wifi")
-//                }
-
-//                QQC2.ComboBox {
-//                    id: wifiModeDropdown
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*12
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    model: ["off", /*"hotspot",*/ "on"]
-//                    currentIndex: find(zynqtgui.wifi_settings.wifiMode)
-//                    onActivated: {
-//                        zynqtgui.wifi_settings.wifiMode = wifiModeDropdown.model[wifiModeDropdown.currentIndex]
-//                    }
-//                }
-//            }
-
-//            RowLayout {
-//                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-
-//                QQC2.Label {
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    Layout.leftMargin: Kirigami.Units.gridUnit
-//                    horizontalAlignment: TextInput.AlignLeft
-//                    text: qsTr("Available Networks")
-//                }
-
-//                QQC2.ComboBox {
-//                    id: availableNetworksDropdown
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*12
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    model: zynqtgui.wifi_settings.availableWifiNetworks
-//                    textRole: "ssid"
-//                }
-
-//                QQC2.Button {
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*6
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    text: qsTr("Connect")
-//                    enabled: availableNetworksDropdown.currentText.trim().length > 0
-//                    onClicked: {
-//                        connectDialog.ssid = availableNetworksDropdown.currentText
-//                        connectDialog.open()
-//                    }
-//                }
-//            }
-
-//            RowLayout {
-//                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-//                visible: zynqtgui.wifi_settings.wifiMode === "on"
-
-//                QQC2.Label {
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    Layout.leftMargin: Kirigami.Units.gridUnit
-//                    horizontalAlignment: TextInput.AlignLeft
-//                    text: qsTr("Saved Networks")
-//                }
-
-//                QQC2.ComboBox {
-//                    id: savedNetworksDropdown
-//                    Layout.alignment: Qt.AlignVCenter
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*12
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    model: zynqtgui.wifi_settings.savedWifiNetworks
-//                    textRole: "ssid"
-//                }
-
-//                QQC2.Button {
-//                    Layout.preferredWidth: Kirigami.Units.gridUnit*6
-//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-//                    text: qsTr("Remove")
-//                    visible: zynqtgui.wifi_settings.savedWifiNetworks.length > 0
-//                    onClicked: {
-//                        zynqtgui.wifi_settings.remove_network(savedNetworksDropdown.model[savedNetworksDropdown.currentIndex].ssid)
-//                        zynqtgui.wifi_settings.reloadLists()
-//                    }
-//                }
-//            }
 
     ColumnLayout {
         anchors.fill: parent
@@ -344,13 +234,14 @@ Zynthian.ScreenPage {
                 id: availableNetworksListView
                 anchors.fill: parent
                 qmlSelector: Zynthian.SelectorWrapper {
-                    selector_list: zynqtgui.wifi_settings.availableWifiNetworks
+                    selector_list: zynqtgui.wifi_settings.availableWifiNetworksModel
                     current_index: -1
                 }
                 delegate: QQC2.ItemDelegate {
                     id: availableNetworkDelegate
                     width: ListView.view.width - Kirigami.Units.largeSpacing
                     height: Kirigami.Units.gridUnit * 2
+                    highlighted: false
                     contentItem: RowLayout {
                         QQC2.Label {
                             Layout.fillWidth: false
@@ -364,7 +255,7 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: height
                             Layout.leftMargin: 2
                             Layout.rightMargin: 2
-                            source: root.getWifiIconNameBySignalStrength(modelData.quality)
+                            source: root.getWifiIconNameByQuality(modelData.quality)
                         }
                         QQC2.Label {
                             Layout.fillWidth: true
@@ -414,27 +305,44 @@ Zynthian.ScreenPage {
                 id: savedNetworksListView
                 anchors.fill: parent
                 qmlSelector: Zynthian.SelectorWrapper {
-                    selector_list: zynqtgui.wifi_settings.savedWifiNetworks
+                    selector_list: zynqtgui.wifi_settings.savedWifiNetworksModel
                     current_index: -1
                 }
                 delegate: QQC2.ItemDelegate {
                     id: savedNetworkDelegate
                     width: ListView.view.width - Kirigami.Units.largeSpacing
                     height: Kirigami.Units.gridUnit * 2
+                    highlighted: false
                     contentItem: RowLayout {
+                        QQC2.Label {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignCenter
+                            opacity: modelData.quality < 0 ? 0.7 : 1
+                            text: "%1 -".arg(index + 1)
+                        }
+                        Kirigami.Icon {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: height
+                            Layout.leftMargin: 2
+                            Layout.rightMargin: 2
+                            opacity: modelData.quality < 0 ? 0.7 : 1
+                            source: root.getWifiIconNameByQuality(modelData.quality)
+                        }
                         QQC2.Label {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignCenter
-                            text: qsTr("%1 - %2").arg(index + 1).arg(modelData.ssid)
-                            elide: Text.ElideRight
+                            opacity: modelData.quality < 0 ? 0.7 : 1
+                            text: modelData.ssid
                         }
                         QQC2.Button {
                             Layout.fillHeight: true
                             Layout.preferredWidth: height * 2
                             icon.name: "delete-symbolic"
                             onClicked: {
-                                zynqtgui.wifi_settings.remove_network(modelData.ssid)
+                                zynqtgui.wifi_settings.removeSavedNetwork(modelData.ssid)
                             }
                         }
                         QQC2.Button {
@@ -442,11 +350,10 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                             text: zynqtgui.wifi_settings.wifiMode == "on" && zynqtgui.wifi_settings.connectedNetworkSsid == modelData.ssid ? qsTr("Disconnect") : qsTr("Connect")
                             onClicked: {
-                                // TODO Connect to saved network
-                                if (zynqtgui.wifi_settings.wifiMode == "on") {
+                                if (zynqtgui.wifi_settings.wifiMode == "on" && zynqtgui.wifi_settings.connectedNetworkSsid == modelData.ssid) {
                                     zynqtgui.wifi_settings.wifiMode = "off"
                                 } else {
-                                    zynqtgui.wifi_settings.wifiMode = "on"
+                                    zynqtgui.wifi_settings.connectSavedNetwork(modelData.ssid)
                                 }
                             }
                         }

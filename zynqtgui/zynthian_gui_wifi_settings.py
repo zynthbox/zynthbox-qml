@@ -25,6 +25,7 @@
 
 
 import base64
+import json
 import os
 import re
 import logging
@@ -37,39 +38,46 @@ from . import zynthian_qt_gui_base
 
 
 class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
+    wpa_supplicant_config_fpath = os.environ.get('ZYNTHIAN_CONFIG_DIR', "/zynthian/config") + "/wpa_supplicant.conf"
+
     def __init__(self, parent=None):
         super(zynthian_gui_wifi_settings, self).__init__(parent)
-        self.wpa_supplicant_config_fpath = os.environ.get('ZYNTHIAN_CONFIG_DIR', "/zynthian/config") + "/wpa_supplicant.conf"
 
-        self.available_wifi_networks = []
-        self.saved_wifi_networks = []
+        # Dict of available networks in the format :
+        # { 'ssid': { "enctyption": <bool>, quality: <int>, signalLevel: <string> }, ... }
+        self.available_wifi_networks = {}
+        # Dict of saved networks in the format :
+        # { 'ssid': { 'password': <string> }, ... }
+        savedNetworks = self.zynqtgui.global_settings.value("WifiSettings/savedNetworks", None)
+        if savedNetworks is None:
+            self.saved_wifi_networks = {}
+        else:
+            self.saved_wifi_networks = json.loads(base64.b64decode(savedNetworks).decode("utf-8"))
+
+        with open("/zynthian/zynthbox-qml/config/ISO3166-1.alpha2.json", "r") as f:
+            self.country_codes = json.load(f)
 
         # Restore previous wifi state
-        self.set_wifiMode(self.zynqtgui.global_settings.value("Wifi/state", "off"), showLoadingScreen=False)
+        self.set_wifiMode(self.zynqtgui.global_settings.value("WifiSettings/state", "off"), showLoadingScreen=False)
+        self.country = self.zynqtgui.global_settings.value("WifiSettings/country", "DE")
 
     def show(self):
         pass
 
-    def zyncoder_read(self):
-        pass
+    @staticmethod
+    def generate_wpa_supplicant_conf(country, ssid, password):
+        with open(zynthian_gui_wifi_settings.wpa_supplicant_config_fpath, "w") as f:
+            f.write(f"country={country}\n")
+            f.write("ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\n")
+            f.write("update_config=1\n")
+            f.write("\n")
+            f.write("network={\n")
+            f.write(f"  ssid=\"{ssid}\"\n")
+            f.write(f"  psk=\"{password}\"\n")
+            f.write("}\n")
 
-    def refresh_loading(self):
-        pass
-
-    @Slot(None)
-    def reloadLists(self):
-        def task():
-            self.update_saved_wifi_networks_list()
-            self.update_available_wifi_networks_list()
-            self.wifiModeChanged.emit()
-            self.zynqtgui.end_long_task()
-
-        self.zynqtgui.do_long_task(task, "Searching for wifi networks...")
-
-    ### BELOW METHODS ARE DERIVED FROM WEBCONF wifi_config_handler.py
     def update_available_wifi_networks_list(self):
         wifiList = OrderedDict()
-        saved_wifi_ssids = [x["ssid"] for x in self.saved_wifi_networks]
 
         try:
             for interface_byte in check_output("ifconfig -a | sed 's/[ \t].*//;/^$/d'", shell=True).splitlines():
@@ -78,28 +86,26 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
                 if interface.startswith("wlan"):
                     if interface[-1:] == ":":
                         interface = interface[:-1]
-
-                    logging.error("Scanning wifi networks on {}...".format(interface))
-
-                    network = None
+                    logging.debug("Scanning wifi networks on {}...".format(interface))
                     ssid = None
                     encryption = False
                     quality = 0
                     signal_level = 0
 
                     check_output(f"ifconfig {interface} up", shell=True)
-
                     for line_byte in check_output(
                             "iwlist {0} scan | grep -e ESSID -e Encryption -e Quality".format(interface),
                             shell=True).splitlines():
                         line = line_byte.decode("utf-8")
                         if line.find('ESSID') >= 0:
-                            network = {'encryption': False, 'quality': 0, 'signalLevel': 0}
                             ssid = line.split(':')[1].replace("\"", "")
-                            if ssid and ssid not in saved_wifi_ssids:
-                                self.add_network(wifiList, ssid, network, encryption, quality, signal_level)
-                                logging.error("Found Network: %s" % ssid)
-                                encryption = False
+                            if ssid:
+                                wifiList[ssid] = {
+                                    "encryption": encryption,
+                                    "quality": quality,
+                                    "signalLevel": signal_level
+                                }
+                            encryption = False
                             quality = 0
                             signal_level = 0
                         elif line.find('Encryption key:on') >= 0:
@@ -115,117 +121,17 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
         except Exception as e:
             logging.error(e)
 
-        self.available_wifi_networks = [{"ssid": ssid, **values} for ssid, values in wifiList.items()]
-        self.availableWifiNetworksChanged.emit()
+        self.available_wifi_networks = wifiList
+        self.availableWifiNetworksModelChanged.emit()
+        self.savedWifiNetworksModelChanged.emit()
 
-    def update_saved_wifi_networks_list(self):
-        idx = 0
-        networks = []
-        p = re.compile('.*?network=\\{.*?ssid=\\"(.*?)\\".*?psk=\\"(.*?)\\"\n?(.*?)\\}.*?', re.I | re.M | re.S)
-        iterator = p.finditer(self.read_wpa_supplicant_config())
-        for m in iterator:
-            networks.append({
-                'idx': idx,
-                'ssid': m.group(1),
-                'ssid64': base64.b64encode(m.group(1).encode())[:5],
-                'psk': m.group(2),
-                'options': m.group(3)
-            })
-            idx += 1
-
-        self.saved_wifi_networks = networks
-        self.savedWifiNetworksChanged.emit()
-
-    def add_network(self, wifiList, ssid, network, encryption, quality, signalLevel):
-        network['quality'] = quality
-        network['signalLevel'] = signalLevel
-        network['encryption'] = encryption
-        if ssid in wifiList:
-            existingNetwork = wifiList[ssid]
-            if existingNetwork:
-                if existingNetwork['quality'] < network['quality']:
-                    existingNetwork['quality'] = network['quality']
-                    existingNetwork['signalLevel'] = network['signalLevel']
-            else:
-                wifiList.update({ssid: network})
-        else:
-            wifiList.update({ssid: network})
-
-    def read_wpa_supplicant_config(self):
-        try:
-            fo = open(self.wpa_supplicant_config_fpath, "r")
-            wpa_supplicant_config = "".join(fo.readlines())
-            fo.close()
-            return wpa_supplicant_config
-
-        except Exception as e:
-            logging.error("Can't read WIFI network configuration: {}".format(e))
-            return ""
-
-    def save_wpa_supplicant_config(self, data):
-        try:
-            fo = open(self.wpa_supplicant_config_fpath, "w")
-            fo.write(data)
-            fo.flush()
-            fo.close()
-
-        except Exception as e:
-            logging.error("Can't save WIFI network configuration: {}".format(e))
-
-    def add_new_network(self, newSSID, newPassword):
-        logging.info("Add Network: {}".format(newSSID))
-        wpa_supplicant_data = self.read_wpa_supplicant_config()
-        wpa_supplicant_data += '\nnetwork={\n'
-        wpa_supplicant_data += '\tssid="{}"\n'.format(newSSID)
-        wpa_supplicant_data += '\tpsk="{}"\n'.format(newPassword)
-        wpa_supplicant_data += '\tscan_ssid=1\n'
-        wpa_supplicant_data += '\tkey_mgmt=WPA-PSK\n'
-        wpa_supplicant_data += '\tpriority=10\n'
-        wpa_supplicant_data += '}\n'
-        self.save_wpa_supplicant_config(wpa_supplicant_data)
-
-    @Slot(str)
-    def remove_network(self, delSSID):
-        logging.info("Remove Network: {}".format(delSSID))
-
-        wpa_supplicant_data = self.read_wpa_supplicant_config()
-
-        i = wpa_supplicant_data.find("network={")
-        wpa_supplicant_header = wpa_supplicant_data[:i]
-
-        p = re.compile('.*?network=\\{.*?ssid=\\"(.*?)\\".*?psk=\\"(.*?)\\"\n?(.*?)\\}.*?', re.I | re.M | re.S)
-        iterator = p.finditer(wpa_supplicant_data[i:])
-
-        for m in iterator:
-            if m.group(1) != delSSID:
-                wpa_supplicant_header += m.group(0)
-
-        self.save_wpa_supplicant_config(wpa_supplicant_header)
-        self.reloadLists()
-
-    def update_network_options(self, updSSID, options):
-        logging.info("Update Network Options: {}".format(updSSID))
-
-        wpa_supplicant_data = self.read_wpa_supplicant_config()
-
-        i = wpa_supplicant_data.find("network={")
-        wpa_supplicant_header = wpa_supplicant_data[:i]
-
-        p = re.compile('.*?network=\\{.*?ssid=\\"(.*?)\\".*?psk=\\"(.*?)\\"\n?(.*?)\\}.*?', re.I | re.M | re.S)
-        iterator = p.finditer(wpa_supplicant_data[i:])
-
-        for m in iterator:
-            if m.group(1) != updSSID:
-                wpa_supplicant_header += m.group(0)
-            else:
-                wpa_supplicant_header += '\nnetwork={\n'
-                wpa_supplicant_header += '\tssid="{}"\n'.format(m.group(1))
-                wpa_supplicant_header += '\tpsk="{}"\n'.format(m.group(2))
-                wpa_supplicant_header += '\t{}\n'.format(options)
-                wpa_supplicant_header += '}\n'
-
-        self.save_wpa_supplicant_config(wpa_supplicant_header)
-    ### ABOVE METHODS ARE DERIVED FROM WEBCONF wifi_config_handler.py
+    def addToSavedNetworks(self, ssid, password):
+        if ssid not in self.saved_wifi_networks or (self.saved_wifi_networks[ssid]["password"] != password):
+            self.saved_wifi_networks[ssid] = { "password": password }
+            savedNetworksBytearray = json.dumps(self.saved_wifi_networks).encode("utf-8")
+            self.zynqtgui.global_settings.setValue("WifiSettings/savedNetworks", base64.b64encode(savedNetworksBytearray).decode("utf-8"))
+            self.availableWifiNetworksModelChanged.emit()
+            self.savedWifiNetworksModelChanged.emit()
 
     def startWifi(self):
         if not zynconf.start_wifi():
@@ -233,7 +139,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
             return False
         else:
             try:
-                logging.debug(f"## WifiCheck : Making a request to networkcheck.kde.org to determine if wifi has a captive network")
+                logging.debug("## WifiCheck : Making a request to networkcheck.kde.org to determine if wifi has a captive network")
                 reply = requests.head("http://networkcheck.kde.org")
                 logging.debug(f"## WifiCheck : Reply headers : {reply.headers}")
 
@@ -256,23 +162,6 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
         else:
             return True
 
-    def startHotspot(self):
-        if not zynconf.start_wifi_hotspot():
-            logging.error("Can't start WIFI Hotspot!")
-            return False
-        else:
-            return True
-
-    @Slot(str, str)
-    def connect(self, ssid, password):
-        def task():
-            logging.error(f"Connect to wifi : {ssid}, {password}")
-            self.add_new_network(ssid, password)
-            self.set_wifiMode("on", showLoadingScreen=False)
-            self.reloadLists()
-            self.zynqtgui.end_long_task()
-        self.zynqtgui.do_long_task(task, f"Attempting to connect to wifi : {ssid}")
-
     ### Property wifiMode
     def get_wifiMode(self):
         return zynconf.get_current_wifi_mode()
@@ -282,12 +171,14 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
             result = False
             try:
                 if mode == "on":
-                    self.zynqtgui.currentTaskMessage = "Attempting to connect to wifi"
+                    if showLoadingScreen:
+                        self.zynqtgui.currentTaskMessage = "Attempting to connect to wifi"
                     result = self.startWifi()
                 elif mode == "hotspot":
                     result = self.startHotspot()
                 elif mode == "off":
-                    self.zynqtgui.currentTaskMessage = "Turning off wifi"
+                    if showLoadingScreen:
+                        self.zynqtgui.currentTaskMessage = "Turning off wifi"
                     result = self.stopWifi()
                 else:
                     # Do nothing if wifi mode is none of the above handled ones
@@ -300,7 +191,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
                 self.zynqtgui.end_long_task()
             # Save state if mode change was successful
             if result:
-                self.zynqtgui.global_settings.setValue("Wifi/state", mode)
+                self.zynqtgui.global_settings.setValue("WifiSettings/state", mode)
                 self.connectedNetworkSsidChanged.emit()
                 self.connectedNetworkIpChanged.emit()
             return result
@@ -318,22 +209,37 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
     wifiMode = Property(str, get_wifiMode, set_wifiMode, notify=wifiModeChanged)
     ### End Property wifiMode
 
-    ### Property availableWifiNetworks
-    def get_availableWifiNetworks(self):
-        return self.available_wifi_networks
+    ### Property availableWifiNetworksModel
+    def get_availableWifiNetworksModel(self):
+        availableNetworksModel = []
+        for ssid in self.available_wifi_networks:
+            if ssid not in self.saved_wifi_networks:
+                availableNetworksModel.append({
+                    "ssid": ssid,
+                    **self.available_wifi_networks[ssid]
+                })
+        return availableNetworksModel
 
-    availableWifiNetworksChanged = Signal()
+    availableWifiNetworksModelChanged = Signal()
 
-    availableWifiNetworks = Property('QVariantList', get_availableWifiNetworks, notify=availableWifiNetworksChanged)
+    availableWifiNetworksModel = Property('QVariantList', get_availableWifiNetworksModel, notify=availableWifiNetworksModelChanged)
     ### END Property availableWifiNetworks
 
-    ### Property savedWifiNetworks
-    def get_savedWifiNetworks(self):
-        return self.saved_wifi_networks
+    ### Property savedWifiNetworksModel
+    def get_savedWifiNetworksModel(self):
+        savedNetworksModel = []
+        for ssid in self.saved_wifi_networks:
+            savedNetworksModel.append({
+                "ssid": ssid,
+                "quality": self.available_wifi_networks[ssid]["quality"] if ssid in self.available_wifi_networks else -1,
+                **self.saved_wifi_networks[ssid]
+            })
+        savedNetworksModel = sorted(savedNetworksModel, key=lambda x: x['quality'], reverse=True)
+        return savedNetworksModel
 
-    savedWifiNetworksChanged = Signal()
+    savedWifiNetworksModelChanged = Signal()
 
-    savedWifiNetworks = Property('QVariantList', get_savedWifiNetworks, notify=savedWifiNetworksChanged)
+    savedWifiNetworksModel = Property('QVariantList', get_savedWifiNetworksModel, notify=savedWifiNetworksModelChanged)
     ### END Property savedWifiNetworks
 
     ### Property connectedNetworkSsid
@@ -370,5 +276,56 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
 
     connectedNetworkIp = Property(str, get_connectedNetworkIp, notify=connectedNetworkIpChanged)
     ### END Property connectedNetworkIp
+
+    ### Property selectedCountry
+    def get_selectedCountry(self):
+        return self.country
+
+    def set_selectedCountry(self, value):
+        if value != self.country:
+            self.zynqtgui.global_settings.setValue("WifiSettings/country", value)
+            self.selectedCountryChanged.emit()
+
+    selectedCountryChanged = Signal()
+
+    selectedCountry = Property(str, get_selectedCountry, set_selectedCountry, notify=selectedCountryChanged)
+    ### END Property selectedCountry
+
+    ### Property countryCodes
+    def get_countryCodes(self):
+        return self.country_codes
+
+    countryCodes = Property('QVariant', get_countryCodes, constant=True)
+    ### END Property countryCodes
+
+    @Slot(None)
+    def reloadLists(self):
+        def task():
+            self.update_available_wifi_networks_list()
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, "Searching for wifi networks...")
+
+    @Slot(str, str)
+    def connectNewNetwork(self, ssid, password):
+        self.addToSavedNetworks(ssid, password)
+        self.connectSavedNetwork(ssid)
+
+    @Slot(str)
+    def connectSavedNetwork(self, ssid):
+        def task():
+            self.generate_wpa_supplicant_conf(self.selectedCountry, ssid, self.saved_wifi_networks[ssid]["password"])
+            self.set_wifiMode("on", showLoadingScreen=False)
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, f"Attempting to connect to wifi : {ssid}")
+
+    @Slot(str)
+    def removeSavedNetwork(self, ssid):
+        # TODO
+        if ssid in self.saved_wifi_networks:
+            if self.connectedNetworkSsid == ssid:
+                self.set_wifiMode("off")
+            del self.saved_wifi_networks[ssid]
+            self.availableWifiNetworksModelChanged.emit()
+            self.savedWifiNetworksModelChanged.emit()
 
     openCaptivePortal = Signal(str)

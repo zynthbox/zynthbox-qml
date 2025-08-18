@@ -50,7 +50,7 @@ led_color_grey = (5, 5, 5)
 led_color_inactive = led_color_blue
 led_color_active = led_color_green
 
-num_leds = 25
+num_leds = 36
 spi_freq = 6400000
 wsleds = None
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         # Display rainbow colors
         rainbow_led_counter = 0
         while True:
-            for i in range(25):
+            for i in range(num_leds):
                 color = QColor.fromHsl((rainbow_led_counter + i * 10) % 359, 242, 127, 127).darker(darkening_factor)
                 wsleds[i] = (color.red(), color.green(), color.blue())
             wsleds.show()
@@ -95,13 +95,13 @@ if __name__ == "__main__":
             time.sleep(0.05)
     elif sys.argv[1] == "on":
         # Turn on all leds with blue color
-        for i in range(25):
+        for i in range(num_leds):
             wsleds[i] = led_color_inactive
         wsleds.show()
         sys.exit(0)
     elif sys.argv[1] == "off":
         # Turn off all leds
-        for i in range(25):
+        for i in range(num_leds):
             wsleds[i] = led_color_off
         wsleds.show()
         sys.exit(0)
@@ -137,13 +137,24 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     3 : 3
     4 : 4
     5 : 5
-    6 : 6
-    7 : FX
+    6 : *
+    7 : MODE
     8 : Under Screen Button 1
     9 : Under Screen Button 2
     10 : Under Screen Button 3
     11 : Under Screen Button 4
     12 : Under Screen Button 5
+    25 : Under Screen Button 6
+    26 : Under Screen Button 7
+    27 : Under Screen Button 8
+    28 : Under Screen Button 9
+    29 : Under Screen Button 10
+    30 : Under Screen Button 11
+    31 : Under Screen Button 12
+    32 : Under Screen Button 13
+    33 : Under Screen Button 14
+    34 : Under Screen Button 15
+    35 : Under Screen Button 16
     13 : ALT
     14 : RECORD
     15 : PLAY
@@ -155,13 +166,15 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     21 : LEFT
     22 : BOTTOM
     23 : RIGHT
-    24 : MASTER
+    24 : GLOBAL
     """
     def __init__(self, parent=None):
         super(zynthian_gui_led_config, self).__init__(parent)
 
         from . import zynthian_gui_config
         zynqtgui = zynthian_gui_config.zynqtgui
+
+        init_wsleds()
 
         channelTypeSynthColorDarkened = zynqtgui.sketchpad.channelTypeSynthColor.darker(darkening_factor)
         channelTypeSketchesColorDarkened = zynqtgui.sketchpad.channelTypeSketchesColor.darker(darkening_factor)
@@ -172,6 +185,9 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.led_color_channel_loop = (channelTypeSketchesColorDarkened.red(), channelTypeSketchesColorDarkened.green(), channelTypeSketchesColorDarkened.blue())
         self.led_color_channel_sample = (channelTypeSamplesColorDarkened.red(), channelTypeSamplesColorDarkened.green(), channelTypeSamplesColorDarkened.blue())
         self.led_color_channel_external = (channelTypeExternalColorDarkened.red(), channelTypeExternalColorDarkened.green(), channelTypeExternalColorDarkened.blue())
+
+        # Temporary nonsense here...
+        self.step_button_colors = [led_color_active, led_color_inactive, led_color_inactive, led_color_inactive] * 4
 
         self.channel = None
         self.channelColor = (0, 0, 0)
@@ -194,6 +210,17 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.button_under_screen_3 = 10
         self.button_under_screen_4 = 11
         self.button_under_screen_5 = 12
+        self.button_under_screen_6 = 25
+        self.button_under_screen_7 = 26
+        self.button_under_screen_8 = 27
+        self.button_under_screen_9 = 28
+        self.button_under_screen_10 = 29
+        self.button_under_screen_11 = 30
+        self.button_under_screen_12 = 31
+        self.button_under_screen_13 = 32
+        self.button_under_screen_14 = 33
+        self.button_under_screen_15 = 34
+        self.button_under_screen_16 = 35
         self.button_alt = 13
         self.button_record = 14
         self.button_play = 15
@@ -208,6 +235,10 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.button_global = 24
 
         Zynthbox.PlayGridManager.instance().metronomeBeat128thChanged.connect(self.metronomeBeatUpdate128thHandler)
+
+        # Initialise all button with inactive color and not blinking
+        for i in range(num_leds):
+            self.set_button_color(i, led_color_inactive)
 
     @Slot()
     def metronomeBeatUpdate128thHandler(self, beat):
@@ -234,6 +265,12 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
                 wsleds[button_id] = config['color']
 
         wsleds.show()
+
+    @Slot(int, 'QColor')
+    def setStepButtonColor(self, stepIndex, stepColor):
+        if -1 < stepIndex and stepIndex < 16:
+            self.step_button_colors[stepIndex] = (stepColor.red(), stepColor.green(), stepColor.blue())
+            self.update_button_colors()
 
     def show(self):
         pass
@@ -269,12 +306,6 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         wsleds[buttonId] = buttonColor
 
     def init(self):
-        init_wsleds()
-
-        # Initialise all button with inactive color and not blinking
-        for i in range(25):
-            self.set_button_color(i, led_color_inactive)
-
         wsleds.show()
         self.connect_dependent_property_signals()
 
@@ -347,34 +378,50 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         edit_page_active = self.zynqtgui.current_screen_id == "control" or self.zynqtgui.current_screen_id in ["channel_wave_editor", "channel_external_setup"]
 
         # Light up 1-5 buttons when respective clip is enabled when leftSidebar is active
-        clipEnabled = [
-            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 0).enabled,
-            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 1).enabled,
-            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 2).enabled,
-            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 3).enabled,
-            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 4).enabled,
-        ]
-        # Light up 1-5 buttons when respective channel is selected when leftSidebar is not active
-        trackDelta = 5 if self.zynqtgui.tracksModActive else 0
-        selectedTrackIndex = self.zynqtgui.sketchpad.selectedTrackId - trackDelta
+        # clipEnabled = [
+        #     self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 0).enabled,
+        #     self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 1).enabled,
+        #     self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 2).enabled,
+        #     self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 3).enabled,
+        #     self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 4).enabled,
+        # ]
+        # # Light up 1-5 buttons when respective channel is selected when leftSidebar is not active
+        # trackDelta = 5 if self.zynqtgui.tracksModActive else 0
+        # selectedTrackIndex = self.zynqtgui.sketchpad.selectedTrackId - trackDelta
 
         if self.zynqtgui.isExternalAppActive:
-            for button_id in range(0, 25):
+            for button_id in range(num_leds):
                 self.set_button_color(button_id, led_color_inactive)
         else:
             self.set_button_color(self.button_menu, led_color_active if menu_page_active else led_color_inactive)
-            self.set_button_color(self.button_1, led_color_inactive, setChannelColor=clipEnabled[0] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 0)
-            self.set_button_color(self.button_2, led_color_inactive, setChannelColor=clipEnabled[1] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 1)
-            self.set_button_color(self.button_3, led_color_inactive, setChannelColor=clipEnabled[2] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 2)
-            self.set_button_color(self.button_4, led_color_inactive, setChannelColor=clipEnabled[3] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 3)
-            self.set_button_color(self.button_5, led_color_inactive, setChannelColor=clipEnabled[4] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 4)
+            self.set_button_color(self.button_1, led_color_active if sketchpad_page_active else led_color_inactive)
+            self.set_button_color(self.button_2, led_color_active if library_page_active else led_color_inactive)
+            self.set_button_color(self.button_3, led_color_active if edit_page_active else led_color_inactive)
+            self.set_button_color(self.button_4, led_color_active if playgrid_page_active else led_color_inactive)
+            self.set_button_color(self.button_5, led_color_active if song_manager_page_active else led_color_inactive)
+            # self.set_button_color(self.button_1, led_color_inactive, setChannelColor=clipEnabled[0] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 0)
+            # self.set_button_color(self.button_2, led_color_inactive, setChannelColor=clipEnabled[1] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 1)
+            # self.set_button_color(self.button_3, led_color_inactive, setChannelColor=clipEnabled[2] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 2)
+            # self.set_button_color(self.button_4, led_color_inactive, setChannelColor=clipEnabled[3] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 3)
+            # self.set_button_color(self.button_5, led_color_inactive, setChannelColor=clipEnabled[4] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 4)
             self.set_button_color(self.button_star, led_color_inactive, setChannelColor=not self.zynqtgui.leftSidebarActive and self.zynqtgui.tracksModActive)
             self.set_button_color(self.button_mode, led_color_inactive, setChannelColor=self.zynqtgui.leftSidebarActive)
-            self.set_button_color(self.button_under_screen_1, led_color_active if sketchpad_page_active else led_color_inactive)
-            self.set_button_color(self.button_under_screen_2, led_color_active if library_page_active else led_color_inactive)
-            self.set_button_color(self.button_under_screen_3, led_color_active if edit_page_active else led_color_inactive)
-            self.set_button_color(self.button_under_screen_4, led_color_active if playgrid_page_active else led_color_inactive)
-            self.set_button_color(self.button_under_screen_5, led_color_active if song_manager_page_active else led_color_inactive)
+            self.set_button_color(self.button_under_screen_1, self.step_button_colors[0])
+            self.set_button_color(self.button_under_screen_2, self.step_button_colors[1])
+            self.set_button_color(self.button_under_screen_3, self.step_button_colors[2])
+            self.set_button_color(self.button_under_screen_4, self.step_button_colors[3])
+            self.set_button_color(self.button_under_screen_5, self.step_button_colors[4])
+            self.set_button_color(self.button_under_screen_6, self.step_button_colors[5])
+            self.set_button_color(self.button_under_screen_7, self.step_button_colors[6])
+            self.set_button_color(self.button_under_screen_8, self.step_button_colors[7])
+            self.set_button_color(self.button_under_screen_9, self.step_button_colors[8])
+            self.set_button_color(self.button_under_screen_10, self.step_button_colors[9])
+            self.set_button_color(self.button_under_screen_11, self.step_button_colors[10])
+            self.set_button_color(self.button_under_screen_12, self.step_button_colors[11])
+            self.set_button_color(self.button_under_screen_13, self.step_button_colors[12])
+            self.set_button_color(self.button_under_screen_14, self.step_button_colors[13])
+            self.set_button_color(self.button_under_screen_15, self.step_button_colors[14])
+            self.set_button_color(self.button_under_screen_16, self.step_button_colors[15])
             self.set_button_color(self.button_alt, led_color_inactive)
             self.set_button_color(self.button_record, led_color_red if self.zynqtgui.sketchpad.isRecording else led_color_inactive)
             self.set_button_color(self.button_play, led_color_active if self.zynqtgui.sketchpad.isMetronomeRunning else led_color_inactive)

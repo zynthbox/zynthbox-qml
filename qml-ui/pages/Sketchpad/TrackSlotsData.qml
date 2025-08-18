@@ -348,6 +348,10 @@ GridLayout {
                         // FIXME This needs refactoring away... everything should be using the selectedSlot logic instead
                         control.channel.selectedSlotRow = index;
                         control.channel.selectedFxSlotRow = index;
+                        // When trackStyle is set to one-to-one, make sure to update selectedClip so that selected column is updated and playing notes on keyboard makes correct sound
+                        if (control.channel.trackStyle === "one-to-one") {
+                            control.channel.selectedClip = index;
+                        }
 
                         if (control.slotType == "synth") {
                             control.channel.setCurlayerByType("synth")

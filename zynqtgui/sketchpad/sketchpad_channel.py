@@ -2136,6 +2136,9 @@ class sketchpad_channel(QObject):
     def set_trackStyle(self, trackStyle):
         if self.__trackStyle__ != trackStyle:
             self.__trackStyle__ = trackStyle
+            # When setting trackStyle to one-to-one, make sure to update selectedClip so that selected column is updated and playing notes on keyboard makes correct sound
+            if trackStyle == "one-to-one":
+                self.selectedClip = self.selectedSlot.value
             self.trackStyleChanged.emit()
 
     trackStyleChanged = Signal()

@@ -372,7 +372,7 @@ Zynthian.ScreenPage {
         }
         property var callbackFunction: null
         Component.onCompleted: {
-            for (let eventIndex = 0; eventIndex < 108; ++eventIndex) {
+            for (let eventIndex = 0; eventIndex < 142; ++eventIndex) {
                 model.append({ text: Zynthbox.CUIAHelper.cuiaTitle(eventIndex), value: eventIndex });
             }
         }

@@ -112,11 +112,16 @@ class zynthian_gui_keybinding(QObject):
 
             "SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
 
-            "SCREEN_SKETCHPAD": { "modifier": 0, "keysym": "F1" },
-            "SCREEN_LAYER": { "modifier": 0, "keysym": "F2" },
-            "SCREEN_EDIT_CONTEXTUAL": { "modifier": 0, "keysym": "F3" },
-            "SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F4" },
-            "SCREEN_SONG_MANAGER": { "modifier": 0, "keysym": "F5" },
+            # "SCREEN_SKETCHPAD": { "modifier": 8, "keysym": "F1" },
+            # "SCREEN_LAYER": { "modifier": 8, "keysym": "F2" },
+            # "SCREEN_EDIT_CONTEXTUAL": { "modifier": 8, "keysym": "F3" },
+            # "SCREEN_PLAYGRID": { "modifier": 8, "keysym": "F4" },
+            # "SCREEN_SONG_MANAGER": { "modifier": 8, "keysym": "F5" },
+            "SCREEN_SKETCHPAD": { "modifier": 0, "keysym": "1" },
+            "SCREEN_LAYER": { "modifier": 0, "keysym": "2" },
+            "SCREEN_EDIT_CONTEXTUAL": { "modifier": 0, "keysym": "3" },
+            "SCREEN_PLAYGRID": { "modifier": 0, "keysym": "4" },
+            "SCREEN_SONG_MANAGER": { "modifier": 0, "keysym": "5" },
 
             "SCREEN_LAYER_FX": { "modifier": 0, "keysym": "f" },
 
@@ -124,11 +129,11 @@ class zynthian_gui_keybinding(QObject):
             "NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
             "NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
 
-            "TRACK_1": { "modifier": 0, "keysym": "1" },
-            "TRACK_2": { "modifier": 0, "keysym": "2" },
-            "TRACK_3": { "modifier": 0, "keysym": "3" },
-            "TRACK_4": { "modifier": 0, "keysym": "4" },
-            "TRACK_5": { "modifier": 0, "keysym": "5" },
+            # "TRACK_1": { "modifier": 0, "keysym": "1" },
+            # "TRACK_2": { "modifier": 0, "keysym": "2" },
+            # "TRACK_3": { "modifier": 0, "keysym": "3" },
+            # "TRACK_4": { "modifier": 0, "keysym": "4" },
+            # "TRACK_5": { "modifier": 0, "keysym": "5" },
 
             # "TRACK_6": { "modifier": 4, "keysym": "1" },
             # "TRACK_7": { "modifier": 4, "keysym": "2" },
@@ -141,6 +146,23 @@ class zynthian_gui_keybinding(QObject):
 
             "TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
             "TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
+
+            "STEP_1": {"modifier": 0, "keysym": "F1"},
+            "STEP_2": {"modifier": 0, "keysym": "F2"},
+            "STEP_3": {"modifier": 0, "keysym": "F3"},
+            "STEP_4": {"modifier": 0, "keysym": "F4"},
+            "STEP_5": {"modifier": 0, "keysym": "F5"},
+            "STEP_6": {"modifier": 0, "keysym": "F6"},
+            "STEP_7": {"modifier": 0, "keysym": "F7"},
+            "STEP_8": {"modifier": 0, "keysym": "F8"},
+            "STEP_9": {"modifier": 0, "keysym": "F9"},
+            "STEP_10": {"modifier": 0, "keysym": "F10"},
+            "STEP_11": {"modifier": 0, "keysym": "F11"},
+            "STEP_12": {"modifier": 0, "keysym": "F12"},
+            "STEP_13": {"modifier": 0, "keysym": "F13"},
+            "STEP_14": {"modifier": 0, "keysym": "F14"},
+            "STEP_15": {"modifier": 0, "keysym": "F15"},
+            "STEP_16": {"modifier": 0, "keysym": "F16"},
 
             "INCREASE" : { "modifier": 0, "keysym": "+" },
             "DECREASE" : { "modifier": 0, "keysym": "-" },

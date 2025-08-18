@@ -1307,7 +1307,7 @@ Zynthian.ScreenPage {
                                                         value: {
                                                             if (zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.value === model.channel) {
                                                                 return "#ff2196f3"
-                                                            } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0) {
+                                                            } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0 || channelHeaderDelegate.channel.occupiedSampleSlotsCount > 0) {
                                                                 return channelHeaderDelegate.channel.color;
                                                             }
                                                             return "#66888888";

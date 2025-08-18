@@ -57,15 +57,16 @@ Kirigami.AbstractApplicationWindow {
         zynqtgui.sketchpad.song.channelsModel.getChannel(8),
         zynqtgui.sketchpad.song.channelsModel.getChannel(9),
     ]
-    property QtObject selectedChannel: {
-        return root.channels[0]
-    }
+    property QtObject selectedChannel: root.channels[0]
     property var cuiaCallback: function(cuia, originId, track, slot, value) {
         var result = false;
 
+        // Handle the global sequencer events first, so we can be sure that's done
+        result = root.globalSequencer.cuiaCallback(cuia, originId, track, slot, value);
+
         // Pass things along to the recording popup explicitly, if it's closed, to ensure things happen that are supposed to
         // (specifically, this allows that dialog to handle recording stops and such)
-        if (recordingPopup.opened === false) {
+        if (result == false && recordingPopup.opened === false) {
             result = recordingPopup.cuiaCallback(cuia);
         }
         // Since VK is not a Zynthian Menu/Popup/Drawer, CUIA events are not sent implicitly
@@ -1263,6 +1264,12 @@ Kirigami.AbstractApplicationWindow {
 //            root.selectedChannel = root.channels[zynqtgui.sketchpad.selectedTrackId]
 //        }
 //    }
+
+    readonly property Item globalSequencer: globalSequencerObject
+    GlobalSequencer {
+        id: globalSequencerObject
+        selectedChannel: root.selectedChannel
+    }
 
     PageManager {
         id: pageManager

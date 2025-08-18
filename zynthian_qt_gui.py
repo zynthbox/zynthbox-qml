@@ -444,6 +444,38 @@ class zynthian_gui(QObject):
         self.__ignoreNextGlobalButtonPress = False
         self.__ignoreNextSelectButtonPress = False
         self.__ignoreNextBackButtonPress = False
+        self.__step1_button_pressed__ = False
+        self.__ignoreNextStep1ButtonPress__ = False
+        self.__step2_button_pressed__ = False
+        self.__ignoreNextStep2ButtonPress__ = False
+        self.__step3_button_pressed__ = False
+        self.__ignoreNextStep3ButtonPress__ = False
+        self.__step4_button_pressed__ = False
+        self.__ignoreNextStep4ButtonPress__ = False
+        self.__step5_button_pressed__ = False
+        self.__ignoreNextStep5ButtonPress__ = False
+        self.__step6_button_pressed__ = False
+        self.__ignoreNextStep6ButtonPress__ = False
+        self.__step7_button_pressed__ = False
+        self.__ignoreNextStep7ButtonPress__ = False
+        self.__step8_button_pressed__ = False
+        self.__ignoreNextStep8ButtonPress__ = False
+        self.__step9_button_pressed__ = False
+        self.__ignoreNextStep9ButtonPress__ = False
+        self.__step10_button_pressed__ = False
+        self.__ignoreNextStep10ButtonPress__ = False
+        self.__step11_button_pressed__ = False
+        self.__ignoreNextStep11ButtonPress__ = False
+        self.__step12_button_pressed__ = False
+        self.__ignoreNextStep12ButtonPress__ = False
+        self.__step13_button_pressed__ = False
+        self.__ignoreNextStep13ButtonPress__ = False
+        self.__step14_button_pressed__ = False
+        self.__ignoreNextStep14ButtonPress__ = False
+        self.__step15_button_pressed__ = False
+        self.__ignoreNextStep15ButtonPress__ = False
+        self.__step16_button_pressed__ = False
+        self.__ignoreNextStep16ButtonPress__ = False
         self.__current_task_message = ""
         self.__show_current_task_message = True
         self.currentTaskMessage = f"Starting Zynthbox"
@@ -1784,6 +1816,54 @@ class zynthian_gui(QObject):
             if self.selectButtonPressed == True and self.ignoreNextSelectButtonPress == False:
                 self.ignoreNextSelectButtonPress = True
                 changedAnything = True
+            if self.step1ButtonPressed == True and self.ignoreNextStep1ButtonPress == False:
+                self.ignoreNextStep1ButtonPress = True
+                changedAnything = True
+            if self.step2ButtonPressed == True and self.ignoreNextStep2ButtonPress == False:
+                self.ignoreNextStep2ButtonPress = True
+                changedAnything = True
+            if self.step3ButtonPressed == True and self.ignoreNextStep3ButtonPress == False:
+                self.ignoreNextStep3ButtonPress = True
+                changedAnything = True
+            if self.step4ButtonPressed == True and self.ignoreNextStep4ButtonPress == False:
+                self.ignoreNextStep4ButtonPress = True
+                changedAnything = True
+            if self.step5ButtonPressed == True and self.ignoreNextStep5ButtonPress == False:
+                self.ignoreNextStep5ButtonPress = True
+                changedAnything = True
+            if self.step6ButtonPressed == True and self.ignoreNextStep6ButtonPress == False:
+                self.ignoreNextStep6ButtonPress = True
+                changedAnything = True
+            if self.step7ButtonPressed == True and self.ignoreNextStep7ButtonPress == False:
+                self.ignoreNextStep7ButtonPress = True
+                changedAnything = True
+            if self.step8ButtonPressed == True and self.ignoreNextStep8ButtonPress == False:
+                self.ignoreNextStep8ButtonPress = True
+                changedAnything = True
+            if self.step9ButtonPressed == True and self.ignoreNextStep9ButtonPress == False:
+                self.ignoreNextStep9ButtonPress = True
+                changedAnything = True
+            if self.step10ButtonPressed == True and self.ignoreNextStep10ButtonPress == False:
+                self.ignoreNextStep10ButtonPress = True
+                changedAnything = True
+            if self.step11ButtonPressed == True and self.ignoreNextStep11ButtonPress == False:
+                self.ignoreNextStep11ButtonPress = True
+                changedAnything = True
+            if self.step12ButtonPressed == True and self.ignoreNextStep12ButtonPress == False:
+                self.ignoreNextStep12ButtonPress = True
+                changedAnything = True
+            if self.step13ButtonPressed == True and self.ignoreNextStep13ButtonPress == False:
+                self.ignoreNextStep13ButtonPress = True
+                changedAnything = True
+            if self.step14ButtonPressed == True and self.ignoreNextStep14ButtonPress == False:
+                self.ignoreNextStep14ButtonPress = True
+                changedAnything = True
+            if self.step15ButtonPressed == True and self.ignoreNextStep15ButtonPress == False:
+                self.ignoreNextStep15ButtonPress = True
+                changedAnything = True
+            if self.step16ButtonPressed == True and self.ignoreNextStep16ButtonPress == False:
+                self.ignoreNextStep16ButtonPress = True
+                changedAnything = True
             if changedAnything == True:
                 return
         # END Button-press abort modifiers logic
@@ -2466,6 +2546,16 @@ class zynthian_gui(QObject):
                     self.switchChannelsButtonPressed = True
                 elif i == 11:
                     self.modeButtonPressed = True
+                elif i == 12:
+                    self.step1ButtonPressed = True
+                elif i == 13:
+                    self.step2ButtonPressed = True
+                elif i == 14:
+                    self.step3ButtonPressed = True
+                elif i == 15:
+                    self.step4ButtonPressed = True
+                elif i == 16:
+                    self.step5ButtonPressed = True
                 elif i == 17:
                     self.altButtonPressed = True
                 elif i == 18:
@@ -2511,6 +2601,16 @@ class zynthian_gui(QObject):
                     self.switchChannelsButtonPressed = False
                 elif i == 11:
                     self.modeButtonPressed = False
+                elif i == 12:
+                    self.step1ButtonPressed = False
+                elif i == 13:
+                    self.step2ButtonPressed = False
+                elif i == 14:
+                    self.step3ButtonPressed = False
+                elif i == 15:
+                    self.step4ButtonPressed = False
+                elif i == 16:
+                    self.step5ButtonPressed = False
                 elif i == 17:
                     self.altButtonPressed = False
                 elif i == 18:
@@ -4072,6 +4172,393 @@ class zynthian_gui(QObject):
     switchChannelsButtonPressed = Property(bool, get_switch_channels_button_pressed, set_switch_channels_button_pressed, notify=switch_channels_button_pressed_changed)
     ### END Property switchChannelsButtonPressed
 
+    ### BEGIN Sequencer Strip Buttons
+    ### BEGIN Property step1ButtonPressed
+    def get_step1_button_pressed(self):
+        return self.__step1_button_pressed__
+    def set_step1_button_pressed(self, pressed):
+        if self.__step1_button_pressed__ != pressed:
+            self.__step1_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP1_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP1_RELEASED")
+            self.step1_button_pressed_changed.emit()
+    step1_button_pressed_changed = Signal()
+    step1ButtonPressed = Property(bool, get_step1_button_pressed, set_step1_button_pressed, notify=step1_button_pressed_changed)
+    ### END Property step1ButtonPressed
+    ### BEGIN Property ignoreNextStep1ButtonPress
+    def get_ignoreNextStep1ButtonPress(self):
+        return self.__ignoreNextStep1ButtonPress__
+    def set_ignoreNextStep1ButtonPress(self, val):
+        if self.__ignoreNextStep1ButtonPress__ != val:
+            self.__ignoreNextStep1ButtonPress__ = val
+            self.ignoreNextStep1ButtonPressChanged.emit()
+    ignoreNextStep1ButtonPressChanged = Signal()
+    ignoreNextStep1ButtonPress = Property(bool, get_ignoreNextStep1ButtonPress, set_ignoreNextStep1ButtonPress, notify=ignoreNextStep1ButtonPressChanged)
+    ### END Property ignoreNextStep1ButtonPress
+    ### BEGIN Property step2ButtonPressed
+    def get_step2_button_pressed(self):
+        return self.__step2_button_pressed__
+    def set_step2_button_pressed(self, pressed):
+        if self.__step2_button_pressed__ != pressed:
+            self.__step2_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP2_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP2_RELEASED")
+            self.step2_button_pressed_changed.emit()
+    step2_button_pressed_changed = Signal()
+    step2ButtonPressed = Property(bool, get_step2_button_pressed, set_step2_button_pressed, notify=step2_button_pressed_changed)
+    ### END Property step2ButtonPressed
+    ### BEGIN Property ignoreNextStep2ButtonPress
+    def get_ignoreNextStep2ButtonPress(self):
+        return self.__ignoreNextStep2ButtonPress__
+    def set_ignoreNextStep2ButtonPress(self, val):
+        if self.__ignoreNextStep2ButtonPress__ != val:
+            self.__ignoreNextStep2ButtonPress__ = val
+            self.ignoreNextStep2ButtonPressChanged.emit()
+    ignoreNextStep2ButtonPressChanged = Signal()
+    ignoreNextStep2ButtonPress = Property(bool, get_ignoreNextStep2ButtonPress, set_ignoreNextStep2ButtonPress, notify=ignoreNextStep2ButtonPressChanged)
+    ### END Property ignoreNextStep2ButtonPress
+    ### BEGIN Property step3ButtonPressed
+    def get_step3_button_pressed(self):
+        return self.__step3_button_pressed__
+    def set_step3_button_pressed(self, pressed):
+        if self.__step3_button_pressed__ != pressed:
+            self.__step3_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP3_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP3_RELEASED")
+            self.step3_button_pressed_changed.emit()
+    step3_button_pressed_changed = Signal()
+    step3ButtonPressed = Property(bool, get_step3_button_pressed, set_step3_button_pressed, notify=step3_button_pressed_changed)
+    ### END Property step3ButtonPressed
+    ### BEGIN Property ignoreNextStep3ButtonPress
+    def get_ignoreNextStep3ButtonPress(self):
+        return self.__ignoreNextStep3ButtonPress__
+    def set_ignoreNextStep3ButtonPress(self, val):
+        if self.__ignoreNextStep3ButtonPress__ != val:
+            self.__ignoreNextStep3ButtonPress__ = val
+            self.ignoreNextStep3ButtonPressChanged.emit()
+    ignoreNextStep3ButtonPressChanged = Signal()
+    ignoreNextStep3ButtonPress = Property(bool, get_ignoreNextStep3ButtonPress, set_ignoreNextStep3ButtonPress, notify=ignoreNextStep3ButtonPressChanged)
+    ### END Property ignoreNextStep3ButtonPress
+    ### BEGIN Property step4ButtonPressed
+    def get_step4_button_pressed(self):
+        return self.__step4_button_pressed__
+    def set_step4_button_pressed(self, pressed):
+        if self.__step4_button_pressed__ != pressed:
+            self.__step4_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP4_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP4_RELEASED")
+            self.step4_button_pressed_changed.emit()
+    step4_button_pressed_changed = Signal()
+    step4ButtonPressed = Property(bool, get_step4_button_pressed, set_step4_button_pressed, notify=step4_button_pressed_changed)
+    ### END Property step4ButtonPressed
+    ### BEGIN Property ignoreNextStep4ButtonPress
+    def get_ignoreNextStep4ButtonPress(self):
+        return self.__ignoreNextStep4ButtonPress__
+    def set_ignoreNextStep4ButtonPress(self, val):
+        if self.__ignoreNextStep4ButtonPress__ != val:
+            self.__ignoreNextStep4ButtonPress__ = val
+            self.ignoreNextStep4ButtonPressChanged.emit()
+    ignoreNextStep4ButtonPressChanged = Signal()
+    ignoreNextStep4ButtonPress = Property(bool, get_ignoreNextStep4ButtonPress, set_ignoreNextStep4ButtonPress, notify=ignoreNextStep4ButtonPressChanged)
+    ### END Property ignoreNextStep4ButtonPress
+    ### BEGIN Property step5ButtonPressed
+    def get_step5_button_pressed(self):
+        return self.__step5_button_pressed__
+    def set_step5_button_pressed(self, pressed):
+        if self.__step5_button_pressed__ != pressed:
+            self.__step5_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP5_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP5_RELEASED")
+            self.step5_button_pressed_changed.emit()
+    step5_button_pressed_changed = Signal()
+    step5ButtonPressed = Property(bool, get_step5_button_pressed, set_step5_button_pressed, notify=step5_button_pressed_changed)
+    ### END Property step5ButtonPressed
+    ### BEGIN Property ignoreNextStep5ButtonPress
+    def get_ignoreNextStep5ButtonPress(self):
+        return self.__ignoreNextStep5ButtonPress__
+    def set_ignoreNextStep5ButtonPress(self, val):
+        if self.__ignoreNextStep5ButtonPress__ != val:
+            self.__ignoreNextStep5ButtonPress__ = val
+            self.ignoreNextStep5ButtonPressChanged.emit()
+    ignoreNextStep5ButtonPressChanged = Signal()
+    ignoreNextStep5ButtonPress = Property(bool, get_ignoreNextStep5ButtonPress, set_ignoreNextStep5ButtonPress, notify=ignoreNextStep5ButtonPressChanged)
+    ### END Property ignoreNextStep5ButtonPress
+    ### BEGIN Property step6ButtonPressed
+    def get_step6_button_pressed(self):
+        return self.__step6_button_pressed__
+    def set_step6_button_pressed(self, pressed):
+        if self.__step6_button_pressed__ != pressed:
+            self.__step6_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP6_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP6_RELEASED")
+            self.step6_button_pressed_changed.emit()
+    step6_button_pressed_changed = Signal()
+    step6ButtonPressed = Property(bool, get_step6_button_pressed, set_step6_button_pressed, notify=step6_button_pressed_changed)
+    ### END Property step6ButtonPressed
+    ### BEGIN Property ignoreNextStep6ButtonPress
+    def get_ignoreNextStep6ButtonPress(self):
+        return self.__ignoreNextStep6ButtonPress__
+    def set_ignoreNextStep6ButtonPress(self, val):
+        if self.__ignoreNextStep6ButtonPress__ != val:
+            self.__ignoreNextStep6ButtonPress__ = val
+            self.ignoreNextStep6ButtonPressChanged.emit()
+    ignoreNextStep6ButtonPressChanged = Signal()
+    ignoreNextStep6ButtonPress = Property(bool, get_ignoreNextStep6ButtonPress, set_ignoreNextStep6ButtonPress, notify=ignoreNextStep6ButtonPressChanged)
+    ### END Property ignoreNextStep6ButtonPress
+    ### BEGIN Property step7ButtonPressed
+    def get_step7_button_pressed(self):
+        return self.__step7_button_pressed__
+    def set_step7_button_pressed(self, pressed):
+        if self.__step7_button_pressed__ != pressed:
+            self.__step7_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP7_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP7_RELEASED")
+            self.step7_button_pressed_changed.emit()
+    step7_button_pressed_changed = Signal()
+    step7ButtonPressed = Property(bool, get_step7_button_pressed, set_step7_button_pressed, notify=step7_button_pressed_changed)
+    ### END Property step7ButtonPressed
+    ### BEGIN Property ignoreNextStep7ButtonPress
+    def get_ignoreNextStep7ButtonPress(self):
+        return self.__ignoreNextStep7ButtonPress__
+    def set_ignoreNextStep7ButtonPress(self, val):
+        if self.__ignoreNextStep7ButtonPress__ != val:
+            self.__ignoreNextStep7ButtonPress__ = val
+            self.ignoreNextStep7ButtonPressChanged.emit()
+    ignoreNextStep7ButtonPressChanged = Signal()
+    ignoreNextStep7ButtonPress = Property(bool, get_ignoreNextStep7ButtonPress, set_ignoreNextStep7ButtonPress, notify=ignoreNextStep7ButtonPressChanged)
+    ### END Property ignoreNextStep7ButtonPress
+    ### BEGIN Property step8ButtonPressed
+    def get_step8_button_pressed(self):
+        return self.__step8_button_pressed__
+    def set_step8_button_pressed(self, pressed):
+        if self.__step8_button_pressed__ != pressed:
+            self.__step8_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP8_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP8_RELEASED")
+            self.step8_button_pressed_changed.emit()
+    step8_button_pressed_changed = Signal()
+    step8ButtonPressed = Property(bool, get_step8_button_pressed, set_step8_button_pressed, notify=step8_button_pressed_changed)
+    ### END Property step8ButtonPressed
+    ### BEGIN Property ignoreNextStep8ButtonPress
+    def get_ignoreNextStep8ButtonPress(self):
+        return self.__ignoreNextStep8ButtonPress__
+    def set_ignoreNextStep8ButtonPress(self, val):
+        if self.__ignoreNextStep8ButtonPress__ != val:
+            self.__ignoreNextStep8ButtonPress__ = val
+            self.ignoreNextStep8ButtonPressChanged.emit()
+    ignoreNextStep8ButtonPressChanged = Signal()
+    ignoreNextStep8ButtonPress = Property(bool, get_ignoreNextStep8ButtonPress, set_ignoreNextStep8ButtonPress, notify=ignoreNextStep8ButtonPressChanged)
+    ### END Property ignoreNextStep8ButtonPress
+    ### BEGIN Property step9ButtonPressed
+    def get_step9_button_pressed(self):
+        return self.__step9_button_pressed__
+    def set_step9_button_pressed(self, pressed):
+        if self.__step9_button_pressed__ != pressed:
+            self.__step9_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP9_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP9_RELEASED")
+            self.step9_button_pressed_changed.emit()
+    step9_button_pressed_changed = Signal()
+    step9ButtonPressed = Property(bool, get_step9_button_pressed, set_step9_button_pressed, notify=step9_button_pressed_changed)
+    ### END Property step9ButtonPressed
+    ### BEGIN Property ignoreNextStep9ButtonPress
+    def get_ignoreNextStep9ButtonPress(self):
+        return self.__ignoreNextStep9ButtonPress__
+    def set_ignoreNextStep9ButtonPress(self, val):
+        if self.__ignoreNextStep9ButtonPress__ != val:
+            self.__ignoreNextStep9ButtonPress__ = val
+            self.ignoreNextStep9ButtonPressChanged.emit()
+    ignoreNextStep9ButtonPressChanged = Signal()
+    ignoreNextStep9ButtonPress = Property(bool, get_ignoreNextStep9ButtonPress, set_ignoreNextStep9ButtonPress, notify=ignoreNextStep9ButtonPressChanged)
+    ### END Property ignoreNextStep9ButtonPress
+    ### BEGIN Property step10ButtonPressed
+    def get_step10_button_pressed(self):
+        return self.__step10_button_pressed__
+    def set_step10_button_pressed(self, pressed):
+        if self.__step10_button_pressed__ != pressed:
+            self.__step10_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP10_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP10_RELEASED")
+            self.step10_button_pressed_changed.emit()
+    step10_button_pressed_changed = Signal()
+    step10ButtonPressed = Property(bool, get_step10_button_pressed, set_step10_button_pressed, notify=step10_button_pressed_changed)
+    ### END Property step10ButtonPressed
+    ### BEGIN Property ignoreNextStep10ButtonPress
+    def get_ignoreNextStep10ButtonPress(self):
+        return self.__ignoreNextStep10ButtonPress__
+    def set_ignoreNextStep10ButtonPress(self, val):
+        if self.__ignoreNextStep10ButtonPress__ != val:
+            self.__ignoreNextStep10ButtonPress__ = val
+            self.ignoreNextStep10ButtonPressChanged.emit()
+    ignoreNextStep10ButtonPressChanged = Signal()
+    ignoreNextStep10ButtonPress = Property(bool, get_ignoreNextStep10ButtonPress, set_ignoreNextStep10ButtonPress, notify=ignoreNextStep10ButtonPressChanged)
+    ### END Property ignoreNextStep10ButtonPress
+    ### BEGIN Property step11ButtonPressed
+    def get_step11_button_pressed(self):
+        return self.__step11_button_pressed__
+    def set_step11_button_pressed(self, pressed):
+        if self.__step11_button_pressed__ != pressed:
+            self.__step11_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP11_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP11_RELEASED")
+            self.step11_button_pressed_changed.emit()
+    step11_button_pressed_changed = Signal()
+    step11ButtonPressed = Property(bool, get_step11_button_pressed, set_step11_button_pressed, notify=step11_button_pressed_changed)
+    ### END Property step11ButtonPressed
+    ### BEGIN Property ignoreNextStep11ButtonPress
+    def get_ignoreNextStep11ButtonPress(self):
+        return self.__ignoreNextStep11ButtonPress__
+    def set_ignoreNextStep11ButtonPress(self, val):
+        if self.__ignoreNextStep11ButtonPress__ != val:
+            self.__ignoreNextStep11ButtonPress__ = val
+            self.ignoreNextStep11ButtonPressChanged.emit()
+    ignoreNextStep11ButtonPressChanged = Signal()
+    ignoreNextStep11ButtonPress = Property(bool, get_ignoreNextStep11ButtonPress, set_ignoreNextStep11ButtonPress, notify=ignoreNextStep11ButtonPressChanged)
+    ### END Property ignoreNextStep11ButtonPress
+    ### BEGIN Property step12ButtonPressed
+    def get_step12_button_pressed(self):
+        return self.__step12_button_pressed__
+    def set_step12_button_pressed(self, pressed):
+        if self.__step12_button_pressed__ != pressed:
+            self.__step12_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP12_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP12_RELEASED")
+            self.step12_button_pressed_changed.emit()
+    step12_button_pressed_changed = Signal()
+    step12ButtonPressed = Property(bool, get_step12_button_pressed, set_step12_button_pressed, notify=step12_button_pressed_changed)
+    ### END Property step12ButtonPressed
+    ### BEGIN Property ignoreNextStep12ButtonPress
+    def get_ignoreNextStep12ButtonPress(self):
+        return self.__ignoreNextStep12ButtonPress__
+    def set_ignoreNextStep12ButtonPress(self, val):
+        if self.__ignoreNextStep12ButtonPress__ != val:
+            self.__ignoreNextStep12ButtonPress__ = val
+            self.ignoreNextStep12ButtonPressChanged.emit()
+    ignoreNextStep12ButtonPressChanged = Signal()
+    ignoreNextStep12ButtonPress = Property(bool, get_ignoreNextStep12ButtonPress, set_ignoreNextStep12ButtonPress, notify=ignoreNextStep12ButtonPressChanged)
+    ### END Property ignoreNextStep12ButtonPress
+    ### BEGIN Property step13ButtonPressed
+    def get_step13_button_pressed(self):
+        return self.__step13_button_pressed__
+    def set_step13_button_pressed(self, pressed):
+        if self.__step13_button_pressed__ != pressed:
+            self.__step13_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP13_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP13_RELEASED")
+            self.step13_button_pressed_changed.emit()
+    step13_button_pressed_changed = Signal()
+    step13ButtonPressed = Property(bool, get_step13_button_pressed, set_step13_button_pressed, notify=step13_button_pressed_changed)
+    ### END Property step13ButtonPressed
+    ### BEGIN Property ignoreNextStep13ButtonPress
+    def get_ignoreNextStep13ButtonPress(self):
+        return self.__ignoreNextStep13ButtonPress__
+    def set_ignoreNextStep13ButtonPress(self, val):
+        if self.__ignoreNextStep13ButtonPress__ != val:
+            self.__ignoreNextStep13ButtonPress__ = val
+            self.ignoreNextStep13ButtonPressChanged.emit()
+    ignoreNextStep13ButtonPressChanged = Signal()
+    ignoreNextStep13ButtonPress = Property(bool, get_ignoreNextStep13ButtonPress, set_ignoreNextStep13ButtonPress, notify=ignoreNextStep13ButtonPressChanged)
+    ### END Property ignoreNextStep13ButtonPress
+    ### BEGIN Property step14ButtonPressed
+    def get_step14_button_pressed(self):
+        return self.__step14_button_pressed__
+    def set_step14_button_pressed(self, pressed):
+        if self.__step14_button_pressed__ != pressed:
+            self.__step14_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP14_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP14_RELEASED")
+            self.step14_button_pressed_changed.emit()
+    step14_button_pressed_changed = Signal()
+    step14ButtonPressed = Property(bool, get_step14_button_pressed, set_step14_button_pressed, notify=step14_button_pressed_changed)
+    ### END Property step14ButtonPressed
+    ### BEGIN Property ignoreNextStep14ButtonPress
+    def get_ignoreNextStep14ButtonPress(self):
+        return self.__ignoreNextStep14ButtonPress__
+    def set_ignoreNextStep14ButtonPress(self, val):
+        if self.__ignoreNextStep14ButtonPress__ != val:
+            self.__ignoreNextStep14ButtonPress__ = val
+            self.ignoreNextStep14ButtonPressChanged.emit()
+    ignoreNextStep14ButtonPressChanged = Signal()
+    ignoreNextStep14ButtonPress = Property(bool, get_ignoreNextStep14ButtonPress, set_ignoreNextStep14ButtonPress, notify=ignoreNextStep14ButtonPressChanged)
+    ### END Property ignoreNextStep14ButtonPress
+    ### BEGIN Property step15ButtonPressed
+    def get_step15_button_pressed(self):
+        return self.__step15_button_pressed__
+    def set_step15_button_pressed(self, pressed):
+        if self.__step15_button_pressed__ != pressed:
+            self.__step15_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP15_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP15_RELEASED")
+            self.step15_button_pressed_changed.emit()
+    step15_button_pressed_changed = Signal()
+    step15ButtonPressed = Property(bool, get_step15_button_pressed, set_step15_button_pressed, notify=step15_button_pressed_changed)
+    ### END Property step15ButtonPressed
+    ### BEGIN Property ignoreNextStep15ButtonPress
+    def get_ignoreNextStep15ButtonPress(self):
+        return self.__ignoreNextStep15ButtonPress__
+    def set_ignoreNextStep15ButtonPress(self, val):
+        if self.__ignoreNextStep15ButtonPress__ != val:
+            self.__ignoreNextStep15ButtonPress__ = val
+            self.ignoreNextStep15ButtonPressChanged.emit()
+    ignoreNextStep15ButtonPressChanged = Signal()
+    ignoreNextStep15ButtonPress = Property(bool, get_ignoreNextStep15ButtonPress, set_ignoreNextStep15ButtonPress, notify=ignoreNextStep15ButtonPressChanged)
+    ### END Property ignoreNextStep15ButtonPress
+    ### BEGIN Property step16ButtonPressed
+    def get_step16_button_pressed(self):
+        return self.__step16_button_pressed__
+    def set_step16_button_pressed(self, pressed):
+        if self.__step16_button_pressed__ != pressed:
+            self.__step16_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP16_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP16_RELEASED")
+            self.step16_button_pressed_changed.emit()
+    step16_button_pressed_changed = Signal()
+    step16ButtonPressed = Property(bool, get_step16_button_pressed, set_step16_button_pressed, notify=step16_button_pressed_changed)
+    ### END Property step16ButtonPressed
+    ### BEGIN Property ignoreNextStep16ButtonPress
+    def get_ignoreNextStep16ButtonPress(self):
+        return self.__ignoreNextStep16ButtonPress__
+    def set_ignoreNextStep16ButtonPress(self, val):
+        if self.__ignoreNextStep16ButtonPress__ != val:
+            self.__ignoreNextStep16ButtonPress__ = val
+            self.ignoreNextStep16ButtonPressChanged.emit()
+    ignoreNextStep16ButtonPressChanged = Signal()
+    ignoreNextStep16ButtonPress = Property(bool, get_ignoreNextStep16ButtonPress, set_ignoreNextStep16ButtonPress, notify=ignoreNextStep16ButtonPressChanged)
+    ### END Property ignoreNextStep16ButtonPress
+    ### END Sequencer Strip Buttons
+
     ### BEGIN Property modeButtonPressed
     def get_mode_button_pressed(self):
         return self.__mode_button_pressed__
@@ -4117,11 +4604,11 @@ class zynthian_gui(QObject):
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ALT_DOWN")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ALT_RELEASED")
-            self.alt_button_pressed_changed.emit()
+            self.altButtonPressedChanged.emit()
 
-    alt_button_pressed_changed = Signal()
+    altButtonPressedChanged = Signal()
 
-    altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=alt_button_pressed_changed)
+    altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=altButtonPressedChanged)
     ### END Property altButtonPressed
 
     ### BEGIN Property globalButtonPressed

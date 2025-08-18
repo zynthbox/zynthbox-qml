@@ -48,6 +48,15 @@ Item {
                 console.log("Toggle entry for step", stepOffset + stepButtonIndex);
             }
         } else if (_private.interactionMode == 1) {
+            if (stepButtonIndex < 10) {
+                // The track buttons
+                zynqtgui.sketchpad.selectedTrackId = stepButtonIndex;
+            } else if (stepButtonIndex < 11) {
+                // The greyed out button in the middle that we need to work out what to do with
+            } else if (stepButtonIndex < 16) {
+                // The clip buttons
+                component.selectedChannel.selectedClip = stepButtonIndex - 11;
+            }
         } else if (_private.interactionMode == 2) {
         }
     }
@@ -339,9 +348,30 @@ Item {
             }
         }
         function updateLedsForTrackClipSelector() {
-            for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
+            for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
                 let stepColor = _private.stepEmpty;
-                zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+                let theTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
+                if (theTrack.occupiedSlotsCount > 0 || theTrack.occupiedSampleSlotsCount > 0) {
+                    stepColor = _private.stepWithNotes;
+                }
+                if (zynqtgui.sketchpad.selectedTrackId == trackIndex) {
+                    stepColor = Qt.tint(stepColor, _private.stepCurrent);
+                }
+                // Maybe mark red when muted?
+                zynqtgui.led_config.setStepButtonColor(trackIndex, stepColor);
+            }
+            // Last button's not really a thing for now, grey it out...
+            zynqtgui.led_config.setStepButtonColor(10, _private.stepEmpty);
+            for (let clipIndex = 0; clipIndex < 5; ++clipIndex) {
+                let stepColor = _private.stepEmpty;
+                let clipPattern = _private.sequence.getByClipId(component.selectedChannel.id, clipIndex);
+                if (clipPattern.currentBankHasNotes) {
+                    stepColor = _private.stepWithNotes;
+                }
+                if (component.selectedChannel.selectedClip === clipIndex) {
+                    stepColor = Qt.tint(stepColor, _private.stepCurrent);
+                }
+                zynqtgui.led_config.setStepButtonColor(clipIndex + 11, stepColor);
             }
         }
         function updateLedsForMusicalButtons() {

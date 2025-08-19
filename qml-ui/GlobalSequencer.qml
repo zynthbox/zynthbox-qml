@@ -284,12 +284,15 @@ Item {
                 break;
 
             case "SWITCH_MODE_RELEASED":
-                if (_private.interactionMode === 2) {
-                    _private.interactionMode = 0;
-                } else {
-                    _private.interactionMode = _private.interactionMode + 1;
+                // Don't swallow mode when alt is pressed, that's for tab switching on e.g. sketchpad main
+                if (zynqtgui.altButtonPressed == false) {
+                    if (_private.interactionMode === 2) {
+                        _private.interactionMode = 0;
+                    } else {
+                        _private.interactionMode = _private.interactionMode + 1;
+                    }
+                    returnValue = true;
                 }
-                returnValue = true;
                 break;
         }
         return returnValue;
@@ -308,7 +311,21 @@ Item {
         // 1: Track/Clip Selector
         // 2: Musical keyboard for some basic music playings
         property int interactionMode: 0
-        onInteractionModeChanged: updateLedColors()
+        onInteractionModeChanged: {
+            updateLedColors();
+            switch (interactionMode) {
+                case 2:
+                    applicationWindow().showPassiveNotification("3/3: Musical Keys", 1500);
+                    break;
+                case 1:
+                    applicationWindow().showPassiveNotification("2/3: Track and Clip", 1500);
+                    break;
+                case 0:
+                default:
+                    applicationWindow().showPassiveNotification("1/3: Sequencer", 1500);
+                    break;
+            }
+        }
         function updateLedsForStepSequencer() {
             let workingModel = _private.pattern.workingModel;
             if (zynqtgui.altButtonPressed) {

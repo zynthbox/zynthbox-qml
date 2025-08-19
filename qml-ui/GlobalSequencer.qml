@@ -46,6 +46,33 @@ Item {
             } else {
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
                 console.log("Toggle entry for step", stepOffset + stepButtonIndex);
+                if (_private.heardNotes.length > 0) {
+                    let workingModel = _private.pattern.workingModel;
+                    let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
+                    let removedAtLeastOne = false;
+                    // First, let's see if any of the notes in our list are already on this position, and if so, remove them
+                    for (var i = 0; i < _private.heardNotes.length; ++i) {
+                        var subNoteIndex = workingModel.subnoteIndex(padNoteRow, stepButtonIndex, _private.heardNotes[i].midiNote);
+                        if (subNoteIndex > -1) {
+                            workingModel.removeSubnote(padNoteRow, stepButtonIndex, subNoteIndex);
+                            removedAtLeastOne = true;
+                        }
+                    }
+
+                    // And then, only if we didn't remove anything should we be adding the notes
+                    if (!removedAtLeastOne) {
+                        var subNoteIndex = -1;
+                        for (var i = 0; i < _private.heardNotes.length; ++i) {
+                            subNoteIndex = workingModel.insertSubnoteSorted(padNoteRow, stepButtonIndex, _private.heardNotes[i]);
+                            workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subNoteIndex, "velocity", _private.heardVelocities[i]);
+                            if (workingModel.defaultNoteDuration > 0) {
+                                workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subNoteIndex, "duration", workingModel.defaultNoteDuration);
+                            }
+                        }
+                    }
+                } else {
+                    // TODO Pick the notes from that pad into the current selection
+                }
             }
         } else if (_private.interactionMode == 1) {
             if (stepButtonIndex < 10) {
@@ -271,16 +298,54 @@ Item {
                 break;
 
             // BK controls the note values (transposing the note, and also adjusting the current global captured note, so the display keeps making sense)
+            // - hold star button and scroll BK to change the current pattern's key
             case "KNOB3_TOUCHED":
                 component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    zynqtgui.ignoreNextStarButtonPress = true;
+                }
                 break;
             case "KNOB3_RELEASED":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    zynqtgui.ignoreNextStarButtonPress = true;
+                }
                 break;
             case "KNOB3_UP":
                 component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    zynqtgui.ignoreNextStarButtonPress = true;
+                    let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
+                    if (currentKey > 0) {
+                        currentKey = currentKey + 1;
+                        _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
+                        _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
+                    }
+                    applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
+                        .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
+                        .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
+                        .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
+                        , 1000);
+                    returnValue = true;
+                }
                 break;
             case "KNOB3_DOWN":
                 component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    zynqtgui.ignoreNextStarButtonPress = true;
+                    let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
+                    if (currentKey < 127) {
+                        currentKey = currentKey - 1;
+                        _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
+                        _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
+                    }
+                    applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
+                        .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
+                        .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
+                        .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
+                        , 1000);
+                    returnValue = true;
+                }
                 break;
 
             case "SWITCH_MODE_RELEASED":
@@ -302,10 +367,19 @@ Item {
         id: _private
         property QtObject sequence: component.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
         property QtObject pattern: sequence && component.selectedChannel ? sequence.getByClipId(component.selectedChannel.id, component.selectedChannel.selectedClip) : null
-        onPatternChanged: updateLedColors()
+        // property QtObject clip: component.selectedChannel ? component.selectedChannel.getClipsModelById(component.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
+        onPatternChanged: {
+            heardNotes = [Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey), pattern.sketchpadTrack)];
+            heardVelocities = [64];
+            updateLedColors();
+        }
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
         property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
         property color stepCurrent: Qt.rgba(0.4, 0.4, 0.0)
+
+        property var heardNotes: []
+        property var heardVelocities: []
+
         // The interaction modes are:
         // 0: Step sequencer (displays the 16 steps of the current bar, tapping toggles the step's entry given either the currently held note, or the clip's key)
         // 1: Track/Clip Selector

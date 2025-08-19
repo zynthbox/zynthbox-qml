@@ -107,47 +107,42 @@ logging.debug("SWITCHES layout: %s" % zynswitch_pin)
 # Custom Switches Action Configuration
 #------------------------------------------------------------------------------
 
-custom_switch_ui_actions = [
-    {'S': "SCREEN_MAIN", 'B': '', 'L': ''},
-    {'S': "CHANNEL_1", 'B': '', 'L': ''},
-    {'S': "CHANNEL_2", 'B': '', 'L': ''},
-    {'S': "CHANNEL_3", 'B': '', 'L': ''},
-    {'S': "CHANNEL_4", 'B': '', 'L': ''},
-    {'S': "CHANNEL_5", 'B': '', 'L': ''},
-    {'S': "SWITCH_CHANNELS_MOD_SHORT", 'B': '', 'L': ''},
-    {'S': "MODE_SWITCH_SHORT", 'B': '', 'L': ''},
-    {'S': "SCREEN_SKETCHPAD", 'B': '', 'L': ''},
-    {'S': "SCREEN_ARRANGER", 'B': '', 'L': ''},
-    {'S': "SCREEN_PLAYGRID", 'B': '', 'L': ''},
-    {'S': "SCREEN_LAYER", 'B': '', 'L': ''},
-    {'S': "SCREEN_ADMIN", 'B': '', 'L': ''},
-    {'S': "ALT_BUTTON", 'B': '', 'L': ''},
-    {'S': "START_RECORD", 'B': '', 'L': ''},
-    {'S': "ZL_PLAY", 'B': '', 'L': ''},
-    {'S': "SWITCH_METRONOME_SHORT", 'B': '', 'L': ''},
-    {'S': "ZL_STOP", 'B': '', 'L': ''},
-    {'S': "SWITCH_BACK_SHORT", 'B': '', 'L': ''},
-    {'S': "SELECT_UP", 'B': '', 'L': ''},
-    {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''},
-    {'S': "NAVIGATE_LEFT", 'B': '', 'L': ''},
-    {'S': "SELECT_DOWN", 'B': '', 'L': ''},
-    {'S': "NAVIGATE_RIGHT", 'B': '', 'L': ''},
-    {'S': "SCREEN_AUDIO_SETTINGS", 'B': '', 'L': ''},
-    {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''},
-    {'S': "CP_RV1", 'B': '', 'L': ''},
-    {'S': "CP_RV2", 'B': '', 'L': ''},
-    {'S': "CP_RV3", 'B': '', 'L': ''},
-    {'S': "CP_RV4", 'B': '', 'L': ''}
-]
+custom_switch_ui_actions = {
+    0: {'S': "SCREEN_MAIN", 'B': '', 'L': ''},
+    1: {'S': "CHANNEL_1", 'B': '', 'L': ''},
+    2: {'S': "CHANNEL_2", 'B': '', 'L': ''},
+    3: {'S': "CHANNEL_3", 'B': '', 'L': ''},
+    4: {'S': "CHANNEL_4", 'B': '', 'L': ''},
+    5: {'S': "CHANNEL_5", 'B': '', 'L': ''},
+    6: {'S': "SWITCH_CHANNELS_MOD_SHORT", 'B': '', 'L': ''},
+    7: {'S': "MODE_SWITCH_SHORT", 'B': '', 'L': ''},
+    8: {'S': "SCREEN_SKETCHPAD", 'B': '', 'L': ''},
+    9: {'S': "SCREEN_ARRANGER", 'B': '', 'L': ''},
+    0: {'S': "SCREEN_PLAYGRID", 'B': '', 'L': ''},
+    11: {'S': "SCREEN_LAYER", 'B': '', 'L': ''},
+    12: {'S': "SCREEN_ADMIN", 'B': '', 'L': ''},
+    13: {'S': "ALT_BUTTON", 'B': '', 'L': ''},
+    14: {'S': "START_RECORD", 'B': '', 'L': ''},
+    15: {'S': "ZL_PLAY", 'B': '', 'L': ''},
+    16: {'S': "SWITCH_METRONOME_SHORT", 'B': '', 'L': ''},
+    17: {'S': "ZL_STOP", 'B': '', 'L': ''},
+    18: {'S': "SWITCH_BACK_SHORT", 'B': '', 'L': ''},
+    19: {'S': "SELECT_UP", 'B': '', 'L': ''},
+    20: {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''},
+    21: {'S': "NAVIGATE_LEFT", 'B': '', 'L': ''},
+    22: {'S': "SELECT_DOWN", 'B': '', 'L': ''},
+    23: {'S': "NAVIGATE_RIGHT", 'B': '', 'L': ''},
+    24: {'S': "SCREEN_AUDIO_SETTINGS", 'B': '', 'L': ''},
+    25: {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''},
+    26: {'S': "CP_RV1", 'B': '', 'L': ''},
+    27: {'S': "CP_RV2", 'B': '', 'L': ''},
+    28: {'S': "CP_RV3", 'B': '', 'L': ''},
+    29: {'S': "CP_RV4", 'B': '', 'L': ''}
+}
 custom_switch_midi_events = []
 
-#try:
-#    n_custom_switches = max(0, len(zynswitch_pin) - 4)
-#except:
-#    n_custom_switches = 0
-
-## TODO: make it come from some config
-#n_custom_switches = 33
+# # TODO: make it come from some config
+# n_custom_switches = 33
 
 #for i in range(0, n_custom_switches):
 #    cuias = {}

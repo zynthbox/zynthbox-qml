@@ -2451,28 +2451,28 @@ class zynthian_gui(QObject):
     def zynswitches_midi_setup(self, curlayer_chan=None):
         # logging.info("MIDI SWITCHES SETUP...")
 
-        # Configure Custom Switches
-        for i in range(0, zynthian_gui_config.n_custom_switches):
-            swi = 4 + i
-            event = zynthian_gui_config.custom_switch_midi_events[i]
-            if event is not None:
-                if event["chan"] is not None:
-                    midi_chan = event["chan"]
-                else:
-                    midi_chan = curlayer_chan
+        # # Configure Custom Switches
+        # for i in range(0, zynthian_gui_config.n_custom_switches):
+        #     swi = 4 + i
+        #     event = zynthian_gui_config.custom_switch_midi_events[i]
+        #     if event is not None:
+        #         if event["chan"] is not None:
+        #             midi_chan = event["chan"]
+        #         else:
+        #             midi_chan = curlayer_chan
 
-                if midi_chan is not None:
-                    lib_zyncoder.setup_zynswitch_midi(
-                        swi, event["type"], midi_chan, event["num"]
-                    )
-                    logging.info(
-                        "MIDI ZYNSWITCH {}: {} CH#{}, {}".format(
-                            swi, event["type"], midi_chan, event["num"]
-                        )
-                    )
-                else:
-                    lib_zyncoder.setup_zynswitch_midi(swi, 0, 0, 0)
-                    logging.info("MIDI ZYNSWITCH {}: DISABLED!".format(swi))
+        #         if midi_chan is not None:
+        #             lib_zyncoder.setup_zynswitch_midi(
+        #                 swi, event["type"], midi_chan, event["num"]
+        #             )
+        #             logging.info(
+        #                 "MIDI ZYNSWITCH {}: {} CH#{}, {}".format(
+        #                     swi, event["type"], midi_chan, event["num"]
+        #                 )
+        #             )
+        #         else:
+        #             lib_zyncoder.setup_zynswitch_midi(swi, 0, 0, 0)
+        #             logging.info("MIDI ZYNSWITCH {}: DISABLED!".format(swi))
 
         # Configure Zynaptik Analog Inputs (CV-IN)
         for i, event in enumerate(zynthian_gui_config.zynaptik_ad_midi_events):

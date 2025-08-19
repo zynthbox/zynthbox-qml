@@ -470,7 +470,7 @@ class zynthian_gui_controller(QObject):
             #logging.error("%s" % err)
 
     def setup_zyncoder(self):
-        if not self.__visible:
+        if not self.__visible or self.index == -1:
             return
         self.init_value=None
         try:
@@ -500,8 +500,8 @@ class zynthian_gui_controller(QObject):
                 midi_cc = self.zctrl.midi_cc
                 osc_path_char = None
 
-            zyncoder.lib_zyncoder.setup_midi_zynpot(self.index, self.zctrl.midi_chan, midi_cc)
-            zyncoder.lib_zyncoder.setup_osc_zynpot(self.index, osc_path_char)
+                zyncoder.lib_zyncoder.setup_midi_zynpot(self.index, self.zctrl.midi_chan, midi_cc)
+                zyncoder.lib_zyncoder.setup_osc_zynpot(self.index, osc_path_char)
 
         except Exception as err:
             logging.error("%s" % err)
@@ -515,7 +515,7 @@ class zynthian_gui_controller(QObject):
             self.ctrl_value=v
             #logging.debug("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
             if self.__visible:
-                if set_zynpot:
+                if set_zynpot and self.index != -1:
                     if self.mult>1: v = self.mult*v
                     zyncoder.lib_zyncoder.set_value_zynpot(self.index,int(v),int(send_zynpot))
                     #logging.debug("set_value_zyncoder {} {} ({}, {}) => {}".format(self, self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
@@ -540,7 +540,7 @@ class zynthian_gui_controller(QObject):
         #if self.canvas_push_ts:
         #    return
         is_external_app = hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False
-        if not self.__visible or is_external_app:
+        if not self.__visible or is_external_app or self.index == -1:
             return
         if self.zctrl and zyncoder.lib_zyncoder.get_value_flag_zynpot(self.index):
             val=zyncoder.lib_zyncoder.get_value_zynpot(self.index)

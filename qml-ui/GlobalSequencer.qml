@@ -302,19 +302,22 @@ Item {
             case "KNOB3_TOUCHED":
                 component.ignoreHeldStepButtonsReleases();
                 if (zynqtgui.starButtonPressed) {
-                    zynqtgui.ignoreNextStarButtonPress = true;
+                    applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
+                        .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
+                        .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
+                        .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
+                        , 1000);
                 }
                 break;
             case "KNOB3_RELEASED":
                 component.ignoreHeldStepButtonsReleases();
                 if (zynqtgui.starButtonPressed) {
-                    zynqtgui.ignoreNextStarButtonPress = true;
+                    // Release doesn't really want anything doing...
                 }
                 break;
             case "KNOB3_UP":
                 component.ignoreHeldStepButtonsReleases();
                 if (zynqtgui.starButtonPressed) {
-                    zynqtgui.ignoreNextStarButtonPress = true;
                     let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
                     if (currentKey > 0) {
                         currentKey = currentKey + 1;
@@ -326,13 +329,17 @@ Item {
                         .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
                         .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
                         , 1000);
+                    // Since we're holding the key down while we're here, restart the note when we do the twist here
+                    _private.starNote.setOff();
+                    _private.starNote.sendPitchChange(0);
+                    _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                    _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
                 }
                 break;
             case "KNOB3_DOWN":
                 component.ignoreHeldStepButtonsReleases();
                 if (zynqtgui.starButtonPressed) {
-                    zynqtgui.ignoreNextStarButtonPress = true;
                     let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
                     if (currentKey < 127) {
                         currentKey = currentKey - 1;
@@ -344,8 +351,28 @@ Item {
                         .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
                         .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
                         , 1000);
+                    // Since we're holding the key down while we're here, restart the note when we do the twist here
+                    _private.starNote.setOff();
+                    _private.starNote.sendPitchChange(0);
+                    _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                    _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
                 }
+                break;
+
+            case "SWITCH_STAR_DOWN":
+                // TODO Maybe we can set the key's velocity by holding star and twisting K1?
+                // Note-on for the current pattern's key, save the note value in _private so we can be sure it's the same one being turned off again if people change clips or whatever while holding down the thing
+                _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                _private.starNote.setOn(_private.starVelocity);
+                returnValue = true;
+                break;
+            case "SWITCH_STAR_RELEASED":
+                // Note-off for whatever's stored on the _private property, and then remove it
+                _private.starNote.setOff();
+                _private.starNote.sendPitchChange(0);
+                _private.starNote = null;
+                returnValue = true;
                 break;
 
             case "SWITCH_MODE_RELEASED":
@@ -379,6 +406,9 @@ Item {
 
         property var heardNotes: []
         property var heardVelocities: []
+
+        property QtObject starNote: null
+        property int starVelocity: 64
 
         // The interaction modes are:
         // 0: Step sequencer (displays the 16 steps of the current bar, tapping toggles the step's entry given either the currently held note, or the clip's key)

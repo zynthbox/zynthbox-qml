@@ -49,7 +49,6 @@ Zynthian.ScreenPage {
                 text: qsTr("Double Click Threshold Amount")
             }
             QQC2.Slider {
-                id: slider
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                 from: 0
                 to: 500
@@ -73,7 +72,39 @@ Zynthian.ScreenPage {
 
                 QQC2.Label {
                     anchors.centerIn: parent
-                    text: qsTr("%1 ms").arg(slider.value)
+                    text: qsTr("%1 ms").arg(zynqtgui.ui_settings.doubleClickThreshold)
+                }
+            }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+
+            QQC2.Label {
+                Layout.fillWidth: false
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                text: qsTr("Hardware Sequencer Interaction")
+            }
+            QQC2.Switch {
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                checked: zynqtgui.ui_settings.hardwareSequencer
+                onClicked: {
+                    zynqtgui.ui_settings.hardwareSequencer = checked;
+                }
+            }
+            Rectangle {
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                color: Kirigami.Theme.backgroundColor
+                border.color: "#ff999999"
+                border.width: 2
+                radius: 4
+
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    text: zynqtgui.ui_settings.hardwareSequencer ? qsTr("Enabled") : qsTr("Disabled")
                 }
             }
         }

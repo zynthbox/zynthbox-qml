@@ -37,6 +37,8 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         super(zynthian_gui_ui_settings, self).__init__(parent)
         self.__doubleClickThreshold = int(self.zynqtgui.global_settings.value("UI/doubleClickThreshhold", 200))
         self.doubleClickThresholdChanged.emit()
+        self.__hardwareSequencer = bool(self.zynqtgui.global_settings.value("UI/hardwareSequencer", False))
+        self.hardwareSequencerChanged.emit();
 
     def fill_list(self):
         super().fill_list()
@@ -61,5 +63,20 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     doubleClickThreshold = Property(int, get_doubleClickThreshhold, set_doubleClickThreshhold, notify=doubleClickThresholdChanged)
     ### END Property doubleClickThreshhold
+
+    ### BEGIN Property hardwareSequencer
+    def get_hardwareSequencer(self):
+        return self.__hardwareSequencer
+
+    def set_hardwareSequencer(self, value):
+        if value != self.__hardwareSequencer:
+            self.__hardwareSequencer = value
+            self.zynqtgui.global_settings.setValue("UI/hardwareSequencer", self.__hardwareSequencer)
+            self.hardwareSequencerChanged.emit()
+
+    hardwareSequencerChanged = Signal()
+
+    hardwareSequencer = Property(bool, get_hardwareSequencer, set_hardwareSequencer, notify=hardwareSequencerChanged)
+    ### END Property hardwareSequencer
 
 # ------------------------------------------------------------------------------

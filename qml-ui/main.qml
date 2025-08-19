@@ -61,8 +61,10 @@ Kirigami.AbstractApplicationWindow {
     property var cuiaCallback: function(cuia, originId, track, slot, value) {
         var result = false;
 
-        // Handle the global sequencer events first, so we can be sure that's done
-        result = root.globalSequencer.cuiaCallback(cuia, originId, track, slot, value);
+        if (zynqtgui.ui_settings.hardwareSequencer) {
+            // Handle the global sequencer events first, so we can be sure that's done
+            result = root.globalSequencer.cuiaCallback(cuia, originId, track, slot, value);
+        }
 
         // Pass things along to the recording popup explicitly, if it's closed, to ensure things happen that are supposed to
         // (specifically, this allows that dialog to handle recording stops and such)

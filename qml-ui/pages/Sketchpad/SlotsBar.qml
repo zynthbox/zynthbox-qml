@@ -727,19 +727,18 @@ QQC2.Pane {
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
 
                         visible: synthsButton.checked
-                        enabled: chainedSound >= 0 &&
-                                 (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
+                        enabled: volumeSlider.synthPassthroughClient != null && chainedSound >= 0 && (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
                         value: volumeSlider.synthPassthroughClient ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
                         stepSize: 0.01
-                        from: volumeSlider.synthPassthroughClient.dryGainHandler.minimumDecibel
-                        to: volumeSlider.synthPassthroughClient.dryGainHandler.maximumDecibel
+                        from: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.minimumDecibel : 0
+                        to: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.maximumDecibel : 0
                         onMoved: {
                             volumeSlider.synthPassthroughClient.dryGainHandler.gainDb = volumeSlider.value;
                         }
                         Binding {
                             target: volumeSlider
                             property: "value"
-                            value: volumeSlider.synthPassthroughClient.dryGainHandler.gainDb
+                            value: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
                         }
                     }
 

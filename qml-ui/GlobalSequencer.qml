@@ -30,6 +30,9 @@ import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
     id: component
+    readonly property alias heardNotes: _private.heardNotes
+    readonly property alias heardVelocities: _private.heardVelocities
+
     property QtObject selectedChannel: null
     function handleStepButtonPress(stepButtonIndex) {
         let workingModel = _private.pattern.workingModel;
@@ -406,6 +409,9 @@ Item {
 
         property var heardNotes: []
         property var heardVelocities: []
+        property int noteListeningActivations: 0
+        property var noteListeningNotes: []
+        property var noteListeningVelocities: []
 
         property QtObject starNote: null
         property int starVelocity: 64
@@ -519,6 +525,78 @@ Item {
             }
         }
     }
+    Connections {
+        target: Zynthbox.MidiRouter
+        enabled: zynqtgui.ui_settings.hardwareSequencer
+        onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
+            // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.pattern.sketchpadTrack, "listening on port", listenToPort);
+            let targetTrack = Zynthbox.MidiRouter.sketchpadTrackTargetTrack(_private.pattern.sketchpadTrack);
+            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort)
+                && (targetTrack == _private.pattern.sketchpadTrack
+                    ? sketchpadTrack == _private.pattern.sketchpadTrack
+                    : sketchpadTrack == targetTrack
+                )
+                && size === 3) {
+                if (127 < byte1 && byte1 < 160) {
+                    let setOn = true;
+                    // By convention, an "off" note can be either a midi off message, or an on message with a velocity of 0
+                    if (byte1 < 144 || byte3 === 0) {
+                        setOn = false;
+                    }
+                    let midiNote = byte2;
+                    let velocity = byte3;
+                    if (setOn === true) {
+                        if (_private.noteListeningActivations === 0) {
+                            // Clear the current state, in case there's something there (otherwise things look a little weird)
+                            _private.heardNotes = [];
+                            _private.heardVelocities = [];
+                        }
+                        // Count up one tick for a note on message
+                        _private.noteListeningActivations = _private.noteListeningActivations + 1;
+                        // Create a new note based on the new thing that just arrived, but only if it's an on note
+                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, _private.pattern.sketchpadTrack);
+                        var existingIndex = _private.noteListeningNotes.indexOf(newNote);
+                        if (existingIndex > -1) {
+                            _private.noteListeningNotes.splice(existingIndex, 1);
+                            _private.noteListeningVelocities.splice(existingIndex, 1);
+                        }
+                        _private.noteListeningNotes.push(newNote);
+                        _private.noteListeningVelocities.push(velocity);
+                        // console.log("Registering note on , new activation count is", _private.noteListeningActivations, _private.noteListeningNotes);
+                    } else if (setOn == false) {
+                        // Count down one for a note off message
+                        _private.noteListeningActivations = _private.noteListeningActivations - 1;
+                        // console.log("Registering note off, new activation count is", _private.noteListeningActivations, _private.noteListeningNotes, _private.noteListeningVelocities);
+                    }
+                    if (_private.noteListeningActivations < 0) {
+                        // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
+                        // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
+                        // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
+                        // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
+                        _private.noteListeningActivations = 0;
+                        _private.noteListeningNotes = [];
+                        _private.noteListeningVelocities = [];
+                    }
+                    if (_private.noteListeningActivations > 0) {
+                        // As we listen, assign all the heard notes to the heard notes thinger so we show things as we listen
+                        _private.heardNotes = _private.noteListeningNotes;
+                        _private.heardVelocities = _private.noteListeningVelocities;
+                    }
+                    if (_private.noteListeningActivations === 0) {
+                        // Now, if we're back down to zero, then we've had all the notes released, and we should clear our lists, ready for next go
+                        _private.noteListeningNotes = [];
+                        _private.noteListeningVelocities = [];
+                    }
+                } else if (175 < byte1 && byte1 < 192 && byte2 === 123) {
+                    // console.log("Registering all-off, resetting to empty, bytes are", byte1, byte2, byte3);
+                    _private.noteListeningActivations = 0;
+                    _private.noteListeningNotes = [];
+                    _private.noteListeningVelocities = [];
+                }
+            }
+        }
+    }
+
     // Thoughts: When in step sequencer mode, hold alt to show a split of the current clip's bar setup (first eight handles current bar, and the other eight lets you set the length by pushing the buttons)
     Connections {
         target: _private.pattern ? _private.pattern.workingModel : null

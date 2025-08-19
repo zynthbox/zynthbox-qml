@@ -500,8 +500,8 @@ class zynthian_gui_controller(QObject):
                 midi_cc = self.zctrl.midi_cc
                 osc_path_char = None
 
-                zyncoder.lib_zyncoder.setup_midi_zynpot(self.index, self.zctrl.midi_chan, midi_cc)
-                zyncoder.lib_zyncoder.setup_osc_zynpot(self.index, osc_path_char)
+            zyncoder.lib_zyncoder.setup_midi_zynpot(self.index, self.zctrl.midi_chan, midi_cc)
+            zyncoder.lib_zyncoder.setup_osc_zynpot(self.index, osc_path_char)
 
         except Exception as err:
             logging.error("%s" % err)

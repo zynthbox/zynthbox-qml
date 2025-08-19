@@ -118,7 +118,7 @@ custom_switch_ui_actions = {
     7: {'S': "MODE_SWITCH_SHORT", 'B': '', 'L': ''},
     8: {'S': "SCREEN_SKETCHPAD", 'B': '', 'L': ''},
     9: {'S': "SCREEN_ARRANGER", 'B': '', 'L': ''},
-    0: {'S': "SCREEN_PLAYGRID", 'B': '', 'L': ''},
+    10: {'S': "SCREEN_PLAYGRID", 'B': '', 'L': ''},
     11: {'S': "SCREEN_LAYER", 'B': '', 'L': ''},
     12: {'S': "SCREEN_ADMIN", 'B': '', 'L': ''},
     13: {'S': "ALT_BUTTON", 'B': '', 'L': ''},

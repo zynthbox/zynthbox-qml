@@ -4155,11 +4155,12 @@ class zynthian_gui(QObject):
 
     def set_star_button_pressed(self, pressed):
         if self.__star_button_pressed__ != pressed:
-            logging.error(f"Star Button pressed : {pressed}")
+            # logging.error(f"Star Button pressed : {pressed}")
             self.__star_button_pressed__ = pressed
             if pressed:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STAR_DOWN")
-                self.tracksModActive = not self.tracksModActive
+                if self.ui_settings.hardwareSequencer == False:
+                    self.tracksModActive = not self.tracksModActive
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STAR_RELEASED")
                 # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.

@@ -114,7 +114,7 @@ custom_switch_ui_actions = {
     3: {'S': "CHANNEL_3", 'B': '', 'L': ''},
     4: {'S': "CHANNEL_4", 'B': '', 'L': ''},
     5: {'S': "CHANNEL_5", 'B': '', 'L': ''},
-    6: {'S': "SWITCH_CHANNELS_MOD_SHORT", 'B': '', 'L': ''},
+    6: {'S': "SWITCH_STAR_SHORT", 'B': '', 'L': ''},
     7: {'S': "MODE_SWITCH_SHORT", 'B': '', 'L': ''},
     8: {'S': "SCREEN_SKETCHPAD", 'B': '', 'L': ''},
     9: {'S': "SCREEN_ARRANGER", 'B': '', 'L': ''},

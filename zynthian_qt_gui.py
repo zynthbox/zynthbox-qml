@@ -436,6 +436,7 @@ class zynthian_gui(QObject):
         self.delayBeforePressingMetronome = 0
         self.reverbBeforePressingMetronome = 0
         self.__ignoreNextMenuButtonPress = False
+        self.__ignoreNextStarButtonPress = False
         self.__ignoreNextModeButtonPress = False
         self.__ignoreNextRecordButtonPress = False
         self.__ignoreNextMetronomeButtonPress = False
@@ -498,7 +499,7 @@ class zynthian_gui(QObject):
         self.__clipToRecord = None
         self.__forceSongMode__ = False
         self.__menu_button_pressed__ = False
-        self.__switch_channels_button_pressed__ = False
+        self.__star_button_pressed__ = False
         self.__mode_button_pressed__ = False
         self.__alt_button_pressed__ = False
         self.__global_button_pressed__ = False
@@ -649,9 +650,6 @@ class zynthian_gui(QObject):
         self.osc_server = None
 
         self.__test_wave_clip = None
-
-        # Load keyboard binding map
-        zynthian_gui_keybinding.getInstance(self).load()
 
         # Get Jackd Options
         self.jackd_options = zynconf.get_jackd_options()
@@ -1255,6 +1253,9 @@ class zynthian_gui(QObject):
         self.screens["test_knobs"] = zynthian_gui_test_knobs(self)
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)
 
+        # Load keyboard binding map (needs to happen after ui_settings is loaded)
+        zynthian_gui_keybinding.getInstance(self).load()
+
         # Init GlobalFX
         self.init_global_fx()
 
@@ -1743,7 +1744,7 @@ class zynthian_gui(QObject):
                       "START_AUDIO_RECORD", "STOP_AUDIO_RECORD", "TOGGLE_AUDIO_RECORD", "START_AUDIO_PLAY", "STOP_AUDIO_PLAY", "TOGGLE_AUDIO_PLAY", "MODAL_AUDIO_RECORDER",
                       "BACK_UP", "BACK_DOWN",
                       "MODE_SWITCH_SHORT", "MODE_SWITCH_BOLD", "MODE_SWITCH_LONG",
-                      "SWITCH_TRACKS_MOD_SHORT", "SWITCH_TRACKS_MOD_BOLD", "SWITCH_TRACKS_MOD_LONG", "SWITCH_CHANNELS_MOD_SHORT", "SWITCH_CHANNELS_MOD_BOLD", "SWITCH_CHANNELS_MOD_LONG"]:
+                      "SWITCH_TRACKS_MOD_SHORT", "SWITCH_TRACKS_MOD_BOLD", "SWITCH_TRACKS_MOD_LONG", "SWITCH_CHANNELS_MOD_SHORT", "SWITCH_CHANNELS_MOD_BOLD", "SWITCH_CHANNELS_MOD_LONG", "SWITCH_STAR_SHORT", "SWITCH_STAR_BOLD", "SWITCH_STAR_LONG"]:
             # These commands are simply ignored (they have no function, so while they may still show up, we have no use for them)
             # They became not required when we switched our recorder logic from a split modal page to a globally available popup
             return
@@ -2139,10 +2140,10 @@ class zynthian_gui(QObject):
         elif cuia == "TRACK_NEXT":
             self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId + 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
 
-        elif cuia == "SWITCH_TRACKS_MOD_DOWN":
-            self.switchChannelsButtonPressed = True
-        elif cuia == "SWITCH_TRACKS_MOD_RELEASED":
-            self.switchChannelsButtonPressed = False
+        elif cuia == "SWITCH_STAR_DOWN":
+            self.starButtonPressed = True
+        elif cuia == "SWITCH_STAR_RELEASED":
+            self.starButtonPressed = False
 
         elif cuia == "TOGGLE_KEYBOARD":
             # logging.info("TOGGLE_KEYBOARD")
@@ -2543,7 +2544,7 @@ class zynthian_gui(QObject):
                 if i == 4:
                     self.menuButtonPressed = True
                 elif i == 10:
-                    self.switchChannelsButtonPressed = True
+                    self.starButtonPressed = True
                 elif i == 11:
                     self.modeButtonPressed = True
                 elif i == 12:
@@ -2598,7 +2599,7 @@ class zynthian_gui(QObject):
                 if i == 4:
                     self.menuButtonPressed = False
                 elif i == 10:
-                    self.switchChannelsButtonPressed = False
+                    self.starButtonPressed = False
                 elif i == 11:
                     self.modeButtonPressed = False
                 elif i == 12:
@@ -4148,29 +4149,40 @@ class zynthian_gui(QObject):
     ignoreNextMenuButtonPress = Property(bool, get_ignoreNextMenuButtonPress, set_ignoreNextMenuButtonPress, notify=ignoreNextMenuButtonPressChanged)
     ### END Property ignoreNextMenuButtonPress
 
-    ### BEGIN Property switchChannelsButtonPressed
-    def get_switch_channels_button_pressed(self):
-        return self.__switch_channels_button_pressed__
+    ### BEGIN Property starButtonPressed
+    def get_star_button_pressed(self):
+        return self.__star_button_pressed__
 
-    def set_switch_channels_button_pressed(self, pressed):
-        if self.__switch_channels_button_pressed__ != pressed:
-            logging.error(f"Switch Channels Button pressed : {pressed}")
-            self.__switch_channels_button_pressed__ = pressed
+    def set_star_button_pressed(self, pressed):
+        if self.__star_button_pressed__ != pressed:
+            logging.error(f"Star Button pressed : {pressed}")
+            self.__star_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_TRACKS_MOD_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STAR_DOWN")
                 self.tracksModActive = not self.tracksModActive
             else:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_TRACKS_MOD_RELEASED")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STAR_RELEASED")
                 # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
                 # Since * button is pressed, start timer
                 QMetaObject.invokeMethod(self.tracksModTimer, "start", Qt.QueuedConnection)
             logging.debug(f'self.tracksModActive({self.tracksModActive})')
-            self.switch_channels_button_pressed_changed.emit()
+            self.starButtonPressedChanged.emit()
 
-    switch_channels_button_pressed_changed = Signal()
+    starButtonPressedChanged = Signal()
 
-    switchChannelsButtonPressed = Property(bool, get_switch_channels_button_pressed, set_switch_channels_button_pressed, notify=switch_channels_button_pressed_changed)
-    ### END Property switchChannelsButtonPressed
+    starButtonPressed = Property(bool, get_star_button_pressed, set_star_button_pressed, notify=starButtonPressedChanged)
+    ### END Property starButtonPressed
+
+    ### BEGIN Property ignoreNextStarButtonPress
+    def get_ignoreNextStarButtonPress(self):
+        return self.__ignoreNextStarButtonPress
+    def set_ignoreNextStarButtonPress(self, val):
+        if self.__ignoreNextStarButtonPress != val:
+            self.__ignoreNextStarButtonPress = val
+            self.ignoreNextStarButtonPressChanged.emit()
+    ignoreNextStarButtonPressChanged = Signal()
+    ignoreNextStarButtonPress = Property(bool, get_ignoreNextStarButtonPress, set_ignoreNextStarButtonPress, notify=ignoreNextStarButtonPressChanged)
+    ### END Property ignoreNextStarButtonPress
 
     ### BEGIN Sequencer Strip Buttons
     ### BEGIN Property step1ButtonPressed

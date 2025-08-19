@@ -62,7 +62,7 @@ class zynthian_gui_keybinding(QObject):
         8: 'Alt'
     }
 
-    default_config = {
+    default_config_base = {
         "enabled": True,
         "map": {
             "ALL_NOTES_OFF": { "modifier": 0, "keysym": "Space" },
@@ -76,16 +76,10 @@ class zynthian_gui_keybinding(QObject):
 
             "SWITCH_SELECT_SHORT": { "modifier": 0, "keysym": "Return" },
             "SWITCH_SELECT_BOLD": { "modifier": 1, "keysym": "Return" },
-            # "SWITCH_SELECT_LONG": { "modifier": 4, "keysym": "Return" },
             "SWITCH_BACK_SHORT": { "modifier": 0, "keysym": "BackSpace, Escape" },
             "SWITCH_BACK_BOLD": { "modifier": 1, "keysym": "BackSpace, Escape" },
-            # "SWITCH_BACK_LONG": { "modifier": 4, "keysym": "BackSpace, Escape" },
             "SWITCH_LAYER_SHORT": { "modifier": 0, "keysym": "l" },
             "SWITCH_LAYER_BOLD": { "modifier": 1, "keysym": "l" },
-            # "SWITCH_LAYER_LONG": { "modifier": 4, "keysym": "l" },
-            #"SWITCH_SNAPSHOT_SHORT": { "modifier": 0, "keysym": "s" },
-            #"SWITCH_SNAPSHOT_BOLD": { "modifier": 1, "keysym": "s" },
-            #"SWITCH_SNAPSHOT_LONG": { "modifier": 4, "keysym": "s" },
 
             "SELECT_UP": { "modifier": 0, "keysym": "Up" },
             "SELECT_DOWN": { "modifier": 0, "keysym": "Down" },
@@ -103,20 +97,77 @@ class zynthian_gui_keybinding(QObject):
             "STOP_AUDIO_PLAY": { "modifier": 5, "keysym": "r" },
             "TOGGLE_AUDIO_PLAY": { "modifier": 12, "keysym": "r" },
 
-            #"START_MIDI_RECORD": { "modifier": 0, "keysym": "r" },
-            #"STOP_MIDI_RECORD": { "modifier": 1, "keysym": "r" },
-            #"TOGGLE_MIDI_RECORD": { "modifier": 8, "keysym": "r" },
-            #"START_MIDI_PLAY": { "modifier": 4, "keysym": "r" },
-            #"STOP_MIDI_PLAY": { "modifier": 5, "keysym": "r" },
-            #"TOGGLE_MIDI_PLAY": { "modifier": 12, "keysym": "r" },
+            "SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
+
+            "SCREEN_SKETCHPAD": { "modifier": 0, "keysym": "F1" },
+            "SCREEN_LAYER": { "modifier": 0, "keysym": "F2" },
+            "SCREEN_EDIT_CONTEXTUAL": { "modifier": 0, "keysym": "F3" },
+            "SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F4" },
+            "SCREEN_SONG_MANAGER": { "modifier": 0, "keysym": "F5" },
+
+            "SCREEN_LAYER_FX": { "modifier": 0, "keysym": "f" },
+
+            # Added in QML version
+            "NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
+            "NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
+
+            "TRACK_1": { "modifier": 0, "keysym": "1" },
+            "TRACK_2": { "modifier": 0, "keysym": "2" },
+            "TRACK_3": { "modifier": 0, "keysym": "3" },
+            "TRACK_4": { "modifier": 0, "keysym": "4" },
+            "TRACK_5": { "modifier": 0, "keysym": "5" },
+
+            "TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
+            "TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
+
+            "INCREASE" : { "modifier": 0, "keysym": "+" },
+            "DECREASE" : { "modifier": 0, "keysym": "-" },
+
+            "TOGGLE_KEYBOARD" : { "modifier": 0, "keysym": "k" },
+            "SWITCH_PLAY" : { "modifier": 0, "keysym": "a" },
+            "SWITCH_STOP" : { "modifier": 0, "keysym": "s" },
+
+            "SWITCH_RECORD": {"modifier": 0, "keysym": "`"},
+            "STOP_RECORD": {"modifier": 4, "keysym": "`"},
+        }
+    }
+    default_config_steps = {
+        "enabled": True,
+        "map": {
+            "ALL_NOTES_OFF": { "modifier": 0, "keysym": "Space" },
+            "ALL_SOUNDS_OFF": { "modifier": 1, "keysym": "Space" },
+            "ALL_OFF": { "modifier": 4, "keysym": "Space" },
+
+            "RESTART_UI": { "modifier": 1, "keysym": "Home" },
+            "REBOOT": { "modifier": 4, "keysym": "Home" },
+            "POWER_OFF": { "modifier" : 4, "keysym" : "End" },
+            "RELOAD_MIDI_CONFIG": { "modifier": 4, "keysym": "Insert" },
+
+            "SWITCH_SELECT_SHORT": { "modifier": 0, "keysym": "Return" },
+            "SWITCH_SELECT_BOLD": { "modifier": 1, "keysym": "Return" },
+            "SWITCH_BACK_SHORT": { "modifier": 0, "keysym": "BackSpace, Escape" },
+            "SWITCH_BACK_BOLD": { "modifier": 1, "keysym": "BackSpace, Escape" },
+            "SWITCH_LAYER_SHORT": { "modifier": 0, "keysym": "l" },
+            "SWITCH_LAYER_BOLD": { "modifier": 1, "keysym": "l" },
+
+            "SELECT_UP": { "modifier": 0, "keysym": "Up" },
+            "SELECT_DOWN": { "modifier": 0, "keysym": "Down" },
+            "LAYER_UP": { "modifier": 1, "keysym": "Up" },
+            "LAYER_DOWN": { "modifier": 1, "keysym": "Down" },
+            "SNAPSHOT_UP": { "modifier": 4, "keysym": "Up" },
+            "SNAPSHOT_DOWN": { "modifier": 4, "keysym": "Down" },
+            "SCENE_UP": { "modifier": 8, "keysym": "Up" },
+            "SCENE_DOWN": { "modifier": 8, "keysym": "Down" },
+
+            "START_AUDIO_RECORD": { "modifier": 0, "keysym": "r" },
+            "STOP_AUDIO_RECORD": { "modifier": 1, "keysym": "r" },
+            "TOGGLE_AUDIO_RECORD": { "modifier": 8, "keysym": "r" },
+            "START_AUDIO_PLAY": { "modifier": 4, "keysym": "r" },
+            "STOP_AUDIO_PLAY": { "modifier": 5, "keysym": "r" },
+            "TOGGLE_AUDIO_PLAY": { "modifier": 12, "keysym": "r" },
 
             "SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
 
-            # "SCREEN_SKETCHPAD": { "modifier": 8, "keysym": "F1" },
-            # "SCREEN_LAYER": { "modifier": 8, "keysym": "F2" },
-            # "SCREEN_EDIT_CONTEXTUAL": { "modifier": 8, "keysym": "F3" },
-            # "SCREEN_PLAYGRID": { "modifier": 8, "keysym": "F4" },
-            # "SCREEN_SONG_MANAGER": { "modifier": 8, "keysym": "F5" },
             "SCREEN_SKETCHPAD": { "modifier": 0, "keysym": "1" },
             "SCREEN_LAYER": { "modifier": 0, "keysym": "2" },
             "SCREEN_EDIT_CONTEXTUAL": { "modifier": 0, "keysym": "3" },
@@ -128,21 +179,6 @@ class zynthian_gui_keybinding(QObject):
             # Added in QML version
             "NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
             "NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
-
-            # "TRACK_1": { "modifier": 0, "keysym": "1" },
-            # "TRACK_2": { "modifier": 0, "keysym": "2" },
-            # "TRACK_3": { "modifier": 0, "keysym": "3" },
-            # "TRACK_4": { "modifier": 0, "keysym": "4" },
-            # "TRACK_5": { "modifier": 0, "keysym": "5" },
-
-            # "TRACK_6": { "modifier": 4, "keysym": "1" },
-            # "TRACK_7": { "modifier": 4, "keysym": "2" },
-            # "TRACK_8": { "modifier": 4, "keysym": "3" },
-            # "TRACK_9": { "modifier": 4, "keysym": "4" },
-            # "TRACK_10": { "modifier": 4, "keysym": "5" },
-
-            # "TRACK_11": { "modifier": 4, "keysym": "5" }, # Disable channel 11 and 12
-            # "TRACK_12": { "modifier": 4, "keysym": "6" }, # Disable channel 11 and 12
 
             "TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
             "TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
@@ -209,6 +245,8 @@ class zynthian_gui_keybinding(QObject):
         
         if zynthian_gui_keybinding.__instance == None:
             zynthian_gui_keybinding.__instance = self
+            self.zynqtgui = parent
+            self.zynqtgui.ui_settings.hardwareSequencerChanged.connect(self.reset_and_load)
         else:
             raise Exception("Use getInstance() to get the singleton object.")
 
@@ -355,9 +393,15 @@ class zynthian_gui_keybinding(QObject):
         Reset keyboard binding to default values
         """
 
-        self.config = copy.copy(self.default_config)
+        if self.zynqtgui.ui_settings.hardwareSequencer:
+            self.config = copy.copy(self.default_config_steps)
+        else:
+            self.config = copy.copy(self.default_config_base)
         self.parse_map()
 
+    def reset_and_load(self):
+        self.reset_config()
+        self.load()
 
     def set_binding_keysym(self, action, keysym):
         self.config['map'][action]['keysym'] = keysym

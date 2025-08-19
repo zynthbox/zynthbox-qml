@@ -88,6 +88,26 @@ Item {
                 component.selectedChannel.selectedClip = stepButtonIndex - 11;
             }
         } else if (_private.interactionMode == 2) {
+            if (_private.stepKeyNotesActive[stepButtonIndex]) {
+                let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
+                activeNote.setOff();
+                activeNote.sendPitchChange(0);
+                _private.stepKeyNotesActive[stepButtonIndex] = null;
+            }
+        }
+    }
+    function handleStepButtonDown(stepButtonIndex) {
+        if (_private.stepKeyNotesActive[stepButtonIndex]) {
+            let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
+            activeNote.setOff();
+            activeNote.sendPitchChange(0);
+            _private.stepKeyNotesActive[stepButtonIndex] = null;
+        }
+        let newNote = _private.stepKeyNotes[stepButtonIndex];
+        // This can be null, if the note value is out of range
+        if (newNote) {
+            newNote.setOn(_private.starVelocity);
+            _private.stepKeyNotesActive[stepButtonIndex] = newNote;
         }
     }
     function ignoreHeldStepButtonsReleases() {
@@ -160,9 +180,21 @@ Item {
     function cuiaCallback(cuia, originId, track, slot, value) {
         let returnValue = false;
         switch (cuia) {
+            case "SWITCH_STEP1_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(0);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP1_RELEASED":
                 if (zynqtgui.ignoreNextStep1ButtonPress == false) {
                     component.handleStepButtonPress(0);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP2_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(1);
                 }
                 returnValue = true;
                 break;
@@ -172,9 +204,21 @@ Item {
                 }
                 returnValue = true;
                 break;
+            case "SWITCH_STEP3_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(2);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP3_RELEASED":
                 if (zynqtgui.ignoreNextStep3ButtonPress == false) {
                     component.handleStepButtonPress(2);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP4_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(3);
                 }
                 returnValue = true;
                 break;
@@ -184,9 +228,21 @@ Item {
                 }
                 returnValue = true;
                 break;
+            case "SWITCH_STEP5_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(4);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP5_RELEASED":
                 if (zynqtgui.ignoreNextStep5ButtonPress == false) {
                     component.handleStepButtonPress(4);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP6_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(5);
                 }
                 returnValue = true;
                 break;
@@ -196,9 +252,21 @@ Item {
                 }
                 returnValue = true;
                 break;
+            case "SWITCH_STEP7_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(6);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP7_RELEASED":
                 if (zynqtgui.ignoreNextStep7ButtonPress == false) {
                     component.handleStepButtonPress(6);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP8_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(7);
                 }
                 returnValue = true;
                 break;
@@ -208,9 +276,21 @@ Item {
                 }
                 returnValue = true;
                 break;
+            case "SWITCH_STEP9_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(8);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP9_RELEASED":
                 if (zynqtgui.ignoreNextStep9ButtonPress == false) {
                     component.handleStepButtonPress(8);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP10_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(9);
                 }
                 returnValue = true;
                 break;
@@ -220,9 +300,21 @@ Item {
                 }
                 returnValue = true;
                 break;
+            case "SWITCH_STEP11_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(10);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP11_RELEASED":
                 if (zynqtgui.ignoreNextStep11ButtonPress == false) {
                     component.handleStepButtonPress(10);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP12_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(11);
                 }
                 returnValue = true;
                 break;
@@ -232,9 +324,21 @@ Item {
                 }
                 returnValue = true;
                 break;
+            case "SWITCH_STEP13_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(12);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP13_RELEASED":
                 if (zynqtgui.ignoreNextStep13ButtonPress == false) {
                     component.handleStepButtonPress(12);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP14_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(13);
                 }
                 returnValue = true;
                 break;
@@ -244,9 +348,21 @@ Item {
                 }
                 returnValue = true;
                 break;
+            case "SWITCH_STEP15_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(14);
+                }
+                returnValue = true;
+                break;
             case "SWITCH_STEP15_RELEASED":
                 if (zynqtgui.ignoreNextStep15ButtonPress == false) {
                     component.handleStepButtonPress(14);
+                }
+                returnValue = true;
+                break;
+            case "SWITCH_STEP16_DOWN":
+                if (_private.interactionMode === 2) {
+                    component.handleStepButtonDown(15);
                 }
                 returnValue = true;
                 break;
@@ -399,8 +515,16 @@ Item {
         property QtObject pattern: sequence && component.selectedChannel ? sequence.getByClipId(component.selectedChannel.id, component.selectedChannel.selectedClip) : null
         // property QtObject clip: component.selectedChannel ? component.selectedChannel.getClipsModelById(component.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
         onPatternChanged: {
-            heardNotes = [Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey), pattern.sketchpadTrack)];
+            let keyNote = Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey);
+            heardNotes = [Zynthbox.PlayGridManager.getNote(keyNote, pattern.sketchpadTrack)];
             heardVelocities = [64];
+            // Just build out 16 steps based on whatever the root pitch is
+            let newStepKeyNotes = [];
+            for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
+                let stepNote = Zynthbox.KeyScales.transposeNote(keyNote, stepIndex, pattern.scaleKey, pattern.pitchKey, pattern.octaveKey);
+                newStepKeyNotes.push(Zynthbox.PlayGridManager.getNote(stepNote, pattern.sketchpadTrack));
+            }
+            stepKeyNotes = newStepKeyNotes;
             updateLedColors();
         }
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
@@ -415,6 +539,10 @@ Item {
 
         property QtObject starNote: null
         property int starVelocity: 64
+
+        // Should probably do a thing where we show when notes are playing when in keys mode...
+        property var stepKeyNotes: []
+        property var stepKeyNotesActive: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
 
         // The interaction modes are:
         // 0: Step sequencer (displays the 16 steps of the current bar, tapping toggles the step's entry given either the currently held note, or the clip's key)

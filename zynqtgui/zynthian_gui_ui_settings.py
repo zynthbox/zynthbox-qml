@@ -37,7 +37,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         super(zynthian_gui_ui_settings, self).__init__(parent)
         self.__doubleClickThreshold = int(self.zynqtgui.global_settings.value("UI/doubleClickThreshhold", 200))
         self.doubleClickThresholdChanged.emit()
-        self.__hardwareSequencer = bool(self.zynqtgui.global_settings.value("UI/hardwareSequencer", False))
+        self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "false") == "true" else False
         self.hardwareSequencerChanged.emit();
 
     def fill_list(self):

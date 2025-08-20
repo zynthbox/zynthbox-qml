@@ -49,12 +49,14 @@ Zynthian.ScreenPage {
                 text: qsTr("Double Click Threshold Amount")
             }
             QQC2.Slider {
+                id: doubleClickThresholdSlider
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                 from: 0
                 to: 500
                 stepSize: 1
                 value: zynqtgui.ui_settings.doubleClickThreshold
                 onPressedChanged: {
+                    // Set the value on release to save the value only when needed
                     if (!pressed) {
                         zynqtgui.ui_settings.doubleClickThreshold = value
                     }
@@ -72,7 +74,7 @@ Zynthian.ScreenPage {
 
                 QQC2.Label {
                     anchors.centerIn: parent
-                    text: qsTr("%1 ms").arg(zynqtgui.ui_settings.doubleClickThreshold)
+                    text: qsTr("%1 ms").arg(doubleClickThresholdSlider.value)
                 }
             }
         }

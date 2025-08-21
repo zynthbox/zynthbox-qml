@@ -97,93 +97,96 @@ Item {
         }
     }
     function handleStepButtonDown(stepButtonIndex) {
-        if (_private.stepKeyNotesActive[stepButtonIndex]) {
-            let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
-            activeNote.setOff();
-            activeNote.sendPitchChange(0);
-            _private.stepKeyNotesActive[stepButtonIndex] = null;
-        }
-        let newNote = _private.stepKeyNotes[stepButtonIndex];
-        // This can be null, if the note value is out of range
-        if (newNote) {
-            newNote.setOn(_private.starVelocity);
-            _private.stepKeyNotesActive[stepButtonIndex] = newNote;
+        if (_private.interactionMode === 2) {
+            if (_private.stepKeyNotesActive[stepButtonIndex]) {
+                let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
+                activeNote.setOff();
+                activeNote.sendPitchChange(0);
+                _private.stepKeyNotesActive[stepButtonIndex] = null;
+            }
+            let newNote = _private.stepKeyNotes[stepButtonIndex];
+            // This can be null, if the note value is out of range
+            if (newNote) {
+                newNote.setOn(_private.starVelocity);
+                _private.stepKeyNotesActive[stepButtonIndex] = newNote;
+            }
         }
     }
     function ignoreHeldStepButtonsReleases() {
         // If we're holding a step button down, make sure that we ignore the next release of those buttons
-        if (zynqtgui.step1ButtonPressed) {
-            zynqtgui.ignoreNextStep1ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step2ButtonPressed) {
-            zynqtgui.ignoreNextStep2ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step3ButtonPressed) {
-            zynqtgui.ignoreNextStep3ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step4ButtonPressed) {
-            zynqtgui.ignoreNextStep4ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step5ButtonPressed) {
-            zynqtgui.ignoreNextStep5ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step6ButtonPressed) {
-            zynqtgui.ignoreNextStep6ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step7ButtonPressed) {
-            zynqtgui.ignoreNextStep7ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step8ButtonPressed) {
-            zynqtgui.ignoreNextStep8ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step9ButtonPressed) {
-            zynqtgui.ignoreNextStep9ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step10ButtonPressed) {
-            zynqtgui.ignoreNextStep10ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step11ButtonPressed) {
-            zynqtgui.ignoreNextStep11ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step12ButtonPressed) {
-            zynqtgui.ignoreNextStep12ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step13ButtonPressed) {
-            zynqtgui.ignoreNextStep13ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step14ButtonPressed) {
-            zynqtgui.ignoreNextStep14ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step15ButtonPressed) {
-            zynqtgui.ignoreNextStep15ButtonPress = true;
-            returnValue = true;
-        }
-        if (zynqtgui.step16ButtonPressed) {
-            zynqtgui.ignoreNextStep16ButtonPress = true;
-            returnValue = true;
+        // Do this for the sequencer interaction mode only (otherwise we'll potentially end up not releasing notes, which would be sort of weird)
+        if (_private.interactionMode == 0) {
+            if (zynqtgui.step1ButtonPressed) {
+                zynqtgui.ignoreNextStep1ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step2ButtonPressed) {
+                zynqtgui.ignoreNextStep2ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step3ButtonPressed) {
+                zynqtgui.ignoreNextStep3ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step4ButtonPressed) {
+                zynqtgui.ignoreNextStep4ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step5ButtonPressed) {
+                zynqtgui.ignoreNextStep5ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step6ButtonPressed) {
+                zynqtgui.ignoreNextStep6ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step7ButtonPressed) {
+                zynqtgui.ignoreNextStep7ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step8ButtonPressed) {
+                zynqtgui.ignoreNextStep8ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step9ButtonPressed) {
+                zynqtgui.ignoreNextStep9ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step10ButtonPressed) {
+                zynqtgui.ignoreNextStep10ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step11ButtonPressed) {
+                zynqtgui.ignoreNextStep11ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step12ButtonPressed) {
+                zynqtgui.ignoreNextStep12ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step13ButtonPressed) {
+                zynqtgui.ignoreNextStep13ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step14ButtonPressed) {
+                zynqtgui.ignoreNextStep14ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step15ButtonPressed) {
+                zynqtgui.ignoreNextStep15ButtonPress = true;
+                returnValue = true;
+            }
+            if (zynqtgui.step16ButtonPressed) {
+                zynqtgui.ignoreNextStep16ButtonPress = true;
+                returnValue = true;
+            }
         }
     }
     function cuiaCallback(cuia, originId, track, slot, value) {
         let returnValue = false;
         switch (cuia) {
             case "SWITCH_STEP1_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(0);
-                }
+                component.handleStepButtonDown(0);
                 returnValue = true;
                 break;
             case "SWITCH_STEP1_RELEASED":
@@ -193,9 +196,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP2_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(1);
-                }
+                component.handleStepButtonDown(1);
                 returnValue = true;
                 break;
             case "SWITCH_STEP2_RELEASED":
@@ -205,9 +206,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP3_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(2);
-                }
+                component.handleStepButtonDown(2);
                 returnValue = true;
                 break;
             case "SWITCH_STEP3_RELEASED":
@@ -217,9 +216,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP4_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(3);
-                }
+                component.handleStepButtonDown(3);
                 returnValue = true;
                 break;
             case "SWITCH_STEP4_RELEASED":
@@ -229,9 +226,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP5_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(4);
-                }
+                component.handleStepButtonDown(4);
                 returnValue = true;
                 break;
             case "SWITCH_STEP5_RELEASED":
@@ -241,9 +236,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP6_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(5);
-                }
+                component.handleStepButtonDown(5);
                 returnValue = true;
                 break;
             case "SWITCH_STEP6_RELEASED":
@@ -253,9 +246,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP7_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(6);
-                }
+                component.handleStepButtonDown(6);
                 returnValue = true;
                 break;
             case "SWITCH_STEP7_RELEASED":
@@ -265,9 +256,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP8_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(7);
-                }
+                component.handleStepButtonDown(7);
                 returnValue = true;
                 break;
             case "SWITCH_STEP8_RELEASED":
@@ -277,9 +266,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP9_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(8);
-                }
+                component.handleStepButtonDown(8);
                 returnValue = true;
                 break;
             case "SWITCH_STEP9_RELEASED":
@@ -289,9 +276,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP10_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(9);
-                }
+                component.handleStepButtonDown(9);
                 returnValue = true;
                 break;
             case "SWITCH_STEP10_RELEASED":
@@ -301,9 +286,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP11_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(10);
-                }
+                component.handleStepButtonDown(10);
                 returnValue = true;
                 break;
             case "SWITCH_STEP11_RELEASED":
@@ -313,9 +296,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP12_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(11);
-                }
+                component.handleStepButtonDown(11);
                 returnValue = true;
                 break;
             case "SWITCH_STEP12_RELEASED":
@@ -325,9 +306,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP13_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(12);
-                }
+                component.handleStepButtonDown(12);
                 returnValue = true;
                 break;
             case "SWITCH_STEP13_RELEASED":
@@ -337,9 +316,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP14_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(13);
-                }
+                component.handleStepButtonDown(13);
                 returnValue = true;
                 break;
             case "SWITCH_STEP14_RELEASED":
@@ -349,9 +326,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP15_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(14);
-                }
+                component.handleStepButtonDown(14);
                 returnValue = true;
                 break;
             case "SWITCH_STEP15_RELEASED":
@@ -361,9 +336,7 @@ Item {
                 returnValue = true;
                 break;
             case "SWITCH_STEP16_DOWN":
-                if (_private.interactionMode === 2) {
-                    component.handleStepButtonDown(15);
-                }
+                component.handleStepButtonDown(15);
                 returnValue = true;
                 break;
             case "SWITCH_STEP16_RELEASED":
@@ -497,10 +470,14 @@ Item {
             case "SWITCH_MODE_RELEASED":
                 // Don't swallow mode when alt is pressed, that's for tab switching on e.g. sketchpad main
                 if (zynqtgui.altButtonPressed == false) {
-                    if (_private.interactionMode === 2) {
-                        _private.interactionMode = 0;
+                    if (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed) {
+                        // Don't allow switching modes when holding down a button, that just makes interaction weird...
                     } else {
-                        _private.interactionMode = _private.interactionMode + 1;
+                        if (_private.interactionMode === 2) {
+                            _private.interactionMode = 0;
+                        } else {
+                            _private.interactionMode = _private.interactionMode + 1;
+                        }
                     }
                     returnValue = true;
                 }

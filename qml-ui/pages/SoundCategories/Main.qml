@@ -651,11 +651,12 @@ Zynthian.ScreenPage {
                 performSlotInteractions: !soundDetails.displaySelectedSoundData
                 highlightCurrentlySelectedSlot: !soundDetails.displaySelectedSoundData
                 onSlotClicked: {
-                    if (soundDetails.displaySelectedSoundData && soundButtonGroup.checkedButton.soundObj.synthSlotsData[index] !== "") {
+                    // FIXME : Fix errors and re-enable
+                    /*if (soundDetails.displaySelectedSoundData && soundButtonGroup.checkedButton.soundObj.synthSlotsData[index] !== "") {
                         slotsActionPicker.slotType = "synth";
                         slotsActionPicker.slotIndex = index;
                         slotsActionPicker.open();
-                    }
+                    }*/
                 }
             }
 

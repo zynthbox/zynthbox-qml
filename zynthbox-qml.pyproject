@@ -168,7 +168,7 @@
         "./qml-ui/Zynthian/private/ActionButton.qml",
         "./qml-ui/Zynthian/private/ActionsMenu.qml",
         "./qml-ui/Zynthian/private/CardBackground.qml",
-        "./qml-ui/Zynthian/private/ControllerGroup.qml",
+        "./qml-ui/Zynthian/ControllerGroup.qml",
         "./qml-ui/Zynthian/private/DelegateBackground.qml",
         "./qml-ui/Zynthian/private/NewStuffPageContents.qml",
         "./qml-ui/Zynthian/private/SelectorViewBackground.qml",

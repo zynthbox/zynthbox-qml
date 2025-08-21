@@ -28,8 +28,6 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "private"
-
 Item {
     id: root
 

@@ -10,6 +10,7 @@ BreadcrumbButton 1.0 BreadcrumbButton.qml
 Card 1.0 Card.qml
 ComboBox 1.0 ComboBox.qml
 ControllerLoader 1.0 ControllerLoader.qml
+ControllerGroup 1.0 ControllerGroup.qml
 DialController 1.0 DialController.qml
 MultiSelectorPage 1.0 MultiSelectorPage.qml
 MultiSwitchController 1.0 MultiSwitchController.qml

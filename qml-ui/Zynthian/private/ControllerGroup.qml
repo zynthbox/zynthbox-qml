@@ -43,6 +43,7 @@ QtObject {
 
     property Connections _internal: Connections {
         id: internal
+        enabled: symbol.length > 0 || (category.length > 0 && index > -1)
         function syncCtrl() {
             if (symbol.length > 0) {
                 // If name is not null, try getting controller by name and ignore category
@@ -62,6 +63,6 @@ QtObject {
             }
         }
         target: zynqtgui.control
-        onControllers_changed: syncCtrl()
+        onControllers_changed: Qt.callLater(syncCtrl)
     }
 }

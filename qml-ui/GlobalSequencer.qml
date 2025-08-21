@@ -491,19 +491,22 @@ Item {
         property QtObject sequence: component.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
         property QtObject pattern: sequence && component.selectedChannel ? sequence.getByClipId(component.selectedChannel.id, component.selectedChannel.selectedClip) : null
         // property QtObject clip: component.selectedChannel ? component.selectedChannel.getClipsModelById(component.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
-        onPatternChanged: {
+        onPatternChanged: handlePatternDataChange()
+        function handlePatternDataChange() {
             let keyNote = Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey);
             heardNotes = [Zynthbox.PlayGridManager.getNote(keyNote, pattern.sketchpadTrack)];
             heardVelocities = [64];
-            // Just build out 16 steps based on whatever the root pitch is
+            // Build out 16 steps based on the pattern's grid model
             let newStepKeyNotes = [];
+            let firstStepKeyNote = pattern.gridModelStartNote;
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
-                let stepNote = Zynthbox.KeyScales.transposeNote(keyNote, stepIndex, pattern.scaleKey, pattern.pitchKey, pattern.octaveKey);
+                let stepNote = Zynthbox.KeyScales.transposeNote(firstStepKeyNote, stepIndex, pattern.scaleKey, pattern.pitchKey, pattern.octaveKey);
                 newStepKeyNotes.push(Zynthbox.PlayGridManager.getNote(stepNote, pattern.sketchpadTrack));
             }
             stepKeyNotes = newStepKeyNotes;
             updateLedColors();
         }
+
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
         property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
         property color stepCurrent: Qt.rgba(0.4, 0.4, 0.0)
@@ -629,6 +632,13 @@ Item {
                 }
             }
         }
+    }
+    Connections {
+        target: _private.pattern
+        onGridModelStartNoteChanged: _private.handlePatternDataChange()
+        onScaleChanged: _private.handlePatternDataChange()
+        onOctaveChanged: _private.handlePatternDataChange()
+        onPitchChanged: _private.handlePatternDataChange()
     }
     Connections {
         target: Zynthbox.MidiRouter

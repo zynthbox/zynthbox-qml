@@ -558,14 +558,14 @@ Item {
             updateLedColors();
             switch (interactionMode) {
                 case 2:
-                    applicationWindow().showPassiveNotification("3/3: Musical Keys", 1500);
+                    applicationWindow().showPassiveNotification("Musical Keys", 1500);
                     break;
                 case 1:
-                    applicationWindow().showPassiveNotification("2/3: Track and Clip", 1500);
+                    applicationWindow().showPassiveNotification("Track and Clip", 1500);
                     break;
                 case 0:
                 default:
-                    applicationWindow().showPassiveNotification("1/3: Sequencer", 1500);
+                    applicationWindow().showPassiveNotification("Sequencer", 1500);
                     break;
             }
         }

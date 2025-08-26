@@ -1767,6 +1767,54 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_SELECT_SHORT" and self.ignoreNextSelectButtonPress == True:
             self.ignoreNextSelectButtonPress = False
             return
+        elif cuia == "SWITCH_STEP1_RELEASED" and self.ignoreNextStep1ButtonPress == True:
+            self.ignoreNextStep1ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP2_RELEASED" and self.ignoreNextStep2ButtonPress == True:
+            self.ignoreNextStep2ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP3_RELEASED" and self.ignoreNextStep3ButtonPress == True:
+            self.ignoreNextStep3ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP4_RELEASED" and self.ignoreNextStep4ButtonPress == True:
+            self.ignoreNextStep4ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP5_RELEASED" and self.ignoreNextStep5ButtonPress == True:
+            self.ignoreNextStep5ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP6_RELEASED" and self.ignoreNextStep6ButtonPress == True:
+            self.ignoreNextStep6ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP7_RELEASED" and self.ignoreNextStep7ButtonPress == True:
+            self.ignoreNextStep7ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP8_RELEASED" and self.ignoreNextStep8ButtonPress == True:
+            self.ignoreNextStep8ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP9_RELEASED" and self.ignoreNextStep9ButtonPress == True:
+            self.ignoreNextStep9ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP10_RELEASED" and self.ignoreNextStep10ButtonPress == True:
+            self.ignoreNextStep10ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP11_RELEASED" and self.ignoreNextStep11ButtonPress == True:
+            self.ignoreNextStep11ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP12_RELEASED" and self.ignoreNextStep12ButtonPress == True:
+            self.ignoreNextStep12ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP13_RELEASED" and self.ignoreNextStep13ButtonPress == True:
+            self.ignoreNextStep13ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP14_RELEASED" and self.ignoreNextStep14ButtonPress == True:
+            self.ignoreNextStep14ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP15_RELEASED" and self.ignoreNextStep15ButtonPress == True:
+            self.ignoreNextStep15ButtonPress = False
+            return
+        elif cuia == "SWITCH_STEP16_RELEASED" and self.ignoreNextStep16ButtonPress == True:
+            self.ignoreNextStep16ButtonPress = False
+            return
         # END Button ignore logic
 
         # BEGIN Button-press abort modifiers logic

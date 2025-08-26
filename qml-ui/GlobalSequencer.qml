@@ -98,17 +98,36 @@ Item {
     }
     function handleStepButtonDown(stepButtonIndex) {
         if (_private.interactionMode === 2) {
-            if (_private.stepKeyNotesActive[stepButtonIndex]) {
-                let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
-                activeNote.setOff();
-                activeNote.sendPitchChange(0);
-                _private.stepKeyNotesActive[stepButtonIndex] = null;
-            }
-            let newNote = _private.stepKeyNotes[stepButtonIndex];
-            // This can be null, if the note value is out of range
-            if (newNote) {
-                newNote.setOn(_private.starVelocity);
-                _private.stepKeyNotesActive[stepButtonIndex] = newNote;
+            if (zynqtgui.altButtonPressed) {
+                let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                if (stepButtonIndex < 11) {
+                    _private.pattern.workingModel.gridModelStartNote = 12 * stepButtonIndex;
+                    _private.pattern.workingModel.gridModelEndNote = _private.pattern.workingModel.gridModelStartNote + 16;
+                } else if (stepButtonIndex < 13) {
+                    // No bits here, step colour just gets to be empty
+                } else if (stepButtonIndex === 13) {
+                    _private.pattern.workingModel.gridModelStartNote = patternTonic.midiNote;
+                    _private.pattern.workingModel.gridModelEndNote = _private.pattern.workingModel.gridModelStartNote + 16;
+                } else if (stepButtonIndex === 14) {
+                    _private.pattern.workingModel.gridModelStartNote = patternTonic.midiNote + 8;
+                    _private.pattern.workingModel.gridModelEndNote = _private.pattern.workingModel.gridModelStartNote + 16;
+                } else if (stepButtonIndex === 15) {
+                    _private.pattern.workingModel.gridModelStartNote = patternTonic.midiNote + 16;
+                    _private.pattern.workingModel.gridModelEndNote = _private.pattern.workingModel.gridModelStartNote + 16;
+                }
+            } else {
+                if (_private.stepKeyNotesActive[stepButtonIndex]) {
+                    let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
+                    activeNote.setOff();
+                    activeNote.sendPitchChange(0);
+                    _private.stepKeyNotesActive[stepButtonIndex] = null;
+                }
+                let newNote = _private.stepKeyNotes[stepButtonIndex];
+                // This can be null, if the note value is out of range
+                if (newNote) {
+                    newNote.setOn(_private.starVelocity);
+                    _private.stepKeyNotesActive[stepButtonIndex] = newNote;
+                }
             }
         }
     }
@@ -502,14 +521,19 @@ Item {
             let firstStepKeyNote = pattern.gridModelStartNote;
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                 let stepNote = Zynthbox.KeyScales.transposeNote(firstStepKeyNote, stepIndex, pattern.scaleKey, pattern.pitchKey, pattern.octaveKey);
-                newStepKeyNotes.push(Zynthbox.PlayGridManager.getNote(stepNote, pattern.sketchpadTrack));
+                if (-1 < stepNote && stepNote < 128) {
+                    newStepKeyNotes.push(Zynthbox.PlayGridManager.getNote(stepNote, pattern.sketchpadTrack));
+                } else {
+                    newStepKeyNotes.push(null);
+                }
             }
             stepKeyNotes = newStepKeyNotes;
             updateLedColors();
         }
 
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
-        property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
+            property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
+        property color stepHighlighted: Qt.rgba(0.1, 0.5, 0.5)
         property color stepCurrent: Qt.rgba(0.4, 0.4, 0.0)
 
         property var heardNotes: []
@@ -522,7 +546,7 @@ Item {
         property int starVelocity: 64
 
         // Should probably do a thing where we show when notes are playing when in keys mode...
-        property var stepKeyNotes: []
+        property var stepKeyNotes: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
         property var stepKeyNotesActive: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
 
         // The interaction modes are:
@@ -611,9 +635,44 @@ Item {
             }
         }
         function updateLedsForMusicalButtons() {
-            for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
-                let stepColor = _private.stepEmpty;
-                zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+            if (zynqtgui.altButtonPressed) {
+                let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
+                    let stepColor = _private.stepEmpty;
+                    if (stepIndex < 11) {
+                        if (pattern.gridModelStartNote == 12 * stepIndex) {
+                            stepColor = _private.stepCurrent;
+                        } else {
+                            stepColor = _private.stepWithNotes;
+                        }
+                    } else if (stepIndex < 13) {
+                        // No bits here, step colour just gets to be empty
+                    } else if (stepIndex < 16) {
+                        if (stepIndex === 13 && pattern.gridModelStartNote == patternTonic.midiNote) {
+                            stepColor = _private.stepCurrent;
+                        } else if (stepIndex === 14 && pattern.gridModelStartNote == patternTonic.midiNote + 8) {
+                            stepColor = _private.stepCurrent;
+                        } else if (stepIndex === 15 && pattern.gridModelStartNote == patternTonic.midiNote + 16) {
+                            stepColor = _private.stepCurrent;
+                        } else {
+                            stepColor = _private.stepWithNotes;
+                        }
+                    }
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+                }
+            } else {
+                for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
+                    let stepColor = _private.stepEmpty;
+                    let stepNote = stepKeyNotes[stepIndex];
+                    if (stepNote) {
+                        if (stepNote.midiNote % 12 == 0) {
+                            stepColor = _private.stepHighlighted;
+                        } else {
+                            stepColor = _private.stepWithNotes;
+                        }
+                    }
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+                }
             }
         }
         function updateLedColors() {

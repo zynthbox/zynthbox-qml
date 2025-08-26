@@ -118,7 +118,6 @@ Zynthian.BasePlayGrid {
                     }
                     break;
                 case "SWITCH_BACK_SHORT":
-                case "SWITCH_BACK_BOLD":
                     if (zynqtgui.altButtonPressed) {
                         _private.workingPatternModel.clear();
                     } else {
@@ -163,7 +162,6 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "SWITCH_SELECT_SHORT":
-                case "SWITCH_SELECT_BOLD":
                     _private.activateSelectedItem();
                     returnValue = true;
                     break;

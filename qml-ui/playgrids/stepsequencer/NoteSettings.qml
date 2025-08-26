@@ -72,9 +72,7 @@ ColumnLayout {
             case "SCREEN_PLAYGRID":
                 // To partner with the bit in main which shows it, this will cause us to toggle when hitting the playgrid button
             case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
             case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
                 component.close();
                 break;
             case "NAVIGATE_LEFT":

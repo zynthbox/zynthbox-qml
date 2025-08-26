@@ -42,7 +42,6 @@ RowLayout {
 
         switch (cuia) {
         case "SWITCH_SELECT_SHORT":
-        case "SWITCH_SELECT_BOLD":
             if (zynqtgui.control.selectedEngineBypassController) {
                 if (zynqtgui.control.selectedEngineBypassController.value === 0) {
                     zynqtgui.control.selectedEngineBypassController.value = 1;

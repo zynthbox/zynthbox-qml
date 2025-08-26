@@ -156,7 +156,6 @@ Zynthian.ScreenPage {
                     returnValue = true;
                     break;
                 case "SWITCH_SELECT_SHORT":
-                case "SWITCH_SELECT_BOLD":
                     switch (_private.selectedColumn) {
                         case 0:
                             if (component.selectedChannel.trackType === "sample-loop") {

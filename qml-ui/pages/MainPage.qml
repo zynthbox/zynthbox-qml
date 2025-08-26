@@ -45,7 +45,6 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         switch (cuia) {
         case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
             if (zynqtgui.main.visibleCategory === "sessions-versions") {
                 // Mimic back to return to sketchpad folder view when versions are being displayed
                 zynqtgui.main.visibleCategory = "sessions"
@@ -53,7 +52,6 @@ Zynthian.ScreenPage {
             }
             return false
 
-        case "SWITCH_SELECT_BOLD":
             zynqtgui.admin.power_off()
             return true
         case "SELECT_UP":

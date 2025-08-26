@@ -36,7 +36,6 @@ Zynthian.Card {
                 return true;
 
             case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
                 samplePickerDialog.folderModel.folder = samplePickerDialog.rootFolder;
                 samplePickerDialog.open();
 

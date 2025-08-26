@@ -714,7 +714,6 @@ QQC2.Pane {
             }
             break;
         case "SWITCH_SELECT_SHORT":
-        case "SWITCH_SELECT_BOLD":
             returnValue = true;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":

@@ -34,7 +34,6 @@ QQC2.Drawer {
         var result = component.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
                 root.close()
                 result = true;
                 break;

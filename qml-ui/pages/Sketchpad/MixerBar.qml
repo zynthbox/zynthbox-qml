@@ -48,7 +48,6 @@ QQC2.Pane {
     function cuiaCallback(cuia) {
         switch (cuia) {
         case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
             bottomStack.slotsBar.channelButton.checked = true
             return true
 

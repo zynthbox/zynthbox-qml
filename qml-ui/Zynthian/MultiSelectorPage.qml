@@ -50,7 +50,6 @@ ScreenPage {
             zynqtgui.current_screen_id = root.screenIds[newIndex];
             return true;
         case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
             zynqtgui.current_screen_id = screenIds[0];
             zynqtgui.go_back();
             return true;

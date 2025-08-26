@@ -388,17 +388,9 @@ class zynthian_gui(QObject):
         "58": "SNAPSHOT_UP",
         "59": "SNAPSHOT_DOWN",
         "64": "SWITCH_BACK_SHORT",
-        "63": "SWITCH_BACK_BOLD",
-        # "62": "SWITCH_BACK_LONG",
         "65": "SWITCH_SELECT_SHORT",
-        "66": "SWITCH_SELECT_BOLD",
-        # "67": "SWITCH_SELECT_LONG",
         "60": "SWITCH_LAYER_SHORT",
-        "61": "SWITCH_LAYER_BOLD",
-        # "68": "SWITCH_LAYER_LONG",
         "71": "SWITCH_SNAPSHOT_SHORT",
-        "72": "SWITCH_SNAPSHOT_BOLD",
-        # "73": "SWITCH_SNAPSHOT_LONG",
         "80": "SCREEN_ADMIN",
         "81": "SCREEN_LAYER",
         "82": "SCREEN_BANK",
@@ -555,8 +547,6 @@ class zynthian_gui(QObject):
 
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
         self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
-        self.zynswitch_long_triggered.connect(self.zynswitch_long, Qt.QueuedConnection)
-        self.zynswitch_bold_triggered.connect(self.zynswitch_bold, Qt.QueuedConnection)
         self.fakeKeyboard = Controller()
 
         self.modal_timer = QTimer(self)
@@ -1727,14 +1717,6 @@ class zynthian_gui(QObject):
             rewriteLegacyAs = "TOGGLE_KEYBOARD"
         elif cuia == "MODAL_STEPSEQ":
             rewriteLegacyAs = "SCREEN_PLAYGRID"
-        elif cuia == "SWITCH_LAYER_LONG":
-            rewriteLegacyAs = "SWITCH_LAYER_BOLD"
-        elif cuia == "SWITCH_BACK_LONG":
-            rewriteLegacyAs = "SWITCH_BACK_BOLD"
-        elif cuia == "SWITCH_SNAPSHOT_LONG":
-            rewriteLegacyAs = "SWITCH_SNAPSHOT_BOLD"
-        elif cuia == "SWITCH_SELECT_LONG":
-            rewriteLegacyAs = "SWITCH_SELECT_BOLD"
         elif cuia.startswith("CHANNEL_"):
             # Catch all five numerical entries, and the two next/previous ones
             rewriteLegacyAs = cuia.replace("CHANNEL_", "TRACK_")
@@ -1743,8 +1725,8 @@ class zynthian_gui(QObject):
         elif cuia in ["START_MIDI_RECORD", "STOP_MIDI_RECORD", "TOGGLE_MIDI_RECORD", "START_MIDI_PLAY", "STOP_MIDI_PLAY", "TOGGLE_MIDI_PLAY", "MODAL_MIDI_RECORDER",
                       "START_AUDIO_RECORD", "STOP_AUDIO_RECORD", "TOGGLE_AUDIO_RECORD", "START_AUDIO_PLAY", "STOP_AUDIO_PLAY", "TOGGLE_AUDIO_PLAY", "MODAL_AUDIO_RECORDER",
                       "BACK_UP", "BACK_DOWN",
-                      "MODE_SWITCH_SHORT", "MODE_SWITCH_BOLD", "MODE_SWITCH_LONG",
-                      "SWITCH_TRACKS_MOD_SHORT", "SWITCH_TRACKS_MOD_BOLD", "SWITCH_TRACKS_MOD_LONG", "SWITCH_CHANNELS_MOD_SHORT", "SWITCH_CHANNELS_MOD_BOLD", "SWITCH_CHANNELS_MOD_LONG", "SWITCH_STAR_SHORT", "SWITCH_STAR_BOLD", "SWITCH_STAR_LONG"]:
+                      "MODE_SWITCH_SHORT", "MODE_SWITCH_LONG",
+                      "SWITCH_TRACKS_MOD_SHORT", "SWITCH_TRACKS_MOD_LONG", "SWITCH_CHANNELS_MOD_SHORT", "SWITCH_CHANNELS_MOD_LONG", "SWITCH_STAR_SHORT", "SWITCH_STAR_LONG"]:
             # These commands are simply ignored (they have no function, so while they may still show up, we have no use for them)
             # They became not required when we switched our recorder logic from a split modal page to a globally available popup
             return
@@ -1755,7 +1737,7 @@ class zynthian_gui(QObject):
 
         # BEGIN Button ignore logic
         # NOTE If any of these are hit, we will return early from this function
-        if (cuia == "SWITCH_BACK_SHORT" or cuia == "SWITCH_BACK_BOLD") and self.ignoreNextBackButtonPress == True:
+        if cuia == "SWITCH_BACK_SHORT" and self.ignoreNextBackButtonPress == True:
             self.ignoreNextBackButtonPress = False
             return
         elif cuia == "SWITCH_MODE_RELEASED" and self.ignoreNextModeButtonPress == True:
@@ -1775,14 +1757,14 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_RECORD" and self.ignoreNextRecordButtonPress == True:
             self.ignoreNextRecordButtonPress = False
             return
-        elif (cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD") and self.ignoreNextMetronomeButtonPress == True:
+        elif cuia == "SWITCH_METRONOME_SHORT" and self.ignoreNextMetronomeButtonPress == True:
             self.ignoreNextMetronomeButtonPress = False
             return
         elif cuia == "SWITCH_GLOBAL_RELEASED" and self.ignoreNextGlobalButtonPress == True:
             self.globalButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextGlobalButtonPress = False
             return
-        elif (cuia == "SWITCH_SELECT_SHORT" or cuia == "SWITCH_SELECT_BOLD") and self.ignoreNextSelectButtonPress == True:
+        elif cuia == "SWITCH_SELECT_SHORT" and self.ignoreNextSelectButtonPress == True:
             self.ignoreNextSelectButtonPress = False
             return
         # END Button ignore logic
@@ -1791,7 +1773,7 @@ class zynthian_gui(QObject):
         # NOTE If any of these are hit, we will return early from this function
         # If we press the back button when any of the modifier-capable
         # buttons are held down, abort that button's release actions
-        if cuia == "SWITCH_BACK_SHORT" or cuia == "SWITCH_BACK_BOLD":
+        if cuia == "SWITCH_BACK_SHORT":
             changedAnything = False
             if self.globalButtonPressed == True and self.ignoreNextGlobalButtonPress == False:
                 self.ignoreNextGlobalButtonPress = True
@@ -2009,26 +1991,14 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_LAYER_SHORT":
             self.zynswitch_short(0)
 
-        elif cuia == "SWITCH_LAYER_BOLD":
-            self.zynswitch_bold(0)
-
         elif cuia == "SWITCH_BACK_SHORT":
             self.zynswitch_short(1)
-
-        elif cuia == "SWITCH_BACK_BOLD":
-            self.zynswitch_bold(1)
 
         elif cuia == "SWITCH_SNAPSHOT_SHORT":
             self.zynswitch_short(2)
 
-        elif cuia == "SWITCH_SNAPSHOT_BOLD":
-            self.zynswitch_bold(2)
-
         elif cuia == "SWITCH_SELECT_SHORT":
             self.zynswitch_short(3)
-
-        elif cuia == "SWITCH_SELECT_BOLD":
-            self.zynswitch_bold(3)
 
         elif cuia == "SCREEN_MAIN_MENU":
             if self.get_current_screen_id() == "main":
@@ -2219,9 +2189,6 @@ class zynthian_gui(QObject):
                 self.closeLeftSidebar.emit()
             else:
                 self.openLeftSidebar.emit()
-
-        # elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
-        #     self.screens["sketchpad"].metronomeEnabled = not self.screens["sketchpad"].metronomeEnabled
         elif cuia == "SWITCH_PRESSED":
             pass
         elif cuia == "SWITCH_RELEASED":
@@ -2523,7 +2490,8 @@ class zynthian_gui(QObject):
         i = 0
 
         while i<=last_zynswitch_index:
-            dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
+            # Disable long press detection by setting to a very high value of 2 billion dtus which is 33.33 minutes' worth - this is a long time
+            dtus = lib_zyncoder.get_zynswitch(i, 2000000000)
 
             if self.is_external_app_active():
                 if dtus == 0:
@@ -2656,23 +2624,14 @@ class zynthian_gui(QObject):
                 # Do not handle idle state
                 if dtus <= 0:
                     pass
-                else:
-                    if dtus>zynthian_gui_config.zynswitch_long_us:
-                        self.zynswitch_long_triggered.emit(i)
-                    elif dtus>zynthian_gui_config.zynswitch_bold_us:
-                        # Double switches must be bold!!! => by now ...
-                        if not self.zynswitch_double(i):
-                            self.zynswitch_bold_triggered.emit(i)
-                    elif dtus>0:
-                        #print("Switch "+str(i)+" dtus="+str(dtus))
-                        self.zynswitch_short_triggered.emit(i)
+                elif dtus>0:
+                    #print("Switch "+str(i)+" dtus="+str(dtus))
+                    self.zynswitch_short_triggered.emit(i)
             i += 1;
 
         self.fake_key_event_for_zynpot(3, Key.left, Key.right)
 
     zynswitch_short_triggered = Signal(int)
-    zynswitch_long_triggered = Signal(int)
-    zynswitch_bold_triggered = Signal(int)
 
     def fake_key_event_for_zynpot(self, npot, key_left, key_right):
         bk_value = zyncoder.lib_zyncoder.get_value_zynpot(npot)
@@ -2776,265 +2735,11 @@ class zynthian_gui(QObject):
         return True
 
 
-    def zynswitch_long(self, i):
-        # logging.info("Looooooooong Switch " + str(i))
-        # Disabling ald loong presses for the moment
-        return
-        #self.start_loading()
-
-        # Standard 4 ZynSwitches
-        if i == 0:
-            pass
-
-        elif i == 1:
-            # self.callable_ui_action("ALL_OFF")
-            self.show_modal("admin")
-
-        elif i == 2:
-            self.show_modal("alsa_mixer")
-
-        elif i == 3:
-            self.screens["admin"].power_off()
-
-        # Custom ZynSwitches
-        elif i >= 4:
-            self.custom_switch_ui_action(i - 4, "L")
-
-        #self.stop_loading()
-
-    def zynswitch_bold(self, i):
-        # logging.info("Bold Switch " + str(i))
-        #self.start_loading()
-
-        if self.modal_screen in ["stepseq", "keyboard"]:
-            self.stop_loading()
-            if self.screens[self.modal_screen].switch(i, "B"):
-                return
-
-        # Standard 4 ZynSwitches
-        if i == 0:
-            if (
-                self.active_screen == "layer"
-                and self.modal_screen != "stepseq"
-            ):
-                self.show_modal("stepseq")
-            else:
-                if self.active_screen == "preset":
-                    self.screens["preset"].restore_preset()
-                self.show_screen("layer")
-
-        elif i == 1:
-            if self.modal_screen:
-                logging.debug("CLOSE MODAL => " + self.modal_screen)
-                self.show_screen(self.__home_screen)
-
-            elif self.active_screen == "preset":
-                self.screens["preset"].restore_preset()
-                self.show_screen("control")
-
-            elif (
-                self.active_screen in [self.__home_screen, "admin"]
-                and len(self.screens["layer"].layers) > 0
-            ):
-                self.show_control()
-
-            else:
-                self.show_screen(self.__home_screen)
-
-        elif i == 2:
-            self.load_snapshot()
-
-        elif i == 3:
-            if self.modal_screen:
-                self.screens[self.modal_screen].switch_select("B")
-            else:
-                self.screens[self.active_screen].switch_select("B")
-
-        # Custom ZynSwitches
-        elif i >= 4:
-            self.custom_switch_ui_action(i - 4, "B")
-
-        #self.stop_loading()
-
     def zynswitch_short(self, i):
         # logging.info("Short Switch " + str(i))
-        if self.modal_screen in ["stepseq"]:
-            if self.screens[self.modal_screen].switch(i, "S"):
-                return
-
-        #if i != 1:  # HACK to not show loading screen when just going back
-            #self.start_loading()
-
-        # Standard 4 ZynSwitches
-        if i == 0:
-            if (
-                self.active_screen == "control"
-                or self.modal_screen == "alsa_mixer"
-            ):
-                if self.screens["layer"].get_num_root_layers() > 1:
-                    logging.info("Next layer")
-                    self.screens["layer"].next(True)
-                else:
-                    self.show_screen("layer")
-
-            elif self.active_screen == "layer":
-                if self.modal_screen is not None:
-                    self.show_screen("layer")
-                elif self.screens["layer"].get_num_root_layers() > 1:
-                    logging.info("Next layer")
-                    self.screens["layer"].next(False)
-
-            else:
-                if self.active_screen == "preset":
-                    self.screens["preset"].restore_preset()
-                self.show_screen("layer")
-
-        elif i == 1:
-            screen_back = None
-            if  self.__forced_screen_back != None and self.__forced_screen_back != "":
-                if self.__forced_screen_back in self.non_modal_screens:
-                    self.show_screen(self.__forced_screen_back)
-                else:
-                    self.show_modal(self.__forced_screen_back)
-                self.__forced_screen_back = None
-                return
-            # If modal screen ...
-            if self.modal_screen:
-                logging.debug("CLOSE MODAL => " + self.modal_screen)
-
-                # Try to call modal back_action method:
-                try:
-                    screen_back = self.screens[self.modal_screen].back_action()
-                    logging.debug("SCREEN BACK => " + screen_back)
-                except:
-                    pass
-
-                # Back to home screen or modal
-                if screen_back is None:
-                    if self.modal_screen_back:
-                        screen_back = self.modal_screen_back
-                    elif self.active_screen == "main": #HACK
-                        screen_back = self.__home_screen
-                    else:
-                        screen_back = self.active_screen #self.__home_screen #FIXME: it was self.active_screen should be somewhat configurable
-
-            else:
-                try:
-                    screen_back = self.screens[
-                        self.active_screen
-                    ].back_action()
-                except:
-                    pass
-
-                # Back to screen-1 by default ...
-                if screen_back is None:
-                    j = self.screens_sequence.index(self.active_screen) - 1
-                    if j < 0:
-                        if (
-                            len(self.screens["layer"].layers) > 0
-                            and self.curlayer
-                        ):
-                            j = len(self.screens_sequence) - 1
-                        else:
-                            j = 0
-                    screen_back = self.screens_sequence[j]
-
-            # TODO: this code is disabled to have a more predictable back navigation, is a good choice? how to make it depend only from qml part?
-            # If there is only one preset, go back to bank selection
-            #if screen_back == "preset" and len(self.curlayer.preset_list) <= 1:
-                #screen_back = "bank"
-
-            ## If there is only one bank, go back to layer selection
-            #if screen_back == "bank" and len(self.curlayer.bank_list) <= 1:
-                #screen_back = "layer"
-
-            if screen_back:
-                logging.debug("BACK TO SCREEN => {}".format(screen_back))
-                if screen_back in self.non_modal_screens:
-                    self.show_screen(screen_back)
-                else:
-                    self.show_modal(screen_back)
-                    self.modal_screen_back = None
-
-        elif i == 2:
-            if self.modal_screen == "snapshot":
-                self.screens["snapshot"].next()
-            elif (
-                self.active_screen == "control"
-                or self.modal_screen == "alsa_mixer"
-            ) and self.screens["control"].mode == "control":
-                if self.midi_learn_mode or self.midi_learn_zctrl:
-                    if self.modal_screen == "zs3_learn":
-                        self.show_screen("control")
-                    elif zynthian_gui_config.midi_prog_change_zs3:
-                        self.show_modal("zs3_learn")
-                else:
-                    self.enter_midi_learn_mode()
-
-            elif len(self.screens["layer"].layers) > 0:
-                self.enter_midi_learn_mode()
-                self.show_modal("zs3_learn")
-
-            else:
-                self.load_snapshot()
-
-        elif i == 3:
-            if self.modal_screen:
-                self.screens[self.modal_screen].switch_select("S")
-            else:
-                self.screens[self.active_screen].switch_select("S")
-
         # Custom ZynSwitches
-        elif i >= 4:
+        if i >= 4:
             self.custom_switch_ui_action(i - 4, "S")
-
-        #self.stop_loading()
-
-    def zynswitch_push(self,i):
-        logging.info('Push Switch '+str(i))
-        self.start_loading()
-
-        # Standard 4 ZynSwitches
-        if i>=0 and i<=3:
-            pass
-
-        # Custom ZynSwitches
-        elif i>=4:
-            self.custom_switch_ui_action(i-4, "P")
-
-        self.stop_loading()
-
-    def zynswitch_double(self, i):
-        if not i in self.dtsw: return
-        self.dtsw[i] = datetime.now()
-        for j in range(4):
-            if j == i:
-                continue
-            if abs((self.dtsw[i] - self.dtsw[j]).total_seconds()) < 0.3:
-                self.start_loading()
-                dswstr = str(i) + "+" + str(j)
-                logging.info("Double Switch " + dswstr)
-                # self.show_control_xy(i,j)
-                self.show_screen("control")
-                self.screens["control"].set_xyselect_mode(i, j)
-                self.stop_loading()
-                return True
-
-    def zynswitch_X(self, i):
-        logging.info("X Switch %d" % i)
-        if (
-            self.active_screen == "control"
-            and self.screens["control"].mode == "control"
-        ):
-            self.screens["control"].midi_learn(i)
-
-    def zynswitch_Y(self, i):
-        logging.info("Y Switch %d" % i)
-        if (
-            self.active_screen == "control"
-            and self.screens["control"].mode == "control"
-        ):
-            self.screens["control"].midi_unlearn(i)
 
     # ------------------------------------------------------------------
     # Switch Defered Event
@@ -3049,16 +2754,7 @@ class zynthian_gui(QObject):
             event = copy.deepcopy(self.zynswitch_defered_event)
             self.zynswitch_defered_event = None
             # Process event
-            if event[0] == "S":
-                self.zynswitch_short(event[1])
-            elif event[0] == "B":
-                self.zynswitch_bold(event[1])
-            elif event[0] == "L":
-                self.zynswitch_long(event[1])
-            elif event[0] == "X":
-                self.zynswitch_X(event[1])
-            elif event[0] == "Y":
-                self.zynswitch_Y(event[1])
+            self.zynswitch_short(event[1])
 
     # ------------------------------------------------------------------
     # Threads

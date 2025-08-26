@@ -64,7 +64,6 @@ Zynthian.Popup {
         var returnValue = root.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
                 root.close();
                 returnValue = true;
                 break;

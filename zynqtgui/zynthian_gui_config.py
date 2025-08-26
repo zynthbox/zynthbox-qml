@@ -141,56 +141,6 @@ custom_switch_ui_actions = {
 }
 custom_switch_midi_events = []
 
-# # TODO: make it come from some config
-# n_custom_switches = 33
-
-#for i in range(0, n_custom_switches):
-#    cuias = {}
-#    midi_event = None
-
-#    root_varname = "ZYNTHIAN_WIRING_CUSTOM_SWITCH_{:02d}".format(i+1)
-#    custom_type = os.environ.get(root_varname, "")
-
-#    if custom_type == "UI_ACTION":
-#        cuias['S'] = os.environ.get(root_varname + "__UI_SHORT")
-#        cuias['B'] = os.environ.get(root_varname + "__UI_BOLD")
-#        cuias['L'] = os.environ.get(root_varname + "__UI_LONG")
-
-#    else:
-#        evtype = None
-#        if custom_type=="MIDI_CC":
-#            evtype = 0xB
-#        elif custom_type=="MIDI_NOTE":
-#            evtype = 0x9
-#        elif custom_type=="MIDI_PROG_CHANGE":
-#            evtype = 0xC
-
-#        if evtype:
-#            chan = os.environ.get(root_varname + "__MIDI_CHAN")
-#            try:
-#                chan = int(chan) - 1
-#                if chan<0 or chan>15:
-#                    chan = None
-#            except:
-#                chan = None
-
-#            num = os.environ.get(root_varname + "__MIDI_NUM")
-#            if num is None:
-#                num = os.environ.get(root_varname + "__CC_NUM")
-#            try:
-#                num = int(num)
-#                if num>=0 and num<=127:
-#                    midi_event = {
-#                        'type': evtype,
-#                        'chan': chan,
-#                        'num': num
-#                    }
-#            except:
-#                pass
-
-#    custom_switch_ui_actions.append(cuias)
-#    custom_switch_midi_events.append(midi_event)
-
 #------------------------------------------------------------------------------
 # Zynaptik & Zyntof configuration helpers
 #------------------------------------------------------------------------------
@@ -257,26 +207,6 @@ if zyntof_config:
     for i in range(0, n_zyntofs):
         root_varname = "ZYNTHIAN_WIRING_ZYNTOF{:02d}".format(i+1)
         zyntof_midi_events.append(get_zynsensor_config(root_varname))
-
-#------------------------------------------------------------------------------
-# Zynswitches events timing
-#------------------------------------------------------------------------------
-
-try:
-    zynswitch_bold_us = 1000 * int(os.environ.get('ZYNTHIAN_UI_SWITCH_BOLD_MS', 300))
-    
-    # zynswitch_long_us = 1000 * int(os.environ.get('ZYNTHIAN_UI_SWITCH_LONG_MS', 2000))
-    #
-    # Setting zynswitch_long_us to 2 seconds will cause any long buttonpress to emit long pressed event after 2 seconds
-    # and hence operations like "press and hold metronome + BK" to control bpm cannot be done
-    # Zynthbox does not use longpress button events and hence it is not required to keep it configurable
-    #
-    # Hardcoding it to max-ish possible value gives us 33.33 minutes' of longpress time before event gets fired    
-    zynswitch_long_us = 2000000000
-except:
-    zynswitch_bold_us = 300000
-    # zynswitch_long_us = 2000000
-    zynswitch_long_us = 2000000000 # 33.33 minutes' worth - this is a long time, but it's our default (people can change it, but we're using a held button as a held button, not auto-released)
 
 #------------------------------------------------------------------------------
 # UI Geometric Parameters

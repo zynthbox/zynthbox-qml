@@ -79,7 +79,6 @@ Zynthian.Popup {
                 case "SELECT_UP":
                 case "SELECT_DOWN":
                 case "SWITCH_SELECT_SHORT":
-                case "SWITCH_SELECT_BOLD":
                 case "SWITCH_MODE_RELEASED":
                 case "KNOB0_TOUCHED":
                 case "KNOB0_RELEASED":
@@ -126,7 +125,6 @@ Zynthian.Popup {
                     returnValue = true;
                     break;
                 case "SWITCH_BACK_SHORT":
-                case "SWITCH_BACK_BOLD":
                     root.close();
                     returnValue = true;
                     break;

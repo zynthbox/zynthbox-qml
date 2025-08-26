@@ -234,7 +234,6 @@ Zynthian.ScreenPage {
                         zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
                     }
                     return false
-                case "SWITCH_SELECT_BOLD":
                     if (zynqtgui.fixed_layers.current_index_valid) {
                         zynqtgui.control.single_effect_engine = null;
                         zynqtgui.current_screen_id = "control";
@@ -250,7 +249,6 @@ Zynthian.ScreenPage {
                     zynqtgui.current_screen_id = root.screenIds[newIndex];
                     return true;
                 case "SWITCH_BACK_SHORT":
-                case "SWITCH_BACK_BOLD":
                     zynqtgui.current_screen_id = "layers_for_channel";
                     zynqtgui.go_back();
                     return true;

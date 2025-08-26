@@ -94,12 +94,10 @@ Zynthian.ScreenPage {
                 let result = false;
                 switch (cuia) {
                     case "SWITCH_BACK_SHORT":
-                    case "SWITCH_BACK_BOLD":
                         zynqtgui.current_screen_id = "admin";
                         returnValue = true;
                         break;
                     case "SWITCH_SELECT_SHORT":
-                    case "SWITCH_SELECT_BOLD":
                         if (_private.selectedDeviceIndex > -1) {
                             contentStack.push(deviceComponent, { containingPage: root, _private: _private });
                         }
@@ -439,12 +437,10 @@ Zynthian.ScreenPage {
             let result = false;
             switch (cuia) {
                 case "SWITCH_BACK_SHORT":
-                case "SWITCH_BACK_BOLD":
                     midiEventListener.reject();
                     returnValue = true;
                     break;
                 case "SWITCH_SELECT_SHORT":
-                case "SWITCH_SELECT_BOLD":
                     midiEventListener.accept();
                     returnValue = true;
                     break;

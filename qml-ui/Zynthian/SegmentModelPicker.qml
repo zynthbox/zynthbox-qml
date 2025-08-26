@@ -42,7 +42,6 @@ Zynthian.Popup {
         var result = component.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
                 component.close();
                 result = true;
                 break;

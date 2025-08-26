@@ -168,7 +168,6 @@ Zynthian.ScreenPage {
             zynqtgui.current_screen_id = root.screenIds[newIndex];
             return true;
         case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
             zynqtgui.current_screen_id = "main_layers_view";
             zynqtgui.go_back();
             return true;

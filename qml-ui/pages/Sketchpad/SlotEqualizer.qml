@@ -67,7 +67,6 @@ Zynthian.DialogQuestion {
         let returnValue = false;
         switch (cuia) {
         case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
             component.reject();
             returnValue = true;
             break;
@@ -82,7 +81,6 @@ Zynthian.DialogQuestion {
             returnValue = true;
             break;
         case "SWITCH_SELECT_SHORT":
-        case "SWITCH_SELECT_BOLD":
             _private.select();
             returnValue = true;
             break;

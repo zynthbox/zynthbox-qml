@@ -81,7 +81,6 @@ Zynthian.DialogQuestion {
                 component.selectPreviousButton();
                 break;
             case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
                 component.reject();
                 break;
             case "SWITCH_SELECT_SHORT":

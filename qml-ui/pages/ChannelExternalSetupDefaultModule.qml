@@ -38,7 +38,6 @@ Zynthian.BaseExternalEditor {
         var returnValue = false;
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
                 _private.selectPressed();
                 returnValue = true;
                 break;

@@ -146,7 +146,6 @@ Zynthian.ScreenPage {
                     pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(-1, root.selectedChannel.selectedSlot.value)
                     return true;
                 case "SWITCH_BACK_SHORT":
-                case "SWITCH_BACK_BOLD":
                     zynqtgui.go_back();
                     return true;
                 default:

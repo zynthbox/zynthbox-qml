@@ -54,7 +54,6 @@ Zynthian.DialogQuestion {
             returnValue = true;
             break;
         case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
             root.reject();
             returnValue = true;
             break;

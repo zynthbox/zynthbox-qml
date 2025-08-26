@@ -378,9 +378,7 @@ QQC2.Pane
                     result = true;
                     break;
                 case "SWITCH_SELECT_SHORT":
-                case "SWITCH_SELECT_BOLD":
                 case "SWITCH_BACK_SHORT":
-                case "SWITCH_BACK_BOLD":
                     zynqtgui.globalPopupOpened = false;
                     result = true;
                     break;

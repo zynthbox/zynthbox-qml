@@ -139,7 +139,6 @@ RowLayout {
                 }
                 return true;
             case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
                 if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
                     Window.activeFocusItem.toggle();
                     return true;

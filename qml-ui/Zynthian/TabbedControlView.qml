@@ -60,7 +60,6 @@ Item {
         switch (cuia) { //TODO: figure out rows and columns
         // Eat select actions
         case "SWITCH_SELECT_SHORT":
-        case "SWITCH_SELECT_BOLD":
             if (focusedScope === internalStack) {
                 if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
                     Window.activeFocusItem.toggle()

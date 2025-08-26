@@ -467,19 +467,21 @@ Item {
                 break;
 
             case "SWITCH_MODE_RELEASED":
-                // Don't swallow mode when alt is pressed, that's for tab switching on e.g. sketchpad main
-                if (zynqtgui.altButtonPressed == false) {
-                    if (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed) {
-                        // Don't allow switching modes when holding down a button, that just makes interaction weird...
+                if (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed) {
+                    // Don't allow switching modes when holding down a button, that just makes interaction weird...
+                } else {
+                    // When holding alt, always switch to the musical keys mode, otherwise toggle between steps and track/clip
+                    if (zynqtgui.altButtonPressed) {
+                        _private.interactionMode = 2;
                     } else {
-                        if (_private.interactionMode === 2) {
-                            _private.interactionMode = 0;
+                        if (_private.interactionMode === 0) {
+                            _private.interactionMode = 1;
                         } else {
-                            _private.interactionMode = _private.interactionMode + 1;
+                            _private.interactionMode = 0;
                         }
                     }
-                    returnValue = true;
                 }
+                returnValue = true;
                 break;
         }
         return returnValue;

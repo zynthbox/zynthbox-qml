@@ -2737,8 +2737,127 @@ class zynthian_gui(QObject):
 
     def zynswitch_short(self, i):
         # logging.info("Short Switch " + str(i))
+        # Standard 4 ZynSwitches
+        if i == 0:
+            if (
+                self.active_screen == "control"
+                or self.modal_screen == "alsa_mixer"
+            ):
+                if self.screens["layer"].get_num_root_layers() > 1:
+                    logging.info("Next layer")
+                    self.screens["layer"].next(True)
+                else:
+                    self.show_screen("layer")
+
+            elif self.active_screen == "layer":
+                if self.modal_screen is not None:
+                    self.show_screen("layer")
+                elif self.screens["layer"].get_num_root_layers() > 1:
+                    logging.info("Next layer")
+                    self.screens["layer"].next(False)
+
+            else:
+                if self.active_screen == "preset":
+                    self.screens["preset"].restore_preset()
+                self.show_screen("layer")
+
+        elif i == 1:
+            screen_back = None
+            if  self.__forced_screen_back != None and self.__forced_screen_back != "":
+                if self.__forced_screen_back in self.non_modal_screens:
+                    self.show_screen(self.__forced_screen_back)
+                else:
+                    self.show_modal(self.__forced_screen_back)
+                self.__forced_screen_back = None
+                return
+            # If modal screen ...
+            if self.modal_screen:
+                logging.debug("CLOSE MODAL => " + self.modal_screen)
+
+                # Try to call modal back_action method:
+                try:
+                    screen_back = self.screens[self.modal_screen].back_action()
+                    logging.debug("SCREEN BACK => " + screen_back)
+                except:
+                    pass
+
+                # Back to home screen or modal
+                if screen_back is None:
+                    if self.modal_screen_back:
+                        screen_back = self.modal_screen_back
+                    elif self.active_screen == "main": #HACK
+                        screen_back = self.__home_screen
+                    else:
+                        screen_back = self.active_screen #self.__home_screen #FIXME: it was self.active_screen should be somewhat configurable
+
+            else:
+                try:
+                    screen_back = self.screens[
+                        self.active_screen
+                    ].back_action()
+                except:
+                    pass
+
+                # Back to screen-1 by default ...
+                if screen_back is None:
+                    j = self.screens_sequence.index(self.active_screen) - 1
+                    if j < 0:
+                        if (
+                            len(self.screens["layer"].layers) > 0
+                            and self.curlayer
+                        ):
+                            j = len(self.screens_sequence) - 1
+                        else:
+                            j = 0
+                    screen_back = self.screens_sequence[j]
+
+            # TODO: this code is disabled to have a more predictable back navigation, is a good choice? how to make it depend only from qml part?
+            # If there is only one preset, go back to bank selection
+            #if screen_back == "preset" and len(self.curlayer.preset_list) <= 1:
+                #screen_back = "bank"
+
+            ## If there is only one bank, go back to layer selection
+            #if screen_back == "bank" and len(self.curlayer.bank_list) <= 1:
+                #screen_back = "layer"
+
+            if screen_back:
+                logging.debug("BACK TO SCREEN => {}".format(screen_back))
+                if screen_back in self.non_modal_screens:
+                    self.show_screen(screen_back)
+                else:
+                    self.show_modal(screen_back)
+                    self.modal_screen_back = None
+
+        elif i == 2:
+            if self.modal_screen == "snapshot":
+                self.screens["snapshot"].next()
+            elif (
+                self.active_screen == "control"
+                or self.modal_screen == "alsa_mixer"
+            ) and self.screens["control"].mode == "control":
+                if self.midi_learn_mode or self.midi_learn_zctrl:
+                    if self.modal_screen == "zs3_learn":
+                        self.show_screen("control")
+                    elif zynthian_gui_config.midi_prog_change_zs3:
+                        self.show_modal("zs3_learn")
+                else:
+                    self.enter_midi_learn_mode()
+
+            elif len(self.screens["layer"].layers) > 0:
+                self.enter_midi_learn_mode()
+                self.show_modal("zs3_learn")
+
+            else:
+                self.load_snapshot()
+
+        elif i == 3:
+            if self.modal_screen:
+                self.screens[self.modal_screen].switch_select("S")
+            else:
+                self.screens[self.active_screen].switch_select("S")
+
         # Custom ZynSwitches
-        if i >= 4:
+        elif i >= 4:
             self.custom_switch_ui_action(i - 4, "S")
 
     # ------------------------------------------------------------------

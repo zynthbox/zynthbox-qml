@@ -622,15 +622,18 @@ class zynthian_controller(QObject):
 
 
     def midi_learn_zyncoder(self, chan, cc):
-        try:
-            if zyncoder.lib_zyncoder.set_midi_filter_cc_swap(ctypes.c_ubyte(chan), ctypes.c_ubyte(cc), ctypes.c_ubyte(self.midi_chan), ctypes.c_ubyte(self.midi_cc)):
-                logging.info("Set MIDI filter CC map: (%s, %s) => (%s, %s)" % (chan, cc, self.midi_chan, self.midi_cc))
-                return self._set_midi_learn(chan, cc)
-            else:
-                logging.error("Can't set MIDI filter CC swap map: call returned 0")
+        if -1 < chan and chan < 16 and -1 < cc and cc < 128:
+            try:
+                if zyncoder.lib_zyncoder.set_midi_filter_cc_swap(ctypes.c_ubyte(chan), ctypes.c_ubyte(cc), ctypes.c_ubyte(self.midi_chan), ctypes.c_ubyte(self.midi_cc)):
+                    logging.info("Set MIDI filter CC map: (%s, %s) => (%s, %s)" % (chan, cc, self.midi_chan, self.midi_cc))
+                    return self._set_midi_learn(chan, cc)
+                else:
+                    logging.error("Can't set MIDI filter CC swap map: call returned 0")
 
-        except Exception as e:
-            logging.error("Can't set MIDI filter CC swap map: (%s, %s) => (%s, %s) => %s" % (self.midi_learn_chan, self.midi_learn_cc, self.midi_chan, self.midi_cc, e))
+            except Exception as e:
+                logging.error("Can't set MIDI filter CC swap map: (%s, %s) => (%s, %s) => %s" % (self.midi_learn_chan, self.midi_learn_cc, self.midi_chan, self.midi_cc, e))
+        else:
+            logging.error(f"Can't set MIDI filter CC swap map for chan {chan} and cc {cc}")
 
 
     def midi_unlearn_zyncoder(self):

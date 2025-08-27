@@ -225,7 +225,34 @@ Zynthian.ScreenPage {
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
      */
     function updateChannelPan(sign, channelId) {
-        applicationWindow().channels[channelId].pan = Zynthian.CommonUtils.clamp(applicationWindow().channels[channelId].pan + sign * 0.05, -1, 1)
+        let theTrack = applicationWindow().channels[channelId];
+        function valueSetter(value) {
+            if (-1 < channelId && channelId < Zynthbox.Plugin.sketchpadTrackCount) {
+                theTrack.pan = Zynthian.CommonUtils.clamp(Math.round((theTrack.pan + sign * 0.05 + Number.EPSILON) * 100) / 100, -1, 1);
+                if (root.bottomStack.slotsBar.mixerButton.checked === false) {
+                    applicationWindow().showOsd({
+                                                    parameterName: "track_pan",
+                                                    description: qsTr("Track %1 Pan").arg(channelId),
+                                                    start: -1,
+                                                    stop: 1,
+                                                    step: 0.05,
+                                                    defaultValue: 0,
+                                                    currentValue: theTrack.pan,
+                                                    startLabel: qsTr("-1 (L)"),
+                                                    stopLabel: qsTr("+1 (R)"),
+                                                    valueLabel: qsTr("%1").arg(theTrack.pan),
+                                                    setValueFunction: valueSetter,
+                                                    showValueLabel: true,
+                                                    showResetToDefault: false,
+                                                    showVisualZero: true
+                                                })
+                }
+            } else {
+                applicationWindow().showMessageDialog(qsTr("Track %1 is out of range (0 through %2)").arg(channelId).arg(Zynthbox.Plugin.sketchpadTrackCount), 2000);
+            }
+        }
+
+        valueSetter(theTrack.pan + sign * 0.05);
     }
     /**
      * Update layer filter cutoff for selected channel

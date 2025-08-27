@@ -510,6 +510,10 @@ Item {
                         .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
                         .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
                         , 1000);
+                    returnValue = true;
+                } else if (_private.interactionMode === 2 && zynqtgui.altButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
+                    returnValue = true;
                 }
                 break;
             case "KNOB3_RELEASED":
@@ -538,6 +542,9 @@ Item {
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
+                } else if (_private.interactionMode === 2 && zynqtgui.altButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
+                    returnValue = true;
                 }
                 break;
             case "KNOB3_DOWN":
@@ -559,6 +566,9 @@ Item {
                     _private.starNote.sendPitchChange(0);
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
+                    returnValue = true;
+                } else if (_private.interactionMode === 2 && zynqtgui.altButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
                     returnValue = true;
                 }
                 break;

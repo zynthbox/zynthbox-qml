@@ -532,6 +532,46 @@ Zynthian.ScreenPage {
             clipCppObj.bpm = Zynthian.CommonUtils.clamp(clipCppObj.bpm + sign, 50, 200)
         }
     }
+    /**
+     * Change the given clip's musical scale
+     * @param trackId The track on which the clip exists
+     * @param clipId the id of the clip in the given track
+     * @param sign Sign to determine if the value should be incremented / decremented. Pass 1 to increment, and -1 to decrement. Pass 0 to simply display the OSD without changing the value.
+     */
+    function updateClipScale(trackId, clipId, sign) {
+        if (-1 < trackId && trackId < Zynthbox.Plugin.sketchpadTrackCount) {
+            if (-1 < clipId && clipId < Zynthbox.Plugin.sketchpadSlotCount) {
+                let theSequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
+                let thePattern = sequence.getByClipId(trackId, clipId);
+                function valueSetter(value) {
+                    let scaleIndex = Zynthbox.KeyScales.scaleEnumKeyToIndex(thePattern.scaleKey);
+                    scaleIndex = Zynthian.CommonUtils.clamp(value, 0, 51);
+                    thePattern.scaleKey = Zynthbox.KeyScales.scaleIndexToEnumKey(scaleIndex);
+                    applicationWindow().showOsd({
+                                                    parameterName: "clip_scale",
+                                                    description: qsTr("Clip %1%2 Scale").arg(trackId + 1).arg(thePattern.clipName),
+                                                    start: 0,
+                                                    stop: 51,
+                                                    step: 1,
+                                                    defaultValue: 6,
+                                                    currentValue: scaleIndex,
+                                                    startLabel: "",
+                                                    stopLabel: "",
+                                                    valueLabel: Zynthbox.KeyScales.scaleName(thePattern.scaleKey),
+                                                    setValueFunction: valueSetter,
+                                                    showValueLabel: true,
+                                                    showResetToDefault: false,
+                                                    showVisualZero: false
+                                                })
+                }
+                valueSetter(Zynthbox.KeyScales.scaleEnumKeyToIndex(thePattern.scaleKey) + sign);
+            } else {
+                console.log("Clip ID is out of range:", clipId);
+            }
+        } else {
+            console.log("Track ID is out of range:", trackId);
+        }
+    }
 
     title: qsTr("Sketchpad")
     screenId: "sketchpad"

@@ -72,7 +72,7 @@ Item {
                                                 step: 1,
                                                 defaultValue: 64,
                                                 currentValue: parseFloat(firstStepEntryVelocity),
-                                                startLabel: "0",
+                                                startLabel: "1",
                                                 stopLabel: "127",
                                                 valueLabel: qsTr("%1").arg(firstStepEntryVelocity),
                                                 setValueFunction: valueSetter,
@@ -184,9 +184,9 @@ Item {
     }
     function ignoreHeldStepButtonsReleases() {
         // If we're holding a step button down, make sure that we ignore the next release of those buttons
-        // Do this for the sequencer interaction mode only (otherwise we'll potentially end up not releasing notes, which would be sort of weird)
+        // Don't do this for the musical keys mode (otherwise we'll potentially end up not releasing notes, which would be sort of weird)
         let returnValue = false;
-        if (_private.interactionMode == 0) {
+        if (_private.interactionMode !== 2) {
             if (zynqtgui.step1ButtonPressed) {
                 zynqtgui.ignoreNextStep1ButtonPress = true;
                 returnValue = true;
@@ -394,11 +394,16 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        component.updateStepVelocity(0, stepButtonIndex);
+                        if (_private.interactionMode === 0) {
+                            component.updateStepVelocity(0, stepButtonIndex);
+                        } else if (_private.interactionMode === 1) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().updateChannelVolume(0, stepButtonIndex);
+                            }
+                        }
                         returnValue = true;
                     }
                 }
-                returnValue = true;
                 break;
             case "KNOB0_RELEASED":
                 break;
@@ -406,17 +411,28 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        component.updateStepVelocity(1, stepButtonIndex);
+                        if (_private.interactionMode === 0) {
+                            component.updateStepVelocity(1, stepButtonIndex);
+                        } else if (_private.interactionMode === 1) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().updateChannelVolume(1, stepButtonIndex);
+                            }
+                        }
                         returnValue = true;
                     }
                 }
-                returnValue = true;
                 break;
             case "KNOB0_DOWN":
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        component.updateStepVelocity(-1, stepButtonIndex);
+                        if (_private.interactionMode === 0) {
+                            component.updateStepVelocity(-1, stepButtonIndex);
+                        } else if (_private.interactionMode === 1) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().updateChannelVolume(-1, stepButtonIndex);
+                            }
+                        }
                         returnValue = true;
                     }
                 }
@@ -425,14 +441,50 @@ Item {
             // K2 controls length
             case "KNOB1_TOUCHED":
                 component.ignoreHeldStepButtonsReleases();
+                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                    if (_private.heldStepButtons[stepButtonIndex]) {
+                        if (_private.interactionMode === 0) {
+                            // component.updateStepLength(0, stepButtonIndex);
+                        } else if (_private.interactionMode === 1) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
+                            }
+                        }
+                        returnValue = true;
+                    }
+                }
                 break;
             case "KNOB1_RELEASED":
                 break;
             case "KNOB1_UP":
                 component.ignoreHeldStepButtonsReleases();
+                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                    if (_private.heldStepButtons[stepButtonIndex]) {
+                        if (_private.interactionMode === 0) {
+                            // component.updateStepLength(1, stepButtonIndex);
+                        } else if (_private.interactionMode === 1) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
+                            }
+                        }
+                        returnValue = true;
+                    }
+                }
                 break;
             case "KNOB1_DOWN":
                 component.ignoreHeldStepButtonsReleases();
+                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                    if (_private.heldStepButtons[stepButtonIndex]) {
+                        if (_private.interactionMode === 0) {
+                            // component.updateStepLength(-1, stepButtonIndex);
+                        } else if (_private.interactionMode === 1) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
+                            }
+                        }
+                        returnValue = true;
+                    }
+                }
                 break;
 
             // K3 controls position

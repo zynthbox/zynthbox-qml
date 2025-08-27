@@ -1190,6 +1190,97 @@ QQC2.Pane {
                                             }
                                         }
 
+                                        MouseArea {
+                                            property var lastMouseX
+                                            property var lastMouseY
+                                            property int horizontalDrag: 0
+                                            property int verticalDrag: 0
+                                            property int dragDeltaThreshold: 50
+                                            anchors.fill: parent
+                                            onPressed: {
+                                                lastMouseX = mouse.x;
+                                                lastMouseY = mouse.y;
+                                            }
+                                            onMouseXChanged: {
+                                                const dx = mouse.x - lastMouseX;
+                                                if (verticalDrag == 0 && Math.abs(dx) > dragDeltaThreshold) {
+                                                    horizontalDrag = Math.floor(dx/dragDeltaThreshold);
+                                                }
+                                            }
+                                            onMouseYChanged: {
+                                                const dy = lastMouseY - mouse.y;
+                                                if (horizontalDrag == 0 && Math.abs(dy) > dragDeltaThreshold) {
+                                                    verticalDrag = Math.floor(dy/dragDeltaThreshold);
+                                                }
+                                            }
+                                            onReleased: {
+                                                if (horizontalDrag == 0 && verticalDrag == 0) {
+                                                    // Drag action did not happen. Perform single press action
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_sampleslot":
+                                                            if (!root.selectedChannel.selectedSlot.isEmpty()) {
+                                                                root.selectedChannel.samples[root.selectedChannel.selectedSlot.value].play()
+                                                            }
+                                                            break;
+                                                    }
+                                                } else {
+                                                    if (horizontalDrag > 0) {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
+
+                                                    } else if (horizontalDrag < 0) {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
+                                                    }
+                                                    if (verticalDrag > 0) {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
+                                                    } else if (verticalDrag < 0) {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
+                                                    }
+
+                                                    horizontalDrag = 0;
+                                                    verticalDrag = 0;
+                                                }
+                                            }
+                                            onPressAndHold: {
+                                                switch (root.selectedChannel.selectedSlot.className) {
+                                                    case "TracksBar_synthslot":
+                                                    case "TracksBar_sampleslot":
+                                                    case "TracksBar_fxslot":
+                                                        if (!root.selectedChannel.selectedSlot.isEmpty()) {
+                                                            zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                                                        }
+                                                        break;
+                                                }
+                                            }
+                                        }
+
                                         RowLayout {
                                             id: infoBar
                                             property QtObject zynthianLayer: {
@@ -1448,97 +1539,6 @@ QQC2.Pane {
                                                         topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                                                     }
                                                     x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
-                                                }
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            property var lastMouseX
-                                            property var lastMouseY
-                                            property int horizontalDrag: 0
-                                            property int verticalDrag: 0
-                                            property int dragDeltaThreshold: 50
-                                            anchors.fill: parent
-                                            onPressed: {
-                                                lastMouseX = mouse.x;
-                                                lastMouseY = mouse.y;
-                                            }
-                                            onMouseXChanged: {
-                                                const dx = mouse.x - lastMouseX;
-                                                if (verticalDrag == 0 && Math.abs(dx) > dragDeltaThreshold) {
-                                                    horizontalDrag = Math.floor(dx/dragDeltaThreshold);
-                                                }
-                                            }
-                                            onMouseYChanged: {
-                                                const dy = lastMouseY - mouse.y;
-                                                if (horizontalDrag == 0 && Math.abs(dy) > dragDeltaThreshold) {
-                                                    verticalDrag = Math.floor(dy/dragDeltaThreshold);
-                                                }
-                                            }
-                                            onReleased: {
-                                                if (horizontalDrag == 0 && verticalDrag == 0) {
-                                                    // Drag action did not happen. Perform single press action
-                                                    switch (root.selectedChannel.selectedSlot.className) {
-                                                        case "TracksBar_sampleslot":
-                                                            if (!root.selectedChannel.selectedSlot.isEmpty()) {
-                                                                root.selectedChannel.samples[root.selectedChannel.selectedSlot.value].play()
-                                                            }
-                                                            break;
-                                                    }
-                                                } else {
-                                                    if (horizontalDrag > 0) {
-                                                        switch (root.selectedChannel.selectedSlot.className) {
-                                                            case "TracksBar_synthslot":
-                                                                root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                            case "TracksBar_fxslot":
-                                                                root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                        }
-
-                                                    } else if (horizontalDrag < 0) {
-                                                        switch (root.selectedChannel.selectedSlot.className) {
-                                                            case "TracksBar_synthslot":
-                                                                root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                            case "TracksBar_fxslot":
-                                                                root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                        }
-                                                    }
-                                                    if (verticalDrag > 0) {
-                                                        switch (root.selectedChannel.selectedSlot.className) {
-                                                            case "TracksBar_synthslot":
-                                                                root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                            case "TracksBar_fxslot":
-                                                                root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                        }
-                                                    } else if (verticalDrag < 0) {
-                                                        switch (root.selectedChannel.selectedSlot.className) {
-                                                            case "TracksBar_synthslot":
-                                                                root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                            case "TracksBar_fxslot":
-                                                                root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
-                                                                break;
-                                                        }
-                                                    }
-
-                                                    horizontalDrag = 0;
-                                                    verticalDrag = 0;
-                                                }
-                                            }
-                                            onPressAndHold: {
-                                                switch (root.selectedChannel.selectedSlot.className) {
-                                                    case "TracksBar_synthslot":
-                                                    case "TracksBar_sampleslot":
-                                                    case "TracksBar_fxslot":
-                                                        if (!root.selectedChannel.selectedSlot.isEmpty()) {
-                                                            zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
-                                                        }
-                                                        break;
                                                 }
                                             }
                                         }

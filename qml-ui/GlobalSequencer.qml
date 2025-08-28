@@ -392,16 +392,21 @@ Item {
             // K1 controls velocity
             case "KNOB0_TOUCHED":
                 component.ignoreHeldStepButtonsReleases();
-                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                    if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === 0) {
-                            component.updateStepVelocity(0, stepButtonIndex);
-                        } else if (_private.interactionMode === 1) {
-                            if (stepButtonIndex < 10) {
-                                applicationWindow().updateChannelVolume(0, stepButtonIndex);
+                if (zynqtgui.starButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
+                    returnValue = true;
+                } else {
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            if (_private.interactionMode === 0) {
+                                component.updateStepVelocity(0, stepButtonIndex);
+                            } else if (_private.interactionMode === 1) {
+                                if (stepButtonIndex < 10) {
+                                    applicationWindow().updateChannelVolume(0, stepButtonIndex);
+                                }
                             }
+                            returnValue = true;
                         }
-                        returnValue = true;
                     }
                 }
                 break;
@@ -409,31 +414,41 @@ Item {
                 break;
             case "KNOB0_UP":
                 component.ignoreHeldStepButtonsReleases();
-                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                    if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === 0) {
-                            component.updateStepVelocity(1, stepButtonIndex);
-                        } else if (_private.interactionMode === 1) {
-                            if (stepButtonIndex < 10) {
-                                applicationWindow().updateChannelVolume(1, stepButtonIndex);
+                if (zynqtgui.starButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
+                    returnValue = true;
+                } else {
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            if (_private.interactionMode === 0) {
+                                component.updateStepVelocity(1, stepButtonIndex);
+                            } else if (_private.interactionMode === 1) {
+                                if (stepButtonIndex < 10) {
+                                    applicationWindow().updateChannelVolume(1, stepButtonIndex);
+                                }
                             }
+                            returnValue = true;
                         }
-                        returnValue = true;
                     }
                 }
                 break;
             case "KNOB0_DOWN":
                 component.ignoreHeldStepButtonsReleases();
-                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                    if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === 0) {
-                            component.updateStepVelocity(-1, stepButtonIndex);
-                        } else if (_private.interactionMode === 1) {
-                            if (stepButtonIndex < 10) {
-                                applicationWindow().updateChannelVolume(-1, stepButtonIndex);
+                if (zynqtgui.starButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
+                    returnValue = true;
+                } else {
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            if (_private.interactionMode === 0) {
+                                component.updateStepVelocity(-1, stepButtonIndex);
+                            } else if (_private.interactionMode === 1) {
+                                if (stepButtonIndex < 10) {
+                                    applicationWindow().updateChannelVolume(-1, stepButtonIndex);
+                                }
                             }
+                            returnValue = true;
                         }
-                        returnValue = true;
                     }
                 }
                 break;
@@ -618,7 +633,7 @@ Item {
         function handlePatternDataChange() {
             let keyNote = Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey);
             heardNotes = [Zynthbox.PlayGridManager.getNote(keyNote, pattern.sketchpadTrack)];
-            heardVelocities = [64];
+            heardVelocities = [pattern.defaultVelocity];
             // Build out 16 steps based on the pattern's grid model
             let newStepKeyNotes = [];
             let firstStepKeyNote = pattern.gridModelStartNote;
@@ -646,7 +661,7 @@ Item {
         property var noteListeningVelocities: []
 
         property QtObject starNote: null
-        property int starVelocity: 64
+        property int starVelocity: pattern ? pattern.defaultVelocity : 64
 
         // Should probably do a thing where we show when notes are playing when in keys mode...
         property var stepKeyNotes: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]

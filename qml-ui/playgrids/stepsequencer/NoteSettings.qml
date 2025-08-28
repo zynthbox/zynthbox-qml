@@ -639,7 +639,7 @@ ColumnLayout {
                                 if (typeof(delay) === "undefined") {
                                     delay = 0;
                                 }
-                                Zynthbox.PlayGridManager.scheduleNote(subnoteDelegate.subnote.midiNote, subnoteDelegate.subnote.midiChannel, true, velocity, duration, delay);
+                                Zynthbox.PlayGridManager.scheduleNote(subnoteDelegate.subnote.midiNote, 0, true, velocity, duration, delay, subnoteDelegate.subnote.sketchpadTrack);
                             }
                         }
                     }

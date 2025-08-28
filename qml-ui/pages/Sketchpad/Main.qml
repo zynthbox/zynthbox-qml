@@ -560,11 +560,49 @@ Zynthian.ScreenPage {
                                                     valueLabel: Zynthbox.KeyScales.scaleName(thePattern.scaleKey),
                                                     setValueFunction: valueSetter,
                                                     showValueLabel: true,
-                                                    showResetToDefault: false,
+                                                    showResetToDefault: true,
                                                     showVisualZero: false
                                                 })
                 }
                 valueSetter(Zynthbox.KeyScales.scaleEnumKeyToIndex(thePattern.scaleKey) + sign);
+            } else {
+                console.log("Clip ID is out of range:", clipId);
+            }
+        } else {
+            console.log("Track ID is out of range:", trackId);
+        }
+    }
+    /**
+     * Change the given clip's default velocity
+     * @param trackId The track on which the clip exists
+     * @param clipId the id of the clip in the given track
+     * @param sign Sign to determine if the value should be incremented / decremented. Pass 1 to increment, and -1 to decrement. Pass 0 to simply display the OSD without changing the value.
+     */
+    function updateClipDefaultVelocity(trackId, clipId, sign) {
+        if (-1 < trackId && trackId < Zynthbox.Plugin.sketchpadTrackCount) {
+            if (-1 < clipId && clipId < Zynthbox.Plugin.sketchpadSlotCount) {
+                let theSequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
+                let thePattern = sequence.getByClipId(trackId, clipId);
+                function valueSetter(value) {
+                    thePattern.defaultVelocity = value;
+                    applicationWindow().showOsd({
+                                                    parameterName: "clip_default_velocity",
+                                                    description: qsTr("Clip %1%2 Default Velocity").arg(trackId + 1).arg(thePattern.clipName),
+                                                    start: 1,
+                                                    stop: 127,
+                                                    step: 1,
+                                                    defaultValue: 64,
+                                                    currentValue: thePattern.defaultVelocity,
+                                                    startLabel: "",
+                                                    stopLabel: "",
+                                                    valueLabel: thePattern.defaultVelocity,
+                                                    setValueFunction: valueSetter,
+                                                    showValueLabel: true,
+                                                    showResetToDefault: true,
+                                                    showVisualZero: false
+                                                })
+                }
+                valueSetter(thePattern.defaultVelocity + sign);
             } else {
                 console.log("Clip ID is out of range:", clipId);
             }

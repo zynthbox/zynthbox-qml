@@ -603,6 +603,39 @@ Item {
                 returnValue = true;
                 break;
 
+            case "SWITCH_PLAY":
+                if (_private.interactionMode === 0 && (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed)) {
+                    // When in stepsequencer mode and holding down any step button, test-run that step's entries when you tap play
+                    component.ignoreHeldStepButtonsReleases();
+                    let workingModel = _private.pattern.workingModel;
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            let stepNote = workingModel.getNote(workingModel.activeBar, stepButtonIndex);
+                            if (stepNote) {
+                                for (let subnoteIndex = 0; subnoteIndex < stepNote.subnotes.length; ++subnoteIndex) {
+                                    let subnote = stepNote.subnotes[subnoteIndex];
+                                    let velocity = workingModel.subnoteMetadata(workingModel.activeBar, stepButtonIndex, subnoteIndex, "velocity");
+                                    if (typeof(velocity) === "undefined") {
+                                        velocity = 64;
+                                    }
+                                    let duration = workingModel.subnoteMetadata(workingModel.activeBar, stepButtonIndex, subnoteIndex, "duration");
+                                    if (typeof(duration) === "undefined") {
+                                        duration = _private.stepDuration;
+                                    }
+                                    let delay = workingModel.subnoteMetadata(workingModel.activeBar, stepButtonIndex, subnoteIndex, "delay");
+                                    if (typeof(delay) === "undefined") {
+                                        delay = 0;
+                                    }
+                                    Zynthbox.PlayGridManager.scheduleNote(subnote.midiNote, 0, true, velocity, duration, delay, subnote.sketchpadTrack);
+                                }
+                            }
+                        }
+                    }
+                    returnValue = true;
+                } else {
+                    // Don't do anything with the play button unless a step button is held down
+                }
+                break;
             case "SWITCH_MODE_RELEASED":
                 if (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed) {
                     // Don't allow switching modes when holding down a button, that just makes interaction weird...
@@ -650,9 +683,12 @@ Item {
         }
 
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
-            property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
+        property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
         property color stepHighlighted: Qt.rgba(0.1, 0.5, 0.5)
         property color stepCurrent: Qt.rgba(0.4, 0.4, 0.0)
+
+        readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
+        property int stepDuration: pattern ? (pattern.stepLength / patternSubbeatToTickMultiplier) : 0
 
         property var heardNotes: []
         property var heardVelocities: []

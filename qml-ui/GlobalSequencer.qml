@@ -99,7 +99,7 @@ Item {
                 }
             } else {
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
-                console.log("Toggle entry for step", stepOffset + stepButtonIndex);
+                // console.log("Toggle entry for step", stepOffset + stepButtonIndex);
                 if (_private.heardNotes.length > 0) {
                     let workingModel = _private.pattern.workingModel;
                     let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
@@ -606,6 +606,7 @@ Item {
             case "SWITCH_PLAY":
                 if (_private.interactionMode === 0 && (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed)) {
                     // When in stepsequencer mode and holding down any step button, test-run that step's entries when you tap play
+                    // TODO This probably want to pass through PatternModel, using some manner of fanciness to reuse the scheduling logic so we can ensure all the various settings are included (like probability, ratchet, etc)
                     component.ignoreHeldStepButtonsReleases();
                     let workingModel = _private.pattern.workingModel;
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
@@ -683,6 +684,7 @@ Item {
         }
 
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
+        property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.2)
         property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
         property color stepHighlighted: Qt.rgba(0.1, 0.5, 0.5)
         property color stepCurrent: Qt.rgba(0.4, 0.4, 0.0)
@@ -695,6 +697,7 @@ Item {
         property int noteListeningActivations: 0
         property var noteListeningNotes: []
         property var noteListeningVelocities: []
+        onHeardNotesChanged: updateLedColors()
 
         property QtObject starNote: null
         property int starVelocity: pattern ? pattern.defaultVelocity : 64
@@ -748,12 +751,28 @@ Item {
                     zynqtgui.led_config.setStepButtonColor(stepIndex + 8, stepColor);
                 }
             } else {
+                let heardNoteValues = [];
+                for (let i = 0; i < heardNotes.length; ++i) {
+                    heardNoteValues.push(heardNotes[i].midiNote);
+                }
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                     let stepColor = _private.stepEmpty;
                     let stepNote = workingModel.getNote(workingModel.activeBar + workingModel.bankOffset, stepIndex)
                     if (stepNote != null && stepNote.subnotes.length > 0) {
-                        stepColor = _private.stepWithNotes;
+                        let atLeastOneHeard = false;
+                        for (let subnoteIndex = 0; subnoteIndex < stepNote.subnotes.length; ++subnoteIndex) {
+                            let subnote = stepNote.subnotes[subnoteIndex];
+                            if (heardNoteValues.includes(subnote.midiNote)) {
+                                atLeastOneHeard = true;
+                                break;
+                            }
+                        }
+                        if (atLeastOneHeard) {
+                            stepColor = _private.stepWithNotes;
+                        } else {
+                            stepColor = _private.stepWithNotesDimmed;
+                        }
                     }
                     let actualStepIndex = stepOffset + stepIndex;
                     if (workingModel.playbackPosition === actualStepIndex) {

@@ -100,14 +100,9 @@ if command -v kwin_x11 &> /dev/null; then
 
     # Enable qml debuuger if ZYNTHBOX_DEBUG env variable is set
     if [ -z "$ZYNTHBOX_DEBUG" ]; then
-        export ZYNTHIAN_LOG_LEVEL=20
-
         python3 -X faulthandler ./bootlog_window.py &
         python3 -X faulthandler ./zynthian_qt_gui.py
     else
-        export ZYNTHIAN_LOG_LEVEL=10
-        extra_args=""
-
         if [ "$ZYNTHBOX_DEBUG" = "block" ]; then
             extra_args="$extra_args,block"
         fi

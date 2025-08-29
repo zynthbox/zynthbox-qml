@@ -27,7 +27,7 @@ import os
 import logging
 
 from PySide2.QtCore import Signal, Property
-from . import zynthian_qt_gui_base
+from . import zynthian_qt_gui_base, zynthian_gui_config
 
 class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     data_dir = os.environ.get("ZYNTHIAN_DATA_DIR", "/zynthian/zynthian-data")
@@ -90,6 +90,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
             self.__debugMode = value
             self.zynqtgui.global_settings.setValue("UI/debugMode", self.__debugMode)
             self.debugModeChanged.emit()
+            zynthian_gui_config.reset_log_level()
 
     debugModeChanged = Signal()
 

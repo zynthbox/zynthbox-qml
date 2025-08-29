@@ -32,21 +32,45 @@ from PIL import Image, ImageTk
 
 # Zynthian specific modules
 import zynconf
+from PySide2.QtCore import QSettings
 
 #******************************************************************************
+
+#------------------------------------------------------------------------------
+# Zynthian GUI variable
+#------------------------------------------------------------------------------
+
+zynqtgui=None
 
 #------------------------------------------------------------------------------
 # Log level and debuging
 #------------------------------------------------------------------------------
 
-log_level=int(os.environ.get('ZYNTHIAN_LOG_LEVEL',logging.WARNING))
-#log_level=logging.DEBUG
+def reset_log_level():
+    global zynqtgui
 
-logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s: %(message)s', stream=sys.stderr, level=log_level)
-logging.getLogger().setLevel(level=log_level)
+    # Set default(fallback) log level to INFO
+    log_level = logging.INFO
 
-# Reduce log level for other modules
-logging.getLogger("urllib3").setLevel(logging.WARNING)
+    # If log level env variable is set, give it max priority
+    if "ZYNTHIAN_LOG_LEVEL" in os.environ:
+        log_level = int(os.environ.get('ZYNTHIAN_LOG_LEVEL',logging.WARNING))
+    # If log level env variable is not set, check if zynqtgui is initialized
+    # If not initialized, then the application is starting up. So read the debugMode value from config file and set log level accordingly
+    elif zynqtgui is None:
+        global_settings = QSettings("zynthbox", "zynthbox-qml")
+        if global_settings.value("UI/debugMode", "false") == "true":
+            log_level = logging.DEBUG
+    # If zynqtgui is initialized, directly read the debugMode property value to set the logging level accordingly
+    elif zynqtgui.ui_settings.debugMode:
+        log_level = logging.DEBUG
+
+    logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s: %(message)s', stream=sys.stderr, level=log_level)
+    logging.getLogger().setLevel(level=log_level)
+    # Reduce log level for other modules
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+reset_log_level()
 
 logging.info("ZYNTHIAN-UI CONFIG ...")
 
@@ -482,11 +506,5 @@ if "zynthian_gui.py" in sys.argv[0]:
 
     except Exception as e:
         logging.error("Failed to configure geometry => {}".format(e))
-
-#------------------------------------------------------------------------------
-# Zynthian GUI variable
-#------------------------------------------------------------------------------
-
-zynqtgui=None
 
 #------------------------------------------------------------------------------

@@ -9,26 +9,26 @@ from PySide2.QtQml import QQmlApplicationEngine
 
 import Zynthbox # Only use the most basic parts of this, as it will be uninitialised (in our case here, only FifoHelper)
 
-logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s: %(message)s', stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s: %(message)s', stream=sys.stderr, level=logging.INFO)
 
 
 class BootLogInterface(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        logging.error("Starting bootlog display")
+        logging.info("Starting bootlog display")
         self.__boot_log = "Initializing"
         self.__boot_log_file = None
 
         self.__bootCompleted = False
         self.exit_flag = False
 
-        logging.error("Initialising bootlog reader")
+        logging.info("Initialising bootlog reader")
         if not os.path.exists("/tmp/bootlog.fifo"):
             os.mkfifo("/tmp/bootlog.fifo")
         self.fifoReader = Zynthbox.FifoHandler("/tmp/bootlog.fifo", Zynthbox.FifoHandler.ReadingDirection, self)
         self.fifoReader.received.connect(self.handleData)
-        logging.error("Starting thread")
+        logging.info("Starting thread")
         self.fifoReader.start()
 
     @Slot(None)

@@ -83,4 +83,12 @@ Card {
             text: root.controller.ctrl ? root.controller.ctrl.midi_bind : ""
         }
     }
+
+    Text {
+        visible: zynqtgui.ui_settings.displayDebugLabels
+        text: root.controller.ctrl.symbol
+        font.family: "Hack"
+        font.pointSize: 8
+        color: "orange"
+    }
 }

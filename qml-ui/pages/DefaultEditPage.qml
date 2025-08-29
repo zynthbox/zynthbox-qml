@@ -327,6 +327,15 @@ RowLayout {
                     }
                 }
             }
+
+            Text {
+                visible: zynqtgui.ui_settings.displayDebugLabels
+                text: zynqtgui.curlayerEngineName+":"+zynqtgui.curlayerEngineId
+                font.family: "Hack"
+                font.pointSize: 8
+                color: "orange"
+                anchors.bottom: parent.bottom
+            }
         }
     }
 }

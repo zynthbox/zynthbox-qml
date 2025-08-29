@@ -39,6 +39,8 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.doubleClickThresholdChanged.emit()
         self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "false") == "true" else False
         self.hardwareSequencerChanged.emit();
+        self.__displayDebugLabels = True if self.zynqtgui.global_settings.value("UI/displayDebugLabels", "false") == "true" else False
+        self.displayDebugLabelsChanged.emit();
 
     def fill_list(self):
         super().fill_list()
@@ -78,5 +80,20 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     hardwareSequencer = Property(bool, get_hardwareSequencer, set_hardwareSequencer, notify=hardwareSequencerChanged)
     ### END Property hardwareSequencer
+
+    ### BEGIN Property displayDebugLabels
+    def get_displayDebugLabels(self):
+        return self.__displayDebugLabels
+
+    def set_displayDebugLabels(self, value):
+        if value != self.__doubleClickThreshold:
+            self.__displayDebugLabels = value
+            self.zynqtgui.global_settings.setValue("UI/displayDebugLabels", self.__displayDebugLabels)
+            self.displayDebugLabelsChanged.emit()
+
+    displayDebugLabelsChanged = Signal()
+
+    displayDebugLabels = Property(bool, get_displayDebugLabels, set_displayDebugLabels, notify=displayDebugLabelsChanged)
+    ### END Property displayDebugLabels
 
 # ------------------------------------------------------------------------------

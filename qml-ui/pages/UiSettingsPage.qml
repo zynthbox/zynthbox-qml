@@ -117,13 +117,13 @@ Zynthian.ScreenPage {
             QQC2.Label {
                 Layout.fillWidth: false
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                text: qsTr("Display Debug Labels")
+                text: qsTr("Debug Mode")
             }
             QQC2.Switch {
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                checked: zynqtgui.ui_settings.displayDebugLabels
+                checked: zynqtgui.ui_settings.debugMode
                 onClicked: {
-                    zynqtgui.ui_settings.displayDebugLabels = checked;
+                    zynqtgui.ui_settings.debugMode = checked;
                 }
             }
             Rectangle {
@@ -138,7 +138,7 @@ Zynthian.ScreenPage {
 
                 QQC2.Label {
                     anchors.centerIn: parent
-                    text: zynqtgui.ui_settings.displayDebugLabels ? qsTr("Enabled") : qsTr("Disabled")
+                    text: zynqtgui.ui_settings.debugMode ? qsTr("Enabled") : qsTr("Disabled")
                 }
             }
         }

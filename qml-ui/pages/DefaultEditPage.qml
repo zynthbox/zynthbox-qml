@@ -329,7 +329,7 @@ RowLayout {
             }
 
             Text {
-                visible: zynqtgui.ui_settings.displayDebugLabels
+                visible: zynqtgui.ui_settings.debugMode
                 text: zynqtgui.curlayerEngineName+":"+zynqtgui.curlayerEngineId
                 font.family: "Hack"
                 font.pointSize: 8

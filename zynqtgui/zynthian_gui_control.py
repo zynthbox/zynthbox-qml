@@ -165,8 +165,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.x_zctrl=None
         self.y_zctrl=None
 
-        self.load_config()
-
         self.show()
         self.sync_selectors_visibility()
 
@@ -198,35 +196,6 @@ class zynthian_gui_control(zynthian_gui_selector):
                 ctrl.hide()
             for ctrl in self.zgui_custom_controllers_map.values():
                 ctrl.hide()
-
-    def load_config(self):
-        json = None
-        fpath = "/zynthian/config/control_page.conf"
-        try:
-            with open(fpath, "r") as fh:
-                json = fh.read()
-                # logging.debug("Loading control config %s => \n%s" % (fpath, json))
-
-        except Exception as e:
-            logging.error("Can't load control config '%s': %s" % (fpath, e))
-
-        try:
-            self.__conf = JSONDecoder().decode(json)
-            if self.__single_effect_engine == None:
-                if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.engine.nickname in self.__conf:
-                    self.set_custom_control_page(self.__conf[self.zynqtgui.curlayer.engine.nickname]["custom_control_page"])
-                else:
-                    self.set_custom_control_page("")
-            else:
-                if self.__single_effect_engine in self.__conf:
-                    self.set_custom_control_page(self.__conf[self.__single_effect_engine]["custom_control_page"])
-                else:
-                    self.set_custom_control_page("")
-        except Exception as e:
-            logging.error("Can't parse control config '%s': %s" % (fpath, e))
-            if self.__single_effect_engine != None:
-                self.set_custom_control_page("")
-
 
     def set_single_effect_engine(self, eng : str):
         if self.__single_effect_engine == eng:
@@ -752,8 +721,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.lock_controllers()
 
         self.controllers_count_changed.emit()
-
-        self.load_config()
 
         if self.__last_custom_control_page != self.get_custom_control_page():
             self.custom_control_page_changed.emit()

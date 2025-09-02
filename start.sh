@@ -43,10 +43,6 @@ function load_config_env() {
     else
         source "$ZYNTHIAN_MY_DATA_DIR/midi-profiles/default.sh"
     fi
-
-    if [ -f "$ZYNTHIAN_CONFIG_DIR/zynthian_custom_config.sh" ]; then
-        source "$ZYNTHIAN_CONFIG_DIR/zynthian_custom_config.sh"
-    fi
 }
 
 function screensaver_off() {

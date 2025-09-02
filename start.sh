@@ -32,16 +32,10 @@
 #------------------------------------------------------------------------------
 
 function load_config_env() {
-    if [ -d "$ZYNTHIAN_CONFIG_DIR" ]; then
-        source "$ZYNTHIAN_CONFIG_DIR/zynthian_envars.sh"
-    else
-        source "$ZYNTHIAN_SYS_DIR/scripts/zynthian_envars.sh"
-    fi
+    source "$ZYNTHIAN_SYS_DIR/config/zynthian_envars.sh"
 
     if [ ! -z "$ZYNTHIAN_SCRIPT_MIDI_PROFILE" ]; then
         source "$ZYNTHIAN_SCRIPT_MIDI_PROFILE"
-    else
-        source "$ZYNTHIAN_MY_DATA_DIR/midi-profiles/default.sh"
     fi
 }
 

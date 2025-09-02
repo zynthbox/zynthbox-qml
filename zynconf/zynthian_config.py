@@ -122,18 +122,15 @@ sys_dir = os.environ.get('ZYNTHIAN_SYS_DIR',"/zynthian/zynthian-sys")
 #-------------------------------------------------------------------------------
 
 def get_config_fpath():
-    fpath=os.environ.get('ZYNTHIAN_CONFIG_DIR','/zynthian/zynthian-sys/scripts')+"/zynthian_envars.sh"
+    fpath=os.environ.get('ZYNTHIAN_SYS_DIR')+"/config/zynthian_envars.sh"
     if not os.path.isfile(fpath):
-        fpath=os.environ.get('ZYNTHIAN_SYS_DIR')+"/scripts/zynthian_envars.sh"
-    elif not os.path.isfile(fpath):
         fpath="./zynthian_envars.sh"
     return fpath
 
 
 def get_midi_config_fpath(fpath=None):
     if not fpath:
-        fpath=os.environ.get("ZYNTHIAN_SCRIPT_MIDI_PROFILE",
-            os.environ.get("ZYNTHIAN_MY_DATA_DIR", "/zynthian/zynthian-my-data") + "/midi-profiles/default.sh")
+        fpath=os.environ.get("ZYNTHIAN_SCRIPT_MIDI_PROFILE","/zynthian/config/midi-profiles/default.sh")
     if not os.path.isfile(fpath):
         #Try to copy from default template
         default_src= "%s/config/default_midi_profile.sh" % os.getenv('ZYNTHIAN_SYS_DIR',"/zynthian/zynthian-sys")

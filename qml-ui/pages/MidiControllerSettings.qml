@@ -388,7 +388,7 @@ Zynthian.ScreenPage {
         id: valueSpecifierPicker
         visible: false;
         property int valueSpecifier: -1
-        function pickEvent(currentValueSpecifier, callbackFunction) {
+        function pickValue(currentValueSpecifier, callbackFunction) {
             for (let testIndex = 0; testIndex < model.count; ++testIndex) {
                 let testElement = model.get(testIndex);
                 if (testElement.value === currentValueSpecifier) {

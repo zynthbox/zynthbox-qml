@@ -215,14 +215,14 @@ QQC2.ScrollView {
                 text: component.filterObject === null
                     ? ""
                     : Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterObject.cuiaEvent)
-                        ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterRuleObject.cuiaSlot))
+                        ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterObject.cuiaSlot))
                         : Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterObject.cuiaEvent)
-                            ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.soundSlotLabelText(component.filterRuleObject.cuiaSlot))
+                            ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.soundSlotLabelText(component.filterObject.cuiaSlot))
                             : Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterObject.cuiaEvent)
-                                ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterRuleObject.cuiaSlot))
-                                : qsTr("Sketchpad Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterRuleObject.cuiaSlot))
+                                ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterObject.cuiaSlot))
+                                : qsTr("Sketchpad Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterObject.cuiaSlot))
                 onClicked: {
-                    slotType = -1;
+                    let slotType = -1;
                     if (Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterObject.cuiaEvent)) {
                         slotType = 0;
                     } else if(Zynthbox.CUIAHelper.cuiaEventWantsASoundSlot(component.filterObject.cuiaEvent)) {

@@ -32,6 +32,7 @@ from time import sleep
 from shutil import copyfile
 from subprocess import check_output
 from collections import OrderedDict
+from pathlib import Path
 
 #-------------------------------------------------------------------------------
 # Configure logging
@@ -122,10 +123,11 @@ sys_dir = os.environ.get('ZYNTHIAN_SYS_DIR',"/zynthian/zynthian-sys")
 #-------------------------------------------------------------------------------
 
 def get_config_fpath():
-    fpath=os.environ.get('ZYNTHIAN_SYS_DIR')+"/config/zynthian_envars.sh"
-    if not os.path.isfile(fpath):
-        fpath="./zynthian_envars.sh"
-    return fpath
+    # All custom config should be saved to user envars file
+    fpath = Path(os.environ.get('ZYNTHIAN_CONFIG_DIR', '/zynthian/config')) / "zynthian_envars.user.sh"
+    if not fpath.exists():
+        fpath.touch(exist_ok=True)
+    return str(fpath)
 
 
 def get_midi_config_fpath(fpath=None):

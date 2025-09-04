@@ -2573,6 +2573,28 @@ class zynthian_gui(QObject):
                     self.step4ButtonPressed = True
                 elif i == 16:
                     self.step5ButtonPressed = True
+                elif i == 34:
+                    self.step6ButtonPressed = True
+                elif i == 35:
+                    self.step7ButtonPressed = True
+                elif i == 36:
+                    self.step8ButtonPressed = True
+                elif i == 37:
+                    self.step9ButtonPressed = True
+                elif i == 38:
+                    self.step10ButtonPressed = True
+                elif i == 39:
+                    self.step11ButtonPressed = True
+                elif i == 40:
+                    self.step12ButtonPressed = True
+                elif i == 41:
+                    self.step13ButtonPressed = True
+                elif i == 42:
+                    self.step14ButtonPressed = True
+                elif i == 43:
+                    self.step15ButtonPressed = True
+                elif i == 44:
+                    self.step16ButtonPressed = True
                 elif i == 17:
                     self.altButtonPressed = True
                 elif i == 18:
@@ -2628,6 +2650,28 @@ class zynthian_gui(QObject):
                     self.step4ButtonPressed = False
                 elif i == 16:
                     self.step5ButtonPressed = False
+                elif i == 34:
+                    self.step6ButtonPressed = False
+                elif i == 35:
+                    self.step7ButtonPressed = False
+                elif i == 36:
+                    self.step8ButtonPressed = False
+                elif i == 37:
+                    self.step9ButtonPressed = False
+                elif i == 38:
+                    self.step10ButtonPressed = False
+                elif i == 39:
+                    self.step11ButtonPressed = False
+                elif i == 40:
+                    self.step12ButtonPressed = False
+                elif i == 41:
+                    self.step13ButtonPressed = False
+                elif i == 42:
+                    self.step14ButtonPressed = False
+                elif i == 43:
+                    self.step15ButtonPressed = False
+                elif i == 44:
+                    self.step16ButtonPressed = False
                 elif i == 17:
                     self.altButtonPressed = False
                 elif i == 18:
@@ -2733,6 +2777,7 @@ class zynthian_gui(QObject):
             fake_key = Key.enter
         elif i == 22:
             fake_key = Key.esc
+
         # Channel buttons
         elif i == 5:
             fake_key = "1"
@@ -2748,7 +2793,8 @@ class zynthian_gui(QObject):
         # Disable emitting key 6 as it will act as modifier
         # elif i == 10:
         #     fake_key = "6"
-        #F1 .. F5
+
+        #F1 .. F16
         elif i == 12:
             fake_key = Key.f1
         elif i == 13:
@@ -2759,6 +2805,29 @@ class zynthian_gui(QObject):
             fake_key = Key.f4
         elif i == 16:
             fake_key = Key.f5
+        # These new set of keys are from Z1_V1-16 c-board with 10 new buttons to be used as step buttons
+        elif i == 34:
+            fake_key = Key.f6
+        elif i == 35:
+            fake_key = Key.f7
+        elif i == 36:
+            fake_key = Key.f8
+        elif i == 37:
+            fake_key = Key.f9
+        elif i == 38:
+            fake_key = Key.f10
+        elif i == 39:
+            fake_key = Key.f11
+        elif i == 40:
+            fake_key = Key.f12
+        elif i == 41:
+            fake_key = Key.f13
+        elif i == 42:
+            fake_key = Key.f14
+        elif i == 43:
+            fake_key = Key.f15
+        elif i == 44:
+            fake_key = Key.f16
 
         if fake_key == None:
             return False

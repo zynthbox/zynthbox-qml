@@ -385,6 +385,72 @@ Item {
                 component.handleStepButtonPress(15);
                 returnValue = true;
                 break;
+
+            case "STEP_1":
+                component.handleStepButtonPress(0);
+                returnValue = true;
+                break;
+            case "STEP_2":
+                component.handleStepButtonPress(1);
+                returnValue = true;
+                break;
+            case "STEP_3":
+                component.handleStepButtonPress(2);
+                returnValue = true;
+                break;
+            case "STEP_4":
+                component.handleStepButtonPress(3);
+                returnValue = true;
+                break;
+            case "STEP_5":
+                component.handleStepButtonPress(4);
+                returnValue = true;
+                break;
+            case "STEP_6":
+                component.handleStepButtonPress(5);
+                returnValue = true;
+                break;
+            case "STEP_7":
+                component.handleStepButtonPress(6);
+                returnValue = true;
+                break;
+            case "STEP_8":
+                component.handleStepButtonPress(7);
+                returnValue = true;
+                break;
+            case "STEP_9":
+                component.handleStepButtonPress(8);
+                returnValue = true;
+                break;
+            case "STEP_10":
+                component.handleStepButtonPress(9);
+                returnValue = true;
+                break;
+            case "STEP_11":
+                component.handleStepButtonPress(10);
+                returnValue = true;
+                break;
+            case "STEP_12":
+                component.handleStepButtonPress(11);
+                returnValue = true;
+                break;
+            case "STEP_13":
+                component.handleStepButtonPress(12);
+                returnValue = true;
+                break;
+            case "STEP_14":
+                component.handleStepButtonPress(13);
+                returnValue = true;
+                break;
+            case "STEP_15":
+                component.handleStepButtonPress(14);
+                returnValue = true;
+                break;
+            case "STEP_16":
+                component.handleStepButtonPress(15);
+                returnValue = true;
+                break;
+
             case "SWITCH_BACK_SHORT":
                 component.ignoreHeldStepButtonsReleases();
                 break;

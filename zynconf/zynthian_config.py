@@ -136,6 +136,7 @@ def get_midi_config_fpath(fpath=None):
     if not os.path.isfile(fpath):
         #Try to copy from default template
         default_src= "%s/config/default_midi_profile.sh" % os.getenv('ZYNTHIAN_SYS_DIR',"/zynthian/zynthian-sys")
+        Path(fpath).parent.mkdir(parents=True, exist_ok=True)
         copyfile(default_src, fpath)
 
     return fpath

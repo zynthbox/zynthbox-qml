@@ -744,7 +744,7 @@
       }
     },
     "ZBP_FX_00006": {
-      "displayName": "CS10QS",
+      "displayName": "Calf Compressor",
       "description": null,
       "longDescription": null,
       "image": null,
@@ -758,13 +758,13 @@
       "versions": {
         "0000": {
           "visible": true,
-          "pluginName": "CS10QS",
+          "pluginName": "Calf Compressor",
           "format": "LV2",
-          "path": "/usr/lib/lv2/sapistaEQv2.lv2/",
+          "path": "/usr/lib/lv2/calf.lv2",
           "engineType": "jalv",
           "sha256sum": null,
           "zynthboxVersionAdded": "1.0",
-          "url": "http://eq10q.sourceforge.net/compressor_stereo",
+          "url": "http://calf.sourceforge.net/plugins/Compressor",
           "volumeControls": null,
           "cutoffControls": null,
           "resonanceControls": null
@@ -772,7 +772,7 @@
       }
     },
     "ZBP_FX_00007": {
-      "displayName": "CS10QS-SC",
+      "displayName": "GxCompressor",
       "description": null,
       "longDescription": null,
       "image": null,
@@ -786,13 +786,13 @@
       "versions": {
         "0000": {
           "visible": true,
-          "pluginName": "CS10QS-SC",
+          "pluginName": "GxCompressor",
           "format": "LV2",
-          "path": "/usr/lib/lv2/sapistaEQv2.lv2/",
+          "path": "/zynthian/zynthian-plugins/lv2/gx_compressor.lv2",
           "engineType": "jalv",
           "sha256sum": null,
           "zynthboxVersionAdded": "1.0",
-          "url": "http://eq10q.sourceforge.net/compressor_stereo_sc",
+          "url": "http://guitarix.sourceforge.net/plugins/gx_compressor#_compressor",
           "volumeControls": null,
           "cutoffControls": null,
           "resonanceControls": null

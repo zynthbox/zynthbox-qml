@@ -2765,69 +2765,77 @@ class zynthian_gui(QObject):
             fake_key = Key.space
 
         # NAV CLUSTER
-        if i == 23:
-            fake_key = Key.up
-        elif i == 26:
-            fake_key = Key.down
-        elif i == 25:
-            fake_key = Key.left
-        elif i == 27:
-            fake_key = Key.right
-        elif i == 24:
-            fake_key = Key.enter
-        elif i == 22:
-            fake_key = Key.esc
+        match i:
+            case 23:
+                fake_key = Key.up
+            case 26:
+                fake_key = Key.down
+            case 25:
+                fake_key = Key.left
+            case 27:
+                fake_key = Key.right
+            case 24:
+                fake_key = Key.enter
+            case 22:
+                fake_key = Key.esc
 
-        # Channel buttons
-        elif i == 5:
-            fake_key = "1"
-        elif i == 6:
-            fake_key = "2"
-        elif i == 7:
-            fake_key = "3"
-        elif i == 8:
-            fake_key = "4"
-        elif i == 9:
-            fake_key = "5"
+            # Channel buttons
+            case 5:
+                fake_key = "1"
+            case 6:
+                fake_key = "2"
+            case 7:
+                fake_key = "3"
+            case 8:
+                fake_key = "4"
+            case 9:
+                fake_key = "5"
 
-        # Disable emitting key 6 as it will act as modifier
-        # elif i == 10:
-        #     fake_key = "6"
+            # Disable emitting key 6 as it will act as modifier
+            # case 10:
+            #     fake_key = "6"
 
-        #F1 .. F16
-        elif i == 12:
-            fake_key = Key.f1
-        elif i == 13:
-            fake_key = Key.f2
-        elif i == 14:
-            fake_key = Key.f3
-        elif i == 15:
-            fake_key = Key.f4
-        elif i == 16:
-            fake_key = Key.f5
-        # These new set of keys are from Z1_V1-16 c-board with 10 new buttons to be used as step buttons
-        elif i == 34:
-            fake_key = Key.f6
-        elif i == 35:
-            fake_key = Key.f7
-        elif i == 36:
-            fake_key = Key.f8
-        elif i == 37:
-            fake_key = Key.f9
-        elif i == 38:
-            fake_key = Key.f10
-        elif i == 39:
-            fake_key = Key.f11
-        elif i == 40:
-            fake_key = Key.f12
-        elif i == 41:
-            fake_key = Key.f13
-        elif i == 42:
-            fake_key = Key.f14
-        elif i == 43:
-            fake_key = Key.f15
-        elif i == 44:
-            fake_key = Key.f16
+            #F1 .. F16
+            case 12 | 13 | 14 | 15 | 16 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44:
+                if self.ui_settings.hardwareSequencer:
+                    # When step buttons are pressed, stop key event propagation as the pressed handlers will emit appropriate CUIA events
+                    # If key event is not consumed, it will cause the gui_config.custom_switch_ui_actions to emit, which we do not want to happen in hardwareSequencer mode.
+                    return True
+                else:
+                    match i:
+                        case 12:
+                            fake_key = Key.f1
+                        case 13:
+                            fake_key = Key.f2
+                        case 14:
+                            fake_key = Key.f3
+                        case 15:
+                            fake_key = Key.f4
+                        case 16:
+                            fake_key = Key.f5
+                        # These new set of keys are from Z1_V1-16 c-board with 10 new buttons to be used as step buttons
+                        case 34:
+                            fake_key = Key.f6
+                        case 35:
+                            fake_key = Key.f7
+                        case 36:
+                            fake_key = Key.f8
+                        case 37:
+                            fake_key = Key.f9
+                        case 38:
+                            fake_key = Key.f10
+                        case 39:
+                            fake_key = Key.f11
+                        case 40:
+                            fake_key = Key.f12
+                        case 41:
+                            fake_key = Key.f13
+                        case 42:
+                            fake_key = Key.f14
+                        case 43:
+                            fake_key = Key.f15
+                        case 44:
+                            fake_key = Key.f16
 
         if fake_key == None:
             return False
@@ -3504,6 +3512,12 @@ class zynthian_gui(QObject):
 
         if action != None:
             zynqtgui.callable_ui_action(action)
+            # If action is a SWITCH_STEP*_DOWN, also call the corresponding RELEASED action
+            # This will enable using keyboard F buttons as step buttons in hardwareSequencer mode
+            # TODO : This is a bit hacky. The proper solution would be to detect keyboard key press and release events
+            match_result = re.match(r"SWITCH_STEP\d+_DOWN", action)
+            if match_result:
+                zynqtgui.callable_ui_action(action.replace("DOWN", "RELEASED"))
 
     @Slot("void")
     def go_back(self):

@@ -109,7 +109,7 @@ Zynthian.ScreenPage {
                     text: zynqtgui.ui_settings.hardwareSequencer ? qsTr("Enabled") : qsTr("Disabled")
                 }
             }
-        }        
+        }
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: false
@@ -139,6 +139,38 @@ Zynthian.ScreenPage {
                 QQC2.Label {
                     anchors.centerIn: parent
                     text: zynqtgui.ui_settings.debugMode ? qsTr("Enabled") : qsTr("Disabled")
+                }
+            }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+
+            QQC2.Label {
+                Layout.fillWidth: false
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                text: qsTr("Show Cursor")
+            }
+            QQC2.Switch {
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                checked: zynqtgui.ui_settings.showCursor
+                onClicked: {
+                    zynqtgui.ui_settings.showCursor = checked;
+                }
+            }
+            Rectangle {
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                color: Kirigami.Theme.backgroundColor
+                border.color: "#ff999999"
+                border.width: 2
+                radius: 4
+
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    text: zynqtgui.ui_settings.showCursor ? qsTr("Enabled") : qsTr("Disabled")
                 }
             }
         }

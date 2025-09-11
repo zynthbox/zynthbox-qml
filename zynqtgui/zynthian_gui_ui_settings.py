@@ -26,8 +26,10 @@
 import os
 import logging
 
-from PySide2.QtCore import Signal, Property
+from PySide2.QtCore import Signal, Property, Qt
+from PySide2.QtGui import QPixmap, QCursor
 from . import zynthian_qt_gui_base, zynthian_gui_config
+import zynconf
 
 class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     data_dir = os.environ.get("ZYNTHIAN_DATA_DIR", "/zynthian/zynthian-data")
@@ -40,6 +42,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "false") == "true" else False
         self.hardwareSequencerChanged.emit();
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
+        self.__showCursor = True if os.environ.get("ZYNTHIAN_UI_ENABLE_CURSOR", "0") == "1" else False
         self.debugModeChanged.emit();
 
     def fill_list(self):
@@ -96,5 +99,26 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     debugMode = Property(bool, get_debugMode, set_debugMode, notify=debugModeChanged)
     ### END Property debugMode
+
+    ### BEGIN Property showCursor
+    def get_showCursor(self):
+        return self.__showCursor
+
+    def set_showCursor(self, value):
+        if value != self.__doubleClickThreshold:
+            self.__showCursor = value
+            if value == True or value == "1":
+                zynthian_gui_config.app.restoreOverrideCursor()
+            else:
+                nullCursor = QPixmap(16, 16);
+                nullCursor.fill(Qt.transparent);
+                zynthian_gui_config.app.setOverrideCursor(QCursor(nullCursor));
+            zynconf.save_config({"ZYNTHIAN_UI_ENABLE_CURSOR": "1" if value == True or value == "1" else "0"})
+            self.showCursorChanged.emit()
+
+    showCursorChanged = Signal()
+
+    showCursor = Property(bool, get_showCursor, set_showCursor, notify=showCursorChanged)
+    ### END Property showCursor
 
 # ------------------------------------------------------------------------------

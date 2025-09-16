@@ -105,7 +105,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         return self.__showCursor
 
     def set_showCursor(self, value):
-        if value != self.__doubleClickThreshold:
+        if value != self.__showCursor:
             self.__showCursor = value
             if value == True or value == "1":
                 zynthian_gui_config.app.restoreOverrideCursor()

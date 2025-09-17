@@ -165,11 +165,7 @@ GridLayout {
         horizontalAlignment: Qt.AlignRight
         verticalAlignment: Qt.AlignVCenter
         visible: control.showSlotTypeLabel
-        // font.bold: true
-        fontSizeMode: Text.Fit
-        minimumPointSize: 6
         wrapMode: Text.NoWrap
-        font.pointSize: 11
         text: {
             if (control.slotTypeLabel == "") {
                 switch (control.slotType) {

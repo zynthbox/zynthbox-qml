@@ -242,17 +242,27 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
         app = QGuiApplication.instance()
         font = app.font()
         font.setFamily(font_settings.value("family", "Roboto"))
-        font.setPointSize(int(font_settings.value("size", 12)))
+        font.setPointSize(int(font_settings.value("size", self.calculate_font_size())))
         app.setFont(font)
-
         font_settings.endGroup()
+
+    @Slot(result=int)
+    def calculate_font_size(self):
+        font_size = self.zynqtgui.global_settings.value("UI/fontSize", None)
+        # If font size is saved in config, use that
+        if font_size is not None:
+            return int(font_size)
+        else:
+            screen_width = QGuiApplication.instance().primaryScreen().size().width()
+            font_size = int((12 / 1024) * screen_width)
+            return font_size
 
 
     def apply_default_font(self):
         app = QGuiApplication.instance()
         font = app.font()
         font.setFamily("Roboto")
-        font.setPointSize(12)
+        font.setPointSize(self.calculate_font_size())
         app.setFont(font)
 
 

@@ -27,7 +27,7 @@ import os
 import logging
 
 from PySide2.QtCore import Signal, Property, Qt
-from PySide2.QtGui import QPixmap, QCursor
+from PySide2.QtGui import QPixmap, QCursor, QGuiApplication
 from . import zynthian_qt_gui_base, zynthian_gui_config
 import zynconf
 
@@ -43,6 +43,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.hardwareSequencerChanged.emit();
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
         self.__showCursor = True if os.environ.get("ZYNTHIAN_UI_ENABLE_CURSOR", "0") == "1" else False
+        self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
         self.debugModeChanged.emit();
 
     def fill_list(self):
@@ -120,5 +121,28 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     showCursor = Property(bool, get_showCursor, set_showCursor, notify=showCursorChanged)
     ### END Property showCursor
+
+    ### BEGIN Property fontSize
+    def get_fontSize(self):
+        return self.__fontSize
+
+    def set_fontSize(self, value):
+        if value != self.__fontSize:
+            self.__fontSize = value
+            self.zynqtgui.global_settings.setValue("UI/fontSize", self.__fontSize)
+            app = QGuiApplication.instance()
+            font = app.font()
+            font.setPointSize(self.__fontSize)
+            app.setFont(font)
+            self.fontSizeChanged.emit()
+
+    def reset_fontSize(self):
+        self.zynqtgui.global_settings.remove("UI/fontSize")
+        self.zynqtgui.theme_chooser.apply_font()
+
+    fontSizeChanged = Signal()
+
+    fontSize = Property(int, get_fontSize, set_fontSize, notify=fontSizeChanged)
+    ### END Property fontSize
 
 # ------------------------------------------------------------------------------

@@ -1178,6 +1178,7 @@ class zynthian_gui(QObject):
         # Instantiate Plugin helper before anything else as this will be used by some of the screens below
         self.__zynthbox_plugins_helper = zynthbox_plugins_helper(self)
 
+        self.screens["ui_settings"] = zynthian_gui_ui_settings(self)
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
         self.screens["confirm"] = zynthian_gui_confirm(self)
@@ -1239,7 +1240,6 @@ class zynthian_gui(QObject):
         self.screens["network"] = zynthian_gui_network(self)
         self.screens["network_info"] = self.screens["network"]
         self.screens["hardware"] = zynthian_gui_hardware(self)
-        self.screens["ui_settings"] = zynthian_gui_ui_settings(self)
         self.screens["test_knobs"] = zynthian_gui_test_knobs(self)
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)
 

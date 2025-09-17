@@ -174,6 +174,45 @@ Zynthian.ScreenPage {
                 }
             }
         }
+        // RowLayout {
+        //     Layout.fillWidth: true
+        //     Layout.fillHeight: false
+
+        //     QQC2.Label {
+        //         Layout.fillWidth: false
+        //         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+        //         text: qsTr("Font Size")
+        //     }
+        //     QQC2.Slider {
+        //         id: fontSizeSlider
+        //         Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+        //         from: 1
+        //         to: 100
+        //         stepSize: 1
+        //         value: zynqtgui.ui_settings.fontSize == null ? zynqtgui.theme_chooser.calculate_font_size() : zynqtgui.ui_settings.fontSize
+        //         onPressedChanged: {
+        //             // Set the value on release to save the value only when needed
+        //             if (!pressed) {
+        //                 zynqtgui.ui_settings.fontSize = value
+        //             }
+        //         }
+        //     }
+        //     Rectangle {
+        //         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+        //         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        //         Kirigami.Theme.inherit: false
+        //         Kirigami.Theme.colorSet: Kirigami.Theme.Button
+        //         color: Kirigami.Theme.backgroundColor
+        //         border.color: "#ff999999"
+        //         border.width: 2
+        //         radius: 4
+
+        //         QQC2.Label {
+        //             anchors.centerIn: parent
+        //             text: qsTr("%1 pt").arg(fontSizeSlider.value)
+        //         }
+        //     }
+        // }
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true

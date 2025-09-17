@@ -70,8 +70,8 @@ Rectangle {
                     valueBar: PlasmaCore.FrameSvgItem {
                         visible: audioGauge.value > audioGauge.minimumValue
                         id: grooveFill
-                        imagePath: "widgets/slider"
-                        prefix: "groove-highlight"
+                        imagePath: "widgets/bar_meter_vertical"
+                        prefix: "bar-active"
                         colorGroup: PlasmaCore.ColorScope.colorGroup
                         implicitWidth: 8
                     }
@@ -79,8 +79,8 @@ Rectangle {
                     background: PlasmaCore.FrameSvgItem {
                         id: svgBg
                         // visible: fromCurrentTheme
-                        imagePath: "widgets/slider"
-                        prefix: "groove"
+                        imagePath: "widgets/bar_meter_vertical"
+                        prefix: "bar-inactive"
                     }
 
                     minorTickmark: Item {

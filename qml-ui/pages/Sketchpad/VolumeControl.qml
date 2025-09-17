@@ -47,202 +47,182 @@ Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            Extras.Gauge {
+                id: audioGauge
+                anchors.centerIn: parent
+                anchors.horizontalCenterOffset: -8
+                height: parent.height
+
+                //Layout.fillHeight: true
+                //Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                //Layout.leftMargin: 4
+                minimumValue: -40
+                maximumValue: 20
+                value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
+
+                // Rectangle {
+                //     anchors.fill: parent
+                //     color: "blue"
+                // }
+
+                font.pointSize: 8
+                style: GaugeStyle {
+                    valueBar: PlasmaCore.FrameSvgItem {
+                        visible: audioGauge.value > audioGauge.minimumValue
+                        id: grooveFill
+                        imagePath: "widgets/slider"
+                        prefix: "groove-highlight"
+                        colorGroup: PlasmaCore.ColorScope.colorGroup
+                        implicitWidth: 8
+                    }
+
+                    background: PlasmaCore.FrameSvgItem {
+                        id: svgBg
+                        // visible: fromCurrentTheme
+                        imagePath: "widgets/slider"
+                        prefix: "groove"
+                    }
+
+                    minorTickmark: Item {
+                        implicitWidth: 8
+                        implicitHeight: 1
+
+                        Rectangle {
+                            color: "#cccccc"
+                            anchors.fill: parent
+                            anchors.leftMargin: 2
+                            anchors.rightMargin: 4
+                        }
+                    }
+                    tickmark: Item {
+                        implicitWidth: 12
+                        implicitHeight: 1
+
+                        Rectangle {
+                            color: "#dfdfdf"
+                            anchors.fill: parent
+                            anchors.leftMargin: 3
+                            anchors.rightMargin: 3
+                        }
+                    }
+                    tickmarkLabel: QQC2.Label {
+                        text: {
+                            switch (styleData.value) {
+                            case -40:
+                                return "-40"
+                            case 0:
+                                return "0"
+                            case 20:
+                                return "+20"
+                            default:
+                                return ""
+                            }
+                        }
+
+                        font: audioGauge.font
+                    }
+                }
+            }
+
             QQC2.Slider {
                 id: slider
+                anchors.top: audioGauge.top
+                anchors.bottom: audioGauge.bottom
+                anchors.margins: 6
 
-                anchors.centerIn: parent
-                height: parent.height
+                anchors {
+                    left: audioGauge.right
+                    leftMargin: 4
+                }
 
                 enabled: control.enabled
                 orientation: Qt.Vertical
                 from: -40
                 to: 20
                 stepSize: 1
+                handle: null
 
-                background: Item {
-                    implicitWidth: svgBg.implicitWidth
-                    implicitHeight: svgBg.implicitHeight
-
-                    PlasmaCore.FrameSvgItem {
-                        id: svgBg
-                        // visible: fromCurrentTheme
-                        imagePath: "widgets/slider"
-                        prefix: "groove"
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        colorGroup: PlasmaCore.ColorScope.colorGroup
-                        implicitWidth: slider.horizontal ? PlasmaCore.Units.gridUnit * 12 : fixedMargins.left + fixedMargins.right
-                        implicitHeight: slider.vertical ? PlasmaCore.Units.gridUnit * 12 : fixedMargins.top + fixedMargins.bottom
-
-                        width: slider.horizontal ? Math.max(fixedMargins.left + fixedMargins.right, slider.availableWidth) : implicitWidth
-                        height: slider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, slider.availableHeight) : implicitHeight
-                        x: slider.leftPadding + (slider.horizontal ? 0 : Math.round((slider.availableWidth - width) / 2))
-                        y: slider.topPadding + (slider.vertical ? 0 : Math.round((slider.availableHeight - height) / 2))
-
-                        PlasmaCore.FrameSvgItem {
-                            id: grooveFill
-                            imagePath: "widgets/slider"
-                            prefix: "groove-highlight"
-                            colorGroup: PlasmaCore.ColorScope.colorGroup
-
-                            LayoutMirroring.enabled: slider.mirrored
-                            anchors.left: parent.left
-                            anchors.bottom: parent.bottom
-                            // The general idea is to extend the groove at least up to the middle of a handle, but don't overextend it at the end.
-                            width: slider.horizontal ? Math.max(fixedMargins.left + fixedMargins.right, Math.round(slider.position * (slider.availableWidth - slider.handle.width / 2) + (slider.handle.width / 2))) : parent.width
-                            height: slider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, Math.round(slider.position * (slider.availableHeight - slider.handle.height / 2) + (slider.handle.height / 2))) : parent.height
-                        }
-                    }
-
-                    // Rectangle {
-                    //     visible: !svgBg.visible
-                    //     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    //     Kirigami.Theme.inherit: false
-                    //     width: 8
-                    //     height: parent.height
-                    //     anchors.centerIn: parent
-                    //     radius: 4
-                    //     border.color: Qt.darker(color, 1.5)
-                    //     color: Kirigami.Theme.backgroundColor
-
-                    //     /*Canvas {
-                    //     readonly property real xCenter: width / 2
-                    //     readonly property real yCenter: height / 2
-                    //     property real shineLength: height * 0.95
-
-                    //     anchors.fill: parent
-                    //     z: 5
-
-                    //     onPaint: {
-                    //         var ctx = getContext("2d");
-                    //         ctx.reset();
-
-                    //         ctx.beginPath();
-                    //         ctx.rect(0, 0, width, height);
-
-                    //         var gradient = ctx.createLinearGradient(0, yCenter, width, yCenter);
-
-                    //         gradient.addColorStop(0, Qt.rgba(1, 1, 1, 0.08));
-                    //         gradient.addColorStop(1, Qt.rgba(1, 1, 1, 0.20));
-                    //         ctx.fillStyle = gradient;
-                    //         ctx.fill();
-                    //     }
-                    // }*/
-
-                    //     Rectangle {
-                    //         id: valueBox
-
-                    //         height: parent.height * (1 - slider.visualPosition)
-                    //         color: Kirigami.Theme.highlightColor
-                    //         opacity: slider.enabled ? 1 : 0.5
-                    //         border.color: Qt.darker(color, 1.5)
-
-                    //         radius: parent.radius
-                    //         anchors.bottom: parent.bottom
-                    //         anchors.left: parent.left
-                    //         anchors.right: parent.right
-                    //         // anchors.margins: 2
-                    //     }
-
-                    //     Rectangle {
-                    //         width: parent.width + 6
-                    //         height: width
-                    //         radius: width/2
-                    //         visible: enabled
-                    //         anchors.top: valueBox.top
-                    //         anchors.topMargin: -height/2
-                    //         anchors.horizontalCenter: valueBox.horizontalCenter
-                    //         color: Kirigami.Theme.textColor
-                    //         border.color: parent.border.color
-                    //     }
-                    // }
-
-                    Extras.Gauge {
-                        id: audioGauge
-                        z: -1
-
-                        anchors {
-                            top: parent.top
-                            bottom:parent.bottom
-                            right: parent.right
-                            rightMargin:  implicitWidth - 8
-                        }
-                        //Layout.fillHeight: true
-                        //Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                        //Layout.leftMargin: 4
-                        minimumValue: -40
-                        maximumValue: 20
-
-                        font.pointSize: 8
-                        style: GaugeStyle {
-                            valueBar: null
-                            foreground: null
-                            background: null
-                            minorTickmark: Item {
-                                implicitWidth: 8
-                                implicitHeight: 1
-
-                                Rectangle {
-                                    color: "#cccccc"
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 2
-                                    anchors.rightMargin: 4
-                                }
-                            }
-                            tickmark: Item {
-                                implicitWidth: 12
-                                implicitHeight: 1
-
-                                Rectangle {
-                                    color: "#dfdfdf"
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 3
-                                    anchors.rightMargin: 3
-                                }
-                            }
-                            tickmarkLabel: QQC2.Label {
-                                text: {
-                                    switch (styleData.value) {
-                                    case -40:
-                                        return "-40"
-                                    case 0:
-                                        return "0"
-                                    case 20:
-                                        return "+20"
-                                    default:
-                                        return ""
-                                    }
-                                }
-
-                                font: audioGauge.font
-                            }
-                        }
-                    }
-
-                    Extras.Gauge {
+                background:  Item {
+                    Item {
                         id: inputAudioLevelGauge
-                        anchors.top: parent.top
+                        height: slider.availableHeight * slider.position
+                        width: 2
                         anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        anchors.rightMargin: -2
-                        visible: control.inputAudioLeveldB != null
+                        // color: "yellow"
 
-                        minimumValue: -40
-                        maximumValue: 20
-                        value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
+                        // Rectangle {
+                        //     height: 5
+                        //     width: height
+                        //     color: "orange"
+                        //     anchors.top: parent.top
+                        //     anchors.horizontalCenter: parent.horizontalCenter
+                        // }
 
-                        font.pointSize: 8
-
-                        style: GaugeStyle {
-                            valueBar: Rectangle {
-                                color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                                implicitWidth: 3
-                            }
-                            minorTickmark: null
-                            tickmark: null
-                            tickmarkLabel: null
+                        Kirigami.Icon {
+                            anchors.verticalCenter: parent.top
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            implicitHeight: 22
+                            implicitWidth: 22
+                            source: Qt.resolvedUrl("../../../img/left-arrow.svg")
+                            color: Kirigami.Theme.textColor
                         }
                     }
                 }
+
+                // background: Item {
+                //     visible: false
+                //     implicitWidth: svgBg.implicitWidth
+                //     implicitHeight: svgBg.implicitHeight
+
+                //     PlasmaCore.FrameSvgItem {
+                //         id: svgBg
+                //         // visible: fromCurrentTheme
+                //         imagePath: "widgets/slider"
+                //         prefix: "groove"
+                //         anchors.horizontalCenter: parent.horizontalCenter
+                //         colorGroup: PlasmaCore.ColorScope.colorGroup
+                //         implicitWidth: slider.horizontal ? PlasmaCore.Units.gridUnit * 12 : fixedMargins.left + fixedMargins.right
+                //         implicitHeight: slider.vertical ? PlasmaCore.Units.gridUnit * 12 : fixedMargins.top + fixedMargins.bottom
+
+                //         width: slider.horizontal ? Math.max(fixedMargins.left + fixedMargins.right, slider.availableWidth) : implicitWidth
+                //         height: slider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, slider.availableHeight) : implicitHeight
+                //         x: slider.leftPadding + (slider.horizontal ? 0 : Math.round((slider.availableWidth - width) / 2))
+                //         y: slider.topPadding + (slider.vertical ? 0 : Math.round((slider.availableHeight - height) / 2))
+
+                //         Extras.Gauge {
+                //             id: inputAudioLevelGauge
+                //             anchors.bottom: parent.bottom
+                //             anchors.left: parent.left
+                //             anchors.right: parent.right
+                //             width: parent.width
+                //             visible: control.inputAudioLeveldB != null
+
+                //             minimumValue: -40
+                //             maximumValue: 20
+                //             // value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
+
+                //             font.pointSize: 8
+
+                //             style: GaugeStyle {
+                //                 valueBar: Item {
+                //                     // color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                //                     PlasmaCore.FrameSvgItem {
+
+                //                         imagePath: "widgets/slider"
+                //                         prefix: "groove-highlight"
+                //                         colorGroup: PlasmaCore.ColorScope.colorGroup
+                //                         anchors.fill: parent
+                //                     }
+                //                 }
+                //                 minorTickmark: null
+                //                 tickmark: null
+                //                 tickmarkLabel: null
+                //             }
+                //         }
+                //     }
+
+
+                // }
 
                 MouseArea {
                     id: mouseArea

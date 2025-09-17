@@ -255,10 +255,12 @@ GridLayout {
             }
 
             Layout.fillWidth: true
-            Layout.fillHeight: false
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.fillHeight: true
+            Layout.margins: svgBg.visible ? 0 : Kirigami.Units.smallSpacing
+            // Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             opacity: slotMakesSound ? 1 : 0.3
+            // padding: svgBg.visible ? svgBg.leftPadding : 0
             background: Item {
                 id: backgroundItem
                 property bool highlightBorder: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === index)

@@ -1227,6 +1227,13 @@ Zynthian.ScreenPage {
                     }
                 }
 
+
+                component HeaderButton :  QQC2.AbstractButton {
+                    background: Rectangle {
+
+                    }
+                }
+
                 contentItem: Item {
 
                     RowLayout {
@@ -1245,31 +1252,41 @@ Zynthian.ScreenPage {
                                     anchors.fill: parent
                                     spacing: 2
 
-                                    TableHeader {
+                                    Item {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
-                                        highlightOnFocus: false
-                                        highlighted: root.displaySceneButtons
-                                        onPressed: {
-                                            if (zynqtgui.sketchpad.displaySceneButtons) {
-                                                zynqtgui.sketchpad.displaySceneButtons = false
-                                                bottomStack.slotsBar.channelButton.checked = true
-                                            } else {
-                                                zynqtgui.sketchpad.displaySceneButtons = true
-                                                bottomStack.slotsBar.clipsButton.checked = true
-                                                // root.displayTrackButtons = false
+
+                                        QQC2.Button {
+                                            // flat: true
+                                            anchors.fill: parent
+                                            text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
+                                            // highlightOnFocus: false
+                                            implicitHeight: height
+                                            checked: root.displaySceneButtons
+                                            onClicked: {
+                                                if (zynqtgui.sketchpad.displaySceneButtons) {
+                                                    zynqtgui.sketchpad.displaySceneButtons = false
+                                                    bottomStack.slotsBar.channelButton.checked = true
+                                                } else {
+                                                    zynqtgui.sketchpad.displaySceneButtons = true
+                                                    bottomStack.slotsBar.clipsButton.checked = true
+                                                    // root.displayTrackButtons = false
+                                                }
                                             }
                                         }
                                     }
 
                                     // Placeholder item of same size to have 2 rows in here
-                                    TableHeader {
+                                    Item {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        text: ""
-                                        highlightOnFocus: false
-                                        highlighted: false
+
+                                        // QQC2.Button {
+                                        //     anchors.fill: parent
+                                        //     text: ""
+                                        //     // highlightOnFocus: false
+                                        //     checked: false
+                                        // }
                                     }
                                 }
                             }
@@ -1641,13 +1658,14 @@ Zynthian.ScreenPage {
                             spacing: 2
 
                             // Common copy button to set the object to copy
-                            TableHeader {
+                            QQC2.Button {
                                 id: copyButton
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                highlightOnFocus: false
+                                // highlightOnFocus: false
                                 font.pointSize: 10
                                 // Button is enabled only if lastSelectedObj can be copy-pasted
+                                flat: !enabled
                                 enabled: zynqtgui.sketchpad.lastSelectedObj.component != null && zynqtgui.sketchpad.lastSelectedObj.component.visible && zynqtgui.sketchpad.lastSelectedObj.isCopyable
                                 text: qsTr("Copy")
                                 // Button is visible only when there is no ongoing copy action
@@ -1658,24 +1676,25 @@ Zynthian.ScreenPage {
                             }
 
                             // Common cancel button to cancel copy
-                            TableHeader {
+                            QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                highlightOnFocus: false
+                                // highlightOnFocus: false
                                 font.pointSize: 10
                                 text: qsTr("Cancel Copy")
                                 visible: !copyButton.visible
-                                onPressed: {
+                                onClicked: {
                                     zynqtgui.sketchpad.copySourceObj.reset()
                                 }
                             }
 
                             // Common button to paste object
-                            TableHeader {
+                            QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                highlightOnFocus: false
+                                // highlightOnFocus: false
                                 font.pointSize: 10
+                                flat: !enabled
                                 // Button is enabled if there is an ongoing copy action and the selected slot is of the same type
                                 enabled: {
                                     // If copySourceObj is a TracksBar slot, allow pasting to same slot index of track is different
@@ -1690,7 +1709,7 @@ Zynthian.ScreenPage {
                                     }
                                 }
                                 text: qsTr("Paste")
-                                onPressed: {
+                                onClicked: {
                                     applicationWindow().confirmer.confirmSomething(qsTr("Confirm Paste"), qsTr("Are you sure that you want to paste %1 to %2? This action is irreversible and will clear all existing contents of %2.").arg(zynqtgui.sketchpad.copySourceObj.humanReadableObjName).arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
                                         zynqtgui.sketchpad.lastSelectedObj.copyFrom(zynqtgui.sketchpad.copySourceObj)
                                         zynqtgui.sketchpad.copySourceObj.reset()
@@ -1698,15 +1717,16 @@ Zynthian.ScreenPage {
                                 }
                             }
 
-                            TableHeader {
+                            QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                highlightOnFocus: false
+                                // highlightOnFocus: false
                                 font.pointSize: 10
+                                flat: !enabled
                                 // Button is enabled when a copy action is not running and selected slot can be copy-pasted
                                 enabled: copyButton.visible && copyButton.enabled && zynqtgui.sketchpad.lastSelectedObj.isCopyable
                                 text: qsTr("Clear")
-                                onPressed: {
+                                onClicked: {
                                     applicationWindow().confirmer.confirmSomething(qsTr("Confirm Clear"), qsTr("Are you sure that you want to clear %1? This action is irreversible and will clear all existing contents of %1.").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
                                         zynqtgui.sketchpad.lastSelectedObj.clear()
                                     });

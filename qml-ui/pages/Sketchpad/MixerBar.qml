@@ -78,47 +78,47 @@ QQC2.Pane {
             return true;
         case "KNOB0_UP":
             switch(zynqtgui.sketchpad.lastSelectedObj.className) {
-                case "MixerBar_item":
-                    applicationWindow().updateChannelVolume(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
-                    return true;
-                case "MixerBar_master":
-                    applicationWindow().updateMasterVolume(1, false)
-                    return true;
-                default:
-                    return false;
+            case "MixerBar_item":
+                applicationWindow().updateChannelVolume(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
+            case "MixerBar_master":
+                applicationWindow().updateMasterVolume(1, false)
+                return true;
+            default:
+                return false;
             }
         case "KNOB0_DOWN":
             switch(zynqtgui.sketchpad.lastSelectedObj.className) {
-                case "MixerBar_item":
-                    applicationWindow().updateChannelVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
-                    return true;
-                case "MixerBar_master":
-                    applicationWindow().updateMasterVolume(-1, false)
-                    return true;
-                default:
-                    return false;
+            case "MixerBar_item":
+                applicationWindow().updateChannelVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
+            case "MixerBar_master":
+                applicationWindow().updateMasterVolume(-1, false)
+                return true;
+            default:
+                return false;
             }
         case "KNOB1_UP":
             switch(zynqtgui.sketchpad.lastSelectedObj.className) {
-                case "MixerBar_item":
-                    pageManager.getPage("sketchpad").updateChannelPan(1, zynqtgui.sketchpad.lastSelectedObj.value)
-                    return true;
-                case "MixerBar_master":
-                    applicationWindow().updateGlobalPlaybackPan(1);
-                    return true;
-                default:
-                    return false;
+            case "MixerBar_item":
+                pageManager.getPage("sketchpad").updateChannelPan(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                return true;
+            case "MixerBar_master":
+                applicationWindow().updateGlobalPlaybackPan(1);
+                return true;
+            default:
+                return false;
             }
         case "KNOB1_DOWN":
             switch(zynqtgui.sketchpad.lastSelectedObj.className) {
-                case "MixerBar_item":
-                    pageManager.getPage("sketchpad").updateChannelPan(-1, zynqtgui.sketchpad.lastSelectedObj.value)
-                    return true;
-                case "MixerBar_master":
-                    applicationWindow().updateGlobalPlaybackPan(-1);
-                    return true;
-                default:
-                    return false;
+            case "MixerBar_item":
+                pageManager.getPage("sketchpad").updateChannelPan(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                return true;
+            case "MixerBar_master":
+                applicationWindow().updateGlobalPlaybackPan(-1);
+                return true;
+            default:
+                return false;
             }
         }
         return false;
@@ -201,7 +201,7 @@ QQC2.Pane {
                                     property bool highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    Layout.bottomMargin: 6
+                                    // Layout.bottomMargin: 6
 
                                     background: Item {
                                         Kirigami.Separator {
@@ -384,20 +384,24 @@ QQC2.Pane {
                                                 }
                                             }
 
-                                            Zynthian.ResetableSlider {
+                                            Item {
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: false
                                                 Layout.preferredHeight: Kirigami.Units.gridUnit
                                                 Layout.leftMargin: Kirigami.Units.smallSpacing
                                                 Layout.rightMargin: Kirigami.Units.smallSpacing
-                                                orientation: Qt.Horizontal
-                                                from: -1.0
-                                                to: 1.0
-                                                controlObj: model.channel
-                                                controlProp: "pan"
-                                                initialValue: model.channel.initialPan
-                                                onClicked: {
-                                                    channelsVolumeRow.handleClick(channel);
+                                                // color: "pink"
+                                                PanSlider {
+                                                   anchors.fill: parent
+                                                    orientation: Qt.Horizontal
+                                                    from: -1.0
+                                                    to: 1.0
+                                                    controlObj: model.channel
+                                                    controlProp: "pan"
+                                                    initialValue: model.channel.initialPan
+                                                    onClicked: {
+                                                        channelsVolumeRow.handleClick(channel);
+                                                    }
                                                 }
                                             }
 
@@ -501,93 +505,96 @@ QQC2.Pane {
                     }
                 }
 
-                Item {
+                QQC2.Control {
+                    id: masterControl
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    Layout.margins: svgBg.inset.top
+                    topPadding: masterSvgBg.topPadding
+                    bottomPadding:  masterSvgBg.visible ? masterSvgBg.bottomPadding : 0
+                    leftPadding:  masterSvgBg.visible ? masterSvgBg.leftPadding : 6
+                    rightPadding:  masterSvgBg.visible ? masterSvgBg.rightPadding : 6
 
-                    QQC2.Control {
-                        id: masterControl
-                        anchors.fill: parent
-                        leftPadding: 6
-                        rightPadding: 6
-                        bottomPadding: 6
-
-                        background: Item {
-                            Kirigami.Separator {
-                                height: parent.height
-                                anchors.left: parent.left
-                                width: 1
-                                color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
-                            }
-                            // PlasmaCore.FrameSvgItem {
-                            //     id: masterSvgBg
-                            //     visible: fromCurrentTheme
-                            //     anchors.fill: parent
-
-                            //     readonly property real leftPadding: fixedMargins.left
-                            //     readonly property real rightPadding: fixedMargins.right
-                            //     readonly property real topPadding: fixedMargins.top
-                            //     readonly property real bottomPadding: fixedMargins.bottom
-
-                            //     imagePath: "widgets/tracks-background"
-                            //     colorGroup: PlasmaCore.Theme.ViewColorGroup
-                            // }
+                    background: Item {
+                        Kirigami.Separator {
+                            visible: !masterSvgBg.visible
+                            height: parent.height
+                            anchors.left: parent.left
+                            width: 1
+                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
                         }
+                        PlasmaCore.FrameSvgItem {
+                            id: masterSvgBg
+                            visible: fromCurrentTheme
+                            anchors.fill: parent
 
-                        contentItem: Item {
-                            MouseArea {
-                                anchors.fill: parent
-                                onPressed: masterVolume.mouseArea.handlePressed(mouse)
-                                onReleased: masterVolume.mouseArea.released(mouse)
-                                onPressAndHold: masterVolume.mouseArea.pressAndHold(mouse)
-                                onClicked: masterVolume.mouseArea.clicked(mouse)
-                                onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
-                                onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
-                            }
-                            ColumnLayout {
-                                anchors.fill: parent
-                                spacing: Kirigami.Units.smallSpacing
+                            readonly property real leftPadding: fixedMargins.left
+                            readonly property real rightPadding: fixedMargins.right
+                            readonly property real topPadding: fixedMargins.top
+                            readonly property real bottomPadding: fixedMargins.bottom
 
-                                VolumeControl {
-                                    id: masterVolume
-                                    property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
+                            imagePath: "widgets/tracks-background"
+                            colorGroup: PlasmaCore.Theme.ViewColorGroup
+                        }
+                    }
 
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
-                                    inputAudioLevelVisible: true
-                                    enabled: !gainHandler.muted
+                    contentItem: Item {
+                        MouseArea {
+                            anchors.fill: parent
+                            onPressed: masterVolume.mouseArea.handlePressed(mouse)
+                            onReleased: masterVolume.mouseArea.released(mouse)
+                            onPressAndHold: masterVolume.mouseArea.pressAndHold(mouse)
+                            onClicked: masterVolume.mouseArea.clicked(mouse)
+                            onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
+                            onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
+                        }
+                        ColumnLayout {
+                            anchors.fill: parent
+                            spacing: Kirigami.Units.smallSpacing
 
-                                    Binding {
-                                        target: masterVolume.slider
-                                        property: "value"
-                                        value: masterVolume.gainHandler.gainDb
-                                    }
+                            VolumeControl {
+                                id: masterVolume
+                                property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
 
-                                    slider {
-                                        value: masterVolume.gainHandler.gainDb
-                                        from: masterVolume.gainHandler.minimumDecibel
-                                        to: masterVolume.gainHandler.maximumDecibel
-                                    }
-                                    onValueChanged: {
-                                        masterVolume.gainHandler.gainDb = masterVolume.slider.value;
-                                        zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
-                                    }
-                                    onClicked: {
-                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
-                                    }
-                                    onDoubleClicked: {
-                                        masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
-                                    }
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
+                                inputAudioLevelVisible: true
+                                enabled: !gainHandler.muted
+
+                                Binding {
+                                    target: masterVolume.slider
+                                    property: "value"
+                                    value: masterVolume.gainHandler.gainDb
                                 }
 
-                                Zynthian.ResetableSlider {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit
-                                    Layout.leftMargin: Kirigami.Units.smallSpacing
-                                    Layout.rightMargin: Kirigami.Units.smallSpacing
+                                slider {
+                                    value: masterVolume.gainHandler.gainDb
+                                    from: masterVolume.gainHandler.minimumDecibel
+                                    to: masterVolume.gainHandler.maximumDecibel
+                                }
+                                onValueChanged: {
+                                    masterVolume.gainHandler.gainDb = masterVolume.slider.value;
+                                    zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
+                                }
+                                onClicked: {
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
+                                }
+                                onDoubleClicked: {
+                                    masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
+                                }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit
+                                Layout.leftMargin: Kirigami.Units.smallSpacing
+                                Layout.rightMargin: Kirigami.Units.smallSpacing
+                                // color: "pink"
+                                PanSlider {
+                                    anchors.fill: parent
                                     orientation: Qt.Horizontal
                                     from: -1.0
                                     to: 1.0
@@ -595,68 +602,114 @@ QQC2.Pane {
                                     controlProp: "panAmount"
                                     initialValue: 0
                                 }
+                            }
 
-                                QQC2.Label {
-                                    Layout.alignment: Qt.AlignCenter
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.margins: 4
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                    text: "Master"
+                            QQC2.Label {
+                                Layout.alignment: Qt.AlignCenter
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.margins: 4
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                                text: "Master"
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
-                                        }
-                                    }
-                                }
-
-                                QQC2.Label {
-                                    Layout.alignment: Qt.AlignCenter
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                    text: qsTr("%1 dB").arg(masterVolume.gainHandler.gainDb.toFixed(2))
-                                    font.pointSize: 9
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
-                                        }
-                                    }
-                                }
-
-                                QQC2.RoundButton {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                                    Layout.margins: 4
-                                    radius: 2
-                                    font.pointSize: 8
-                                    checked: masterVolume.gainHandler.muted
-                                    text: qsTr("M")
-                                    contentItem: QQC2.Label {
-                                        text: parent.text
-                                        font: parent.font
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    background: Rectangle {
-                                        radius: parent.radius
-                                        border.width: 1
-                                        border.color: Qt.rgba(50, 50, 50, 0.1)
-                                        color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
-                                    }
+                                MouseArea {
+                                    anchors.fill: parent
                                     onClicked: {
-                                        masterVolume.gainHandler.muted = !masterVolume.gainHandler.muted
+                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
                                     }
+                                }
+                            }
+
+                            QQC2.Label {
+                                Layout.alignment: Qt.AlignCenter
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                horizontalAlignment: Text.AlignHCenter
+                                elide: Text.ElideRight
+                                text: qsTr("%1 dB").arg(masterVolume.gainHandler.gainDb.toFixed(2))
+                                font.pointSize: 9
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
+                                    }
+                                }
+                            }
+
+                            QQC2.RoundButton {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                Layout.margins: 4
+                                radius: 2
+                                font.pointSize: 8
+                                checked: masterVolume.gainHandler.muted
+                                text: qsTr("M")
+                                contentItem: QQC2.Label {
+                                    text: parent.text
+                                    font: parent.font
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                                background: Rectangle {
+                                    radius: parent.radius
+                                    border.width: 1
+                                    border.color: Qt.rgba(50, 50, 50, 0.1)
+                                    color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                }
+                                onClicked: {
+                                    masterVolume.gainHandler.muted = !masterVolume.gainHandler.muted
                                 }
                             }
                         }
                     }
+                }
+
+            }
+        }
+    }
+
+    component PanSlider : Zynthian.ResetableSlider {
+
+        id: panSlider
+        implicitHeight: Kirigami.Units.gridUnit
+        // Rectangle {
+        //     color: "yellow"
+        //     anchors.fill: parent
+        // }
+
+        background: Item {
+
+            PlasmaCore.FrameSvgItem {
+                id: panSvgBg
+                // visible: fromCurrentTheme
+                imagePath: "widgets/slider"
+                prefix:  "groove"
+                anchors.horizontalCenter: parent.horizontalCenter
+                colorGroup: PlasmaCore.ColorScope.colorGroup
+               anchors.fill: parent
+                width: panSlider.horizontal ? Math.max(fixedMargins.left + fixedMargins.right, panSlider.availableWidth) : implicitWidth
+                height: panSlider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, panSlider.availableHeight) : 20
+                x: panSlider.leftPadding + (panSlider.horizontal ? 0 : Math.round((panSlider.availableWidth - width) / 2))
+                y: panSlider.topPadding + (panSlider.vertical ? 0 : Math.round((panSlider.availableHeight - height) / 2))
+
+                PlasmaCore.FrameSvgItem {
+                    id: grooveFill
+                    // visible: panSlider.value !== 0
+                    imagePath: "widgets/slider"
+                    prefix: "groove-highlight"
+                    colorGroup: PlasmaCore.ColorScope.colorGroup
+
+                    anchors {
+                        left: (panSlider.value > 0 ? parent.horizontalCenter : undefined)
+                        right: (panSlider.value <= 0 ? parent.horizontalCenter : undefined)
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    // The general idea is to extend the groove at least up to the middle of a handle, but don't overextend it at the end.
+                    width: Math.abs(panSlider.value) * (panSlider.availableWidth / 2)
+                    height: panSlider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, Math.round(panSlider.position * (panSlider.availableHeight - panSlider.handle.height / 2) + (panSlider.handle.height / 2))) : parent.height
                 }
             }
         }

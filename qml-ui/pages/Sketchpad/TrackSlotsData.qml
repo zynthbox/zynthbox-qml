@@ -255,9 +255,9 @@ GridLayout {
             }
 
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.fillHeight: false
             Layout.margins: svgBg.visible ? 0 : Kirigami.Units.smallSpacing
-            // Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
             opacity: slotMakesSound ? 1 : 0.3
             // padding: svgBg.visible ? svgBg.leftPadding : 0

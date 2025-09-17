@@ -490,7 +490,7 @@ class zynthian_gui_control(zynthian_gui_selector):
             self.__selected_engine_bypass_controller = None
 
         super().fill_list()
-        self.all_controls_changed.emit()
+        self.allControlsChanged.emit()
 
     @Slot()
     def set_selector(self, zs_hiden=True):
@@ -1179,7 +1179,7 @@ class zynthian_gui_control(zynthian_gui_selector):
     single_effect_engine_changed = Signal()
     custom_controller_mode_changed = Signal()
 #    active_custom_controller_changed = Signal()
-    all_controls_changed = Signal()
+    allControlsChanged = Signal()
     selectedColumnChanged = Signal()
 
     controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
@@ -1188,9 +1188,9 @@ class zynthian_gui_control(zynthian_gui_selector):
     control_pages_model = Property(QObject, get_control_pages_model, constant = True)
     single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
 #    active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
-    all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
-    selectedEngine = Property(QObject, get_selected_engine, notify=all_controls_changed)
-    selectedEngineBypassController = Property(QObject, get_selected_engine_bypass_controller, notify=all_controls_changed)
+    all_controls = Property('QVariantList', get_all_controls, notify=allControlsChanged)
+    selectedEngine = Property(QObject, get_selected_engine, notify=allControlsChanged)
+    selectedEngineBypassController = Property(QObject, get_selected_engine_bypass_controller, notify=allControlsChanged)
 
     selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedColumnChanged)
     selectedColumn = Property(int, get_selectedColumn, set_selectedColumn, notify=selectedColumnChanged)

@@ -1321,22 +1321,19 @@ QQC2.Pane {
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
-                                                    Layout.alignment: Qt.AlignVCenter
-                                                    font.pointSize: 8
+                                                    Layout.alignment: Qt.AlignVCente
                                                     text: qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
-                                                    font.pointSize: 8
                                                     text: qsTr("  Bank : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.bank : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
-                                                    font.pointSize: 8
                                                     text: qsTr("Preset : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.preset : "--")
                                                 }
                                             }
@@ -1353,7 +1350,6 @@ QQC2.Pane {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     visible: root.selectedChannel.selectedSlot != null && root.selectedChannel.selectedSlot.className == "TracksBar_synthslot"
-                                                    font.pointSize: 9
                                                     text: qsTr("Mute")
                                                     enabled: infoBar.zynthianLayer != null
                                                     checkable: false
@@ -1368,7 +1364,6 @@ QQC2.Pane {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     visible: root.selectedChannel.selectedSlot != null && root.selectedChannel.selectedSlot.className == "TracksBar_fxslot"
-                                                    font.pointSize: 9
                                                     text: qsTr("Bypass")
                                                     enabled: infoBar.zynthianLayer != null
                                                     checkable: false
@@ -1381,7 +1376,6 @@ QQC2.Pane {
                                                 QQC2.Button {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
-                                                    font.pointSize: 9
                                                     text: qsTr("Fav")
                                                     icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
                                                     enabled: infoBar.zynthianLayer != null

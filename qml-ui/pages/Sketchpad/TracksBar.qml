@@ -1325,18 +1325,21 @@ QQC2.Pane {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCente
+                                                    font.pointSize: Kirigami.Units.gridUnit * 0.5
                                                     text: qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
+                                                    font.pointSize: Kirigami.Units.gridUnit * 0.5
                                                     text: qsTr("  Bank : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.bank : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
+                                                    font.pointSize: Kirigami.Units.gridUnit * 0.5
                                                     text: qsTr("Preset : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.preset : "--")
                                                 }
                                             }

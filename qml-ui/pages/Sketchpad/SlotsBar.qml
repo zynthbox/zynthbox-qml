@@ -439,7 +439,10 @@ QQC2.Pane {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.margins: svgBg.inset.top
+                    Layout.topMargin: svgBg.inset.top
+                    Layout.leftMargin: svgBg.inset.left
+                    Layout.rightMargin: svgBg.inset.right
+                    Layout.bottomMargin: svgBg.inset.bottom
 
                     topPadding: svgBg.topPadding
                     bottomPadding: svgBg.bottomPadding

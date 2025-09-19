@@ -155,7 +155,10 @@ QQC2.Pane {
                     id: mixerContainer
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.margins: svgBg.inset.top
+                    Layout.topMargin: svgBg.inset.top
+                    Layout.leftMargin: svgBg.inset.left
+                    Layout.rightMargin: svgBg.inset.right
+                    Layout.bottomMargin: svgBg.inset.bottom
 
                     topPadding: svgBg.topPadding
                     bottomPadding: svgBg.bottomPadding
@@ -510,7 +513,10 @@ QQC2.Pane {
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                    Layout.margins: svgBg.inset.top
+                    Layout.topMargin: masterSvgBg.inset.top
+                    Layout.leftMargin: masterSvgBg.inset.left
+                    Layout.rightMargin: masterSvgBg.inset.right
+                    Layout.bottomMargin: masterSvgBg.inset.bottom
                     topPadding: masterSvgBg.topPadding
                     bottomPadding:  masterSvgBg.visible ? masterSvgBg.bottomPadding : 0
                     leftPadding:  masterSvgBg.visible ? masterSvgBg.leftPadding : 6

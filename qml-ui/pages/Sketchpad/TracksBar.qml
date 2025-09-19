@@ -777,7 +777,10 @@ QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                Layout.margins: svgBg4.inset.top
+                Layout.topMargin: svgBg4.inset.top
+                Layout.leftMargin: svgBg4.inset.left
+                Layout.rightMargin: svgBg4.inset.right
+                Layout.bottomMargin: svgBg4.inset.bottom
 
                 padding: svgBg4.visible ? svgBg4.topPadding : Kirigami.Units.smallSpacing
                 // bottomPadding: svgBg4.bottomPadding

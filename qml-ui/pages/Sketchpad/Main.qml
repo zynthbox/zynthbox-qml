@@ -1295,7 +1295,10 @@ Zynthian.ScreenPage {
                         {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            Layout.margins: svgBg2.inset.top
+                            Layout.topMargin: svgBg2.inset.top
+                            Layout.leftMargin: svgBg2.inset.left
+                            Layout.rightMargin: svgBg2.inset.right
+                            Layout.bottomMargin: svgBg2.inset.bottom
 
                             topPadding: svgBg2.topPadding
                             bottomPadding: svgBg2.bottomPadding

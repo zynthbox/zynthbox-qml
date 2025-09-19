@@ -5553,23 +5553,23 @@ if __name__ == "__main__":
     zynqtgui.sketchpad.init() # Call init after zynqtgui initialization is complete
     QIcon.setThemeName("breeze")    
     palette = app.palette()
-    bgColor = QColor(zynthian_gui_config.color_bg)
-    txColor = QColor(zynthian_gui_config.color_tx)
-    palette.setColor(QPalette.Window, bgColor)
-    palette.setColor(QPalette.WindowText, txColor)
-    ratio = 0.2
-    btnColor = QColor(
-        bgColor.red() * (1 - ratio) + txColor.red() * ratio,
-        bgColor.green() * (1 - ratio) + txColor.green() * ratio,
-        bgColor.blue() * (1 - ratio) + txColor.blue() * ratio,
-        255,
-    )
-    palette.setColor(QPalette.Button, btnColor)
-    palette.setColor(QPalette.ButtonText, QColor(zynthian_gui_config.color_tx))
-    palette.setColor(QPalette.Highlight, QColor(zynthian_gui_config.color_on))
-    palette.setColor(QPalette.Base, QColor(zynthian_gui_config.color_panel_bd))
-    palette.setColor(QPalette.Text, QColor(zynthian_gui_config.color_tx))
-    palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
+    # bgColor = QColor(zynthian_gui_config.color_bg)
+    # txColor = QColor(zynthian_gui_config.color_tx)
+    # palette.setColor(QPalette.Window, bgColor)
+    # palette.setColor(QPalette.WindowText, txColor)
+    # ratio = 0.2
+    # btnColor = QColor(
+    #     bgColor.red() * (1 - ratio) + txColor.red() * ratio,
+    #     bgColor.green() * (1 - ratio) + txColor.green() * ratio,
+    #     bgColor.blue() * (1 - ratio) + txColor.blue() * ratio,
+    #     255,
+    # )
+    # palette.setColor(QPalette.Button, btnColor)
+    # palette.setColor(QPalette.ButtonText, QColor(zynthian_gui_config.color_tx))
+    # palette.setColor(QPalette.Highlight, QColor(zynthian_gui_config.color_on))
+    # palette.setColor(QPalette.Base, QColor(zynthian_gui_config.color_panel_bd))
+    # palette.setColor(QPalette.Text, QColor(zynthian_gui_config.color_tx))
+    # palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
     app.setPalette(palette)
     zynqtgui.screens["theme_chooser"].apply_font()
     zynqtgui.show_screen(zynqtgui.home_screen)

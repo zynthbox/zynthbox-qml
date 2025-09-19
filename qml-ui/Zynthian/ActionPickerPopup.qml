@@ -122,7 +122,7 @@ Zynthian.Popup {
         flow: GridLayout.TopToBottom
         Repeater {
             model: component.actions
-            delegate: PlayGridButton {
+            delegate: QQC2.Button {
                 id: delegate
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 12
                 Layout.minimumHeight: Kirigami.Units.gridUnit * 4

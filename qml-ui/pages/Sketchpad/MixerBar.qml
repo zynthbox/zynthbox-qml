@@ -702,7 +702,7 @@ QQC2.Pane {
 
                 PlasmaCore.FrameSvgItem {
                     id: grooveFill
-                    // visible: panSlider.value !== 0
+                    visible: panSlider.value !== 0
                     imagePath: "widgets/slider"
                     prefix: "groove-highlight"
                     colorGroup: PlasmaCore.ColorScope.colorGroup
@@ -717,6 +717,31 @@ QQC2.Pane {
                     width: Math.abs(panSlider.value) * (panSlider.availableWidth / 2)
                     height: panSlider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, Math.round(panSlider.position * (panSlider.availableHeight - panSlider.handle.height / 2) + (panSlider.handle.height / 2))) : parent.height
                 }
+            }
+
+            Rectangle {
+                color: Kirigami.Theme.textColor
+                height: 6
+                width: 1
+                anchors.left: parent.left
+                anchors.top: parent.bottom
+            }
+
+            Rectangle {
+                color: Kirigami.Theme.textColor
+                height: 6
+                width: 1
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.bottom
+
+            }
+
+            Rectangle {
+                color: Kirigami.Theme.textColor
+                height: 6
+                width: 1
+                anchors.right: parent.right
+                anchors.top: parent.bottom
             }
         }
     }

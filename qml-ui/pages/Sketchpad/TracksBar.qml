@@ -760,9 +760,13 @@ QQC2.Pane {
         buttons: buttonsColumn.children
     }
 
+Text {
+    text: "Spacing:" + PlasmaCore.Theme.spacing
+    color: "orange"
+}
     contentItem: Item {
         RowLayout {
-            spacing: 1
+            spacing: PlasmaCore.Theme.spacing
             anchors.fill: parent
 
             BottomStackTabs {

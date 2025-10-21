@@ -113,7 +113,7 @@ QQC2.Pane {
         }
 
         RowLayout {
-            spacing: 2
+            spacing: PlasmaCore.Theme.spacing
             anchors.fill: parent
 
             BottomStackTabs {

@@ -141,7 +141,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 2
+                spacing: PlasmaCore.Theme.spacing
 
                 BottomStackTabs {
                     id: buttonsColumn
@@ -166,6 +166,15 @@ QQC2.Pane {
                     rightPadding: svgBg.rightPadding
 
                     background: Item {
+                        
+                        Rectangle {
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                            Kirigami.Theme.inherit: false
+                             visible: !svgBg.visible
+                            anchors.fill: parent
+                            color: Kirigami.Theme.backgroundColor
+                        }
+                        
                         PlasmaCore.FrameSvgItem {
                             id: svgBg
                             visible: fromCurrentTheme
@@ -193,7 +202,7 @@ QQC2.Pane {
                             }
 
                             anchors.fill: parent
-                            spacing: 0
+                            spacing: 1
 
                             Repeater {
                                 id: mixerItemsRepeater
@@ -207,24 +216,26 @@ QQC2.Pane {
                                     // Layout.bottomMargin: 6
 
                                     background: Item {
-                                        Kirigami.Separator {
-                                            height: parent.height
-                                            anchors.left: parent.left
-                                            visible: index !== 0
-                                            width: 1
-                                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
-                                        }
+                                        // Kirigami.Separator {
+                                        //     height: parent.height
+                                        //     anchors.left: parent.left
+                                        //     visible: index !== 0
+                                        //     width: 1
+                                        //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                                        // }
                                         Rectangle  {
+                                              Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            Kirigami.Theme.inherit: false
                                             visible: !svgBg2.visible
                                             anchors.fill: parent
-                                            color: "transparent"
+                                            color: Kirigami.Theme.backgroundColor
                                             border.width: 1
                                             border.color: mixerColumnDelegate.highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                         }
 
                                         PlasmaCore.FrameSvgItem {
                                             id: svgBg2
-                                            visible: fromCurrentTheme && mixerColumnDelegate.highlighted
+                                            visible: fromCurrentTheme /*&& mixerColumnDelegate.highlighted*/
                                             anchors.fill: parent
 
                                             readonly property real leftPadding: fixedMargins.left
@@ -513,23 +524,34 @@ QQC2.Pane {
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                    Layout.topMargin: masterSvgBg.inset.top
-                    Layout.leftMargin: masterSvgBg.inset.left
-                    Layout.rightMargin: masterSvgBg.inset.right
-                    Layout.bottomMargin: masterSvgBg.inset.bottom
-                    topPadding: masterSvgBg.topPadding
-                    bottomPadding:  masterSvgBg.visible ? masterSvgBg.bottomPadding : 0
-                    leftPadding:  masterSvgBg.visible ? masterSvgBg.leftPadding : 6
-                    rightPadding:  masterSvgBg.visible ? masterSvgBg.rightPadding : 6
-
+                    // Layout.topMargin: masterSvgBg.inset.top
+                    // Layout.leftMargin: masterSvgBg.inset.left
+                    // Layout.rightMargin: masterSvgBg.inset.right
+                    // Layout.bottomMargin: masterSvgBg.inset.bottom
+                    // topPadding: masterSvgBg.topPadding
+                    // bottomPadding:  masterSvgBg.visible ? masterSvgBg.bottomPadding : 0
+                    leftPadding: 6
+                    rightPadding: 6
+                    property bool highlighted : false
                     background: Item {
-                        Kirigami.Separator {
-                            visible: !masterSvgBg.visible
-                            height: parent.height
-                            anchors.left: parent.left
-                            width: 1
-                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
-                        }
+                        // Kirigami.Separator {
+                        //     visible: !masterSvgBg.visible
+                        //     height: parent.height
+                        //     anchors.left: parent.left
+                        //     width: 1
+                        //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                        // }
+                        
+                        Rectangle  {
+                                              Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            Kirigami.Theme.inherit: false
+                                            visible: !masterSvgBg.visible
+                                            anchors.fill: parent
+                                            color: Kirigami.Theme.backgroundColor
+                                            border.width: 1
+                                            border.color: masterControl.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                        }
+                                        
                         PlasmaCore.FrameSvgItem {
                             id: masterSvgBg
                             visible: fromCurrentTheme
@@ -540,8 +562,9 @@ QQC2.Pane {
                             readonly property real topPadding: fixedMargins.top
                             readonly property real bottomPadding: fixedMargins.bottom
 
-                            imagePath: "widgets/tracks-background"
-                            colorGroup: PlasmaCore.Theme.ViewColorGroup
+                             imagePath: "widgets/column-delegate-background"
+                                            prefix: masterControl.highlighted ? ["focus", ""] : ""
+                                            colorGroup: PlasmaCore.Theme.ViewColorGroup
                         }
                     }
 

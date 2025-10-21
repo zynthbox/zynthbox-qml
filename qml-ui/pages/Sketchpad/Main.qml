@@ -1196,7 +1196,7 @@ Zynthian.ScreenPage {
         ColumnLayout {
             anchors.fill: parent
             anchors.bottomMargin: Kirigami.Units.largeSpacing
-            spacing: 2
+            spacing: PlasmaCore.Theme.spacing
 
             QQC2.Control {
                 Layout.fillWidth: true
@@ -1227,18 +1227,11 @@ Zynthian.ScreenPage {
                     }
                 }
 
-
-                component HeaderButton :  QQC2.AbstractButton {
-                    background: Rectangle {
-
-                    }
-                }
-
                 contentItem: Item {
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: 2
+                        spacing: PlasmaCore.Theme.spacing
 
                         QQC2.Control
                         {
@@ -1250,7 +1243,7 @@ Zynthian.ScreenPage {
                                 ColumnLayout {
                                     id: sketchpadSketchHeadersColumn
                                     anchors.fill: parent
-                                    spacing: 2
+                                    spacing: PlasmaCore.Theme.spacing
 
                                     Item {
                                         Layout.fillWidth: true
@@ -1295,12 +1288,12 @@ Zynthian.ScreenPage {
                         {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            Layout.topMargin: svgBg2.inset.top
+                            Layout.topMargin: svgBg2.visible ? svgBg2.inset.top : 1
                             Layout.leftMargin: svgBg2.inset.left
                             Layout.rightMargin: svgBg2.inset.right
                             Layout.bottomMargin: svgBg2.inset.bottom
 
-                            topPadding: svgBg2.topPadding
+                            topPadding: svgBg2.topPadding 
                             bottomPadding: svgBg2.bottomPadding
                             leftPadding: svgBg2.leftPadding
                             rightPadding: svgBg2.rightPadding
@@ -1382,7 +1375,7 @@ Zynthian.ScreenPage {
 
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
-                                                Layout.topMargin: 1 // Without this magic number, the top of header row doesn't match with left side scenes button or right side copy button
+                                                // Layout.topMargin: 1 // Without this magic number, the top of header row doesn't match with left side scenes button or right side copy button
                                                 state: root.displaySceneButtons
                                                        ? "SceneMode"
                                                        : "ChannelMode"
@@ -1508,7 +1501,7 @@ Zynthian.ScreenPage {
                                                 }
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
-                                                Layout.bottomMargin: 1 // Without this magic number, the bottom of clips row doesn't match with left side scenes button or right side copy button
+                                                // Layout.bottomMargin: 1 // Without this magic number, the bottom of clips row doesn't match with left side scenes button or right side copy button
                                                 state: bottomStack.slotsBar.mixerButton.checked
                                                        ? "MixerMode"
                                                        : "ClipsMode"
@@ -1594,7 +1587,8 @@ Zynthian.ScreenPage {
                                                 Rectangle {
                                                     id: mixerCell
                                                     anchors.fill: parent
-                                                    color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+                                                    // color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+                                                    color: Kirigami.Theme.backgroundColor
 
                                                     RowLayout {
                                                         anchors.fill: parent
@@ -1657,7 +1651,7 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: false
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                            spacing: 2
+                            spacing: PlasmaCore.Theme.spacing
 
                             // Common copy button to set the object to copy
                             QQC2.Button {

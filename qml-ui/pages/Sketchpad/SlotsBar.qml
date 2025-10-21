@@ -296,7 +296,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: 2
+                spacing: PlasmaCore.Theme.spacing
 
                 ColumnLayout {
                     id: buttonsColumn
@@ -304,8 +304,8 @@ QQC2.Pane {
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                    Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
-                    spacing: 1
+                    // Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
+                    spacing: PlasmaCore.Theme.spacing
 
                     //// INVISIBLE BUTTONS
                     QQC2.Button {
@@ -450,6 +450,14 @@ QQC2.Pane {
                     rightPadding: svgBg.rightPadding
 
                     background: Item {
+                        Rectangle {
+                            Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            Kirigami.Theme.inherit: false
+                             visible: !svgBg.visible
+                            anchors.fill: parent
+                            color: Kirigami.Theme.backgroundColor
+                        }                                        
+                                        
                         PlasmaCore.FrameSvgItem {
                             id: svgBg
                             visible: fromCurrentTheme
@@ -484,7 +492,7 @@ QQC2.Pane {
                             anchors.fill: parent
                             property int currentIndex: 0
 
-                            spacing: 0
+                            spacing: 1
 
                             Repeater {
                                 model: root.song.channelsModel
@@ -501,23 +509,25 @@ QQC2.Pane {
 
                                     padding: Kirigami.Units.smallSpacing
                                     background: Item {
-                                        Kirigami.Separator {
-                                            height: parent.height
-                                            anchors.left: parent.left
-                                            visible: channelDelegate.channelIndex !== 0
-                                            width: 1
-                                            color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
-                                        }
+                                        // Kirigami.Separator {
+                                        //     height: parent.height
+                                        //     anchors.left: parent.left
+                                        //     visible: channelDelegate.channelIndex !== 0
+                                        //     width: 1
+                                        //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                                        // }
                                         Rectangle {
+                                             Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                            Kirigami.Theme.inherit: false
                                             visible: !svgBg2.visible
                                             anchors.fill: parent
-                                            color: highlighted ? "#22ffffff" : "transparent"
+                                            color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
                                             border.width: 1
                                             border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                         }
                                         PlasmaCore.FrameSvgItem {
                                             id: svgBg2
-                                            visible: fromCurrentTheme && highlighted
+                                            visible: fromCurrentTheme 
                                             anchors.fill: parent
 
                                             readonly property real leftPadding: fixedMargins.left

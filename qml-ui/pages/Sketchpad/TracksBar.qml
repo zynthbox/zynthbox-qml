@@ -761,7 +761,7 @@ QQC2.Pane {
     }
 
 Text {
-    text: "Spacing:" + PlasmaCore.Theme.spacing
+    text: "Spacing:" + PlasmaCore.Theme.spacing + " Padding: " + PlasmaCore.Theme.padding
     color: "orange"
 }
     contentItem: Item {
@@ -786,7 +786,7 @@ Text {
                 Layout.rightMargin: svgBg4.inset.right
                 Layout.bottomMargin: svgBg4.inset.bottom
 
-                padding: svgBg4.visible ? svgBg4.topPadding : Kirigami.Units.smallSpacing
+                padding: svgBg4.visible ? svgBg4.topPadding : PlasmaCore.Theme.padding
                 // bottomPadding: svgBg4.bottomPadding
                 // leftPadding: svgBg4.leftPadding
                 // rightPadding: svgBg4.rightPadding
@@ -1169,7 +1169,7 @@ Text {
                                             anchors.fill: parent
                                             border.width: 1
                                             border.color: "#ff999999"
-                                            radius: 4
+                                            radius: PlasmaCore.Theme.radius
                                             color: "#222222"
                                         }
 
@@ -1193,7 +1193,7 @@ Text {
                                             {
                                                 width: waveItemContainer.width
                                                 height: waveItemContainer.height
-                                                radius: 4
+                                                radius: PlasmaCore.Theme.radius
                                             }
                                         }
 
@@ -1668,7 +1668,7 @@ Text {
                                             anchors.fill: parent
                                             border.width: 1
                                             border.color: "#ff999999"
-                                            radius: 4
+                                            radius: PlasmaCore.Theme.radius
                                             color: "#222222"
                                         }
 
@@ -1695,7 +1695,7 @@ Text {
                                             {
                                                 width: patternVisualiserItem.width
                                                 height: patternVisualiserItem.height
-                                                radius: 4
+                                                radius: PlasmaCore.Theme.radius
                                             }
                                         }
 

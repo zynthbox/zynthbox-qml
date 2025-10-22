@@ -27,6 +27,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import "private"
 
@@ -34,11 +35,11 @@ QQC2.ToolBar {
     id: root
 
     property Item currentPage
-    padding: 0
-    leftPadding: Kirigami.Units.smallSpacing
-    rightPadding: Kirigami.Units.smallSpacing
-    topPadding: Kirigami.Units.smallSpacing
-    bottomPadding: Kirigami.Units.smallSpacing
+    padding: PlasmaCore.Theme.padding
+    // leftPadding: Kirigami.Units.smallSpacing
+    // rightPadding: Kirigami.Units.smallSpacing
+    // topPadding: Kirigami.Units.smallSpacing
+    // bottomPadding: Kirigami.Units.smallSpacing
 
     position: QQC2.ToolBar.Footer
 
@@ -47,7 +48,7 @@ QQC2.ToolBar {
     }
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: PlasmaCore.Theme.spacing
         ActionButton {
             id: backButton
             Layout.fillWidth: true

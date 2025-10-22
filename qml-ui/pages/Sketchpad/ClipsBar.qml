@@ -222,9 +222,16 @@ QQC2.Pane {
             }
 
             // Clip details colume, visible when not in song mode
-            ColumnLayout {
+            QQC2.Pane {
                 Layout.fillWidth: false
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                Layout.alignment: Qt.AlignTop
+                padding: PlasmaCore.Theme.padding
+                background: null
+            contentItem : Item {
+                ColumnLayout {
+                anchors.fill: parent
 
                 QQC2.Label {
                     Layout.fillWidth: true
@@ -278,6 +285,8 @@ QQC2.Pane {
                 //         bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
                 //     }
                 // }
+            }
+            }
             }
         }
     }

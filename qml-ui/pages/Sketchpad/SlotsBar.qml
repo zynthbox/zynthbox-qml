@@ -617,12 +617,23 @@ QQC2.Pane {
                         }
                     }
                 }
-                ColumnLayout {
+
+                QQC2.Pane {
+
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignTop
+
+                    padding: PlasmaCore.Theme.padding
+                    background: null
+
+                contentItem: Item {
+                    
+                    
+                    ColumnLayout {
+                    anchors.fill: parent
                     spacing: Kirigami.Units.mediumSpacing
 
                     QQC2.Label {
@@ -776,6 +787,8 @@ QQC2.Pane {
                         Layout.fillHeight: true
                     }
                 }
+                }
+            }
             }
         }
     }

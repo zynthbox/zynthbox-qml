@@ -24,24 +24,18 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
-import org.kde.plasma.core 2.0 as PlasmaCore
-
 import Qt.labs.folderlistmodel 2.11
-
+import QtQuick 2.10
+import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Layouts 1.4
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
+import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 // GridLayout so TabbedControlView knows how to navigate it
 QQC2.Pane {
     id: root
-
-    Layout.fillWidth: true
-    padding: 0
-    background: null //for now it is not themeable
 
     property QtObject bottomBar: null
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
@@ -54,32 +48,30 @@ QQC2.Pane {
     signal pressAndHold()
 
     function cuiaCallback(cuia) {
-        console.log("### Clips Bar CUIA Callback :", cuia)
-
+        console.log("### Clips Bar CUIA Callback :", cuia);
         var clip;
-        var returnVal = false
-
+        var returnVal = false;
         switch (cuia) {
         case "SWITCH_BACK_SHORT":
-            bottomStack.slotsBar.channelButton.checked = true
-            returnVal = true
-            break
-
+            bottomStack.slotsBar.channelButton.checked = true;
+            returnVal = true;
+            break;
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-            returnVal = true
-            break
-
+            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            returnVal = true;
+            break;
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-            returnVal = true
-            break
+            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            returnVal = true;
+            break;
         }
-
-        console.log("### Clips Bar CUIA Callback :", selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, cuia, clip)
-
+        console.log("### Clips Bar CUIA Callback :", selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, cuia, clip);
         return returnVal;
     }
+
+    Layout.fillWidth: true
+    padding: 0
+    background: null //for now it is not themeable
 
     QQC2.ButtonGroup {
         buttons: buttonsColumn.children
@@ -88,25 +80,26 @@ QQC2.Pane {
     contentItem: Item {
         Zynthian.ActionPickerPopup {
             id: clipSettingsPopup
+
             columns: 3
             rows: 3
             actions: [
                 Kirigami.Action {
                     text: root.selectedObject && root.selectedClipObject.enabled ? qsTr("Disable Clip") : qsTr("Enable Clip")
                     onTriggered: {
-                        root.selectedClipObject.enabled = !root.selectedClipObject.enabled
+                        root.selectedClipObject.enabled = !root.selectedClipObject.enabled;
                     }
                 },
                 Kirigami.Action {
                     text: qsTr("Clear Notes\n(Keep settings)")
                     onTriggered: {
-                        root.selectedClipPattern.clear()
+                        root.selectedClipPattern.clear();
                     }
                 },
                 Kirigami.Action {
                     text: qsTr("Delete Pattern")
                     onTriggered: {
-                        root.selectedClipPattern.resetPattern(true)
+                        root.selectedClipPattern.resetPattern(true);
                     }
                 }
             ]
@@ -118,6 +111,7 @@ QQC2.Pane {
 
             BottomStackTabs {
                 id: buttonsColumn
+
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 6
@@ -127,31 +121,30 @@ QQC2.Pane {
             QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-
-                Layout.topMargin: svgBg.inset.top
-                Layout.leftMargin: svgBg.inset.left
-                Layout.rightMargin: svgBg.inset.right
-                Layout.bottomMargin: svgBg.inset.bottom
-
-                topPadding: svgBg.topPadding
-                bottomPadding: svgBg.bottomPadding
-                leftPadding: svgBg.leftPadding
-                rightPadding: svgBg.rightPadding
+                Layout.topMargin: svgBg.visible ? svgBg.inset.top : 0
+                Layout.leftMargin: svgBg.visible ? svgBg.inset.left : 0
+                Layout.rightMargin: svgBg.visible ? svgBg.inset.right : 0
+                Layout.bottomMargin: svgBg.visible ? svgBg.inset.bottom : 0
+                topPadding: svgBg.visible ? svgBg.topPadding : 0
+                bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
+                leftPadding: svgBg.visible ? svgBg.leftPadding : 0
+                rightPadding: svgBg.visible ? svgBg.rightPadding : 0
 
                 background: Item {
                     PlasmaCore.FrameSvgItem {
                         id: svgBg
-                        visible: fromCurrentTheme
-                        anchors.fill: parent
 
                         readonly property real leftPadding: fixedMargins.left
                         readonly property real rightPadding: fixedMargins.right
                         readonly property real topPadding: fixedMargins.top
                         readonly property real bottomPadding: fixedMargins.bottom
 
+                        visible: fromCurrentTheme
+                        anchors.fill: parent
                         imagePath: "widgets/tracks-background"
                         colorGroup: PlasmaCore.Theme.ViewColorGroup
                     }
+
                 }
 
                 contentItem: Item {
@@ -159,24 +152,26 @@ QQC2.Pane {
 
                     RowLayout {
                         id: contentColumn
-                        anchors.fill: parent
 
+                        anchors.fill: parent
                         spacing: 1
 
                         Connections {
-                            target: Zynthbox.PlayfieldManager
                             function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
                                 // signalCounterThing.boop();
                                 let trackDelegate = clipDelegateRepeater.itemAt(sketchpadTrack);
                                 if (trackDelegate && trackDelegate.channel && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
                                     let clipDelegate = trackDelegate.repeater.itemAt(clip);
-                                    if (clipDelegate.nextBarState != newPlaystate) {
+                                    if (clipDelegate.nextBarState != newPlaystate)
                                         clipDelegate.nextBarState = newPlaystate;
-                                    }
+
                                 }
                             }
+
+                            target: Zynthbox.PlayfieldManager
                         }
                         // Timer {
+
                         //     id: signalCounterThing
                         //     interval: 10; running: false; repeat: false;
                         //     property int signalReceivedCount: 0
@@ -191,7 +186,9 @@ QQC2.Pane {
                         // }
                         Repeater {
                             id: clipDelegateRepeater
+
                             model: 10
+
                             delegate: ClipsBarDelegate {
                                 id: clipsBarDelegate
 
@@ -199,26 +196,30 @@ QQC2.Pane {
                                 Layout.fillHeight: true
                                 channel: zynqtgui.sketchpad.song.channelsModel.getChannel(model.index)
                                 onClicked: {
-                                    zynqtgui.sketchpad.selectedTrackId = model.index
-                                    root.selectedClipChannel = clipsBarDelegate.channel
-                                    root.selectedClipObject = clipsBarDelegate.selectedClipObject
-                                    root.selectedClipPattern = clipsBarDelegate.selectedClipPattern
-                                    root.selectedComponent = clipsBarDelegate.selectedComponent
-                                    root.clicked()
+                                    zynqtgui.sketchpad.selectedTrackId = model.index;
+                                    root.selectedClipChannel = clipsBarDelegate.channel;
+                                    root.selectedClipObject = clipsBarDelegate.selectedClipObject;
+                                    root.selectedClipPattern = clipsBarDelegate.selectedClipPattern;
+                                    root.selectedComponent = clipsBarDelegate.selectedComponent;
+                                    root.clicked();
                                 }
                                 onPressAndHold: {
-                                    zynqtgui.sketchpad.selectedTrackId = model.index
-                                    root.selectedClipChannel = clipsBarDelegate.channel
-                                    root.selectedClipObject = clipsBarDelegate.selectedClipObject
-                                    root.selectedClipPattern = clipsBarDelegate.selectedClipPattern
-                                    root.selectedComponent = clipsBarDelegate.selectedComponent
-                                    root.pressAndHold()
-                                    clipSettingsPopup.open()
+                                    zynqtgui.sketchpad.selectedTrackId = model.index;
+                                    root.selectedClipChannel = clipsBarDelegate.channel;
+                                    root.selectedClipObject = clipsBarDelegate.selectedClipObject;
+                                    root.selectedClipPattern = clipsBarDelegate.selectedClipPattern;
+                                    root.selectedComponent = clipsBarDelegate.selectedComponent;
+                                    root.pressAndHold();
+                                    clipSettingsPopup.open();
                                 }
                             }
+
                         }
+
                     }
+
                 }
+
             }
 
             // Clip details colume, visible when not in song mode
@@ -229,65 +230,74 @@ QQC2.Pane {
                 Layout.alignment: Qt.AlignTop
                 padding: PlasmaCore.Theme.padding
                 background: null
-            contentItem : Item {
-                ColumnLayout {
-                anchors.fill: parent
 
-                QQC2.Label {
-                    Layout.fillWidth: true
-                    wrapMode: Text.WrapAnywhere
-                    enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
-                    text: root.selectedClipObject ? root.selectedClipObject.path.split("/").pop() : ""
-                    // visible: text.length > 0
-                }
+                contentItem: Item {
+                    ColumnLayout {
+                        // TODO : 1.1 Enable this back when loop mode gets enabled again
+                        // QQC2.Button {
+                        //     Layout.fillWidth: true
+                        //     enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
+                        //     text: qsTr("Swap with...")
+                        //     onClicked: {
+                        //         bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
+                        //     }
+                        // }
 
-                QQC2.Label {
-                    Layout.fillWidth: true
-                    wrapMode: Text.WrapAnywhere
-                    enabled: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
-                    text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.clipName) : ""
-                     // visible: text.length > 0
-                }
+                        anchors.fill: parent
 
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    enabled: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
-                    text: qsTr("Swap with...")
-                    onClicked: {
-                        bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.clipIndex);
-                    }
-                }
+                        QQC2.Label {
+                            // visible: text.length > 0
 
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    text: qsTr("Clear Column")
-                    onClicked: {
-                        applicationWindow().confirmer.confirmSomething(qsTr("Clear Column?"), qsTr("Are you sure that you want to clear entire column?"), function() {
-                            // TODO : 1.1 Clear clips when loop mode gets enabled
-                            for (let i=0; i < Zynthbox.Plugin.sketchpadSlotCount; ++i) {
-                                Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.selectedClipChannel.id, i).resetPattern(true)
+                            Layout.fillWidth: true
+                            wrapMode: Text.WrapAnywhere
+                            enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
+                            text: root.selectedClipObject ? root.selectedClipObject.path.split("/").pop() : ""
+                        }
+
+                        QQC2.Label {
+                            // visible: text.length > 0
+
+                            Layout.fillWidth: true
+                            wrapMode: Text.WrapAnywhere
+                            enabled: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
+                            text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.clipName) : ""
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            enabled: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
+                            text: qsTr("Swap with...")
+                            onClicked: {
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.clipIndex);
                             }
-                        });
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            text: qsTr("Clear Column")
+                            onClicked: {
+                                applicationWindow().confirmer.confirmSomething(qsTr("Clear Column?"), qsTr("Are you sure that you want to clear entire column?"), function() {
+                                    // TODO : 1.1 Clear clips when loop mode gets enabled
+                                    for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; ++i) {
+                                        Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.selectedClipChannel.id, i).resetPattern(true);
+                                    }
+                                });
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
                     }
+
                 }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
+            }
 
-                // TODO : 1.1 Enable this back when loop mode gets enabled again
-                // QQC2.Button {
-                //     Layout.fillWidth: true
-                //     enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
-                //     text: qsTr("Swap with...")
-                //     onClicked: {
-                //         bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
-                //     }
-                // }
-            }
-            }
-            }
         }
+
     }
+
 }

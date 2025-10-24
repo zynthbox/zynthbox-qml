@@ -45,6 +45,7 @@ QQC2.ToolBar {
 
     background: Rectangle {
         color: Kirigami.Theme.backgroundColor
+        opacity: 0.2
     }
 
     contentItem: RowLayout {

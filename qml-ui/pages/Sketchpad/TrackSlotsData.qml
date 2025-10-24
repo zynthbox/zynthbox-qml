@@ -270,7 +270,7 @@ GridLayout {
                     // If slot is a enabled clip or slot is selectedSlot, show highlighted border
                     border.color: backgroundItem.highlightBorder ? Kirigami.Theme.highlightColor : "#ff999999"
                     border.width: 2
-                    radius: 4
+                    radius: PlasmaCore.Theme.radius
                 }
                 PlasmaCore.FrameSvgItem {
                     id: svgBg
@@ -386,7 +386,8 @@ GridLayout {
                     id: slotDelegateVisualsContainer
                     anchors {
                         fill: parent
-                        margins: Kirigami.Units.smallSpacing
+                        // margins: Kirigami.Units.smallSpacing
+                        margins: PlasmaCore.Theme.padding
                     }
                     visible: control.dragEnabled
                     Rectangle {
@@ -396,7 +397,7 @@ GridLayout {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: 4
+                        radius: PlasmaCore.Theme.radius
                         opacity: 0.8
                         visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
                         color: Kirigami.Theme.highlightColor
@@ -408,7 +409,7 @@ GridLayout {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: 4
+                        radius: PlasmaCore.Theme.radius
                         opacity: 0.8
                         visible: slotDelegate.cppClipObject
                         color: Kirigami.Theme.highlightColor
@@ -421,7 +422,7 @@ GridLayout {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: 4
+                        radius: PlasmaCore.Theme.radius
                         opacity: 0.8
                         visible: control.slotType === "fx" && control.slotData[index] != null && control.slotData[index].length > 0
                         color: Kirigami.Theme.highlightColor
@@ -434,7 +435,7 @@ GridLayout {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: 4
+                        radius: PlasmaCore.Theme.radius
                         opacity: 0.8
                         visible: control.slotType === "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0
                         color: Kirigami.Theme.highlightColor

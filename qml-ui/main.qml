@@ -1215,7 +1215,12 @@ Kirigami.AbstractApplicationWindow {
         Kirigami.Theme.inherit: false
         // TODO: this should eventually go to Window and the panels to View
         Kirigami.Theme.colorSet: Kirigami.Theme.View
-        color: Kirigami.Theme.backgroundColor
+        color: "yellow"
+
+        Image {
+            anchors.fill: parent
+            source: PlasmaCore.Theme.wallpaperPath
+        }
     }
     footer: Zynthian.ActionBar {
         z: 999999

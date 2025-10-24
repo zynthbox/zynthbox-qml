@@ -88,6 +88,7 @@ QQC2.Pane {
     {
         color: Kirigami.Theme.backgroundColor
         // border.color: "red"
+        opacity: 0.2
     }
 
     function pickNextSlot(onlySelectSlot=false) {
@@ -760,10 +761,10 @@ QQC2.Pane {
         buttons: buttonsColumn.children
     }
 
-Text {
-    text: "Spacing:" + PlasmaCore.Theme.spacing + " Padding: " + PlasmaCore.Theme.padding
-    color: "orange"
-}
+// Text {
+//     text: "Spacing:" + PlasmaCore.Theme.spacing + " Padding: " + PlasmaCore.Theme.wallpaperPath
+//     color: "orange"
+// }
     contentItem: Item {
         RowLayout {
             spacing: PlasmaCore.Theme.spacing
@@ -781,15 +782,15 @@ Text {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                Layout.topMargin: svgBg4.inset.top
-                Layout.leftMargin: svgBg4.inset.left
-                Layout.rightMargin: svgBg4.inset.right
-                Layout.bottomMargin: svgBg4.inset.bottom
+                Layout.topMargin: svgBg4.visible ? svgBg4.inset.top : 0
+                Layout.leftMargin: svgBg4.visible ? svgBg4.inset.left : 0
+                Layout.rightMargin: svgBg4.visible ? svgBg4.inset.right : 0
+                Layout.bottomMargin: svgBg4.visible ? svgBg4.inset.bottom : 0
 
-                padding: svgBg4.visible ? svgBg4.topPadding : PlasmaCore.Theme.padding
-                // bottomPadding: svgBg4.bottomPadding
-                // leftPadding: svgBg4.leftPadding
-                // rightPadding: svgBg4.rightPadding
+                topPadding: svgBg4.visible ? svgBg4.topPadding : PlasmaCore.Theme.padding
+                bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : PlasmaCore.Theme.padding
+                leftPadding: svgBg4.visible ? svgBg4.leftPadding : PlasmaCore.Theme.padding
+                rightPadding: svgBg4.visible ? svgBg4.rightPadding : PlasmaCore.Theme.padding
 
                 background: Item {
                     PlasmaCore.FrameSvgItem {

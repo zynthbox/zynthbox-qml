@@ -619,6 +619,12 @@ Zynthian.ScreenPage {
     topPadding: 0
     bottomPadding: 0
     backAction.visible: false
+    background: Item {
+        Image {
+            anchors.fill: parent
+            source: PlasmaCore.Theme.wallpaperPath
+        }
+    }
 
     contextualActions: [
         Kirigami.Action {
@@ -1288,21 +1294,22 @@ Zynthian.ScreenPage {
                         {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            Layout.topMargin: svgBg2.visible ? svgBg2.inset.top : 1
-                            Layout.leftMargin: svgBg2.inset.left
-                            Layout.rightMargin: svgBg2.inset.right
-                            Layout.bottomMargin: svgBg2.inset.bottom
+                            Layout.topMargin: svgBg2.visible ? svgBg2.inset.top : 0
+                            Layout.leftMargin: svgBg2.visible ? svgBg2.inset.left : 0
+                            Layout.rightMargin: svgBg2.visible ? svgBg2.inset.right : 0
+                            Layout.bottomMargin: svgBg2.visible ? svgBg2.inset.bottom : 0
 
-                            topPadding: svgBg2.topPadding 
-                            bottomPadding: svgBg2.bottomPadding
-                            leftPadding: svgBg2.leftPadding
-                            rightPadding: svgBg2.rightPadding
+                            topPadding: csvgBg2.visible ?  svgBg2.topPadding : 0
+                            bottomPadding: svgBg2.visible ? svgBg2.bottomPadding :0
+                            leftPadding: svgBg2.visible ?  svgBg2.leftPadding : 0
+                            rightPadding:svgBg2.visible ?  svgBg2.rightPadding :0
 
                             background: Item
                             {
                                 PlasmaCore.FrameSvgItem {
                                     id: svgBg2
                                     anchors.fill: parent
+                                    visible: fromCurrentTheme
                                     // property bool highlighted
 
                                     readonly property real leftPadding: fixedMargins.left
@@ -1741,20 +1748,20 @@ Zynthian.ScreenPage {
 
                 background: Item
                 {
-                    PlasmaCore.FrameSvgItem {
-                        id: svgBg3
-                        visible: fromCurrentTheme
-                        anchors.fill: parent
+                    // PlasmaCore.FrameSvgItem {
+                    //     id: svgBg3
+                    //     visible: fromCurrentTheme
+                    //     anchors.fill: parent
 
-                        readonly property real leftPadding: visible ? fixedMargins.left : 0
-                        readonly property real rightPadding: visible ? fixedMargins.right : 0
-                        readonly property real topPadding: visible ? fixedMargins.top : 0
-                        readonly property real bottomPadding: visible ? fixedMargins.bottom : 0
+                    //     readonly property real leftPadding: visible ? fixedMargins.left : 0
+                    //     readonly property real rightPadding: visible ? fixedMargins.right : 0
+                    //     readonly property real topPadding: visible ? fixedMargins.top : 0
+                    //     readonly property real bottomPadding: visible ? fixedMargins.bottom : 0
 
-                        imagePath: "widgets/statusinfo_background"
-                        colorGroup: PlasmaCore.Theme.NormalColorGroup
-                        enabledBorders: PlasmaCore.FrameSvgItem.NoBorder
-                    }
+                    //     imagePath: "widgets/statusinfo_background"
+                    //     colorGroup: PlasmaCore.Theme.NormalColorGroup
+                    //     enabledBorders: PlasmaCore.FrameSvgItem.NoBorder
+                    // }
                 }
 
                 contentItem : Item {

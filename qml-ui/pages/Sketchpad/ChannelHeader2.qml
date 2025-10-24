@@ -84,7 +84,7 @@ QQC2.Control {
         // An overlay for channel muted state
         Rectangle {
             anchors.fill: parent
-            anchors.margins: Kirigami.Units.smallSpacing
+            // anchors.margins: PlasmaCore.Theme.padding
             color: Kirigami.Theme.negativeBackgroundColor
             opacity: root.channel.muted ? 0.7 : 0
 

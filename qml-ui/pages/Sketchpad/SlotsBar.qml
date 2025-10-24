@@ -439,15 +439,15 @@ QQC2.Pane {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.topMargin: svgBg.inset.top
-                    Layout.leftMargin: svgBg.inset.left
-                    Layout.rightMargin: svgBg.inset.right
-                    Layout.bottomMargin: svgBg.inset.bottom
+                    Layout.topMargin: svgBg.visible ?svgBg.inset.top : 0
+                    Layout.leftMargin: svgBg.visible ?svgBg.inset.left : 0
+                    Layout.rightMargin: svgBg.visible ?svgBg.inset.right : 0
+                    Layout.bottomMargin: svgBg.visible ?svgBg.inset.bottom : 0
 
-                    topPadding: svgBg.topPadding
-                    bottomPadding: svgBg.bottomPadding
-                    leftPadding: svgBg.leftPadding
-                    rightPadding: svgBg.rightPadding
+                    topPadding: svgBg.visible ?svgBg.topPadding : 0
+                    bottomPadding: svgBg.visible ?svgBg.bottomPadding : 0
+                    leftPadding: svgBg.visible ?svgBg.leftPadding : 0
+                    rightPadding: svgBg.visible ?svgBg.rightPadding : 0
 
                     background: Item {
                         Rectangle {

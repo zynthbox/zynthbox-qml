@@ -619,12 +619,7 @@ Zynthian.ScreenPage {
     topPadding: 0
     bottomPadding: 0
     backAction.visible: false
-    background: Item {
-        Image {
-            anchors.fill: parent
-            source: PlasmaCore.Theme.wallpaperPath
-        }
-    }
+    background: null
 
     contextualActions: [
         Kirigami.Action {

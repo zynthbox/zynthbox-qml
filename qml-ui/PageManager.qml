@@ -206,6 +206,7 @@ Zynthian.Stack {
 
     background: Rectangle {
         color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
     }
 
     // Get page instance

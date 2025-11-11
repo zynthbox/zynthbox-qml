@@ -122,7 +122,7 @@ Zynthian.ScreenPage {
                     checkable: true
                     checked: zynqtgui.main.visibleCategory === "modules"
                     text: qsTr("Modules")
-                    onClicked: zynqtgui.main.visibleCategory = "modules"
+                    onClicked: zynqtgui.main.audio_settings = "modules"
                 }
 
                 QQC2.Button {

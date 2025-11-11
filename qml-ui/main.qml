@@ -1096,29 +1096,10 @@ Kirigami.AbstractApplicationWindow {
             QQC2.Control
             {
                 Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                Layout.fillHeight: svgBg2.fromCurrentTheme
                 topPadding: svgBg2.topPadding
                 bottomPadding: svgBg2.bottomPadding
                 leftPadding: svgBg2.leftPadding
                 rightPadding: svgBg2.rightPadding
-
-                background: Item
-                {
-                    PlasmaCore.FrameSvgItem {
-                        id: svgBg2
-                        anchors.fill: parent
-
-                        readonly property real leftPadding: margins.left
-                        readonly property real rightPadding: margins.right
-                        readonly property real topPadding: margins.top
-                        readonly property real bottomPadding: margins.bottom
-
-                        imagePath: "widgets/statusinfo_background"
-                        //colorGroup: PlasmaCore.Theme.ViewColorGroup
-                        prefix: root.highlighted ? ["focus", ""] : ""
-                        colorGroup: PlasmaCore.Theme.ViewColorGroup
-                    }
-                }
 
                 contentItem: Row {
                     spacing: 0
@@ -1150,7 +1131,6 @@ Kirigami.AbstractApplicationWindow {
 
                         background: Item
                         {
-                            visible: !svgBg2.fromCurrentTheme
                             PlasmaCore.FrameSvgItem {
                                 id: recBtnBg
                                 anchors.fill: parent
@@ -1187,7 +1167,6 @@ Kirigami.AbstractApplicationWindow {
 
                         background: Item
                         {
-                            visible: !svgBg2.fromCurrentTheme
                             PlasmaCore.FrameSvgItem {
                                 id: playBtnBg
                                 anchors.fill: parent
@@ -1222,19 +1201,19 @@ Kirigami.AbstractApplicationWindow {
             id: wallpaper
             anchors.fill: parent
             source: PlasmaCore.Theme.wallpaperPath
-            visible: !PlasmaCore.Theme.contrastEnabled
+            // visible: !PlasmaCore.Theme.contrastEnabled
         }
 
-        Loader {
-            active: PlasmaCore.Theme.contrastEnabled
-            anchors.fill: wallpaper
+        // Loader {
+        //     active: PlasmaCore.Theme.contrastEnabled && wallpaper.status === Image.Ready
+        //     anchors.fill: wallpaper
 
-            sourceComponent:  BrightnessContrast {
-                source: wallpaper
-                contrast: PlasmaCore.Theme.backgroundContrast
-                brightness: PlasmaCore.Theme.backgroundIntensity
-            }
-        }
+        //     sourceComponent:  BrightnessContrast {
+        //         source: wallpaper
+        //         contrast: PlasmaCore.Theme.backgroundContrast
+        //         brightness: PlasmaCore.Theme.backgroundIntensity
+        //     }
+        // }
     }
     footer: Zynthian.ActionBar {
         z: 999999
@@ -1296,6 +1275,11 @@ Kirigami.AbstractApplicationWindow {
         id: pageManager
         anchors.fill: parent
     }
+
+    // Text {
+    //     color: "orange"
+    //     text:  PlasmaCore.Theme.wallpaperPath
+    // }
 
     Instantiator {
         model: zynqtgui.keybinding.key_sequences_model

@@ -451,6 +451,8 @@ QQC2.Pane
                 GridLayout {
                     anchors.fill: parent
                     columns: 3
+                    rowSpacing:  PlasmaCore.Theme.padding
+                    columnSpacing: PlasmaCore.Theme.padding
                     Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true

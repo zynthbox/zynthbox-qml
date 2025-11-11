@@ -803,7 +803,7 @@ QQC2.Pane {
                         readonly property real topPadding: fixedMargins.top
                         readonly property real bottomPadding: fixedMargins.bottom
 
-                        imagePath: "widgets/statusinfo_background"
+                        imagePath: "widgets/tracks_view_background"
                         colorGroup: PlasmaCore.Theme.ViewColorGroup
                     }
                 }
@@ -1178,7 +1178,7 @@ QQC2.Pane {
                                             id: svgBg
                                             anchors.fill: parent
                                             readonly property bool highlighted: false
-                                            imagePath: "widgets/statusinfo_background"
+                                            imagePath: "widgets/tracks_view_background"
                                             colorGroup: PlasmaCore.Theme.ViewColorGroup
                                             prefix: svgBg.highlighted ? ["focus", ""] : ""
                                         }
@@ -1678,7 +1678,7 @@ QQC2.Pane {
                                             anchors.fill: parent
                                             readonly property bool highlighted: false
 
-                                            imagePath: "widgets/statusinfo_background"
+                                            imagePath: "widgets/tracks_view_background"
                                             colorGroup: PlasmaCore.Theme.ViewColorGroup
                                             prefix: svgBg2.highlighted ? ["focus", ""] : ""
                                         }

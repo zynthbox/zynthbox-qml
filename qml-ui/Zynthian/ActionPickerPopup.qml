@@ -29,6 +29,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import Zynthian 1.0 as Zynthian
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 Zynthian.Popup {
     id: component
@@ -115,8 +116,10 @@ Zynthian.Popup {
     GridLayout {
         id: mainLayout
         anchors.fill: parent
-        rowSpacing: Kirigami.Units.largeSpacing
-        columnSpacing: Kirigami.Units.largeSpacing
+        // rowSpacing: Kirigami.Units.largeSpacing
+        // columnSpacing: Kirigami.Units.largeSpacing
+        rowSpacing: PlasmaCore.Theme.padding
+        columnSpacing: PlasmaCore.Theme.padding
         columns: component.columns
         rows: component.rows
         flow: GridLayout.TopToBottom
@@ -132,7 +135,7 @@ Zynthian.Popup {
                 text: modelData != null && modelData.hasOwnProperty("text") ? modelData.text : ""
                 visible: modelData != null && modelData.hasOwnProperty("visible") ? modelData.visible : true
                 enabled: modelData != null && modelData.hasOwnProperty("enabled") ? modelData.enabled : true
-                opacity: enabled ? 1 : 0.3
+                // opacity: enabled ? 1 : 0.3
                 onClicked: {
                     component.close();
                     modelData.trigger();
@@ -147,7 +150,7 @@ Zynthian.Popup {
                         width: 2
                         color: Kirigami.Theme.textColor
                     }
-                    opacity: _private.currentIndex === index ? 0.7 : 0
+                    opacity: _private.currentIndex === index ? 1 : 0
                 }
             }
         }

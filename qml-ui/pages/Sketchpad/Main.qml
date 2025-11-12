@@ -1222,9 +1222,9 @@ Zynthian.ScreenPage {
                         readonly property real topPadding: fixedMargins.top
                         readonly property real bottomPadding: fixedMargins.bottom
 
-                        imagePath: "widgets/statusinfo_background"
+                        imagePath: "widgets/tracks_overview_background"
                         colorGroup: PlasmaCore.Theme.ViewColorGroup
-                        enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
+                        // enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
                     }
                 }
 

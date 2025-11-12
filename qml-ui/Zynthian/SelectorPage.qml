@@ -42,7 +42,7 @@ ScreenPage {
     property alias currentIndex: view.currentIndex
     property alias cuiaCallback: view.cuiaCallback
 
-    bottomPadding: Kirigami.Units.gridUnit
+    // bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: view.forceActiveFocus()
 
     onFocusChanged: {

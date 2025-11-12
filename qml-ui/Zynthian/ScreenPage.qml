@@ -62,7 +62,7 @@ Kirigami.Page {
     signal itemActivated(string screenId, int index)
     signal itemActivatedSecondary(string screenId, int index)
 
-    bottomPadding: Kirigami.Units.gridUnit
+    // bottomPadding: Kirigami.Units.gridUnit
 
     Component.onCompleted: {
         //HACK to disable kirigami automatic toolbars in that old version

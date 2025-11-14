@@ -24,6 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.10
+import QtQml 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
@@ -127,6 +128,7 @@ Zynthian.Popup {
             model: component.actions
             delegate: QQC2.Button {
                 id: delegate
+                property int mindex: index
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 12
                 Layout.minimumHeight: Kirigami.Units.gridUnit * 4
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 12
@@ -141,18 +143,30 @@ Zynthian.Popup {
                     modelData.trigger();
                 }
                 Rectangle {
-                    anchors {
-                        fill: parent
-                        margins: -5
-                    }
+                    parent: _overlay
+                    
+                    z: parent.z + 9999
+                    height: delegate.height + 8
+                    width: delegate.width + 8
+                    x: delegate.x-4
+                    y: delegate.y-4
+                    // anchors {
+                    //     fill: delegate
+                    //     margins: -5
+                    // }
                     color: "transparent"
                     border {
                         width: 2
-                        color: Kirigami.Theme.textColor
+                        color:  Kirigami.Theme.textColor
                     }
                     opacity: _private.currentIndex === index ? 1 : 0
                 }
             }
         }
+    }
+
+    Item {
+        id: _overlay
+        anchors.fill: parent
     }
 }

@@ -75,6 +75,11 @@ Zynthian.ScreenPage {
     property int currentIndex: 0
     readonly property int count: content.children.length
     property var cuiaCallback: function(cuia) {
+        // case "KNOB3_TOUCHED":
+        // case "KNOB3_RELEASED":
+        //     root.currentControl().clicked();
+        //     return true;
+
         switch (cuia) {
         case "SELECT_DOWN":
         case "KNOB3_UP":
@@ -84,10 +89,6 @@ Zynthian.ScreenPage {
         case "KNOB3_DOWN":
             root.decrementCurrentIndex();
             return true;
-        // case "KNOB3_TOUCHED":
-        // case "KNOB3_RELEASED":
-        //     root.currentControl().clicked();
-        //     return true;
         case "KNOB0_UP":
             root.currentControl().incrementValue();
             return true;

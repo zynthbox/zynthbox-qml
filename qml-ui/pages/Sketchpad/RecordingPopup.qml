@@ -142,8 +142,15 @@ Zynthian.Popup {
                     // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
                     break;
                 case "SWITCH_RECORD":
-                    // If user does alt+record, recording should be started immediately, and metronome+record to do so with default countin (if done while stopped, otherwise just start recording immediately)
-                    if (zynqtgui.sketchpad.isRecording === false && (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed)) {
+                    if (zynqtgui.sketchpad.isRecording === true && (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed)) {
+                        // If user does alt+record or metronome+record, and we're already recording, stop recording
+                        zynqtgui.callable_ui_action_simple("SWITCH_STOP");
+                        if (zynqtgui.metronomeButtonPressed) {
+                            zynqtgui.ignoreNextMetronomeButtonPress = true
+                        }
+                        returnValue = true;
+                    } else if (zynqtgui.sketchpad.isRecording === false && (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed)) {
+                        // If user does alt+record, recording should be started immediately, and metronome+record to do so with default countin (if done while stopped, otherwise just start recording immediately)
                         let doCountin = false;
                         if (zynqtgui.metronomeButtonPressed) {
                             doCountin = true;

@@ -669,7 +669,7 @@ def audio_autoconnect(force=False):
     # TODO Maybe we could actually get away with only using the one global samplersynth, and instead use the two first lanes to perform the same job? (no effect for lane 0, effects for lane 1, no connection for the other three)
     # BEGIN Connect SamplerSynth's global effected to the global effects passthrough
     for laneType in ["lane", "sketch"]:
-        samplerSynthEffectedPorts =jclient.get_ports(f"SamplerSynth:global-{laneType}2", is_audio=True, is_output=True)
+        samplerSynthEffectedPorts = jclient.get_ports(f"SamplerSynth:global-{laneType}2-", is_audio=True, is_output=True)
         for port in zip(samplerSynthEffectedPorts, globalFx1InputPorts):
             zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
         for port in zip(samplerSynthEffectedPorts, globalFx2InputPorts):
@@ -713,7 +713,7 @@ def audio_autoconnect(force=False):
         if song:
             for channelId in range(0, 10):
                 channel = song.channelsModel.getChannel(channelId)
-                channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channelId + 1}-", is_audio=True, is_input=True)
+                channelAudioLevelsInputPorts = [f"AudioLevels:Channel{channelId + 1}-left_in", f"AudioLevels:Channel{channelId + 1}-right_in"]
                 laneHasInput = [False] * 5; # needs to be lane-bound, to ensure we don't disconnect just because we end up without a thing later
                 sketchLaneHasInput = [False] * 5; # needs to be lane-bound, to ensure we don't disconnect just because we end up without a thing later
                 if channel is not None:
@@ -723,8 +723,8 @@ def audio_autoconnect(force=False):
                     if channel.trackRoutingStyle == "one-to-one":
                         channelInputLanes = [0, 1, 2, 3, 4]
                     for laneId in range(0, 5):
-                        laneInputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-input", is_audio=True, is_output=False, is_input=True)
-                        sketchLaneInputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-input", is_audio=True, is_output=False, is_input=True)
+                        laneInputs = [f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-inputLeft", f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-inputRight"]
+                        sketchLaneInputs = [f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-inputLeft", f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-inputRight"]
                         # BEGIN Handle external inputs for external mode channels
                         # only hook up the first lane, doesn't make super lots of sense otherwise
                         if laneId == 0 and channel.trackType == "external":
@@ -741,7 +741,7 @@ def audio_autoconnect(force=False):
                                 except: pass
                         # END Handle external inputs for external mode channels
                         # BEGIN Handle sample slots
-                        samplerOutputPorts = jclient.get_ports(name_pattern=f"SamplerSynth:channel_{channelId + 1}-lane{laneId + 1}", is_audio=True, is_output=True, is_input=False)
+                        samplerOutputPorts = [f"SamplerSynth:channel_{channelId + 1}-lane{laneId + 1}-left", f"SamplerSynth:channel_{channelId + 1}-lane{laneId + 1}-right"]
                         sample = channel.samples[laneId]
                         if sample.audioSource is not None:
                             # Connect sampler ports if there's a sample in the given slot
@@ -759,7 +759,7 @@ def audio_autoconnect(force=False):
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Handle sample slots
                         # BEGIN Handle sketch slots
-                        samplerOutputPorts = jclient.get_ports(name_pattern=f"SamplerSynth:channel_{channelId + 1}-sketch{laneId + 1}", is_audio=True, is_output=True, is_input=False)
+                        samplerOutputPorts = [f"SamplerSynth:channel_{channelId + 1}-sketch{laneId + 1}-left", f"SamplerSynth:channel_{channelId + 1}-sketch{laneId + 1}-right"]
                         loopSample = channel.clips[laneId].getClip(zynthian_gui_config.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                         if loopSample and loopSample.audioSource is not None:
                             # Connect sampler ports if there's a loop in the given slot
@@ -906,8 +906,8 @@ def audio_autoconnect(force=False):
                                 # END Synth Outputs
                         # END Handle synth slots
                         # BEGIN Connect TrackPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
-                        laneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
-                        laneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
+                        laneOutputsFx1 = [f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx1Left", f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx1Right"]
+                        laneOutputsFx2 = [f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx2Left", f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx2Right"]
                         for port in zip(laneOutputsFx1, globalFx1InputPorts):
                             if laneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
@@ -920,8 +920,8 @@ def audio_autoconnect(force=False):
                                 zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Connect TrackPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
                         # BEGIN Connect TrackPassthrough sketch wet ports to GlobalPlayback and AudioLevels via Global FX
-                        sketchLaneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
-                        sketchLaneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
+                        sketchLaneOutputsFx1 = [f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx1Left", f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx1Right"]
+                        sketchLaneOutputsFx2 = [f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx2Left", f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx2Right"]
                         for port in zip(sketchLaneOutputsFx1, globalFx1InputPorts):
                             if sketchLaneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
@@ -1038,7 +1038,7 @@ def audio_autoconnect(force=False):
                                 else:
                                     # If the previous client is an FX cluster, use the first client to pull the dry output from, otherwise just use the entry directly (which will happen only if it's the TrackPassthrough)
                                     previousClientName = previousClient[0] if type(previousClient) is list else previousClient
-                                    dry_out_ports = jclient.get_ports(previousClientName + "dryOut", is_audio=True, is_output=True)
+                                    dry_out_ports = [previousClientName + "dryOutLeft", previousClientName + "dryOutRight"]
 
                                     # If the client that is being processed is a a list, then it's an FX cluster, so we need to:
                                     # - connect the previous client's dryOutput to the wet input on the first entry in the list (the FX passthrough)
@@ -1048,7 +1048,7 @@ def audio_autoconnect(force=False):
                                     current_in_ports = []
                                     if type(currentClient) is list:
                                         # First collect all our source signal (dry) input ports
-                                        current_in_ports = current_in_ports + jclient.get_ports(currentClient[0] + "input", is_audio=True, is_input=True)
+                                        current_in_ports = current_in_ports + [currentClient[0] + "inputLeft"] + [currentClient[0] + "inputRight"]
                                         fxClientInputs = jclient.get_ports(currentClient[1], is_audio=True, is_input=True)
                                         if len(fxClientInputs) == 1:
                                             fxClientInputs = [fxClientInputs[0], fxClientInputs[0]]
@@ -1057,13 +1057,13 @@ def audio_autoconnect(force=False):
                                         fxClientOutputs = jclient.get_ports(currentClient[1], is_audio=True, is_output=True)
                                         if len(fxClientOutputs) == 1:
                                             fxClientOutputs = [fxClientOutputs[0], fxClientOutputs[0]]
-                                        passthroughDryInputs = jclient.get_ports(currentClient[0] + "wetInput", is_audio=True, is_input=True)
+                                        passthroughDryInputs = [currentClient[0] + "wetInputLeft", currentClient[0] + "wetInputRight"]
                                         # logging.info(f"## Connecting fx client output ports {fxClientOutputs} to passthrough dry inputs {passthroughDryInputs}")
                                         for ports in zip(fxClientOutputs, passthroughDryInputs):
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                     else:
                                         # Simply collect all the inputs (this will be an AudioLevels client, and it's got a stereo pair for this)
-                                        current_in_ports = jclient.get_ports(currentClient, is_audio=True, is_input=True)
+                                        current_in_ports = [currentClient + "left_in", currentClient + "right_in"]
 
                                     # Connect the input ports to their related output ports (backward listing to ensure zip loops the potentially smaller list correctly)
                                     # logging.info(f"## Connecting current in ports {current_in_ports} to dry out ports {dry_out_ports}")
@@ -1164,7 +1164,7 @@ def audio_autoconnect(force=False):
 
     ### BEGIN Connect Samplersynth uneffected ports to GlobalPlayback client
     for laneType in ["lane", "sketch"]:
-        for port in zip(jclient.get_ports(f"SamplerSynth:global-{laneType}1", is_audio=True, is_output=True), globalPlaybackInputPorts):
+        for port in zip(jclient.get_ports(f"SamplerSynth:global-{laneType}1-", is_audio=True, is_output=True), globalPlaybackInputPorts):
             zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     ### END Connect Samplersynth uneffected ports to GlobalPlayback client
 

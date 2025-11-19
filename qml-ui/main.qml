@@ -1096,10 +1096,10 @@ Kirigami.AbstractApplicationWindow {
             QQC2.Control
             {
                 Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                topPadding: svgBg2.topPadding
-                bottomPadding: svgBg2.bottomPadding
-                leftPadding: svgBg2.leftPadding
-                rightPadding: svgBg2.rightPadding
+                // topPadding: svgBg2.topPadding
+                // bottomPadding: svgBg2.bottomPadding
+                // leftPadding: svgBg2.leftPadding
+                // rightPadding: svgBg2.rightPadding
 
                 contentItem: Row {
                     spacing: 0
@@ -1275,11 +1275,6 @@ Kirigami.AbstractApplicationWindow {
         id: pageManager
         anchors.fill: parent
     }
-
-    // Text {
-    //     color: "orange"
-    //     text:  PlasmaCore.Theme.wallpaperPath
-    // }
 
     Instantiator {
         model: zynqtgui.keybinding.key_sequences_model

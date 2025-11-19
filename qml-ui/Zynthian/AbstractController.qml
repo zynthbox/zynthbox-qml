@@ -84,11 +84,14 @@ Card {
         }
     }
 
-    Text {
-        visible: zynqtgui.ui_settings.debugMode
-        text: root.controller.ctrl.symbol
-        font.family: "Hack"
-        font.pointSize: 8
-        color: "orange"
-    }
+    Loader {
+        active: zynqtgui.ui_settings.debugMode && root.controller.ctrl
+
+        sourceComponent: Text {
+                text: root.controller.ctrl.symbol
+                font.family: "Hack"
+                font.pointSize: 8
+                color: "orange"
+            }
+    }  
 }

@@ -1294,7 +1294,7 @@ Zynthian.ScreenPage {
                             Layout.rightMargin: svgBg2.visible ? svgBg2.inset.right : 0
                             Layout.bottomMargin: svgBg2.visible ? svgBg2.inset.bottom : 0
 
-                            topPadding: csvgBg2.visible ?  svgBg2.topPadding : 0
+                            topPadding: svgBg2.visible ?  svgBg2.topPadding : 0
                             bottomPadding: svgBg2.visible ? svgBg2.bottomPadding :0
                             leftPadding: svgBg2.visible ?  svgBg2.leftPadding : 0
                             rightPadding:svgBg2.visible ?  svgBg2.rightPadding :0
@@ -1736,10 +1736,10 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                topPadding: svgBg3.topPadding
-                bottomPadding: svgBg3.bottomPadding
-                leftPadding: svgBg3.leftPadding
-                rightPadding: svgBg3.rightPadding
+                // topPadding: svgBg3.topPadding
+                // bottomPadding: svgBg3.bottomPadding
+                // leftPadding: svgBg3.leftPadding
+                // rightPadding: svgBg3.rightPadding
 
                 background: Item
                 {

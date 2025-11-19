@@ -1329,7 +1329,7 @@ QQC2.Pane {
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
-                                                    Layout.alignment: Qt.AlignVCente
+                                                    Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: Kirigami.Units.gridUnit * 0.5
                                                     text: qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
                                                 }

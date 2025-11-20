@@ -89,14 +89,22 @@ Item {
         let workingModel = _private.pattern.workingModel;
         if (_private.interactionMode == 0) {
             if (zynqtgui.altButtonPressed) {
-                if (stepButtonIndex < 8) {
-                    if (stepButtonIndex < workingModel.availableBars) {
-                        workingModel.activeBar = stepButtonIndex;
-                    }
+                if (zynqtgui.backButtonPressed) {
+                    zynqtgui.ignoreNextBackButtonPress = true;
+                    // Clear the bar contents when holding down the alt+back buttons and pressing a step
                 } else {
-                    let actualStepIndex = stepButtonIndex - 8;
-                    workingModel.patternLength = workingModel.width * (1 + stepButtonIndex);
+                    if (stepButtonIndex < 8) {
+                        if (stepButtonIndex < workingModel.availableBars) {
+                            workingModel.activeBar = stepButtonIndex;
+                        }
+                    } else {
+                        let actualStepIndex = stepButtonIndex - 8;
+                        workingModel.patternLength = workingModel.width * (1 + stepButtonIndex);
+                    }
                 }
+            } else if (zynqtgui.backButtonPressed) {
+                zynqtgui.ignoreNextBackButtonPress = true;
+                // Clear the step contents when holding down the back button and pressing a step
             } else {
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
                 // console.log("Toggle entry for step", stepOffset + stepButtonIndex);
@@ -129,14 +137,19 @@ Item {
                 }
             }
         } else if (_private.interactionMode == 1) {
-            if (stepButtonIndex < 10) {
-                // The track buttons
-                zynqtgui.sketchpad.selectedTrackId = stepButtonIndex;
-            } else if (stepButtonIndex < 11) {
-                // The greyed out button in the middle that we need to work out what to do with
-            } else if (stepButtonIndex < 16) {
-                // The clip buttons
-                component.selectedChannel.selectedClip = stepButtonIndex - 11;
+            if (zynqtgui.backButtonPressed) {
+                zynqtgui.ignoreNextBackButtonPress = true;
+                // Clear the track/clip contents when holding down the back button and pressing a step
+            } else {
+                if (stepButtonIndex < 10) {
+                    // The track buttons
+                    zynqtgui.sketchpad.selectedTrackId = stepButtonIndex;
+                } else if (stepButtonIndex < 11) {
+                    // The greyed out button in the middle that we need to work out what to do with
+                } else if (stepButtonIndex < 16) {
+                    // The clip buttons
+                    component.selectedChannel.selectedClip = stepButtonIndex - 11;
+                }
             }
         } else if (_private.interactionMode == 2) {
             if (_private.stepKeyNotesActive[stepButtonIndex]) {

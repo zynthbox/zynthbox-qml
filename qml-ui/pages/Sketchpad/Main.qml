@@ -44,6 +44,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynqtgui.sketchpad.song
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
+    property bool showMixerEqualiser: false
     property bool showOccupiedSlotsHeader: false
     property QtObject selectedChannel: null
     Timer {
@@ -1274,6 +1275,63 @@ Zynthian.ScreenPage {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
 
+                                        ColumnLayout {
+                                            anchors.fill: parent
+                                            visible: bottomStack.slotsBar.mixerButton.checked
+                                            QQC2.Button {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                text: "Sends"
+                                                checked: root.showMixerEqualiser === false
+                                                Kirigami.Icon {
+                                                    anchors {
+                                                        bottom: parent.bottom
+                                                        right: parent.right
+                                                        margins: Kirigami.Units.smallMargin
+                                                    }
+                                                    visible: parent.checked
+                                                    height: Kirigami.Units.iconSizes.small
+                                                    width: height
+                                                    source: "overflow-menu"
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        if (parent.checked) {
+                                                        } else {
+                                                            root.showMixerEqualiser = false;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            QQC2.Button {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                text: "EQ/Comp"
+                                                checked: root.showMixerEqualiser === true
+                                                Kirigami.Icon {
+                                                    anchors {
+                                                        bottom: parent.bottom
+                                                        right: parent.right
+                                                        margins: Kirigami.Units.smallMargin
+                                                    }
+                                                    visible: parent.checked
+                                                    height: Kirigami.Units.iconSizes.small
+                                                    width: height
+                                                    source: "overflow-menu"
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        if (parent.checked) {
+                                                            root.bottomStack.slotsBar.requestSlotEqualizer(applicationWindow().channels[root.selectedChannel.id], "mixer", -1);
+                                                        } else {
+                                                            root.showMixerEqualiser = true;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                         // QQC2.Button {
                                         //     anchors.fill: parent
                                         //     text: ""
@@ -1594,6 +1652,116 @@ Zynthian.ScreenPage {
 
                                                     RowLayout {
                                                         anchors.fill: parent
+                                                        visible: root.showMixerEqualiser === true
+                                                        ColumnLayout {
+                                                            Layout.fillWidth: true
+                                                            Layout.fillHeight: true
+                                                            QQC2.Label {
+                                                                Layout.fillWidth: true
+                                                                Layout.fillHeight: false
+                                                                Layout.preferredWidth: 1
+                                                                Layout.topMargin: Kirigami.Units.smallSpacing
+                                                                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                                                                horizontalAlignment: Text.AlignRight
+                                                                font.pointSize: 8
+                                                                text: "EQ/Comp"
+                                                            }
+                                                            Item {
+                                                                Layout.fillWidth: true
+                                                                Layout.fillHeight: true
+                                                                Layout.leftMargin: Kirigami.Units.smallSpacing
+                                                                Layout.rightMargin: Kirigami.Units.smallSpacing
+                                                                MultiPointTouchArea {
+                                                                    id: graphTouchArea
+                                                                    anchors.fill: parent
+                                                                    readonly property int thisTrackIndex: index
+                                                                    Zynthbox.JackPassthroughVisualiserItem {
+                                                                        id: passthroughVisualiserItem
+                                                                        anchors.fill: parent
+                                                                        analyseAudio: false
+                                                                        drawDisabledBands: false
+                                                                        source: root.showMixerEqualiser
+                                                                            ? Zynthbox.AudioLevels.tracks[index]
+                                                                            : null
+                                                                        function getCurrentSelectedBand() {
+                                                                            let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
+                                                                            let currentObject = null;
+                                                                            for (let slotIndex = 0; slotIndex < equaliserSettings.length; ++slotIndex) {
+                                                                                if (passthroughVisualiserItem.source.compressorSettings.selected || equaliserSettings[slotIndex].selected) {
+                                                                                    currentObject = equaliserSettings[slotIndex];
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                            if (currentObject === null) {
+                                                                                // Just in case there's nothing active, pick the last thing in the list, and then try and see if the next (first) is active...
+                                                                                currentObject = equaliserSettings[equaliserSettings.length - 1];
+                                                                            }
+                                                                            return currentObject;
+                                                                        }
+                                                                    }
+                                                                    touchPoints: [
+                                                                        TouchPoint {
+                                                                            id: slidePoint;
+                                                                            property QtObject selectedBand: null
+                                                                            property var pressedTime: undefined
+                                                                            onPressedChanged: {
+                                                                                if (pressed) {
+                                                                                    pressedTime = Date.now();
+                                                                                    selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
+                                                                                } else {
+                                                                                    // Only select the next band if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                                                                    if ((Date.now() - pressedTime) < 300) {
+                                                                                        // Activate the track (to ensure things work as expected in various other ways)
+                                                                                        zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
+                                                                                        // If there are more than one active bands, cycle to the next one in the list
+                                                                                        // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
+                                                                                        let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
+                                                                                        let currentBand = passthroughVisualiserItem.getCurrentSelectedBand();
+                                                                                        let currentBandIndex = equaliserSettings.indexOf(currentBand);
+                                                                                        for (let testOffset = 1; testOffset < equaliserSettings.length - 1; testOffset++) {
+                                                                                            let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
+                                                                                            if (testBand.active) {
+                                                                                                // This is the next active band in the settings list, select that and bail out
+                                                                                                testBand.selected = true;
+                                                                                                break;
+                                                                                            }
+                                                                                        }
+                                                                                        // Also make sure to de-select the compressor, in case that one's selected
+                                                                                        passthroughVisualiserItem.source.compressorSettings.selected = false;
+                                                                                    }
+                                                                                    selectedBand = null;
+                                                                                }
+                                                                            }
+                                                                            onYChanged: {
+                                                                                if (pressed && selectedBand) {
+                                                                                    if (selectedBand.active === true) {
+                                                                                        if (selectedBand.true === false) {
+                                                                                            selectedBand.selected = true
+                                                                                        }
+                                                                                        let newGain = 1-(slidePoint.y / graphTouchArea.height);
+                                                                                        selectedBand.gainAbsolute = Math.min(Math.max(newGain, 0), 1);
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            readonly property double frequencyLowerBound: 20
+                                                                            readonly property double frequencyUpperBound: 20000
+                                                                            onXChanged: {
+                                                                                if (pressed && selectedBand) {
+                                                                                    // first convert position to a normalised 0 through 1 position along the width of the whole area, and then put that position along the frequency area
+                                                                                    let newFrequency = 20.0 * Math.pow(2.0, 10 * (slidePoint.x / graphTouchArea.width));
+                                                                                    selectedBand.frequency = Math.min(Math.max(newFrequency, frequencyLowerBound), frequencyUpperBound);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    RowLayout {
+                                                        anchors.fill: parent
+                                                        visible: root.showMixerEqualiser === false
 
                                                         QQC2.Dial {
                                                             Layout.fillWidth: true
@@ -1621,6 +1789,7 @@ Zynthian.ScreenPage {
                                                                 Layout.preferredWidth: 1
                                                                 Layout.topMargin: Kirigami.Units.smallSpacing
                                                                 Layout.bottomMargin: Kirigami.Units.smallSpacing
+                                                                horizontalAlignment: Text.AlignRight
                                                                 font.pointSize: 8
                                                                 text: "Sends"
                                                             }

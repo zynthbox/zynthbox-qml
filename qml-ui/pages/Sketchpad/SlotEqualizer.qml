@@ -193,7 +193,9 @@ Zynthian.DialogQuestion {
                                                                          ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
                                                                          : slotType === "sketchfx"
                                                                            ? Zynthbox.Plugin.sketchFxPassthroughClients[selectedChannel.id][slotIndex]
-                                                                           : null
+                                                                           : slotType === "mixer"
+                                                                                ? Zynthbox.AudioLevels.tracks[selectedChannel.id]
+                                                                                : null
                     function getCurrent() {
                         let currentObject = null;
                         if (_private.slotPassthroughClient.compressorSettings.selected === true) {

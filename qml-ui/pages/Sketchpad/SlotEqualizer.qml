@@ -61,7 +61,11 @@ Zynthian.DialogQuestion {
 
     acceptText: qsTr("Close")
     rejectText: ""
-    title: _private.engineData === null ? "" : qsTr("%1 Equalizer").arg(_private.engineData.name)
+    title: _private.engineData === null
+        ? _private.slotType === "mixer"
+            ? qsTr("Track %1 Equalizer").arg(_private.selectedChannel.name)
+            : ""
+        : qsTr("%1 Equalizer").arg(_private.engineData.name)
 
     cuiaCallback: function(cuia) {
         let returnValue = false;

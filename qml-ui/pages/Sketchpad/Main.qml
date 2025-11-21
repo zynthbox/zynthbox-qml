@@ -1689,6 +1689,22 @@ Zynthian.ScreenPage {
                                                                             }
                                                                             return currentObject;
                                                                         }
+                                                                        // An overlay for the equaliser disabled state
+                                                                        Rectangle {
+                                                                            id: equaliserEnabledVisualiser
+                                                                            anchors.fill: parent
+                                                                            color: Kirigami.Theme.negativeBackgroundColor
+                                                                            readonly property QtObject audioLevelsTrack: Zynthbox.AudioLevels.tracks[index]
+                                                                            opacity: root.showMixerEqualiser === false ? 0.1 : (audioLevelsTrack.equaliserEnabled ? 0 : 0.5)
+
+                                                                            QQC2.Label {
+                                                                                anchors.centerIn: parent
+                                                                                horizontalAlignment: Text.AlignHCenter
+                                                                                font.bold: true
+                                                                                font.pointSize: 14
+                                                                                text: qsTr("EQ\nOff")
+                                                                            }
+                                                                        }
                                                                     }
                                                                     touchPoints: [
                                                                         TouchPoint {
@@ -1722,8 +1738,10 @@ Zynthian.ScreenPage {
                                                                                     // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
                                                                                     if ((Date.now() - pressedTime) < 300) {
                                                                                         if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
-                                                                                            // If we're already on this track, cycle to the next band
-                                                                                            slidePoint.ensureSelectedBand(1);
+                                                                                            if (equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
+                                                                                                // If we're already on this track (and also the eq is enabled), cycle to the next band
+                                                                                                slidePoint.ensureSelectedBand(1);
+                                                                                            }
                                                                                         } else {
                                                                                             // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
                                                                                             zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
@@ -1733,7 +1751,7 @@ Zynthian.ScreenPage {
                                                                                 }
                                                                             }
                                                                             onYChanged: {
-                                                                                if (pressed && selectedBand) {
+                                                                                if (pressed && selectedBand && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
                                                                                     // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                                     if (selectedBand.active === true) {
                                                                                         let newGain = 1-(slidePoint.y / graphTouchArea.height);
@@ -1744,7 +1762,7 @@ Zynthian.ScreenPage {
                                                                             readonly property double frequencyLowerBound: 20
                                                                             readonly property double frequencyUpperBound: 20000
                                                                             onXChanged: {
-                                                                                if (pressed && selectedBand) {
+                                                                                if (pressed && selectedBand && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
                                                                                     // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                                     if (selectedBand.active === true) {
                                                                                         // first convert position to a normalised 0 through 1 position along the width of the whole area, and then put that position along the frequency area

@@ -224,8 +224,8 @@ QQC2.Pane {
                                         //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
                                         // }
                                         Rectangle  {
-                                              Kirigami.Theme.colorSet: Kirigami.Theme.View
-                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.View
+                                            Kirigami.Theme.inherit: false
                                             visible: !svgBg2.visible
                                             anchors.fill: parent
                                             color: Kirigami.Theme.backgroundColor
@@ -277,7 +277,7 @@ QQC2.Pane {
                                                     enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
                                                     inputAudioLeveldB: visible && !model.channel.muted ? Zynthbox.AudioLevels.channels[model.channel.id] : -40
                                                     onAudioLeveldBChanged: {
-                                                        console.log("Channel audio level changed to", audioLeveldB)
+                                                        // console.log("Channel audio level changed to", audioLeveldB)
                                                     }
                                                     inputAudioLevelVisible: true
 

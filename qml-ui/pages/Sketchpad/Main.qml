@@ -1656,16 +1656,6 @@ Zynthian.ScreenPage {
                                                         ColumnLayout {
                                                             Layout.fillWidth: true
                                                             Layout.fillHeight: true
-                                                            QQC2.Label {
-                                                                Layout.fillWidth: true
-                                                                Layout.fillHeight: false
-                                                                Layout.preferredWidth: 1
-                                                                Layout.topMargin: Kirigami.Units.smallSpacing
-                                                                Layout.bottomMargin: Kirigami.Units.smallSpacing
-                                                                horizontalAlignment: Text.AlignRight
-                                                                font.pointSize: 8
-                                                                text: "EQ/Comp"
-                                                            }
                                                             Item {
                                                                 Layout.fillWidth: true
                                                                 Layout.fillHeight: true
@@ -1770,15 +1760,19 @@ Zynthian.ScreenPage {
                                                         }
                                                     }
 
-                                                    RowLayout {
-                                                        anchors.fill: parent
+                                                    GridLayout {
+                                                        anchors {
+                                                            fill: parent
+                                                            margins: Kirigami.Units.smallSpacing
+                                                        }
+                                                        columnSpacing: 0
+                                                        rowSpacing: 0
+                                                        columns: 2
+                                                        rows: 2
                                                         visible: root.showMixerEqualiser === false
-
                                                         QQC2.Dial {
                                                             Layout.fillWidth: true
                                                             Layout.fillHeight: true
-                                                            Layout.leftMargin: Kirigami.Units.smallSpacing
-                                                            Layout.rightMargin: Kirigami.Units.smallSpacing
                                                             inputMode: QQC2.Dial.Vertical
                                                             handle: null
                                                             value: applicationWindow().channels[index].wetFx1Amount
@@ -1788,36 +1782,50 @@ Zynthian.ScreenPage {
                                                             onValueChanged: {
                                                                 applicationWindow().channels[index].wetFx1Amount = value;
                                                             }
+                                                            QQC2.Label {
+                                                                anchors {
+                                                                    fill: parent
+                                                                    margins: parent.handle.width / 2
+                                                                }
+                                                                horizontalAlignment: Text.AlignHCenter
+                                                                verticalAlignment: Text.AlignVCenter
+                                                                fontSizeMode: Text.Fit
+                                                                minimumPointSize: 6
+                                                                font.pointSize: 9
+                                                                text: qsTr("%1\%").arg(applicationWindow().channels[index].wetFx1Amount)
+                                                            }
                                                         }
-
-                                                        ColumnLayout {
+                                                        Item {
                                                             Layout.fillWidth: true
                                                             Layout.fillHeight: true
-
-                                                            QQC2.Label {
-                                                                Layout.fillWidth: true
-                                                                Layout.fillHeight: false
-                                                                Layout.preferredWidth: 1
-                                                                Layout.topMargin: Kirigami.Units.smallSpacing
-                                                                Layout.bottomMargin: Kirigami.Units.smallSpacing
-                                                                horizontalAlignment: Text.AlignRight
-                                                                font.pointSize: 8
-                                                                text: "Sends"
+                                                        }
+                                                        Item {
+                                                            Layout.fillWidth: true
+                                                            Layout.fillHeight: true
+                                                        }
+                                                        QQC2.Dial {
+                                                            Layout.fillWidth: true
+                                                            Layout.fillHeight: true
+                                                            inputMode: QQC2.Dial.Vertical
+                                                            handle: null
+                                                            value: applicationWindow().channels[index].wetFx2Amount
+                                                            stepSize: 1
+                                                            from: 0
+                                                            to: 100
+                                                            onValueChanged: {
+                                                                applicationWindow().channels[index].wetFx2Amount = value;
                                                             }
-                                                            QQC2.Dial {
-                                                                Layout.fillWidth: true
-                                                                Layout.fillHeight: true
-                                                                Layout.leftMargin: Kirigami.Units.smallSpacing
-                                                                Layout.rightMargin: Kirigami.Units.smallSpacing
-                                                                inputMode: QQC2.Dial.Vertical
-                                                                handle: null
-                                                                value: applicationWindow().channels[index].wetFx2Amount
-                                                                stepSize: 1
-                                                                from: 0
-                                                                to: 100
-                                                                onValueChanged: {
-                                                                    applicationWindow().channels[index].wetFx2Amount = value;
+                                                            QQC2.Label {
+                                                                anchors {
+                                                                    fill: parent
+                                                                    margins: parent.handle.width / 2
                                                                 }
+                                                                horizontalAlignment: Text.AlignHCenter
+                                                                verticalAlignment: Text.AlignVCenter
+                                                                fontSizeMode: Text.Fit
+                                                                minimumPointSize: 6
+                                                                font.pointSize: 9
+                                                                text: qsTr("%1\%").arg(applicationWindow().channels[index].wetFx2Amount)
                                                             }
                                                         }
                                                     }

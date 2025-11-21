@@ -1680,6 +1680,7 @@ Zynthian.ScreenPage {
                                                                         anchors.fill: parent
                                                                         analyseAudio: false
                                                                         drawDisabledBands: false
+                                                                        eqCurveThickness: 2
                                                                         source: root.showMixerEqualiser
                                                                             ? Zynthbox.AudioLevels.tracks[index]
                                                                             : null
@@ -1704,40 +1705,47 @@ Zynthian.ScreenPage {
                                                                             id: slidePoint;
                                                                             property QtObject selectedBand: null
                                                                             property var pressedTime: undefined
+                                                                            // Set the startOffset to 1 to move forward, and 0 to try the current one first
+                                                                            function ensureSelectedBand(startOffset) {
+                                                                                // If there are more than one active bands, cycle to the next one in the list
+                                                                                // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
+                                                                                let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
+                                                                                let currentBandIndex = equaliserSettings.indexOf(selectedBand);
+                                                                                for (let testOffset = startOffset; testOffset < equaliserSettings.length - 1; testOffset++) {
+                                                                                    let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
+                                                                                    if (testBand.active) {
+                                                                                        // This is the next active band in the settings list, select that and bail out
+                                                                                        testBand.selected = true;
+                                                                                        selectedBand = testBand;
+                                                                                        break;
+                                                                                    }
+                                                                                }
+                                                                                // Also make sure to de-select the compressor, in case that one's selected
+                                                                                passthroughVisualiserItem.source.compressorSettings.selected = false;
+                                                                            }
                                                                             onPressedChanged: {
                                                                                 if (pressed) {
                                                                                     pressedTime = Date.now();
                                                                                     selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
+                                                                                    slidePoint.ensureSelectedBand(0);
                                                                                 } else {
-                                                                                    // Only select the next band if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                                                                    // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
                                                                                     if ((Date.now() - pressedTime) < 300) {
-                                                                                        // Activate the track (to ensure things work as expected in various other ways)
-                                                                                        zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
-                                                                                        // If there are more than one active bands, cycle to the next one in the list
-                                                                                        // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
-                                                                                        let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
-                                                                                        let currentBand = passthroughVisualiserItem.getCurrentSelectedBand();
-                                                                                        let currentBandIndex = equaliserSettings.indexOf(currentBand);
-                                                                                        for (let testOffset = 1; testOffset < equaliserSettings.length - 1; testOffset++) {
-                                                                                            let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
-                                                                                            if (testBand.active) {
-                                                                                                // This is the next active band in the settings list, select that and bail out
-                                                                                                testBand.selected = true;
-                                                                                                break;
-                                                                                            }
+                                                                                        if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
+                                                                                            // If we're already on this track, cycle to the next band
+                                                                                            slidePoint.ensureSelectedBand(1);
+                                                                                        } else {
+                                                                                            // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
+                                                                                            zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
                                                                                         }
-                                                                                        // Also make sure to de-select the compressor, in case that one's selected
-                                                                                        passthroughVisualiserItem.source.compressorSettings.selected = false;
                                                                                     }
                                                                                     selectedBand = null;
                                                                                 }
                                                                             }
                                                                             onYChanged: {
                                                                                 if (pressed && selectedBand) {
+                                                                                    // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                                     if (selectedBand.active === true) {
-                                                                                        if (selectedBand.true === false) {
-                                                                                            selectedBand.selected = true
-                                                                                        }
                                                                                         let newGain = 1-(slidePoint.y / graphTouchArea.height);
                                                                                         selectedBand.gainAbsolute = Math.min(Math.max(newGain, 0), 1);
                                                                                     }
@@ -1747,9 +1755,12 @@ Zynthian.ScreenPage {
                                                                             readonly property double frequencyUpperBound: 20000
                                                                             onXChanged: {
                                                                                 if (pressed && selectedBand) {
-                                                                                    // first convert position to a normalised 0 through 1 position along the width of the whole area, and then put that position along the frequency area
-                                                                                    let newFrequency = 20.0 * Math.pow(2.0, 10 * (slidePoint.x / graphTouchArea.width));
-                                                                                    selectedBand.frequency = Math.min(Math.max(newFrequency, frequencyLowerBound), frequencyUpperBound);
+                                                                                    // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
+                                                                                    if (selectedBand.active === true) {
+                                                                                        // first convert position to a normalised 0 through 1 position along the width of the whole area, and then put that position along the frequency area
+                                                                                        let newFrequency = 20.0 * Math.pow(2.0, 10 * (slidePoint.x / graphTouchArea.width));
+                                                                                        selectedBand.frequency = Math.min(Math.max(newFrequency, frequencyLowerBound), frequencyUpperBound);
+                                                                                    }
                                                                                 }
                                                                             }
                                                                         }

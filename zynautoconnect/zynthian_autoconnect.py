@@ -656,7 +656,7 @@ def audio_autoconnect(force=False):
     #                 release_lock()
     #                 return
     # ### END Bluetooth ports connection
-    globalPlaybackInputPorts = jclient.get_ports("GlobalPlayback:input", is_audio=True, is_input=True)
+    globalPlaybackInputPorts = ["GlobalPlayback:inputLeft", "GlobalPlayback:inputRight"]
 
     # BEGIN Connect global FX ports to system playback
     for port in zip(globalFx1OutputPorts, globalPlaybackInputPorts):
@@ -1164,12 +1164,13 @@ def audio_autoconnect(force=False):
 
     ### BEGIN Connect Samplersynth uneffected ports to GlobalPlayback client
     for laneType in ["lane", "sketch"]:
+        # Most of the time we can do these with known lists, but since these sometimes get created dynamically, we need to make sure they're there to avoid zbjack's wrath
         for port in zip(jclient.get_ports(f"SamplerSynth:global-{laneType}1-", is_audio=True, is_output=True), globalPlaybackInputPorts):
             zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     ### END Connect Samplersynth uneffected ports to GlobalPlayback client
 
     ### BEGIN Connect GlobalPlayback ports
-    globalPlaybackDryOutputPorts = jclient.get_ports("GlobalPlayback:dryOut", is_audio=True, is_output=True)
+    globalPlaybackDryOutputPorts = ["GlobalPlayback:dryOutLeft", "GlobalPlayback:dryOutRight"]
     for port in zip(globalPlaybackDryOutputPorts, playback_ports):
         zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
 
@@ -1287,7 +1288,7 @@ def audio_autoconnect(force=False):
     release_lock()
 
     # Now we're done, test to see whether we've got any callbacks that need running
-    runCallbacksAfterMidiAutoconnect()
+    runCallbacksAfterAudioAutoconnect()
 
     if success:
         # Autoconnect ran fine. Reset force flag

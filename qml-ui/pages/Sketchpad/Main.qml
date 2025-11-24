@@ -1729,11 +1729,18 @@ Zynthian.ScreenPage {
                                                                                 // Also make sure to de-select the compressor, in case that one's selected
                                                                                 passthroughVisualiserItem.source.compressorSettings.selected = false;
                                                                             }
+                                                                            property point startingPoint
+                                                                            property double startingGain
+                                                                            property double startingFrequency
                                                                             onPressedChanged: {
                                                                                 if (pressed) {
                                                                                     pressedTime = Date.now();
                                                                                     selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
                                                                                     slidePoint.ensureSelectedBand(0);
+                                                                                    slidePoint.startingGain = selectedBand.gainAbsolute;
+                                                                                    slidePoint.startingFrequency = selectedBand.frequencyAbsolute;
+                                                                                    slidePoint.startingPoint.x = slidePoint.x;
+                                                                                    slidePoint.startingPoint.y = slidePoint.y;
                                                                                 } else {
                                                                                     // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
                                                                                     if ((Date.now() - pressedTime) < 300) {
@@ -1754,8 +1761,8 @@ Zynthian.ScreenPage {
                                                                                 if (pressed && selectedBand && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
                                                                                     // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                                     if (selectedBand.active === true) {
-                                                                                        let newGain = 1-(slidePoint.y / graphTouchArea.height);
-                                                                                        selectedBand.gainAbsolute = Math.min(Math.max(newGain, 0), 1);
+                                                                                        let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2);
+                                                                                        selectedBand.gainAbsolute = Math.min(Math.max(slidePoint.startingGain - newGain, 0), 1);
                                                                                     }
                                                                                 }
                                                                             }
@@ -1765,9 +1772,8 @@ Zynthian.ScreenPage {
                                                                                 if (pressed && selectedBand && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
                                                                                     // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                                     if (selectedBand.active === true) {
-                                                                                        // first convert position to a normalised 0 through 1 position along the width of the whole area, and then put that position along the frequency area
-                                                                                        let newFrequency = 20.0 * Math.pow(2.0, 10 * (slidePoint.x / graphTouchArea.width));
-                                                                                        selectedBand.frequency = Math.min(Math.max(newFrequency, frequencyLowerBound), frequencyUpperBound);
+                                                                                        let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2);
+                                                                                        selectedBand.frequencyAbsolute = slidePoint.startingFrequency + newFrequency;
                                                                                     }
                                                                                 }
                                                                             }

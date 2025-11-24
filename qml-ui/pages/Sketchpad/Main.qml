@@ -1277,6 +1277,7 @@ Zynthian.ScreenPage {
 
                                         ColumnLayout {
                                             anchors.fill: parent
+                                            spacing: PlasmaCore.Theme.spacing
                                             visible: bottomStack.slotsBar.mixerButton.checked
                                             QQC2.Button {
                                                 Layout.fillWidth: true

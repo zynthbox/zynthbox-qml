@@ -435,13 +435,9 @@ Zynthian.DialogQuestion {
                                     selectedBand.gainAbsolute = Math.min(Math.max(newGain, 0), 1);
                                 }
                             }
-                            readonly property double frequencyLowerBound: 20
-                            readonly property double frequencyUpperBound: 20000
                             onXChanged: {
                                 if (pressed && selectedBand) {
-                                    // first convert position to a normalised 0 through 1 position along the width of the whole area, and then put that position along the frequency area
-                                    let newFrequency = 20.0 * Math.pow(2.0, 10 * (slidePoint.x / graphTouchArea.width));
-                                    selectedBand.frequency = Math.min(Math.max(newFrequency, frequencyLowerBound), frequencyUpperBound);
+                                    selectedBand.frequencyAbsolute = slidePoint.x / graphTouchArea.width;
                                 }
                             }
                         }

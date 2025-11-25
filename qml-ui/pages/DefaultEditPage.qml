@@ -162,7 +162,7 @@ RowLayout {
                             readonly property real bottomPadding: margins.bottom
 
                             imagePath: "widgets/viewitem"
-                            prefix: highlighted ? ["selected", ""] : ""
+                            prefix: highlighted ? "hover" : "normal"
                             colorGroup: PlasmaCore.Theme.ButtonColorGroup
                         }
                     }

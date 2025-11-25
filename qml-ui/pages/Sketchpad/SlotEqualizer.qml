@@ -662,7 +662,7 @@ Zynthian.DialogQuestion {
                                             }
                                         }
                                         property double lastPressed: 0
-                                        property var defaultFrequencies: [20, 250, 500, 1000, 5000, 12000]
+                                        property var defaultFrequencies: _private.slotType === "mixer" ? [20, 250, 500, 1000, 5000, 20000] : [20, 250, 500, 1000, 5000, 12000]
                                         onPressedChanged: {
                                             if (pressed === false) {
                                                 let newTimestamp = Date.now();

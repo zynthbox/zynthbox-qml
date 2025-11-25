@@ -129,7 +129,7 @@ QQC2.Control {
 
                 background: Rectangle {
                     color: root.color
-                    radius: 2
+                    radius: PlasmaCore.Theme.radius
                 }
             }
 

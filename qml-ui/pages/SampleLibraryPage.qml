@@ -539,16 +539,14 @@ Zynthian.ScreenPage {
                     onItemActivated: folderListView.itemActivated(screenId, index)
                     onItemActivatedSecondary: folderListView.itemActivatedSecondary(screenId, index)
                     contentItem: RowLayout {
-                        Layout.fillWidth: true
                         Item {
                             Layout.fillHeight: true
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
-                            Kirigami.Icon {
-                                anchors {
-                                    fill: parent
-                                    margins: Kirigami.Units.smallSpacing
-                                }
+                            Kirigami.Icon {                                
+                                anchors.centerIn: parent
+                                implicitHeight: 22
+                                implicitWidth: 22
                                 source: "file-library-symbolic"
                             }
                         }

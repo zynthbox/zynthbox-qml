@@ -1660,8 +1660,8 @@ Zynthian.ScreenPage {
                                                             Item {
                                                                 Layout.fillWidth: true
                                                                 Layout.fillHeight: true
-                                                                Layout.leftMargin: Kirigami.Units.smallSpacing
-                                                                Layout.rightMargin: Kirigami.Units.smallSpacing
+                                                                // Layout.leftMargin: Kirigami.Units.smallSpacing
+                                                                // Layout.rightMargin: Kirigami.Units.smallSpacing
                                                                 MultiPointTouchArea {
                                                                     id: graphTouchArea
                                                                     anchors.fill: parent

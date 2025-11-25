@@ -331,13 +331,7 @@ Zynthian.DialogQuestion {
                             if (zynqtgui.modeButtonPressed) {
                                 currentObject.frequency = currentObject.frequency + 1;
                             } else {
-                                if (currentObject.frequency < 1000.0) {
-                                    currentObject.frequency = currentObject.frequency + 1;
-                                } else if (currentObject.frequency < 10000.0) {
-                                    currentObject.frequency = currentObject.frequency + 10;
-                                } else {
-                                    currentObject.frequency = currentObject.frequency + 50;
-                                }
+                                currentObject.frequencyAbsolute = currentObject.frequencyAbsolute + 0.005;
                             }
                         }
                     }
@@ -353,13 +347,7 @@ Zynthian.DialogQuestion {
                             if (zynqtgui.modeButtonPressed) {
                                 currentObject.frequency = currentObject.frequency - 1;
                             } else {
-                                if (currentObject.frequency < 1000.0) {
-                                    currentObject.frequency = currentObject.frequency - 1;
-                                } else if (currentObject.frequency < 10000.0) {
-                                    currentObject.frequency = currentObject.frequency - 10;
-                                } else {
-                                    currentObject.frequency = currentObject.frequency - 50;
-                                }
+                                currentObject.frequencyAbsolute = currentObject.frequencyAbsolute - 0.005;
                             }
                         }
                     }
@@ -664,13 +652,13 @@ Zynthian.DialogQuestion {
                                         width: height
                                         inputMode: QQC2.Dial.Vertical
                                         handle: null
-                                        value: bandDelegate.filterSettings ? bandDelegate.filterSettings.frequency : 0
-                                        stepSize: 1
-                                        from: 20
-                                        to: 20000
+                                        value: bandDelegate.filterSettings ? bandDelegate.filterSettings.frequencyAbsolute : 0
+                                        stepSize: 0.001
+                                        from: 0
+                                        to: 1
                                         onValueChanged: {
                                             if (bandDelegate.filterSettings) {
-                                                bandDelegate.filterSettings.frequency = value;
+                                                bandDelegate.filterSettings.frequencyAbsolute = value;
                                             }
                                         }
                                         property double lastPressed: 0
@@ -690,7 +678,7 @@ Zynthian.DialogQuestion {
                                             verticalAlignment: Text.AlignVCenter
                                             text: bandDelegate.filterSettings
                                                   ?  (bandDelegate.filterSettings.frequency < 1000.0 || zynqtgui.modeButtonPressed)
-                                                    ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(0))
+                                                    ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(1))
                                                     : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
                                             : ""
                                             Zynthian.KnobIndicator {

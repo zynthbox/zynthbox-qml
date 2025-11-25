@@ -1685,8 +1685,8 @@ Zynthian.ScreenPage {
                                                                                 }
                                                                             }
                                                                             if (currentObject === null) {
-                                                                                // Just in case there's nothing active, pick the last thing in the list, and then try and see if the next (first) is active...
-                                                                                currentObject = equaliserSettings[equaliserSettings.length - 1];
+                                                                                // Just in case there's nothing active, just pick the first thing in the list
+                                                                                currentObject = equaliserSettings[0];
                                                                             }
                                                                             return currentObject;
                                                                         }
@@ -1717,18 +1717,35 @@ Zynthian.ScreenPage {
                                                                                 // If there are more than one active bands, cycle to the next one in the list
                                                                                 // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
                                                                                 let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
-                                                                                let currentBandIndex = equaliserSettings.indexOf(selectedBand);
-                                                                                for (let testOffset = startOffset; testOffset < equaliserSettings.length - 1; testOffset++) {
+                                                                                let currentBandIndex = equaliserSettings.indexOf(slidePoint.selectedBand);
+                                                                                for (let testOffset = startOffset; testOffset < equaliserSettings.length; testOffset++) {
                                                                                     let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
                                                                                     if (testBand.active) {
                                                                                         // This is the next active band in the settings list, select that and bail out
                                                                                         testBand.selected = true;
-                                                                                        selectedBand = testBand;
+                                                                                        slidePoint.selectedBand = testBand;
                                                                                         break;
                                                                                     }
                                                                                 }
                                                                                 // Also make sure to de-select the compressor, in case that one's selected
                                                                                 passthroughVisualiserItem.source.compressorSettings.selected = false;
+                                                                            }
+                                                                            readonly property QtObject eqDoublePressedTimer: Timer {
+                                                                                interval: zynqtgui.ui_settings.doubleClickThreshold
+                                                                                running: false
+                                                                                repeat: false
+                                                                                onTriggered: {
+                                                                                    // If we have not been stopped, this will be our single-click action
+                                                                                    if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
+                                                                                        if (equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
+                                                                                            // If we're already on this track (and also the eq is enabled), cycle to the next band
+                                                                                            slidePoint.ensureSelectedBand(1);
+                                                                                        }
+                                                                                    } else {
+                                                                                        // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
+                                                                                        zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
+                                                                                    }
+                                                                                }
                                                                             }
                                                                             property point startingPoint
                                                                             property double startingGain
@@ -1745,35 +1762,30 @@ Zynthian.ScreenPage {
                                                                                 } else {
                                                                                     // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
                                                                                     if ((Date.now() - pressedTime) < 300) {
-                                                                                        if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
-                                                                                            if (equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
-                                                                                                // If we're already on this track (and also the eq is enabled), cycle to the next band
-                                                                                                slidePoint.ensureSelectedBand(1);
-                                                                                            }
+                                                                                        if (eqDoublePressedTimer.running) {
+                                                                                            // If we clicked again this quickly, it was a double-click
+                                                                                            eqDoublePressedTimer.stop();
+                                                                                            passthroughVisualiserItem.source.equaliserEnabled = !passthroughVisualiserItem.source.equaliserEnabled;
                                                                                         } else {
-                                                                                            // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
-                                                                                            zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
+                                                                                            eqDoublePressedTimer.restart();
                                                                                         }
                                                                                     }
-                                                                                    selectedBand = null;
                                                                                 }
                                                                             }
                                                                             onYChanged: {
-                                                                                if (pressed && selectedBand && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
+                                                                                if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
                                                                                     // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                                     if (selectedBand.active === true) {
-                                                                                        let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2);
+                                                                                        let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
                                                                                         selectedBand.gainAbsolute = Math.min(Math.max(slidePoint.startingGain - newGain, 0), 1);
                                                                                     }
                                                                                 }
                                                                             }
-                                                                            readonly property double frequencyLowerBound: 20
-                                                                            readonly property double frequencyUpperBound: 20000
                                                                             onXChanged: {
-                                                                                if (pressed && selectedBand && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled) {
+                                                                                if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
                                                                                     // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                                     if (selectedBand.active === true) {
-                                                                                        let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2);
+                                                                                        let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2.5);
                                                                                         selectedBand.frequencyAbsolute = slidePoint.startingFrequency + newFrequency;
                                                                                     }
                                                                                 }

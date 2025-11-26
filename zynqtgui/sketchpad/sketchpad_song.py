@@ -134,6 +134,7 @@ class sketchpad_song(QObject):
         if clear_passthroughs == True:
             setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
             for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
+                setPassthroughClientDefaults(Zynthbox.AudioLevels.instance().tracks()[trackIndex])
                 for slotType in range(0, 2):
                     for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                         setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
@@ -165,6 +166,7 @@ class sketchpad_song(QObject):
         for midiChannel in range(0, 16):
             connectPassthroughClientForSaving(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel], self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot)
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
+            connectPassthroughClientForSaving(Zynthbox.AudioLevels.instance().tracks()[trackIndex], self.schedule_save)
             for slotType in range(0, 2):
                 for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     connectPassthroughClientForSaving(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), self.schedule_save)
@@ -230,6 +232,7 @@ class sketchpad_song(QObject):
     def serialize(self):
         if not self.__to_be_deleted__:
             trackPassthroughClientsData = []
+            mixerPassthroughClientsData = []
             for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                 track = self.channelsModel.getChannel(trackIndex)
                 slotTypesData = []
@@ -241,6 +244,7 @@ class sketchpad_song(QObject):
                     laneData.append(serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, 0)))
                     slotTypesData.append(laneData)
                 trackPassthroughClientsData.append(slotTypesData)
+                mixerPassthroughClientsData.append(serializePassthroughData(Zynthbox.AudioLevels.instance().tracks()[trackIndex]))
             return {
                 "name": self.__name__,
                 "bpm": self.__bpm__,
@@ -251,7 +255,8 @@ class sketchpad_song(QObject):
                 "scenes": self.__scenes_model__.serialize(),
                 "arrangements": self.__arrangements_model__.serialize(),
                 "globalPlaybackClient": serializePassthroughData(Zynthbox.Plugin.instance().globalPlaybackClient()),
-                "trackPassthroughClients": trackPassthroughClientsData
+                "trackPassthroughClients": trackPassthroughClientsData,
+                "mixerPassthroughClients": mixerPassthroughClientsData
             }
 
     def save(self, autosave=True, save_empty=False):
@@ -429,6 +434,9 @@ class sketchpad_song(QObject):
                                         restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), sketchpad["trackPassthroughClients"][trackIndex][slotType][laneIndexForEntry])
                                     else:
                                         logging.error(f"Failed to fetch either trackPassthroughClient or the fallback from the trackPassthroughClients entry in the sketchpad - something isn't right with this. The object data was:\n{sketchpad['trackPassthroughClients'][trackIndex]}")
+                    if "mixerPassthroughClients" in sketchpad:
+                        for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
+                            restorePassthroughClientData(Zynthbox.AudioLevels.instance().tracks()[trackIndex], sketchpad["mixerPassthroughClients"][trackIndex])
 
                     # Load sequence model for this version explicitly after restoring sketchpad if it is not a temp sketchpad and not an autosave version
                     if not self.isTemp and not load_autosave:

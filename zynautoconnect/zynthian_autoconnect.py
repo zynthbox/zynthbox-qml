@@ -710,6 +710,14 @@ def audio_autoconnect(force=False):
         usbGadgetInputs = jclient.get_ports(name_pattern="usb-gadget-in:", is_audio=True, is_output=False, is_input=True)
         song = zynthian_gui_config.zynqtgui.screens["sketchpad"].song
         synthEntryExists = [False] * 16 # TODO If we want to have more than 16 synth slots, this will need changing
+        # Format is trackPassthroughLanesEnabled[trackId][laneId][laneType]
+        # Annoying that you can't simply do [[[False,False]*5]*10 for this, but that results in duplicated reference instead, so...
+        trackPassthroughLanesEnabled = []
+        for trackId in range(0, 10):
+            trackData = []
+            for laneId in range(0, 5):
+                trackData.append([False, False])
+            trackPassthroughLanesEnabled.append(trackData)
         if song:
             for channelId in range(0, 10):
                 channel = song.channelsModel.getChannel(channelId)
@@ -934,18 +942,13 @@ def audio_autoconnect(force=False):
                                 zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Connect TrackPassthrough sketch wet ports to GlobalPlayback and AudioLevels via Global FX
                         ### BEGIN Ensure TrackPassthrough only has ports where there's audio to work on
-                        trackPassthrough = Zynthbox.Plugin.instance().trackPassthroughClient(channelId, 0, laneId)
-                        if channel.trackRoutingStyle == "standard" and laneId > 0:
-                            # standard routing says we only use lane 1 at all times, so everything else is turned off
-                            trackPassthrough.setCreatePorts(False)
-                        else:
-                            trackPassthrough.setCreatePorts(laneHasInput[channelInputLanes[laneId]])
-                        trackPassthrough = Zynthbox.Plugin.instance().trackPassthroughClient(channelId, 1, laneId)
-                        if channel.trackRoutingStyle == "standard" and laneId > 0:
-                            # standard routing says we only use lane 1 at all times, so everything else is turned off
-                            trackPassthrough.setCreatePorts(False)
-                        else:
-                            trackPassthrough.setCreatePorts(sketchLaneHasInput[channelInputLanes[laneId]])
+                        # Only override to True, never override to False (as that is the default value and if a field has been set to True, it's because *something* needs it)
+                        # logging.info(f"Lane and sketch lane has input for track {channelId} lane {laneId} with effective lane {channelInputLanes[laneId]}? {laneHasInput[channelInputLanes[laneId]]} and {sketchLaneHasInput[channelInputLanes[laneId]]}")
+                        if laneHasInput[channelInputLanes[laneId]]:
+                            trackPassthroughLanesEnabled[channelId][channelInputLanes[laneId]][0] = True
+                        if sketchLaneHasInput[channelInputLanes[laneId]]:
+                            trackPassthroughLanesEnabled[channelId][channelInputLanes[laneId]][1] = True
+                        # Actual creation/destruction operation happens after handling the song data (so we can ensure we only do it once per run)
                         ### END Ensure TrackPassthrough only pas ports where there's audio to work on
                     ### BEGIN Connect TrackPassthrough to GlobalPlayback and AudioLevels via FX
                     # logging.debug(f"# Channel{channelId+1} effects port connections :")
@@ -1147,11 +1150,19 @@ def audio_autoconnect(force=False):
                     ### END FX Engine Audio Routing Overrides
         else:
             logging.info("No song yet, clearly ungood - also how?")
-        # BEGIN Ensure we only have synth passthrough ports for synths which exist
+        ### BEGIN Actually create/destroy the TrackPassthrough ports
+        # logging.info(f"Handling track passthrough data: {trackPassthroughLanesEnabled}")
+        for trackId in range(0, 10):
+            for laneId in range(0, 5):
+                for laneTypeId in range(0, 2):
+                    trackPassthrough = Zynthbox.Plugin.instance().trackPassthroughClient(trackId, laneTypeId, laneId)
+                    trackPassthrough.setCreatePorts(trackPassthroughLanesEnabled[trackId][laneId][laneTypeId])
+        ### END Actually create/destroy the TrackPassthrough ports
+        ### BEGIN Ensure we only have synth passthrough ports for synths which exist
         synthPassthroughClients = Zynthbox.Plugin.instance().synthPassthroughClients()
         for synthEntryIndex, synthPassthroughClient in enumerate(synthPassthroughClients):
             synthPassthroughClient.setCreatePorts(synthEntryExists[synthEntryIndex])
-        # END Ensure we only have synth passthrough ports for synths which exist
+        ### END Ensure we only have synth passthrough ports for synths which exist
     except Exception as e:
         logging.info(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during core routing setup. Reported error: {e} with backtrace {traceback.format_exc()}")
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception

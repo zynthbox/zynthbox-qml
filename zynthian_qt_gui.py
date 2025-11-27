@@ -2813,7 +2813,7 @@ class zynthian_gui(QObject):
                             fake_key = Key.f4
                         case 16:
                             fake_key = Key.f5
-                        # These new set of keys are from Z1_V1-16 c-board with 10 new buttons to be used as step buttons
+                        # These new set of keys are from Z2_V5 c-board with 10 new buttons to be used as step buttons
                         case 34:
                             fake_key = Key.f6
                         case 35:

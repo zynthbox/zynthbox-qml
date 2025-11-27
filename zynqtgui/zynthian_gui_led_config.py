@@ -129,44 +129,6 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         'blinkMode': <'toggleOnBeat'(default) or 'onOffOnBeat'> # toggleOnBeat will toggle on/off state on every beat
                                                                 # onOffOnBeat will blink the button color on=off on every beat
     }
-
-    Button id map :
-    0 : Menu
-    1 : 1
-    2 : 2
-    3 : 3
-    4 : 4
-    5 : 5
-    6 : *
-    7 : MODE
-    8 : Under Screen Button 1
-    9 : Under Screen Button 2
-    10 : Under Screen Button 3
-    11 : Under Screen Button 4
-    12 : Under Screen Button 5
-    25 : Under Screen Button 6
-    26 : Under Screen Button 7
-    27 : Under Screen Button 8
-    28 : Under Screen Button 9
-    29 : Under Screen Button 10
-    30 : Under Screen Button 11
-    31 : Under Screen Button 12
-    32 : Under Screen Button 13
-    33 : Under Screen Button 14
-    34 : Under Screen Button 15
-    35 : Under Screen Button 16
-    13 : ALT
-    14 : RECORD
-    15 : PLAY
-    16 : SAVE
-    17 : STOP
-    18 : BACK/NO
-    19 : UP
-    20 : SELECT/YES
-    21 : LEFT
-    22 : BOTTOM
-    23 : RIGHT
-    24 : GLOBAL
     """
     def __init__(self, parent=None):
         super(zynthian_gui_led_config, self).__init__(parent)
@@ -210,29 +172,29 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.button_under_screen_3 = 10
         self.button_under_screen_4 = 11
         self.button_under_screen_5 = 12
-        self.button_under_screen_6 = 25
-        self.button_under_screen_7 = 26
-        self.button_under_screen_8 = 27
-        self.button_under_screen_9 = 28
-        self.button_under_screen_10 = 29
-        self.button_under_screen_11 = 30
-        self.button_under_screen_12 = 31
-        self.button_under_screen_13 = 32
-        self.button_under_screen_14 = 33
-        self.button_under_screen_15 = 34
-        self.button_under_screen_16 = 35
-        self.button_alt = 13
-        self.button_record = 14
-        self.button_play = 15
-        self.button_metronome = 16
-        self.button_stop = 17
-        self.button_back = 18
-        self.button_up = 19
-        self.button_select = 20
-        self.button_left = 21
-        self.button_down = 22
-        self.button_right = 23
-        self.button_global = 24
+        self.button_under_screen_6 = 13
+        self.button_under_screen_7 = 14
+        self.button_under_screen_8 = 15
+        self.button_under_screen_9 = 16
+        self.button_under_screen_10 = 17
+        self.button_under_screen_11 = 18
+        self.button_under_screen_12 = 19
+        self.button_under_screen_13 = 20
+        self.button_under_screen_14 = 21
+        self.button_under_screen_15 = 22
+        self.button_under_screen_16 = 23
+        self.button_alt = 24
+        self.button_record = 25
+        self.button_play = 26
+        self.button_metronome = 27
+        self.button_stop = 28
+        self.button_back = 29
+        self.button_up = 30
+        self.button_select = 31
+        self.button_left = 32
+        self.button_down = 33
+        self.button_right = 34
+        self.button_global = 35
 
         Zynthbox.PlayGridManager.instance().metronomeBeat128thChanged.connect(self.metronomeBeatUpdate128thHandler)
 

@@ -23,11 +23,12 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import "../Zynthian/private" as ZynthianPrivate
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
+import "../io/zynthbox/ui/private" as ZynthianPrivate
+
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 

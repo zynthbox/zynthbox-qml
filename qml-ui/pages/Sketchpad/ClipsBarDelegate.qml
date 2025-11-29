@@ -8,7 +8,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Qt.labs.folderlistmodel 2.11
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {

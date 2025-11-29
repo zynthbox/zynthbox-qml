@@ -23,14 +23,14 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import "../Zynthian/private" as ZynthianPrivate
+import "../io/zynthbox/ui/private" as ZynthianPrivate
 import "MidiControllerSettings"
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.15
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.6 as Kirigami
 

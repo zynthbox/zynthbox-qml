@@ -26,7 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import org.kde.newstuff 1.91 as NewStuff
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 
 Zynthian.NewStuffPage {
     id: component

@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
 GridLayout {

@@ -34,7 +34,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root

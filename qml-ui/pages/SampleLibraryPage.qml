@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.15
 
 import Helpers 1.0 as Helpers
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.ScreenPage {

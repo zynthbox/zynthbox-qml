@@ -30,7 +30,7 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 import "./Sketchpad" as Sketchpad
 
 Zynthian.ScreenPage {

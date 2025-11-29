@@ -29,7 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {

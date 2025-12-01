@@ -1004,7 +1004,7 @@ def audio_autoconnect(force=False):
                             for laneId in range(0, 5):
                                 fxlayer = channel.chainedFx[laneId] if laneType == "sound" else channel.chainedSketchFx[laneId]
                                 # TODO This would likely be where we would hook in to ensure ports on the FX passthrough ports only exist when there's contents in their slots
-                                slotPassthroughClient = allFxPassthroughClients[channel.id][index] if laneType == "sound" else allSketchFxPassthroughClients[channel.id][index]
+                                slotPassthroughClient = allFxPassthroughClients[channel.id][laneId] if laneType == "sound" else allSketchFxPassthroughClients[channel.id][laneId]
                                 slotPassthroughClient.setCreatePorts(fxlayer is not None)
                                 if thisLaneHasInput:
                                     if fxlayer is None:

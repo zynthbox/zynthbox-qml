@@ -966,17 +966,9 @@ def audio_autoconnect(force=False):
                     # TODO Implement overrides
                     allFxPassthroughClients = Zynthbox.Plugin.instance().fxPassthroughClients()
                     allSketchFxPassthroughClients = Zynthbox.Plugin.instance().sketchFxPassthroughClients()
+                    # logging.info(f"Lanes on track {channelId + 1} have input: {laneHasInput}")
                     for laneType in ["sound", "sketch"]:
                         process_list = []
-
-                        trackPassthroughClient = ""
-                        thisLaneHasInput = False
-                        if laneType == "sound":
-                            trackPassthroughClient = f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-"
-                            thisLaneHasInput = laneHasInput[channelInputLanes[laneId]]
-                        else:
-                            trackPassthroughClient = f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-"
-                            thisLaneHasInput = sketchLaneHasInput[channelInputLanes[laneId]]
 
                         if channel.trackRoutingStyle == "standard":
                             # The order should be the track's TrackPassthrough -> pairs of FXPassthrough + FX layers in order -> the track's Audio levels
@@ -987,14 +979,15 @@ def audio_autoconnect(force=False):
                             # Create a set of client names for each FX in channel
                             # The fx client name should be placed first, and then the fx client name
                             for index, fxlayer in enumerate(channel.chainedFx if laneType == "sound" else channel.chainedSketchFx):
-                                # TODO This would likely be where we would hook in to ensure ports on the FX passthrough ports only exist when there's contents in their slots
-                                slotPassthroughClient = allFxPassthroughClients[channel.id][index] if laneType == "sound" else allSketchFxPassthroughClients[channel.id][index]
-                                slotPassthroughClient.setCreatePorts(fxlayer is not None)
+                                # Ensure ports on the FX passthrough ports only exist when there's contents in their slots
+                                fxSlotPassthroughClient = allFxPassthroughClients[channel.id][index] if laneType == "sound" else allSketchFxPassthroughClients[channel.id][index]
+                                fxSlotPassthroughClient.setCreatePorts(fxlayer is not None)
                                 if fxlayer is not None:
                                     fx_client_names.append([f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-{laneType}-", fxlayer.get_jackname()])
 
                             # Create final client names list, with the client names as it should be connected in order, and also only perform the connection if we have any sound input
-                            if thisLaneHasInput:
+                            if laneHasInput[channelInputLanes[laneId]] if laneType == "sound" else sketchLaneHasInput[channelInputLanes[laneId]]:
+                                trackPassthroughClient = f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-" if laneType == "sound" else f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-"
                                 if len(fx_client_names) > 0:
                                     lane_client_names = [trackPassthroughClient] + fx_client_names + [f"AudioLevels:Channel{channel.id + 1}-"]
                                 else:
@@ -1003,10 +996,11 @@ def audio_autoconnect(force=False):
                         elif channel.trackRoutingStyle == "one-to-one":
                             for laneId in range(0, 5):
                                 fxlayer = channel.chainedFx[laneId] if laneType == "sound" else channel.chainedSketchFx[laneId]
-                                # TODO This would likely be where we would hook in to ensure ports on the FX passthrough ports only exist when there's contents in their slots
-                                slotPassthroughClient = allFxPassthroughClients[channel.id][laneId] if laneType == "sound" else allSketchFxPassthroughClients[channel.id][laneId]
-                                slotPassthroughClient.setCreatePorts(fxlayer is not None)
-                                if thisLaneHasInput:
+                                # Ensure ports on the FX passthrough ports only exist when there's contents in their slots
+                                fxSlotPassthroughClient = allFxPassthroughClients[channel.id][laneId] if laneType == "sound" else allSketchFxPassthroughClients[channel.id][laneId]
+                                fxSlotPassthroughClient.setCreatePorts(fxlayer is not None)
+                                if laneHasInput[channelInputLanes[laneId]] if laneType == "sound" else sketchLaneHasInput[channelInputLanes[laneId]]:
+                                    trackPassthroughClient = f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-" if laneType == "sound" else f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-"
                                     if fxlayer is None:
                                         lane_client_names = [trackPassthroughClient, f"AudioLevels:Channel{channel.id + 1}-"]
                                     else:

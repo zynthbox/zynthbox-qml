@@ -364,7 +364,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
     @Slot()
     def update_button_colors_actual(self):
-        logging.debug("Updating LEDs")
+        # logging.debug("Updating LEDs")
 
         if self.zynqtgui.sketchpad.song is not None and (self.channel is None or (self.channel is not None and self.channel.id != self.zynqtgui.sketchpad.selectedTrackId)):
             self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)

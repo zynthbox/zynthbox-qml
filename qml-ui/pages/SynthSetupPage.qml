@@ -30,10 +30,10 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.15
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -335,13 +335,13 @@ Zynthian.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
-            Zynthian.LibraryPagePicker {
+            ZUI.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "synths"
                 selectedChannel: root.selectedChannel
             }
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -364,7 +364,7 @@ Zynthian.ScreenPage {
                 Component.onCompleted: {
                     layersView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: Zynthian.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: delegate
                     screenId: layersView.screenId
                     selector: layersView.selector
@@ -568,7 +568,7 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-                Zynthian.SelectorView {
+                ZUI.SelectorView {
                     id: bankView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -583,7 +583,7 @@ Zynthian.ScreenPage {
                     Component.onCompleted: {
                         bankView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                     }
-                    delegate: Zynthian.SelectorDelegate {
+                    delegate: ZUI.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
@@ -627,7 +627,7 @@ Zynthian.ScreenPage {
                         onClicked: middleColumnStack.currentIndex = 0
                     }
                 }
-                Zynthian.Card {
+                ZUI.Card {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     contentItem: ColumnLayout {
@@ -707,7 +707,7 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: presetView
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 active: zynqtgui.isBootingComplete
@@ -729,7 +729,7 @@ Zynthian.ScreenPage {
                 Component.onCompleted: {
                     presetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: Zynthian.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     screenId: presetView.screenId
                     selector: presetView.selector
                     // Show highlight frame only if current preset name matches selected one
@@ -769,7 +769,7 @@ Zynthian.ScreenPage {
         onRequestCloseLayerSetupDialog: layerSetupDialog.reject()
     }
 
-    Zynthian.Dialog {
+    ZUI.Dialog {
         id: layerSetupDialog
         parent: applicationWindow().contentItem
         x: Math.round(parent.width/2 - width/2)
@@ -868,7 +868,7 @@ Zynthian.ScreenPage {
         }
     }
 
-//        Zynthian.FilePickerDialog {
+//        ZUI.FilePickerDialog {
 //            id: saveDialog
 //            property string mode: "sound"
 
@@ -948,7 +948,7 @@ Zynthian.ScreenPage {
 //            saveMode: true
 //        }
 
-//        Zynthian.FilePickerDialog {
+//        ZUI.FilePickerDialog {
 //            id: pickerDialog
 //            parent: root
 //            property string mode: "sound"
@@ -1035,7 +1035,7 @@ Zynthian.ScreenPage {
 //            }
 //        }
 
-//        Zynthian.LayerReplaceDialog {
+//        ZUI.LayerReplaceDialog {
 //            id: layerReplaceDialog
 //            parent: root.parent
 //            modal: true

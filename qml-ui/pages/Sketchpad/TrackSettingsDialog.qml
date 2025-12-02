@@ -29,10 +29,10 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.7 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.DialogQuestion {
+ZUI.DialogQuestion {
     id: root
     function showTrackSettings(track) {
         _private.selectedTrack = track;
@@ -104,7 +104,7 @@ Zynthian.DialogQuestion {
             contentItem: Rectangle {
                 color: _private.selectedTrack ? _private.selectedTrack.color : "transparent"
             }
-            Zynthian.Popup {
+            ZUI.Popup {
                 id: trackColorPicker
                 width: Kirigami.Units.gridUnit * 30
                 height: Kirigami.Units.gridUnit * 20
@@ -206,7 +206,7 @@ Zynthian.DialogQuestion {
                     Zynthbox.MidiRouter.setSketchpadTrackTargetTrack(_private.selectedTrack.id, _private.selectedTrack.id);
                 }
             }
-            Zynthian.ComboBox {
+            ZUI.ComboBox {
                 id: trackPicker
                 visible: false
                 property int trackValue: -1

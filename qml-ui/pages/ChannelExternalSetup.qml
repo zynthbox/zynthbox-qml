@@ -30,9 +30,9 @@ import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: component
     screenId: "channel_external_setup"
     title: qsTr("Track External Setup")

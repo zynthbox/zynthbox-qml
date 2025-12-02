@@ -25,9 +25,9 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.NewStuffPage {
+ZUI.NewStuffPage {
     id: component
     screenId: "theme_downloader"
     title: qsTr("Theme Downloader")

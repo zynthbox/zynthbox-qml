@@ -30,7 +30,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
@@ -49,7 +49,7 @@ ColumnLayout {
             visible: row > 0 || component.showFirstRow
             Repeater {
                 model: component.model.columnCount(component.model.index(index, 0))
-                delegate: Zynthian.NotePad {
+                delegate: ZUI.NotePad {
                     positionalVelocity: component.positionalVelocity
                     note: component.model.data(component.model.index(row, index), component.model.roles['note'])
                     property var metadata: component.model.data(component.model.index(row, index), component.model.roles['metadata'])

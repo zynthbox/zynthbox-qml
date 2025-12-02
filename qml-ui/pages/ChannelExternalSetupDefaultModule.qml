@@ -29,9 +29,9 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.BaseExternalEditor {
+ZUI.BaseExternalEditor {
     id: component
 
     cuiaCallback: function(cuia) {
@@ -325,7 +325,7 @@ Zynthian.BaseExternalEditor {
                         }
                         height: Kirigami.Units.iconSizes.small
                         width: Kirigami.Units.iconSizes.small
-                        Zynthian.KnobIndicator {
+                        ZUI.KnobIndicator {
                             anchors.centerIn: parent
                             height: Kirigami.Units.iconSizes.small
                             width: Kirigami.Units.iconSizes.small
@@ -376,7 +376,7 @@ Zynthian.BaseExternalEditor {
                         }
                         height: Kirigami.Units.iconSizes.medium
                         width: Kirigami.Units.iconSizes.medium
-                        Zynthian.KnobIndicator {
+                        ZUI.KnobIndicator {
                             anchors.centerIn: parent
                             height: Kirigami.Units.iconSizes.small
                             width: Kirigami.Units.iconSizes.small
@@ -483,7 +483,7 @@ Zynthian.BaseExternalEditor {
                     }
                     height: Kirigami.Units.iconSizes.medium
                     width: Kirigami.Units.iconSizes.medium
-                    Zynthian.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors.centerIn: parent
                         height: Kirigami.Units.iconSizes.small
                         width: Kirigami.Units.iconSizes.small
@@ -631,7 +631,7 @@ Zynthian.BaseExternalEditor {
                                 }
                                 height: Kirigami.Units.iconSizes.medium
                                 width: Kirigami.Units.iconSizes.medium
-                                Zynthian.KnobIndicator {
+                                ZUI.KnobIndicator {
                                     anchors.centerIn: parent
                                     height: Kirigami.Units.iconSizes.small
                                     width: Kirigami.Units.iconSizes.small
@@ -646,7 +646,7 @@ Zynthian.BaseExternalEditor {
         }
     }
 
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: optionPickerPopup
         // Pick options for this element (specifically: which CC value should this be, and what midi channel)
         function pickOptions(theEntryIndex) {
@@ -679,7 +679,7 @@ Zynthian.BaseExternalEditor {
             }
         ]
     }
-    Zynthian.ComboBox {
+    ZUI.ComboBox {
         id: midiChannelPicker
         visible: false;
         property int channelValue: -1

@@ -30,7 +30,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
@@ -141,7 +141,7 @@ ColumnLayout {
                     console.log("Something isn't working right, the byte size", component.filterRuleObject.byteSize, "was unknown");
                 }
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -202,7 +202,7 @@ ColumnLayout {
                     component.filterRuleObject.byte1 = Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte1;
                 }
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -226,7 +226,7 @@ ColumnLayout {
                     : qsTr("Byte 1 Value:\n%1").arg(applicationWindow().midiBytePicker.byteValueToMessageName(component.filterRuleObject.byte1 + 128))
             onClicked: {
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -251,7 +251,7 @@ ColumnLayout {
             onClicked: {
                 component.filterRuleObject.byte1AddChannel = !component.filterRuleObject.byte1AddChannel;
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -312,7 +312,7 @@ ColumnLayout {
                     component.filterRuleObject.byte2 = Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte2;
                 }
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -334,7 +334,7 @@ ColumnLayout {
                 : component.filterRuleObject.byte2 === Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte2
                     ? qsTr("Byte 2 Value:\n(original)")
                     : qsTr("Byte 2 Value:\n%1").arg(component.filterRuleObject.byte2)
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -359,7 +359,7 @@ ColumnLayout {
             onClicked: {
                 component.filterRuleObject.byte2AddChannel = !component.filterRuleObject.byte2AddChannel;
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -416,7 +416,7 @@ ColumnLayout {
                     component.filterRuleObject.byte3 = Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte3;
                 }
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -438,7 +438,7 @@ ColumnLayout {
                 : component.filterRuleObject.byte3 === Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte3
                     ? qsTr("Byte 3 Value:\n(original)")
                     : qsTr("Byte 3 Value:\n%1").arg(component.filterRuleObject.byte3)
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -463,7 +463,7 @@ ColumnLayout {
             onClicked: {
                 component.filterRuleObject.byte3AddChannel = !component.filterRuleObject.byte3AddChannel;
             }
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom

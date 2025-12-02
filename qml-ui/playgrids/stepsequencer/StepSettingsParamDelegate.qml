@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 RowLayout {
     id: component
@@ -79,7 +79,7 @@ RowLayout {
         }
         component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, newValue);
     }
-    Zynthian.PlayGridButton {
+    ZUI.PlayGridButton {
         text: "-"
         Layout.preferredWidth: Kirigami.Units.gridUnit
         enabled: (component.preferInterpretedValue && component.paramInterpretedDefault > component.paramMin) || parseInt(component.paramValue) > component.paramMin
@@ -159,7 +159,7 @@ RowLayout {
                 color: Kirigami.Theme.textColor
             }
         }
-        Zynthian.KnobIndicator {
+        ZUI.KnobIndicator {
             anchors {
                 left: parent.horizontalCenter
                 leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
@@ -171,7 +171,7 @@ RowLayout {
             knobId: component.knobId
         }
     }
-    Zynthian.PlayGridButton {
+    ZUI.PlayGridButton {
         text: "+"
         Layout.preferredWidth: Kirigami.Units.gridUnit
         enabled: (component.preferInterpretedValue && component.paramInterpretedDefault < component.paramMax) || parseInt(component.paramValue) < component.paramMax

@@ -29,7 +29,7 @@ import QtQuick.Window 2.10
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 RowLayout {
     onVisibleChanged: {
@@ -153,19 +153,19 @@ RowLayout {
         Layout.maximumWidth: Math.floor(root.width / 4)
         Layout.minimumWidth: Layout.maximumWidth
         Layout.fillHeight: true
-        Zynthian.ControllerLoader {
+        ZUI.ControllerLoader {
             id: control1
             Layout.preferredHeight: 1
             // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
             controller.index: 0
         }
-        Zynthian.ControllerLoader {
+        ZUI.ControllerLoader {
             id: control2
             Layout.preferredHeight: 1
             controller.index: 1
         }
     }
-    Zynthian.SelectorView {
+    ZUI.SelectorView {
         id: mainView
         screenId: root.screenId
         Layout.fillWidth: true
@@ -178,12 +178,12 @@ RowLayout {
         Layout.maximumWidth: Math.floor(root.width / 4)
         Layout.minimumWidth: Layout.maximumWidth
         Layout.fillHeight: true
-        Zynthian.ControllerLoader {
+        ZUI.ControllerLoader {
             id: control3
             Layout.preferredHeight: 1
             controller.index: 2
         }
-        Zynthian.ControllerLoader {
+        ZUI.ControllerLoader {
             id: control4
             Layout.preferredHeight: 1
             controller.index: 3

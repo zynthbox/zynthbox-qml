@@ -30,7 +30,7 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 Item {
     id: component
@@ -366,7 +366,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainScanSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -404,7 +404,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainIntervalSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -423,7 +423,7 @@ Item {
                     onGrainIntervalChanged: grainIntervalSlider.value = component.sliceObject.grainInterval
                 }
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainIntervalAdditionalSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -458,7 +458,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainSizeSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -477,7 +477,7 @@ Item {
                     onGrainSizeChanged: grainSizeSlider.value = component.sliceObject.grainSize
                 }
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainSizeAdditionalSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -536,7 +536,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPanMinimumSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -554,7 +554,7 @@ Item {
                     onGrainPanMinimumChanged: grainPanMinimumSlider.value = component.sliceObject.grainPanMinimum
                 }
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPanMaximumSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -588,7 +588,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMinimum1Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -606,7 +606,7 @@ Item {
                     onGrainPitchMinimum1Changed: grainPitchMinimum1Slider.value = component.sliceObject.grainPitchMinimum1
                 }
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMaximum1Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -660,7 +660,7 @@ Item {
                     color: _private.currentElement === 4 ? Kirigami.Theme.highlightedTextColor : "transparent"
                 }
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMinimum2Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -678,7 +678,7 @@ Item {
                     onGrainPitchMinimum2Changed: grainPitchMinimum2Slider.value = component.sliceObject.grainPitchMinimum2
                 }
             }
-            Zynthian.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMaximum2Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true

@@ -29,10 +29,10 @@ import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-Zynthian.Popup {
+ZUI.Popup {
     id: component
 
     property list<QQC2.Action> actions

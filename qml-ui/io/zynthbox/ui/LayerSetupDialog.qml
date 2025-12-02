@@ -30,11 +30,11 @@ import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 
-Zynthian.ActionPickerPopup {
+ZUI.ActionPickerPopup {
     id: root
     property QtObject selectedChannel: null
     signal requestSlotPicker(QtObject channel, string slotType, int slotIndex)
@@ -56,7 +56,7 @@ Zynthian.ActionPickerPopup {
     Component.onCompleted: {
         selectedChannelThrottle.restart()
     }
-    Zynthian.Popup {
+    ZUI.Popup {
         id: noFreeSlotsPopup
         parent: QQC2.Overlay.overlay
         y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y

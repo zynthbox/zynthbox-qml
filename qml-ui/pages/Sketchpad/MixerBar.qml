@@ -33,7 +33,7 @@ import QtQuick.Controls.Styles 1.4
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 QQC2.Pane {
     id: root
@@ -699,7 +699,7 @@ QQC2.Pane {
         }
     }
 
-    component PanSlider : Zynthian.ResetableSlider {
+    component PanSlider : ZUI.ResetableSlider {
 
         id: panSlider
         implicitHeight: Kirigami.Units.gridUnit

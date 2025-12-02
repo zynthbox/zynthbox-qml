@@ -30,7 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import "private" as Private
 
 QQC2.Pane
@@ -356,7 +356,7 @@ QQC2.Pane
             }
         }
 
-        Zynthian.Popup {
+        ZUI.Popup {
             id: popup
 
             property var cuiaCallback: function(cuia) {

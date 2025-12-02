@@ -33,7 +33,7 @@ import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 QQC2.Pane {
@@ -70,11 +70,11 @@ QQC2.Pane {
             return true;
 
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             return true;
 
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             return true;
 
         case "SELECT_UP":
@@ -794,7 +794,7 @@ QQC2.Pane {
     }
 
 
-    Zynthian.FilePickerDialog {
+    ZUI.FilePickerDialog {
         id: samplePickerDialog
         parent: zlScreen.parent
 
@@ -855,7 +855,7 @@ QQC2.Pane {
         }
     }
 
-    Zynthian.FilePickerDialog {
+    ZUI.FilePickerDialog {
         id: loopPickerDialog
         parent: zlScreen.parent
 
@@ -931,7 +931,7 @@ QQC2.Pane {
         id: channelKeyZoneSetup
     }
 
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: sketchPickerPopup
         objectName: "sketchPickerPopup"
         columns: 3
@@ -996,7 +996,7 @@ QQC2.Pane {
         ]
     }
 
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: samplePickerPopup
         objectName: "samplePickerPopup"
         property QtObject sketch: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.samples[root.selectedChannel.selectedSlot.value] : null
@@ -1073,7 +1073,7 @@ QQC2.Pane {
         id: sketchUnbouncer
     }
 
-    Zynthian.LayerSetupDialog {
+    ZUI.LayerSetupDialog {
         id: layerSetupDialog
         onRequestSlotPicker: function(channel, slotType, slotIndex) {
             slotSwapperPopup.pickSlotToSwapWith(channel, slotType, slotIndex);
@@ -1099,7 +1099,7 @@ QQC2.Pane {
     ExternalMidiChannelPicker {
         id: externalMidiChannelPicker
     }
-    Zynthian.ComboBox {
+    ZUI.ComboBox {
         id: externalMidiOutPicker
         visible: false
         function pickOutput(channel) {
@@ -1132,7 +1132,7 @@ QQC2.Pane {
         }
     }
 
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: fxSetupDialog
         property var selectedFx: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_fxslot"
                                  ? root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value]

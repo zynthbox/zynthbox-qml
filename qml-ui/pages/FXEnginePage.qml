@@ -28,9 +28,9 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
 
     property string pluginFormat: "LV2"
@@ -182,7 +182,7 @@ Zynthian.ScreenPage {
         //     //     }
         //     // }
         // }
-        Zynthian.Card {
+        ZUI.Card {
             Layout.fillWidth: true
             Layout.fillHeight: true
             contentItem: QQC2.ScrollView {

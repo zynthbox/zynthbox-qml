@@ -30,7 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
@@ -130,7 +130,7 @@ Item {
         return result;
     }
 
-    Zynthian.FilePickerDialog {
+    ZUI.FilePickerDialog {
         id: sequenceFilePicker
         property string sequenceName
         property string patternName;
@@ -275,7 +275,7 @@ Item {
         }
     }
 
-    Zynthian.Dialog {
+    ZUI.Dialog {
         id: loadedSequenceOptionsPicker
         property QtObject loadedSequence
         width: component.Window.width - Kirigami.Units.largeSpacing * 2
@@ -328,7 +328,7 @@ Item {
         }
     }
 
-    Zynthian.Dialog {
+    ZUI.Dialog {
         id: loadedPatternOptionsPicker
         property QtObject loadedPattern
         width: component.Window.width - Kirigami.Units.largeSpacing * 2
@@ -478,7 +478,7 @@ Item {
         }
     }
 
-    Zynthian.Popup {
+    ZUI.Popup {
         id: trackPicker
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
         x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
@@ -498,7 +498,7 @@ Item {
                 columns: 4
                 Repeater {
                     model: zynqtgui.sketchpad.song.channelsModel
-                    delegate: Zynthian.PlayGridButton {
+                    delegate: ZUI.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.preferredWidth: trackPicker.width / 4
                         Layout.fillHeight: true
@@ -510,7 +510,7 @@ Item {
                     }
                 }
             }
-            Zynthian.ActionBar {
+            ZUI.ActionBar {
                 Layout.fillWidth: true
                 currentPage: Item {
                     property QtObject backAction: Kirigami.Action {

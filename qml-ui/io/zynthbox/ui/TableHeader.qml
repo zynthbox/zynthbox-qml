@@ -29,7 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 
 QQC2.AbstractButton {

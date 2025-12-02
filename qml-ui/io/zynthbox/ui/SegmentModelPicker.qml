@@ -30,9 +30,9 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.Popup {
+ZUI.Popup {
     id: component
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
@@ -81,7 +81,7 @@ Zynthian.Popup {
                     }
                 }
             }
-            Zynthian.DialogQuestion {
+            ZUI.DialogQuestion {
                 id: modelRemover
                 function removeVariant(variantIndex) {
                     modelRemover.variantIndex = variantIndex;
@@ -102,7 +102,7 @@ Zynthian.Popup {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 20
             clip: true
             model: component.opened ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelsCount : 0
-            delegate: Zynthian.Card {
+            delegate: ZUI.Card {
                 id: variantDelegate
                 width: ListView.view.width
                 height: ListView.view.height / 7.1

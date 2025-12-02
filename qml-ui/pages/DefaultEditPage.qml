@@ -30,7 +30,7 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.7 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 RowLayout {
     id: root
@@ -84,10 +84,10 @@ RowLayout {
             applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(2).controllerLoader.controller.ctrl, -1)
             return true;
         case "KNOB3_UP":
-            zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn + 1, 0, zynqtgui.control.totalColumns - 1)
+            zynqtgui.control.selectedColumn = ZUI.CommonUtils.clamp(zynqtgui.control.selectedColumn + 1, 0, zynqtgui.control.totalColumns - 1)
             return true;
         case "KNOB3_DOWN":
-            zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn - 1, 0, zynqtgui.control.totalColumns - 1)
+            zynqtgui.control.selectedColumn = ZUI.CommonUtils.clamp(zynqtgui.control.selectedColumn - 1, 0, zynqtgui.control.totalColumns - 1)
             return true;
         }
 
@@ -178,7 +178,7 @@ RowLayout {
                             text: qsTr("Page %1").arg(index+1)
                         }
 
-                        Zynthian.KnobIndicator {
+                        ZUI.KnobIndicator {
                             anchors {
                                 bottom: parent.bottom
                                 left: parent.left
@@ -309,7 +309,7 @@ RowLayout {
                                         onAll_controlsChanged: controlUpdater.restart()
                                     }
 
-                                    Zynthian.ControllerLoader {
+                                    ZUI.ControllerLoader {
                                         id: controllerLoader
                                         visible: controlDelegate.control != null
                                         knobId: columnDelegate.isCurrentColumn ? controlDelegate.rowIndex : -1

@@ -29,9 +29,9 @@ import QtQuick.Controls 2.4 as QQC2
 import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.Popup {
+ZUI.Popup {
     id: component
     parent: QQC2.Overlay.overlay
     x: Math.round(parent.width/2 - width/2)

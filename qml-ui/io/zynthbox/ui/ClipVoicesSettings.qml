@@ -29,7 +29,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 Item {
     id: component
@@ -267,7 +267,7 @@ Item {
     RowLayout {
         anchors.fill: parent
         spacing: 0
-        Zynthian.InfinitySlider {
+        ZUI.InfinitySlider {
             id: subvoiceCountSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -308,7 +308,7 @@ Item {
                 knobId: 3
             }
         }
-        Zynthian.InfinitySlider {
+        ZUI.InfinitySlider {
             id: editVoiceSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -357,7 +357,7 @@ Item {
                 RowLayout {
                     spacing: 0
                     Layout.bottomMargin: 2 // To give even space for the selected indicator that sits two pixels below the thing
-                    Zynthian.SketchpadDial {
+                    ZUI.SketchpadDial {
                         id: panDial
                         text: qsTr("Pan")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
@@ -381,7 +381,7 @@ Item {
                         }
                     }
 
-                    Zynthian.SketchpadDial {
+                    ZUI.SketchpadDial {
                         id: pitchDial
                         text: qsTr("Pitch")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
@@ -405,7 +405,7 @@ Item {
                         }
                     }
 
-                    Zynthian.SketchpadDial {
+                    ZUI.SketchpadDial {
                         id: gainDial
                         text: qsTr("Gain (dB)")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null

@@ -8,7 +8,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Qt.labs.folderlistmodel 2.11
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
@@ -147,7 +147,7 @@ ColumnLayout {
                         visible: parent.visible && clipDelegate.cppClipObject && clipDelegate.cppClipObject.isPlaying
                         color: Kirigami.Theme.highlightColor
                         width: 1
-                        x: visible ? Zynthian.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
+                        x: visible ? ZUI.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
                     }
                 }
                 Image {

@@ -29,9 +29,9 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.components 3.0 as PlasmaComponents
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: component
     property bool isVisible: zynqtgui.current_screen_id === component.screenId
 
@@ -85,7 +85,7 @@ Zynthian.ScreenPage {
      * itemData is a json structure with the model Roles as key and their respective value as values
      * For example, the following snippet prints the list of installed files :
      * <code>
-     * Zynthian.NewStuffPage {
+     * ZUI.NewStuffPage {
      *     onItemInstalled: {
      *         console.log("Installed Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
      *     }
@@ -98,7 +98,7 @@ Zynthian.ScreenPage {
      * itemData is a json structure with the model Roles as key and their respective value as values
      * For example, the following snippet prints the list of installed files :
      * <code>
-     * Zynthian.NewStuffPage {
+     * ZUI.NewStuffPage {
      *     onItemUninstalled: {
      *         console.log("Uninstalled Files", itemData[NewStuff.ItemsModel.UnInstalledFilesRole])
      *     }
@@ -111,7 +111,7 @@ Zynthian.ScreenPage {
      * itemData is a json structure with the model Roles as key and their respective value as values
      * For example, the following snippet prints the list of installed files :
      * <code>
-     * Zynthian.NewStuffPage {
+     * ZUI.NewStuffPage {
      *     onItemUpdating: {
      *         console.log("Updating Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
      *     }
@@ -156,7 +156,7 @@ Zynthian.ScreenPage {
     contextualActions: contentLoader.status == Loader.Ready ? contentLoader.item.contextualActions : []
     contentItem: Item {
         anchors.fill: parent
-        Zynthian.Card {
+        ZUI.Card {
             anchors.centerIn: parent
             height: Kirigami.Units.gridUnit * 10
             width: Kirigami.Units.gridUnit * 15
@@ -186,7 +186,7 @@ Zynthian.ScreenPage {
             height: Kirigami.Units.gridUnit * 5
             width: Kirigami.Units.gridUnit * 5
             visible: contentLoader.status != Loader.Ready
-            Zynthian.Card {
+            ZUI.Card {
                 anchors {
                     top: parent.top
                     left: parent.left

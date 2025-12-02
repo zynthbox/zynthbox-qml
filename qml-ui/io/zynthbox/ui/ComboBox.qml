@@ -27,7 +27,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 QQC2.Button {
     id: root
@@ -73,7 +73,7 @@ QQC2.Button {
         // saying it cannot find a window to open popup in. So set visual parent to Overlay and while instantiating set
         // object parent to application window
 
-        Zynthian.Popup {
+        ZUI.Popup {
             id: popupRoot
 
             property alias popupListView: popupListView

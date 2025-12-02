@@ -29,18 +29,18 @@ import QtQuick.Window 2.10
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 Item {
     id: root
 
     // FIXME: Use Kirigami.PAgePool when frameworks will be recent enough
-    property list<Zynthian.TabbedControlViewAction> tabActions
+    property list<ZUI.TabbedControlViewAction> tabActions
     property int minimumTabsCount: 6
     property int orientation: Qt.Horizontal
     property bool visibleFocusRects: true
-    property Zynthian.TabbedControlViewAction initialAction: tabActions[0]
-    readonly property Zynthian.TabbedControlViewAction activeAction: internalStack.activeAction
+    property ZUI.TabbedControlViewAction initialAction: tabActions[0]
+    readonly property ZUI.TabbedControlViewAction activeAction: internalStack.activeAction
     readonly property QtObject activeItem: internalStack.currentItem
     property alias initialHeaderItem: initialItem.contentItem
     property alias finalHeaderItem: finalItem.contentItem
@@ -321,7 +321,7 @@ Item {
                 Repeater {
                     model: root.tabActions
                     delegate: QQC2.Button {
-                        readonly property Zynthian.TabbedControlViewAction tabAction: modelData
+                        readonly property ZUI.TabbedControlViewAction tabAction: modelData
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         implicitWidth: 1
@@ -372,10 +372,10 @@ Item {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Zynthian.Stack {
+            ZUI.Stack {
                 id: internalStack
-                property Zynthian.TabbedControlViewAction activeAction: root.initialAction
-                property Zynthian.TabbedControlViewAction activeSubAction: root.initialAction.children.length > 0 ? root.initialAction.children[0] : null
+                property ZUI.TabbedControlViewAction activeAction: root.initialAction
+                property ZUI.TabbedControlViewAction activeSubAction: root.initialAction.children.length > 0 ? root.initialAction.children[0] : null
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
@@ -410,7 +410,7 @@ Item {
                     Repeater {
                         model: internalStack.activeAction.children
                         delegate: QQC2.Button {
-                            readonly property Zynthian.TabbedControlViewAction tabAction: modelData
+                            readonly property ZUI.TabbedControlViewAction tabAction: modelData
                             implicitWidth: 1
                             Layout.fillWidth: true
                             text: modelData.text

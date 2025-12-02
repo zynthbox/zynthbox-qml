@@ -4,7 +4,7 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 Rectangle {
@@ -248,9 +248,9 @@ Rectangle {
                     }
                     onMouseYChanged: {
                         if (mouse.y - mouseArea.initialMouseY != 0) {
-                            var newVal = Zynthian.CommonUtils.clamp((mouseArea.height - mouse.y) / mouseArea.height, 0, 1)
+                            var newVal = ZUI.CommonUtils.clamp((mouseArea.height - mouse.y) / mouseArea.height, 0, 1)
                             mouseArea.dragHappened = true
-                            slider.value = Zynthian.CommonUtils.interp(newVal * (slider.to - slider.from), 0, (slider.to - slider.from), slider.from, slider.to)
+                            slider.value = ZUI.CommonUtils.interp(newVal * (slider.to - slider.from), 0, (slider.to - slider.from), slider.from, slider.to)
                             control.valueChanged()
                         }
                     }

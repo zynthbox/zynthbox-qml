@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 GridLayout {
@@ -416,7 +416,7 @@ GridLayout {
                     }
                     Rectangle {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                        width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                         anchors {
                             left: parent.left
                             top: parent.top
@@ -429,7 +429,7 @@ GridLayout {
                     }
                     Rectangle {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                        width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                         anchors {
                             left: parent.left
                             top: parent.top
@@ -572,24 +572,24 @@ GridLayout {
                         if (control.dragEnabled) {
                             var newVal
                             if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
                                 synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
                             } else if (control.slotType == "sample-trig" && control.slotData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
                             } else if (control.slotType == "fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                                control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
                             } else if (control.slotType == "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                                control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
                             }
                         }
                     }

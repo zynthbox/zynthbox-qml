@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.newstuff 1.91 as NewStuff
 import org.kde.plasma.components 3.0 as PlasmaComponents
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 Item {
     id: component
@@ -70,7 +70,7 @@ Item {
      * itemData is a json structure with the model Roles as key and their respective value as values
      * For example, the following snippet prints the list of installed files :
      * <code>
-     * Zynthian.NewStuffPage {
+     * ZUI.NewStuffPage {
      *     onItemInstalled: {
      *         console.log("Installed Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
      *     }
@@ -83,7 +83,7 @@ Item {
      * itemData is a json structure with the model Roles as key and their respective value as values
      * For example, the following snippet prints the list of installed files :
      * <code>
-     * Zynthian.NewStuffPage {
+     * ZUI.NewStuffPage {
      *     onItemUninstalled: {
      *         console.log("Uninstalled Files", itemData[NewStuff.ItemsModel.UnInstalledFilesRole])
      *     }
@@ -96,7 +96,7 @@ Item {
      * itemData is a json structure with the model Roles as key and their respective value as values
      * For example, the following snippet prints the list of installed files :
      * <code>
-     * Zynthian.NewStuffPage {
+     * ZUI.NewStuffPage {
      *     onItemUpdating: {
      *         console.log("Updating Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
      *     }
@@ -378,7 +378,7 @@ Item {
                 // We're using this as our de-facto single-item view, so just make these the full size of the ListView
                 width: ListView.view.width
                 height: ListView.view.height
-                Zynthian.Card {
+                ZUI.Card {
                     anchors.fill: parent;
                     ColumnLayout {
                         opacity: busyInstallingStuff.running ? 0.3 : 1
@@ -525,7 +525,7 @@ Item {
                             QQC2.Label {
                                 text: qsTr("Rated as")
                             }
-                            Zynthian.Rating {
+                            ZUI.Rating {
                                 Layout.fillWidth: true
                                 rating: model.rating
                             }
@@ -566,7 +566,7 @@ Item {
             }
             height: Kirigami.Units.gridUnit * 5
             visible: component.isLoading;
-            Zynthian.Card {
+            ZUI.Card {
                 anchors {
                     top: parent.top
                     left: busyWithEngineStuffLabel.left
@@ -600,7 +600,7 @@ Item {
                 width: paintedWidth
             }
         }
-        Zynthian.DialogQuestion {
+        ZUI.DialogQuestion {
             id: errorPopup
             rejectText: ""
             acceptText: qsTr("OK")

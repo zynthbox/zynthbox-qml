@@ -28,7 +28,7 @@ import Qt.labs.folderlistmodel 2.11
 import QtQuick 2.10
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Layouts 1.4
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -57,11 +57,11 @@ QQC2.Pane {
             returnVal = true;
             break;
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;
         }
@@ -78,7 +78,7 @@ QQC2.Pane {
     }
 
     contentItem: Item {
-        Zynthian.ActionPickerPopup {
+        ZUI.ActionPickerPopup {
             id: clipSettingsPopup
 
             columns: 3

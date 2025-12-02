@@ -29,10 +29,10 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.DialogQuestion {
+ZUI.DialogQuestion {
     id: component
     width: Kirigami.Units.gridUnit * 40
     height: (Kirigami.Units.gridUnit * 4 * (_private.soundSourceDetails.length + 3)) + (Kirigami.Units.gridUnit * _private.sketchLacksPatternOrMidi.length * 2) + (Kirigami.Units.gridUnit * _private.sketchLacksSoundInfo.length * 2)
@@ -294,7 +294,7 @@ Zynthian.DialogQuestion {
         }
         Repeater {
             model: _private.soundSourceDetails
-            delegate: Zynthian.PlayGridButton {
+            delegate: ZUI.PlayGridButton {
                 id: soundSourceDelegate
                 Layout.fillWidth: true
                 Layout.fillHeight: false

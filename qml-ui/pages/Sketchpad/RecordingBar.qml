@@ -34,7 +34,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
@@ -232,9 +232,9 @@ GridLayout {
 //                if (!zynqtgui.sketchpad.isRecording) {
 //                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
 //                    controlObj.queueRecording();
-//                    Zynthian.CommonUtils.startMetronomeAndPlayback();
+//                    ZUI.CommonUtils.startMetronomeAndPlayback();
 //                } else {
-//                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+//                    ZUI.CommonUtils.stopMetronomeAndPlayback();
 //                    bottomBar.tabbedView.initialAction.trigger()
 //                }
             }

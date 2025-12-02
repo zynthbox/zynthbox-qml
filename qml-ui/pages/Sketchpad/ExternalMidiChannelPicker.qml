@@ -29,9 +29,9 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.Popup {
+ZUI.Popup {
     id: root
     function pickChannel(channel) {
         _private.selectedChannel = channel;
@@ -86,7 +86,7 @@ Zynthian.Popup {
             columns: 4
             Repeater {
                 model: _private.selectedChannel ? 16 : 0
-                delegate: Zynthian.PlayGridButton {
+                delegate: ZUI.PlayGridButton {
                     id: channelDelegate
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5

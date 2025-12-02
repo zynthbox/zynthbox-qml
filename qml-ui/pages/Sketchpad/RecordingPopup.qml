@@ -32,9 +32,9 @@ import org.kde.kirigami 2.6 as Kirigami
 import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.Popup {
+ZUI.Popup {
     id: root
     property QtObject selectedChannel: null
     property string selectedSlotType: "synth"
@@ -101,11 +101,11 @@ Zynthian.Popup {
                     }
                     break;
                 case "KNOB1_UP":
-                    countIn.value = Zynthian.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
+                    countIn.value = ZUI.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
                     returnValue = true;
                     break;
                 case "KNOB1_DOWN":
-                    countIn.value = Zynthian.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
+                    countIn.value = ZUI.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
                     returnValue = true;
                     break;
                 case "KNOB2_UP":
@@ -218,7 +218,7 @@ Zynthian.Popup {
             if (startWithCountin && countIn.value > 0) {
                 Zynthbox.SyncTimer.startWithCountin(countIn.value);
             } else {
-                Zynthian.CommonUtils.startMetronomeAndPlayback();
+                ZUI.CommonUtils.startMetronomeAndPlayback();
             }
         }
     }
@@ -463,12 +463,12 @@ Zynthian.Popup {
                     Layout.maximumHeight: Layout.preferredHeight
                     Layout.minimumHeight: Layout.preferredHeight
 
-                    Zynthian.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            Zynthian.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -499,12 +499,12 @@ Zynthian.Popup {
                             }
                         }
                     }
-                    Zynthian.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            Zynthian.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -535,7 +535,7 @@ Zynthian.Popup {
                                         icon.name: "list-remove-symbolic"
                                         enabled: countIn.value > countIn.from
                                         onClicked: {
-                                            countIn.value = Zynthian.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
+                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
                                         }
                                     }
                                     Rectangle {
@@ -563,7 +563,7 @@ Zynthian.Popup {
                                         icon.name: "list-add-symbolic"
                                         enabled: countIn.value < countIn.to
                                         onClicked: {
-                                            countIn.value = Zynthian.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
+                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
                                         }
                                     }
                                 }
@@ -577,12 +577,12 @@ Zynthian.Popup {
                             }
                         }
                     }
-                    Zynthian.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            Zynthian.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -601,7 +601,7 @@ Zynthian.Popup {
                                     verticalAlignment: Text.AlignVCenter
                                     text: qsTr("Master\nVolume")
                                 }
-                                Zynthian.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
                                     Layout.fillHeight: true
                                     controlObj: gainHandler
@@ -619,12 +619,12 @@ Zynthian.Popup {
                             }
                         }
                     }
-                    Zynthian.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            Zynthian.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -642,7 +642,7 @@ Zynthian.Popup {
                                     horizontalAlignment: Text.AlignRight
                                     text: qsTr("BPM")
                                 }
-                                Zynthian.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     Layout.fillHeight: true
                                     controlObj: Zynthbox.SyncTimer
                                     controlProperty: "bpm"
@@ -709,7 +709,7 @@ Zynthian.Popup {
                                     Layout.alignment: Qt.AlignCenter
                                     text: qsTr("Audio Source:")
                                 }
-                                Zynthian.ComboBox {
+                                ZUI.ComboBox {
                                     id: sourceCombo
 
                                     Layout.fillWidth: true
@@ -737,7 +737,7 @@ Zynthian.Popup {
                                     Layout.alignment: Qt.AlignCenter
                                     text: qsTr("Recording Channel:")
                                 }
-                                Zynthian.ComboBox {
+                                ZUI.ComboBox {
                                     id: recordingChannelCombo
 
                                     Layout.fillWidth: true
@@ -766,7 +766,7 @@ Zynthian.Popup {
                                     enabled: parent.enabled
                                     text: qsTr("Source Track:")
                                 }
-                                Zynthian.ComboBox {
+                                ZUI.ComboBox {
                                     id: channelCombo
 
                                     Layout.fillWidth: true
@@ -828,7 +828,7 @@ Zynthian.Popup {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                                     text: qsTr("Midi Source:")
                                 }
-                                Zynthian.ComboBox {
+                                ZUI.ComboBox {
                                     id: midiSourceCombo
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
@@ -897,7 +897,7 @@ Zynthian.Popup {
                                 Layout.preferredHeight: _private.preferredRowHeight
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-remove-symbolic"
@@ -916,7 +916,7 @@ Zynthian.Popup {
                                         horizontalAlignment: Text.AlignHCenter
                                         text: _private.selectedPattern ? qsTr("Step Length: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.stepLength)) : ""
                                     }
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-add-symbolic"
@@ -936,7 +936,7 @@ Zynthian.Popup {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-remove-symbolic"
@@ -986,7 +986,7 @@ Zynthian.Popup {
                                             ]
                                         }
                                     }
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-add-symbolic"
@@ -1001,7 +1001,7 @@ Zynthian.Popup {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-remove-symbolic"
@@ -1052,7 +1052,7 @@ Zynthian.Popup {
                                         }
                                     }
 
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-add-symbolic"
@@ -1215,7 +1215,7 @@ Zynthian.Popup {
                                             return -100
                                         }
                                     }
-                                    Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
                                     Layout.minimumWidth: Layout.preferredWidth
                                     Layout.maximumWidth: Layout.preferredWidth
                                     Layout.fillHeight: true
@@ -1236,7 +1236,7 @@ Zynthian.Popup {
                                             return -100
                                         }
                                     }
-                                    Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
                                     Layout.minimumWidth: Layout.preferredWidth
                                     Layout.maximumWidth: Layout.preferredWidth
                                     Layout.fillHeight: true

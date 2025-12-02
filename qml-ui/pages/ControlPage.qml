@@ -29,10 +29,10 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.7 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
     title: zynqtgui.control.selector_path_element
 
@@ -64,7 +64,7 @@ Zynthian.ScreenPage {
                 controller.value = sign > 0 ? controller.max_value : controller.value0;
             } else {
                 let stepSize = controller.step_size === 0 ? 1 : controller.step_size
-                controller.value = Zynthian.CommonUtils.clamp(controller.value + sign * stepSize, controller.value0, controller.max_value)
+                controller.value = ZUI.CommonUtils.clamp(controller.value + sign * stepSize, controller.value0, controller.max_value)
             }
         }
     }
@@ -211,7 +211,7 @@ Zynthian.ScreenPage {
         } else if (root.controlPageCache[actualPage] == null) {
             // console.log("Page cache not found for actualPage :", actualPage)
             // console.log("Instantiating page", actualPage, ":", actualPage);
-            var cache = Zynthian.CommonUtils.instantiateComponent(actualPage, defaultParams);
+            var cache = ZUI.CommonUtils.instantiateComponent(actualPage, defaultParams);
 
             if (cache.errorString != "") {
                 console.log("Error instantiating page", cache.url, ":", cache.errorString);
@@ -306,7 +306,7 @@ Zynthian.ScreenPage {
     //}
 
     bottomPadding: Kirigami.Units.gridUnit
-    contentItem: Zynthian.Stack {
+    contentItem: ZUI.Stack {
         id: stack
     }
 
@@ -319,7 +319,7 @@ Zynthian.ScreenPage {
         }
     }
 
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: modPackPicker
         actions: [
             QQC2.Action {
@@ -354,7 +354,7 @@ Zynthian.ScreenPage {
         controlActions.control = control;
         controlActions.open();
     }
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: controlActions
         property QtObject control: null
         property int oldLearnChannel: -1
@@ -390,7 +390,7 @@ Zynthian.ScreenPage {
             }
         }
     }
-    Zynthian.DialogQuestion {
+    ZUI.DialogQuestion {
         id: midiLearner
         text: zynqtgui.midiLearnZctrl !== null ? qsTr("Learning %1\nWaiting for midi control change input...").arg(zynqtgui.midiLearnZctrl.shortName) : ""
         acceptText: ""

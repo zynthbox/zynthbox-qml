@@ -8,13 +8,13 @@ import Qt.labs.folderlistmodel 2.15
 
 import Helpers 1.0 as Helpers
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 /**
   * EXAMPLE :
   *
-  * Zynthian.Fileroot {
+  * ZUI.Fileroot {
   *      id: root
   *
   *      x: parent.width/2 - width/2
@@ -32,7 +32,7 @@ import io.zynthbox.components 1.0 as Zynthbox
   *      }
   * }
   */
-Zynthian.Dialog {
+ZUI.Dialog {
     id: root
     property alias headerText: heading.text
     property string rootFolder: "/"
@@ -68,11 +68,11 @@ Zynthian.Dialog {
                 result = true;
                 break;
             case "SELECT_UP":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             case "SELECT_DOWN":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
@@ -99,11 +99,11 @@ Zynthian.Dialog {
                 result = true;
                 break;
             case "KNOB3_UP":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             case "KNOB3_DOWN":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             default:
@@ -198,7 +198,7 @@ Zynthian.Dialog {
                 }
             }
             onClicked: newFolderDialog.open()
-            Zynthian.DialogQuestion {
+            ZUI.DialogQuestion {
                 id: newFolderDialog
                 textInputVisible: true
                 adjectiveNounButtonVisible: true
@@ -234,7 +234,7 @@ Zynthian.Dialog {
                 renameEntryDialog.containingDirectory = filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.substring(0, filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.lastIndexOf("/"));
                 renameEntryDialog.open();
             }
-            Zynthian.DialogQuestion {
+            ZUI.DialogQuestion {
                 id: renameEntryDialog
                 textInputVisible: true
                 adjectiveNounButtonVisible: true
@@ -294,7 +294,7 @@ Zynthian.Dialog {
             }
             // Show the type-local hierarchy (don't allow moving samples to sketches etc) as potential destinations
             // TODO and also any removable drives and their file system structure
-            Zynthian.ComboBox {
+            ZUI.ComboBox {
                 id: moveEntryLocationPicker
                 visible: false;
                 model: subfolderSubpaths
@@ -328,7 +328,7 @@ Zynthian.Dialog {
             text: qsTr("Delete...")
             enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
             onClicked: deleteEntryDialog.open()
-            Zynthian.DialogQuestion {
+            ZUI.DialogQuestion {
                 id: deleteEntryDialog
                 title: qsTr("Delete?")
                 text: filePropertiesColumn.filePropertiesHelperObj
@@ -449,7 +449,7 @@ Zynthian.Dialog {
                 Layout.leftMargin: 6
                 spacing: 2
 
-                Zynthian.BreadcrumbButton {
+                ZUI.BreadcrumbButton {
                     id: homeButton
                     icon.name: "user-home-symbolic"
                     onClicked: {
@@ -460,7 +460,7 @@ Zynthian.Dialog {
                 Repeater {
                     id: breadcrumbsRepeater
                     model: folderBreadcrumbs.folderSplitArray
-                    delegate: Zynthian.BreadcrumbButton {
+                    delegate: ZUI.BreadcrumbButton {
                         text: decodeURIComponent(modelData)
                         onClicked: {
                             folderModel.folder = root.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")

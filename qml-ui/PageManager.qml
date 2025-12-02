@@ -3,9 +3,9 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.Stack {
+ZUI.Stack {
     id: root
     
     // Any new screen should be added here for PageManager to find and load page
@@ -233,7 +233,7 @@ Zynthian.Stack {
         } else {
             // console.log("Page cache not found for page :", pageResolvedUrl(page))
             console.log("Instantiating page", page, ":", pageResolvedUrl(page))
-            var cache = Zynthian.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
+            var cache = ZUI.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
 
             if (cache.errorString != "") {
                 console.log("Error instantiating page", cache.url, ":", cache.errorString);

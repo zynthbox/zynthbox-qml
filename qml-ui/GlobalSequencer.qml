@@ -25,7 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.15
 
-import io.zynthbox.ui 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
@@ -60,7 +60,7 @@ Item {
                 velocityAdjustment = value;
                 // console.log("Adjusting velocity by", velocityAdjustment);
                 for (let i = 0; i < subnoteIndices.length; ++i) {
-                    workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], "velocity", Zynthian.CommonUtils.clamp(subnoteVelocities[i] + velocityAdjustment, 1, 127));
+                    workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], "velocity", ZUI.CommonUtils.clamp(subnoteVelocities[i] + velocityAdjustment, 1, 127));
                 }
                 let firstStepEntryVelocity = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "velocity");
                 // console.log("The first entry's velocity is", firstStepEntryVelocity);

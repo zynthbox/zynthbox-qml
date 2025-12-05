@@ -41,7 +41,7 @@ ZUI.ScreenPage {
     rightPadding: 0
     topPadding: 5
     bottomPadding: 5
-    anchors.fill: parent
+    // anchors.fill: parent
 
     property QtObject sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
     property QtObject pattern: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePatternObject : null

@@ -566,7 +566,7 @@ GridLayout {
                     bottom: parent.bottom
                     margins: Kirigami.Units.largeSpacing * 1.5
                 }
-                source: "../../Zynthian/img/breadcrumb-separator.svg"
+                source: "../../io/zynthbox/ui/img/breadcrumb-separator.svg"
             }
             Text {
                 id: startHandleLabel
@@ -603,7 +603,7 @@ GridLayout {
                     bottom: parent.bottom
                     margins: Kirigami.Units.largeSpacing * 1.5
                 }
-                source: "../../Zynthian/img/breadcrumb-separator.svg"
+                source: "../../io/zynthbox/ui/img/breadcrumb-separator.svg"
             }
             Text {
                 id: loopHandleLabel
@@ -640,7 +640,7 @@ GridLayout {
                     margins: Kirigami.Units.largeSpacing * 1.5
                 }
                 mirror: true
-                source: "../../Zynthian/img/breadcrumb-separator.svg"
+                source: "../../io/zynthbox/ui/img/breadcrumb-separator.svg"
             }
             Text {
                 id: endHandleLabel

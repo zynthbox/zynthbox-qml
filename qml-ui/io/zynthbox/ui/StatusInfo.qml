@@ -349,7 +349,7 @@ QQC2.Pane
                     Layout.alignment: Qt.AlignCenter
                     implicitHeight: 16
                     implicitWidth: 16
-                    source: Qt.resolvedUrl("../../img/metronome.svg")
+                    source: Qt.resolvedUrl("../../../../img/metronome.svg")
                     color: Kirigami.Theme.textColor
                     opacity: zynqtgui.sketchpad.metronomeEnabled ? 1 : 0
                 }

@@ -1288,7 +1288,7 @@ ZUI.ScreenPage {
                                                     anchors {
                                                         bottom: parent.bottom
                                                         right: parent.right
-                                                        margins: Kirigami.Units.smallMargin
+                                                        margins: Kirigami.Units.smallSpacing
                                                     }
                                                     visible: parent.checked
                                                     height: Kirigami.Units.iconSizes.small
@@ -1314,7 +1314,7 @@ ZUI.ScreenPage {
                                                     anchors {
                                                         bottom: parent.bottom
                                                         right: parent.right
-                                                        margins: Kirigami.Units.smallMargin
+                                                        margins: Kirigami.Units.smallSpacing
                                                     }
                                                     visible: parent.checked
                                                     height: Kirigami.Units.iconSizes.small

@@ -30,10 +30,10 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.DialogQuestion {
+ZUI.DialogQuestion {
     id: component
     function showEqualizer(channel, slotType, slotIndex) {
         _private.slotIndex = slotIndex;
@@ -497,7 +497,7 @@ Zynthian.DialogQuestion {
                                         color: bandDelegate.filterSettings ? bandDelegate.filterSettings.color : "black"
                                     }
                                 }
-                                Zynthian.PlayGridButton {
+                                ZUI.PlayGridButton {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -506,7 +506,7 @@ Zynthian.DialogQuestion {
                                         filterTypeCombo.currentIndex = bandDelegate.filterSettings.filterType;
                                         filterTypeCombo.onClicked()
                                     }
-                                    Zynthian.ComboBox {
+                                    ZUI.ComboBox {
                                         id: filterTypeCombo
                                         visible: false;
                                         model: bandDelegate.filterSettings ? bandDelegate.filterSettings.filterTypeNames() : 0
@@ -562,7 +562,7 @@ Zynthian.DialogQuestion {
                                                         lastPressed = newTimestamp;
                                                     }
                                                 }
-                                                Zynthian.KnobIndicator {
+                                                ZUI.KnobIndicator {
                                                     visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
@@ -622,7 +622,7 @@ Zynthian.DialogQuestion {
                                                         lastPressed = newTimestamp;
                                                     }
                                                 }
-                                                Zynthian.KnobIndicator {
+                                                ZUI.KnobIndicator {
                                                     visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
@@ -681,7 +681,7 @@ Zynthian.DialogQuestion {
                                                     ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(1))
                                                     : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
                                             : ""
-                                            Zynthian.KnobIndicator {
+                                            ZUI.KnobIndicator {
                                                 visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                 anchors {
                                                     top: parent.verticalCenter
@@ -698,7 +698,7 @@ Zynthian.DialogQuestion {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                         Layout.fillHeight: false
@@ -712,7 +712,7 @@ Zynthian.DialogQuestion {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 1
                                     }
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                         Layout.fillHeight: false
@@ -782,7 +782,7 @@ Zynthian.DialogQuestion {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit
                     }
-                    Zynthian.PlayGridButton {
+                    ZUI.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -795,7 +795,7 @@ Zynthian.DialogQuestion {
                             sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 0);
                         }
                     }
-                    Zynthian.PlayGridButton {
+                    ZUI.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -808,7 +808,7 @@ Zynthian.DialogQuestion {
                             sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 1);
                         }
                     }
-                    Zynthian.ComboBox {
+                    ZUI.ComboBox {
                         id: sideChainSourcePicker
                         visible: false;
                         model: Zynthbox.MidiRouter.model.audioInSources
@@ -889,7 +889,7 @@ Zynthian.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    Zynthian.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -949,7 +949,7 @@ Zynthian.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    Zynthian.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1013,7 +1013,7 @@ Zynthian.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    Zynthian.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1073,7 +1073,7 @@ Zynthian.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    Zynthian.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1137,7 +1137,7 @@ Zynthian.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    Zynthian.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1197,7 +1197,7 @@ Zynthian.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    Zynthian.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2

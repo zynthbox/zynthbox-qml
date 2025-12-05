@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
@@ -294,7 +294,7 @@ ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: false
             Layout.fillHeight: true
             text: qsTr("General")
@@ -303,7 +303,7 @@ ColumnLayout {
                 component.currenParameterPageIndex = 0;
             }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: false
             Layout.fillHeight: true
             text: qsTr("Probability")
@@ -312,7 +312,7 @@ ColumnLayout {
                 component.currenParameterPageIndex = 1;
             }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: false
             Layout.fillHeight: true
             text: qsTr("Ratchet")
@@ -427,7 +427,7 @@ ColumnLayout {
                 : component.currenParameterPageIndex === 1
                     ? "Probability"
                     : "Ratchet Style"
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
                     leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
@@ -450,7 +450,7 @@ ColumnLayout {
                 : component.currenParameterPageIndex === 1
                     ? ""
                     : "Ratchet Count"
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
                     leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
@@ -473,7 +473,7 @@ ColumnLayout {
                 : component.currenParameterPageIndex === 1
                     ? "Next Step"
                     : "Ratchet Probability"
-            Zynthian.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
                     leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
@@ -562,7 +562,7 @@ ColumnLayout {
                             Layout.maximumWidth: Kirigami.Units.largeSpacing
                             color: subnoteDelegate.isCurrent ? Kirigami.Theme.highlightColor : "transparent"
                         }
-                        Zynthian.PlayGridButton {
+                        ZUI.PlayGridButton {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height * 0.8
                             Layout.maximumWidth: height * 0.8
@@ -599,7 +599,7 @@ ColumnLayout {
                             font.bold: true
                             text: subnoteDelegate.subnote ? /*(subnoteDelegate.localBarIndex * component.patternModel.width + subnoteDelegate.stepIndex + 1) + ":" + */subnoteDelegate.subnote.name + (subnoteDelegate.subnote.octave - 1) : ""
                         }
-                        Zynthian.PlayGridButton {
+                        ZUI.PlayGridButton {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height * 0.8
                             Layout.maximumWidth: height * 0.8
@@ -610,7 +610,7 @@ ColumnLayout {
                                 component.changeSubnotePitch(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex, -1);
                             }
                         }
-                        Zynthian.PlayGridButton {
+                        ZUI.PlayGridButton {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height * 0.8
                             Layout.maximumWidth: height * 0.8
@@ -621,7 +621,7 @@ ColumnLayout {
                                 component.changeSubnotePitch(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex, 1);
                             }
                         }
-                        Zynthian.PlayGridButton {
+                        ZUI.PlayGridButton {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height * 0.8
                             Layout.maximumWidth: height * 0.8
@@ -937,7 +937,7 @@ ColumnLayout {
             horizontalAlignment: Text.AlignHCenter
             text: "All Notes:"
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 15
             text: "Pitch -12"
             onClicked: {
@@ -948,7 +948,7 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.preferredWidth: 0
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 15
             text: "Pitch -1"
             onClicked: {
@@ -959,7 +959,7 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.preferredWidth: 0
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 15
             text: "Pitch +1"
             onClicked: {
@@ -970,7 +970,7 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.preferredWidth: 0
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 15
             text: "Pitch +12"
             onClicked: {
@@ -995,7 +995,7 @@ ColumnLayout {
             Layout.maximumWidth: Layout.minimumWidth
             horizontalAlignment: Text.AlignHCenter
             text: "Key and Scale:"
-            Zynthian.PlayGridButton {
+            ZUI.PlayGridButton {
                 anchors {
                     top: parent.top
                     left: parent.left
@@ -1012,7 +1012,7 @@ ColumnLayout {
                 onClicked: {
                     keyScaleLockStylePopup.open();
                 }
-                Zynthian.ActionPickerPopup {
+                ZUI.ActionPickerPopup {
                     id: keyScaleLockStylePopup
                     actions: [
                         Kirigami.Action {
@@ -1043,7 +1043,7 @@ ColumnLayout {
                 }
             }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -1053,7 +1053,7 @@ ColumnLayout {
                 component.patternModel.octave = component.patternModel.octave - 1;
             }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -1079,7 +1079,7 @@ ColumnLayout {
                     .arg(Zynthbox.KeyScales.octaveName(Zynthbox.KeyScales.octaveIndexToEnumKey(component.patternModel.octave)))
                 : ""
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -1094,7 +1094,7 @@ ColumnLayout {
                 }
             }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -1108,13 +1108,13 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.preferredWidth: 0
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             text: component.patternModel ? Zynthbox.KeyScales.scaleName(Zynthbox.KeyScales.scaleIndexToEnumKey(component.patternModel.scale)) : ""
             onClicked: scaleComboBox.onClicked()
-            Zynthian.ComboBox {
+            ZUI.ComboBox {
                 id: scaleComboBox
                 visible: false;
                 model: Zynthbox.KeyScales.scaleNames()
@@ -1144,50 +1144,50 @@ ColumnLayout {
             horizontalAlignment: Text.AlignHCenter
             text: "Default Length:"
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 12
             text: qsTr("Step Length")
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 0 : false
             onClicked: { component.patternModel.defaultNoteDuration = 0; }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             text: "1/32"
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 4 : false
             onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 4; }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             text: "1/16"
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 8 : false
             onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 8; }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             text: "1/8"
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 16 : false
             onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 16; }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             text: "1/4"
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 32 : false
             onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 32; }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             text: "1/2"
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 64 : false
             onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 64; }
         }
-        Zynthian.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             text: "1"
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 128 : false
             onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 128; }
         }
     }
-    Zynthian.PlayGridButton {
+    ZUI.PlayGridButton {
         Layout.preferredHeight: Kirigami.Units.gridUnit * 2.5
         Layout.fillWidth: true
         text: "Back"

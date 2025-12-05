@@ -32,10 +32,10 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.BasePlayGrid {
+ZUI.BasePlayGrid {
     id: component
     grid: drumsGrid
     settings: drumsGridSettings
@@ -699,7 +699,7 @@ Zynthian.BasePlayGrid {
     property var noteListeningNotes: []
     property var noteListeningVelocities: []
 
-    // Zynthian.SequenceLoader {
+    // ZUI.SequenceLoader {
     //     id: sequenceLoader
     // }
 
@@ -872,7 +872,7 @@ Zynthian.BasePlayGrid {
                                         }
                                     }
                                 }
-                                Zynthian.KnobIndicator {
+                                ZUI.KnobIndicator {
                                     anchors {
                                         left: parent.left
                                         bottom: parent.bottom
@@ -893,7 +893,7 @@ Zynthian.BasePlayGrid {
                             Layout.preferredWidth: Kirigami.Units.gridUnit
                             ColumnLayout {
                                 anchors.fill: parent
-                                Zynthian.PlayGridButton {
+                                ZUI.PlayGridButton {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     text: "+"
@@ -933,7 +933,7 @@ Zynthian.BasePlayGrid {
                                         ]
                                     }
                                 }
-                                Zynthian.PlayGridButton {
+                                ZUI.PlayGridButton {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     text: "-"
@@ -1051,7 +1051,7 @@ Zynthian.BasePlayGrid {
                                         }
                                     }
                                 }
-                                // Zynthian.KnobIndicator {
+                                // ZUI.KnobIndicator {
                                 //     anchors {
                                 //         left: parent.left
                                 //         bottom: parent.bottom
@@ -1377,7 +1377,7 @@ Zynthian.BasePlayGrid {
                             restoreMode: Binding.RestoreBinding
                         }
                         property QtObject sample: channel ? channel.getClipsModelById(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
-                        Zynthian.SampleVisualiser {
+                        ZUI.SampleVisualiser {
                             anchors.fill: parent
                             sample: parent.visible ? drumpadLoopVisualiser.sample : null
                             trackType: drumpadLoopVisualiser.channel === null ? "" : drumpadLoopVisualiser.channel.trackType
@@ -1863,7 +1863,7 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.minimumWidth: parent.width / 5
                                     Layout.maximumWidth: Layout.minimumWidth
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         text: "+"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.stepLength < _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, 1)
                                         onClicked: {
@@ -1877,13 +1877,13 @@ Zynthian.BasePlayGrid {
                                         text: _private.workingPatternModel ? "step length:\n%1".arg(_private.workingPatternModel.stepLengthName(_private.stepLength)) : ""
                                     }
 
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         text:"-"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.stepLength > _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, -1)
                                         onClicked: {
                                             _private.stepLengthDown();
                                         }
-                                        Zynthian.KnobIndicator {
+                                        ZUI.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.top
@@ -1900,7 +1900,7 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.minimumWidth: parent.width / 5
                                     Layout.maximumWidth: Layout.minimumWidth
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         text: "+"
                                         enabled: _private.swing < 99
                                         onClicked: {
@@ -1948,13 +1948,13 @@ Zynthian.BasePlayGrid {
                                         }
                                     }
 
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         text:"-"
                                         enabled: _private.swing > 0
                                         onClicked: {
                                             _private.swingDown();
                                         }
-                                        Zynthian.KnobIndicator {
+                                        ZUI.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.top
@@ -1971,7 +1971,7 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.minimumWidth: parent.width / 5
                                     Layout.maximumWidth: Layout.minimumWidth
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         text: "+"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.patternLength < (_private.workingPatternModel.bankLength * _private.workingPatternModel.width)
                                         onClicked: {
@@ -2012,13 +2012,13 @@ Zynthian.BasePlayGrid {
                                         }
                                     }
 
-                                    Zynthian.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         text:"-"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.patternLength > _private.workingPatternModel.width
                                         onClicked: {
                                             _private.patternLengthDown();
                                         }
-                                        Zynthian.KnobIndicator {
+                                        ZUI.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.top
@@ -2031,7 +2031,7 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
 
-                                Zynthian.PlayGridButton {
+                                ZUI.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "copy\n"
                                     onPressed: {
@@ -2052,7 +2052,7 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
 
-                                Zynthian.PlayGridButton {
+                                ZUI.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
                                     enabled: _private.clipBoard !== undefined
@@ -2069,7 +2069,7 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
 
-                                Zynthian.PlayGridButton {
+                                ZUI.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "clear\n"
                                     visualPressAndHold: true
@@ -2085,14 +2085,14 @@ Zynthian.BasePlayGrid {
 
                                 //ColumnLayout {
                                     //Layout.fillHeight: true
-                                    //Zynthian.PlayGridButton {
+                                    //ZUI.PlayGridButton {
                                         //text: "bank I"
                                         //checked: _private.bankOffset === 0
                                         //onClicked: {
                                             //_private.sequence.setPatternProperty(_private.activePattern, "bankOffset", 0)
                                         //}
                                     //}
-                                    //Zynthian.PlayGridButton {
+                                    //ZUI.PlayGridButton {
                                         //text: "bank II"
                                         //checked: _private.bankOffset === 8
                                         //onClicked: {
@@ -2152,7 +2152,7 @@ Zynthian.BasePlayGrid {
                                         activeBar: _private.activeBar
                                         playedBar: visible && _private.activePatternModel ? _private.activePatternModel.playingRow - _private.workingPatternModel.bankOffset : 0
                                         playgrid: component
-                                        Zynthian.KnobIndicator {
+                                        ZUI.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.bottom
@@ -2210,7 +2210,7 @@ Zynthian.BasePlayGrid {
                     }
                 }
             }
-            Zynthian.Popup {
+            ZUI.Popup {
                 id: noteSettingsPopup
                 parent: QQC2.Overlay.overlay
                 y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
@@ -2282,7 +2282,7 @@ Zynthian.BasePlayGrid {
                 id: sidebarRoot
                 anchors.fill: parent
 
-                Zynthian.PlayGridButton {
+                ZUI.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.sequence
                         ? _private.sequence.soloPatternObject
@@ -2319,7 +2319,7 @@ Zynthian.BasePlayGrid {
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                Zynthian.PlayGridButton {
+                ZUI.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "arrow-up"
                     onClicked: {
@@ -2332,7 +2332,7 @@ Zynthian.BasePlayGrid {
                     Layout.alignment: Qt.AlignHCenter
                 }
 
-                Zynthian.PlayGridButton {
+                ZUI.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "arrow-down"
                     onClicked: {
@@ -2342,7 +2342,7 @@ Zynthian.BasePlayGrid {
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                Zynthian.PlayGridButton {
+                ZUI.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: "Note:\n" + (component.heardNotes.length > 0
                         ? Zynthbox.Chords.symbol(component.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
@@ -2378,7 +2378,7 @@ Zynthian.BasePlayGrid {
                         visible: component.heardNotes.length > 0 || _private.selectedStep > -1
                         source: "edit-clear-locationbar"
                     }
-                    Zynthian.ActionPickerPopup {
+                    ZUI.ActionPickerPopup {
                         id: clearNotesPopup
                         columns: 2
                         rows: 2
@@ -2424,7 +2424,7 @@ Zynthian.BasePlayGrid {
                         ]
                     }
                 }
-                Zynthian.PlayGridButton {
+                ZUI.PlayGridButton {
                     id: defaultNoteSettingsButton
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.selectedStep > -1
@@ -2497,7 +2497,7 @@ Zynthian.BasePlayGrid {
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                Zynthian.PlayGridButton {
+                ZUI.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "settings-configure"
                     onClicked: {

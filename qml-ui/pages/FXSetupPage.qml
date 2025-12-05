@@ -28,10 +28,10 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
     property var screenIds: ["effects_for_channel", "effect_preset"]
     property QtObject selectedChannel: null
@@ -164,14 +164,14 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
 
-            Zynthian.LibraryPagePicker {
+            ZUI.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "fx"
                 selectedChannel: root.selectedChannel
             }
 
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: fixedEffectsView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -200,7 +200,7 @@ Zynthian.ScreenPage {
                 Component.onCompleted: {
                     fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: Zynthian.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: delegate
                     screenId: fixedEffectsView.screenId
                     selector: fixedEffectsView.selector
@@ -236,7 +236,7 @@ Zynthian.ScreenPage {
                         }
                         Rectangle {
                             property QtObject fxPassthroughClient: root.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
-                            Layout.preferredWidth: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                            Layout.preferredWidth: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                             visible: fxPassthroughClient != null && root.selectedChannel != null && root.selectedChannel.chainedFx[index] != null
                             color: Kirigami.Theme.highlightColor
@@ -265,7 +265,7 @@ Zynthian.ScreenPage {
                 }
             }
 
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 model: []
@@ -300,7 +300,7 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: effectPresetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true

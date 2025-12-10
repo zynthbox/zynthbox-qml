@@ -148,8 +148,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.led_color_channel_sample = (channelTypeSamplesColorDarkened.red(), channelTypeSamplesColorDarkened.green(), channelTypeSamplesColorDarkened.blue())
         self.led_color_channel_external = (channelTypeExternalColorDarkened.red(), channelTypeExternalColorDarkened.green(), channelTypeExternalColorDarkened.blue())
 
-        # Temporary nonsense here...
-        self.step_button_colors = [led_color_active, led_color_inactive, led_color_inactive, led_color_inactive] * 4
+        self.step_button_colors = [led_color_inactive] * 16
+        self.mode_button_color = led_color_blue
 
         self.channel = None
         self.channelColor = (0, 0, 0)
@@ -273,6 +273,11 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         if -1 < stepIndex and stepIndex < 16:
             self.step_button_colors[stepIndex] = (stepColor.red(), stepColor.green(), stepColor.blue())
             self.update_button_colors()
+
+    @Slot('QColor')
+    def setModeButtonColor(self, buttonColor):
+        self.mode_button_color = (buttonColor.red(), buttonColor.green(), buttonColor.blue())
+        self.update_button_colors()
 
     def show(self):
         pass
@@ -407,7 +412,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
                 self.set_button_color(self.button_4, led_color_active if playgrid_page_active else led_color_inactive)
                 self.set_button_color(self.button_5, led_color_active if song_manager_page_active else led_color_inactive)
                 self.set_button_color(self.button_star, led_color_inactive, setChannelColor=not self.zynqtgui.leftSidebarActive and self.zynqtgui.tracksModActive)
-                self.set_button_color(self.button_mode, led_color_inactive, setChannelColor=self.zynqtgui.leftSidebarActive)
+                self.set_button_color(self.button_mode, self.mode_button_color, setChannelColor=self.zynqtgui.leftSidebarActive)
                 self.set_button_color(self.button_under_screen_1, self.step_button_colors[0])
                 self.set_button_color(self.button_under_screen_2, self.step_button_colors[1])
                 self.set_button_color(self.button_under_screen_3, self.step_button_colors[2])

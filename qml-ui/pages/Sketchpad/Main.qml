@@ -1299,10 +1299,22 @@ ZUI.ScreenPage {
                                                     anchors.fill: parent
                                                     onClicked: {
                                                         if (parent.checked) {
+                                                            sendsActions.open();
                                                         } else {
                                                             root.showMixerEqualiser = false;
                                                         }
                                                     }
+                                                }
+                                                Zynthian.ActionPickerPopup {
+                                                    id: sendsActions
+                                                    actions: [
+                                                        Kirigami.Action {
+                                                            text: "Bleep"
+                                                        },
+                                                        Kirigami.Action {
+                                                            text: "Bloop"
+                                                        }
+                                                    ]
                                                 }
                                             }
                                             QQC2.Button {

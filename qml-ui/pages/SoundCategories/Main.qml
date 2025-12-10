@@ -28,11 +28,11 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import '../../Zynthian' 1.0 as Zynthian
+import '../../io/zynthbox/ui' 1.0 as ZUI
 import '../Sketchpad' as Sketchpad
 import io.zynthbox.components 1.0 as Zynthbox
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
 
     property QtObject selectedChannel: applicationWindow().selectedChannel
@@ -267,7 +267,7 @@ Zynthian.ScreenPage {
         }
     }
 
-    Zynthian.SaveFileDialog {
+    ZUI.SaveFileDialog {
         id: saveSoundDialog
         visible: false
         headerText: qsTr("Save Sound")
@@ -590,7 +590,7 @@ Zynthian.ScreenPage {
             Kirigami.Separator {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 2
-                Zynthian.ActionPickerPopup {
+                ZUI.ActionPickerPopup {
                     id: slotsActionPicker
                     property string slotType: "synth"
                     readonly property string slotTypeName: slotType === "synth"

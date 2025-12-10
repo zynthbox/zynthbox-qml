@@ -30,7 +30,7 @@ import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 
 QQC2.AbstractButton {

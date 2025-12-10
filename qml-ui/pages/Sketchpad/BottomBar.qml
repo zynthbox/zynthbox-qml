@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 Rectangle {
@@ -238,7 +238,7 @@ Rectangle {
             }
 
 
-            Zynthian.TabbedControlView {
+            ZUI.TabbedControlView {
                 id: tabbedView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -302,7 +302,7 @@ Rectangle {
                 onInitialActionChanged: Qt.callLater(initialAction.trigger)
 
                 tabActions: [
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: songAction
                         text: qsTr("Song")
                         page: Qt.resolvedUrl("SongBar.qml")
@@ -310,7 +310,7 @@ Rectangle {
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-song"
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: clipsAction
                         text: qsTr("Clip")
                         page: Qt.resolvedUrl("ClipsBar.qml")
@@ -318,7 +318,7 @@ Rectangle {
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-clips"
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: recordingAction
                         text: qsTr("Audio")
                         page: Qt.resolvedUrl("RecordingBar.qml")
@@ -326,14 +326,14 @@ Rectangle {
                         visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && zynqtgui.bottomBarControlObj.recordable && !zynqtgui.bottomBarControlObj.path
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         text: qsTr("Clip Info")
                         page: Qt.resolvedUrl("ClipInfoBar.qml")
                         preload: true
                         visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && !zynqtgui.bottomBarControlObj.isEmpty
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: clipSettingsAction
                         text: qsTr("Clip Settings")
                         page: Qt.resolvedUrl("ClipSettingsBar.qml")
@@ -341,7 +341,7 @@ Rectangle {
                         visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && !zynqtgui.bottomBarControlObj.isEmpty
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: sampleADSREditorAction
                         text: qsTr("ADSR")
                         page: Qt.resolvedUrl("SampleADSREditor.qml")
@@ -349,7 +349,7 @@ Rectangle {
                         visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && !zynqtgui.bottomBarControlObj.isEmpty
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: waveEditorAction
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")
@@ -357,7 +357,7 @@ Rectangle {
                         visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && !zynqtgui.bottomBarControlObj.isEmpty
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: patternAction
                         text: qsTr("Pattern")
                         page: Qt.resolvedUrl("PatternBar.qml")
@@ -365,7 +365,7 @@ Rectangle {
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
                         initialProperties: {"bottomBar": root}
                     },
-                    // Zynthian.TabbedControlViewAction {
+                    // ZUI.TabbedControlViewAction {
                     //     id: channelSoundsAction
                     //     text: qsTr("Sounds")
                     //     page: Qt.resolvedUrl("../SessionDashboard/ChannelsViewSoundsBar.qml")
@@ -373,7 +373,7 @@ Rectangle {
                     //     visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                     //     initialProperties: {"bottomBar": root}
                     // },
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: sampleSoundsAction
                         text: qsTr("Samples")
                         page: Qt.resolvedUrl("SamplesBar.qml")
@@ -382,7 +382,7 @@ Rectangle {
                         initialProperties: {"bottomBar": root}
                     },
                     // Duplicate tab instance but for different placement and zynqtgui.bottomBarControlObj for channel
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: channelSampleADSREditorAction
 
                         property QtObject clip: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.samples ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] : null
@@ -393,7 +393,7 @@ Rectangle {
                         initialProperties: {"bottomBar": root}
                     },
                     // Duplicate tab instance but for different placement and zynqtgui.bottomBarControlObj for channel
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: channelclipSettingsAction
 
                         property QtObject clip: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.samples ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] : null
@@ -404,7 +404,7 @@ Rectangle {
                         initialProperties: {"bottomBar": root}
                     },
                     // Duplicate tab instance but for different placement and zynqtgui.bottomBarControlObj for channel
-                    Zynthian.TabbedControlViewAction {
+                    ZUI.TabbedControlViewAction {
                         id: channelWaveEditorAction
 
                         property QtObject clip: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.samples ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] : null
@@ -414,7 +414,7 @@ Rectangle {
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel" && clip && !clip.isEmpty
                         initialProperties: {"bottomBar": root}
                     }
-                   /* Zynthian.TabbedControlViewAction {
+                   /* ZUI.TabbedControlViewAction {
                         text: qsTr("FX")
                         page: Qt.resolvedUrl("FXBar.qml")
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
@@ -425,7 +425,7 @@ Rectangle {
         }
     }
 
-    Zynthian.FilePickerDialog {
+    ZUI.FilePickerDialog {
         id: pickerDialog
         parent: zlScreen.parent
 

@@ -30,7 +30,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 QQC2.ScrollView {
@@ -159,7 +159,7 @@ QQC2.ScrollView {
                     });
                     // FIXME This is... not actually a thing, right? To send the event forward untouched, we'll just need a rule that does that (current-track target, all bytes untouched)
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -184,7 +184,7 @@ QQC2.ScrollView {
                 onClicked: {
                     component.filterObject.requireRange = !component.filterObject.requireRange;
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -293,7 +293,7 @@ QQC2.ScrollView {
                         }
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -348,7 +348,7 @@ QQC2.ScrollView {
                         });
                     }
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -398,7 +398,7 @@ QQC2.ScrollView {
                         }
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -453,7 +453,7 @@ QQC2.ScrollView {
                         component.filterObject.byte1Maximum = newByte;
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -497,7 +497,7 @@ QQC2.ScrollView {
                         });
                     }
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -528,7 +528,7 @@ QQC2.ScrollView {
                         component.filterObject.byte3Maximum = newByte;
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -650,7 +650,7 @@ QQC2.ScrollView {
                     onClicked: {
                         inputFilterRulesRepeaterDelegate.knob0down();
                     }
-                    Zynthian.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left

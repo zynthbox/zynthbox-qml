@@ -30,7 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import '../../Zynthian' 1.0 as Zynthian
-//import Zynthian 1.0 as Zynthian
+//import io.zynthbox.ui 1.0 as ZUI
 
 Rectangle {
     readonly property QtObject song: zynqtgui.sketchpad.song
@@ -100,7 +100,7 @@ Rectangle {
                         onClicked: {
 //                            scenesModel.stopScene(scenesModel.selectedSketchpadSongIndex);
 //                            scenesModel.selectedSketchpadSongIndex = index;
-                            Zynthian.CommonUtils.switchToScene(index);
+                            ZUI.CommonUtils.switchToScene(index);
                         }
                         background: Rectangle {
                             Kirigami.Theme.inherit: false

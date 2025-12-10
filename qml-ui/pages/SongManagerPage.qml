@@ -30,11 +30,11 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 import "Sketchpad" as Sketchpad
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: component
     screenId: "song_manager"
     title: qsTr("Song")
@@ -194,10 +194,10 @@ Zynthian.ScreenPage {
             }
         }
     ]
-    Zynthian.MultichannelRecorderPopup {
+    ZUI.MultichannelRecorderPopup {
         id: multichannelRecorderPopup
     }
-    Zynthian.SegmentModelPicker {
+    ZUI.SegmentModelPicker {
         id: segmentModelPicker
     }
 
@@ -285,7 +285,7 @@ Zynthian.ScreenPage {
                             } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
                                 return " \n "
                             } else {
-                                let timeInSeconds = Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * ((segmentHeader.segment.barLength * 4) + segmentHeader.segment.beatLength)).toFixed(2));
+                                let timeInSeconds = ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * ((segmentHeader.segment.barLength * 4) + segmentHeader.segment.beatLength)).toFixed(2));
                                 return timeInSeconds + "\n" + segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
                             }
                         }
@@ -413,7 +413,7 @@ Zynthian.ScreenPage {
                                     }
                                     font.pixelSize: Kirigami.Units.gridUnit / 2
                                     visible: segmentDelegate.isCurrentSegment && model.index > 0
-                                    text: Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.segment.beatStartPosition).toFixed(2))
+                                    text: ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.segment.beatStartPosition).toFixed(2))
                                 }
                                 QQC2.Label {
                                     anchors {
@@ -422,7 +422,7 @@ Zynthian.ScreenPage {
                                     }
                                     font.pixelSize: Kirigami.Units.gridUnit / 2
                                     visible: segmentDelegate.isCurrentSegment && segmentDelegate.nextSegment !== null
-                                    text: segmentDelegate.nextSegment ? Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.nextSegment.beatStartPosition).toFixed(2)) : ""
+                                    text: segmentDelegate.nextSegment ? ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.nextSegment.beatStartPosition).toFixed(2)) : ""
                                 }
                             }
                         }
@@ -463,7 +463,7 @@ Zynthian.ScreenPage {
                         }
                         font.pixelSize: Kirigami.Units.gridUnit / 2
                         horizontalAlignment: Text.AlignRight
-                        text: segmentsRepeater.totalDuration > 0 ? Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, segmentsRepeater.totalDuration).toFixed(2)) : ""
+                        text: segmentsRepeater.totalDuration > 0 ? ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, segmentsRepeater.totalDuration).toFixed(2)) : ""
                     }
                 }
             }
@@ -717,7 +717,7 @@ Zynthian.ScreenPage {
                 onClicked: {
                     segmentRemover.open();
                 }
-                Zynthian.ActionPickerPopup {
+                ZUI.ActionPickerPopup {
                     id: segmentRemover
                     rows: 1
                     columns: 3

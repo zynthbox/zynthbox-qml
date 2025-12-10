@@ -31,7 +31,7 @@ import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 import "pages" as Pages
 import "pages/Sketchpad" as Sketchpad
@@ -469,7 +469,7 @@ Kirigami.AbstractApplicationWindow {
     function updateMasterVolume(sign, showOsd=true) {
         const gainHandler = Zynthbox.Plugin.globalPlaybackClient.dryGainHandler;
         function valueSetter(value) {
-            gainHandler.gainDb = Zynthian.CommonUtils.clamp(value, gainHandler.minimumDecibel, gainHandler.maximumDecibel)
+            gainHandler.gainDb = ZUI.CommonUtils.clamp(value, gainHandler.minimumDecibel, gainHandler.maximumDecibel)
             if (!zynqtgui.globalPopupOpened && showOsd) {
                 applicationWindow().showOsd({
                                                 parameterName: "master_volume",
@@ -495,7 +495,7 @@ Kirigami.AbstractApplicationWindow {
      */
     function updateMetronomeVolume(sign) {
         function valueSetter(value) {
-            zynqtgui.sketchpad.metronomeVolume = Zynthian.CommonUtils.clamp(value, 0, 1)
+            zynqtgui.sketchpad.metronomeVolume = ZUI.CommonUtils.clamp(value, 0, 1)
             applicationWindow().showOsd({
                                             parameterName: "metronome_volume",
                                             description: qsTr("Metronome Volume"),
@@ -519,7 +519,7 @@ Kirigami.AbstractApplicationWindow {
      */
     function updateGlobalDelayFXAmount(sign) {
         function valueSetter(value) {
-            zynqtgui.delayController.value = Zynthian.CommonUtils.clamp(value, 0, 100)
+            zynqtgui.delayController.value = ZUI.CommonUtils.clamp(value, 0, 100)
             if (!zynqtgui.globalPopupOpened) {
                 applicationWindow().showOsd({
                                                 parameterName: "global_delay_fx_amount",
@@ -545,7 +545,7 @@ Kirigami.AbstractApplicationWindow {
      */
     function updateGlobalReverbFXAmount(sign) {
         function valueSetter(value) {
-            zynqtgui.reverbController.value = Zynthian.CommonUtils.clamp(value, 0, 100)
+            zynqtgui.reverbController.value = ZUI.CommonUtils.clamp(value, 0, 100)
             if (!zynqtgui.globalPopupOpened) {
                 applicationWindow().showOsd({
                                                 parameterName: "global_reverb_fx_amount",
@@ -616,7 +616,7 @@ Kirigami.AbstractApplicationWindow {
     function updateChannelVolume(sign, channelId, showOsd=true) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
-            selectedChannel.gainHandler.gainDb = Zynthian.CommonUtils.clamp(value, selectedChannel.gainHandler.minimumDecibel, selectedChannel.gainHandler.maximumDecibel)
+            selectedChannel.gainHandler.gainDb = ZUI.CommonUtils.clamp(value, selectedChannel.gainHandler.minimumDecibel, selectedChannel.gainHandler.maximumDecibel)
             if (showOsd) {
                 applicationWindow().showOsd({
                                                 parameterName: "channel_volume",
@@ -653,7 +653,7 @@ Kirigami.AbstractApplicationWindow {
     function updateChannelDelaySend(sign, channelId) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
-            selectedChannel.wetFx1Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
+            selectedChannel.wetFx1Amount = ZUI.CommonUtils.clamp(value, 0, 100)
             applicationWindow().showOsd({
                                             parameterName: "channel_delay_send",
                                             description: qsTr("%1 Delay FX Send Amount").arg(selectedChannel.name),
@@ -686,7 +686,7 @@ Kirigami.AbstractApplicationWindow {
     function updateChannelReverbSend(sign, channelId) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
-            selectedChannel.wetFx2Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
+            selectedChannel.wetFx2Amount = ZUI.CommonUtils.clamp(value, 0, 100)
             applicationWindow().showOsd({
                                             parameterName: "channel_reverb_send",
                                             description: qsTr("%1 Reverb FX Send Amount").arg(selectedChannel.name),
@@ -710,7 +710,7 @@ Kirigami.AbstractApplicationWindow {
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
      */
     function updateGlobalPlaybackPan(sign) {
-        Zynthbox.Plugin.globalPlaybackClient.panAmount = Zynthian.CommonUtils.clamp(Zynthbox.Plugin.globalPlaybackClient.panAmount + sign * 0.05, -1, 1)
+        Zynthbox.Plugin.globalPlaybackClient.panAmount = ZUI.CommonUtils.clamp(Zynthbox.Plugin.globalPlaybackClient.panAmount + sign * 0.05, -1, 1)
     }
     visible: false
     flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
@@ -759,7 +759,7 @@ Kirigami.AbstractApplicationWindow {
                 contentItem: RowLayout
                 {
                     spacing: 0
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: menuButton
                         icon.width: 24
                         icon.height: 24
@@ -789,7 +789,7 @@ Kirigami.AbstractApplicationWindow {
                         }
                         highlighted: zynqtgui.current_screen_id === 'main'
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: homeButton
                         Layout.minimumWidth: Kirigami.Units.gridUnit * 6
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
@@ -817,7 +817,7 @@ Kirigami.AbstractApplicationWindow {
                             text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
                         }
 
-                        Zynthian.Menu {
+                        ZUI.Menu {
                             id: tracksMenu
                             y: parent.height
                             modal: true
@@ -837,7 +837,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: sceneButton
                         icon.color: Kirigami.Theme.textColor
                         text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
@@ -854,11 +854,11 @@ Kirigami.AbstractApplicationWindow {
                             interval: 100
                             repeat: false
                             onTriggered: {
-                                Zynthian.CommonUtils.switchToScene(index)
+                                ZUI.CommonUtils.switchToScene(index)
                             }
                         }
 
-                        Zynthian.Menu {
+                        ZUI.Menu {
                             id: scenesMenu
                             y: parent.height
                             modal: true
@@ -880,7 +880,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: channelButton
                         icon.color: Kirigami.Theme.textColor
                         text: qsTr("Track %1 ˬ")
@@ -890,7 +890,7 @@ Kirigami.AbstractApplicationWindow {
                         rightPadding: Kirigami.Units.largeSpacing*2
                         font.pointSize: 11
                         onClicked: channelsMenu.visible = true
-                        Zynthian.Menu {
+                        ZUI.Menu {
                             id: channelsMenu
                             y: parent.height
                             modal: true
@@ -909,7 +909,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: samplesButton
 
                         property QtObject selectedSample: null
@@ -939,7 +939,7 @@ Kirigami.AbstractApplicationWindow {
                         onClicked: samplesMenu.visible = true
                         visible: root.selectedChannel.trackType == "sample-trig"
 
-                        Zynthian.Menu {
+                        ZUI.Menu {
                             id: samplesMenu
                             y: parent.height
                             modal: true
@@ -957,7 +957,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: sampleLoopButton
 
                         property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
@@ -969,7 +969,7 @@ Kirigami.AbstractApplicationWindow {
                         font.pointSize: 11
                         visible: root.selectedChannel.trackType === "sample-loop"
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: synthButton
                         icon.color: Kirigami.Theme.textColor
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
@@ -1003,7 +1003,7 @@ Kirigami.AbstractApplicationWindow {
                             synthButtonSoundNameThrottle.restart();
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         id: presetButton
                         icon.color: Kirigami.Theme.textColor
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
@@ -1033,7 +1033,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         icon.color: Kirigami.Theme.textColor
                         text: {
                             switch (effectScreen) {
@@ -1078,7 +1078,7 @@ Kirigami.AbstractApplicationWindow {
                         rightPadding: Kirigami.Units.largeSpacing*2
                         font.pointSize: 11
                     }
-                    Zynthian.BreadcrumbButton {
+                    ZUI.BreadcrumbButton {
                         icon.color: Kirigami.Theme.textColor
                         text: "EDIT"
                         visible: zynqtgui.current_screen_id === "control"
@@ -1116,7 +1116,7 @@ Kirigami.AbstractApplicationWindow {
                             if (globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive) {
                                 globalRecordButton.currentSequence.activePatternObject.recordLive = false;
                                 if (Zynthbox.PlayGridManager.metronomeActive) {
-                                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                                    ZUI.CommonUtils.stopMetronomeAndPlayback();
                                 }
                             } else {
                                 applicationWindow().openRecordingPopup();
@@ -1187,7 +1187,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
 
-            Zynthian.StatusInfo {}
+            ZUI.StatusInfo {}
         }
     }
 
@@ -1215,7 +1215,7 @@ Kirigami.AbstractApplicationWindow {
         //     }
         // }
     }
-    footer: Zynthian.ActionBar {
+    footer: ZUI.ActionBar {
         z: 999999
         currentPage: root.currentPage
         visible: root.visible && root.controlsVisible && !zynqtgui.doingLongTask
@@ -1313,14 +1313,14 @@ Kirigami.AbstractApplicationWindow {
         id: passiveNotificationComponent
     }
 
-    Zynthian.DialogQuestion {
+    ZUI.DialogQuestion {
         id: confirmDialog
         text: zynqtgui.confirm.text
         onAccepted: zynqtgui.confirm.accept()
         onRejected: zynqtgui.confirm.reject()
     }
 
-    Zynthian.DialogQuestion {
+    ZUI.DialogQuestion {
         id: confirmer
         function confirmSomething(title, description, callbackFunction) {
             confirmer.title = title;
@@ -1388,8 +1388,8 @@ Kirigami.AbstractApplicationWindow {
 
     Connections {
         target: zynqtgui
-        onRun_start_metronome_and_playback: Zynthian.CommonUtils.startMetronomeAndPlayback()
-        onRun_stop_metronome_and_playback: Zynthian.CommonUtils.stopMetronomeAndPlayback()
+        onRun_start_metronome_and_playback: ZUI.CommonUtils.startMetronomeAndPlayback()
+        onRun_stop_metronome_and_playback: ZUI.CommonUtils.stopMetronomeAndPlayback()
         onDisplayMainWindow: {
             root.minimumWidth = root.screen.width;
             root.minimumHeight = root.screen.height;
@@ -1434,7 +1434,7 @@ Kirigami.AbstractApplicationWindow {
     }
 
     readonly property QtObject libraryTypePicker: libraryTypePicker
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: libraryTypePicker
         actions: [
             QQC2.Action {
@@ -1484,7 +1484,7 @@ Kirigami.AbstractApplicationWindow {
         confirmClearPatternDialog.pattern = pattern;
         confirmClearPatternDialog.open();
     }
-    Zynthian.DialogQuestion {
+    ZUI.DialogQuestion {
         id: confirmClearPatternDialog
         property QtObject channel
         property QtObject pattern
@@ -1499,7 +1499,7 @@ Kirigami.AbstractApplicationWindow {
         confirmClearClipDialog.clipToClear = clipToClear;
         confirmClearClipDialog.open();
     }
-    Zynthian.DialogQuestion {
+    ZUI.DialogQuestion {
         id: confirmClearClipDialog
         property QtObject clipToClear: null
         text: confirmClearClipDialog.clipToClear != null ? qsTr("Are you sure you want to clear %1 from clip %2").arg(confirmClearClipDialog.clipToClear.path.split("/").pop()).arg(confirmClearClipDialog.clipToClear.name) : ""
@@ -1518,16 +1518,16 @@ Kirigami.AbstractApplicationWindow {
     function pickNote(currentNote, callbackFunction) {
         notePicker.pickNote(currentNote, callbackFunction);
     }
-    Zynthian.NotePickerPopup {
+    ZUI.NotePickerPopup {
         id: notePicker
     }
 
     readonly property QtObject midiBytePicker: midiBytePicker
-    Zynthian.MidiBytePickerPopup {
+    ZUI.MidiBytePickerPopup {
         id: midiBytePicker
     }
 
-    Zynthian.Drawer {
+    ZUI.Drawer {
         id: miniPlayGridDrawer
         width: root.width
         height: root.height * 0.66
@@ -1547,7 +1547,7 @@ Kirigami.AbstractApplicationWindow {
         contentItem: MiniPlayGrid {}
     }
 
-    Zynthian.Drawer {
+    ZUI.Drawer {
         id: slotSelectionDrawer
         width: Kirigami.Units.gridUnit * 24
         height: root.height
@@ -1970,11 +1970,11 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    Zynthian.OnScreenDisplay {
+    ZUI.OnScreenDisplay {
         id: osd
     }
 
-    Zynthian.Popup {
+    ZUI.Popup {
         id: messageDialog
 
         property alias text: messageLabel.text

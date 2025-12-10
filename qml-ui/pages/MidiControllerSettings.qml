@@ -23,18 +23,18 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import "../Zynthian/private" as ZynthianPrivate
+import "../io/zynthbox/ui/private" as ZynthianPrivate
 import "MidiControllerSettings"
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.15
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.6 as Kirigami
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
 
     property bool isVisible: ["midicontroller_settings"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -232,7 +232,7 @@ Zynthian.ScreenPage {
 
     }
 
-    Zynthian.DialogQuestion {
+    ZUI.DialogQuestion {
         id: confirmer
 
         property var callbackFunction: null
@@ -251,7 +251,7 @@ Zynthian.ScreenPage {
         }
     }
 
-    Zynthian.ComboBox {
+    ZUI.ComboBox {
         id: trackPicker
 
         property int trackValue: -1
@@ -348,7 +348,7 @@ Zynthian.ScreenPage {
 
     }
 
-    Zynthian.ComboBox {
+    ZUI.ComboBox {
         id: slotPicker
 
         property int slotValue: -1
@@ -430,7 +430,7 @@ Zynthian.ScreenPage {
 
     }
 
-    Zynthian.ComboBox {
+    ZUI.ComboBox {
         id: midiChannelPicker
 
         property int channelValue: -1
@@ -542,7 +542,7 @@ Zynthian.ScreenPage {
 
     }
 
-    Zynthian.ComboBox {
+    ZUI.ComboBox {
         id: cuiaEventPicker
 
         property int cuiaEvent: -1
@@ -582,7 +582,7 @@ Zynthian.ScreenPage {
 
     }
 
-    Zynthian.ComboBox {
+    ZUI.ComboBox {
         id: valueSpecifierPicker
 
         property int valueSpecifier: -1
@@ -642,7 +642,7 @@ Zynthian.ScreenPage {
 
     }
 
-    Zynthian.DialogQuestion {
+    ZUI.DialogQuestion {
         id: midiEventListener
 
         property var selectedEvent: []

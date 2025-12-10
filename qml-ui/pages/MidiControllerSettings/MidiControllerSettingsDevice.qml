@@ -30,7 +30,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
 QQC2.ScrollView {
@@ -168,7 +168,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.lowerMasterChannel = newChannel;
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -190,7 +190,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.upperMasterChannel = newChannel;
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -209,7 +209,7 @@ QQC2.ScrollView {
                 onClicked: {
                     _private.selectedDeviceObject.sendTimecode = !_private.selectedDeviceObject.sendTimecode;
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -267,7 +267,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.upperMasterChannel = 15;
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -289,7 +289,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.lastLowerZoneMemberChannel = newChannel;
                     });
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -308,7 +308,7 @@ QQC2.ScrollView {
                 onClicked: {
                     _private.selectedDeviceObject.sendBeatClock = !_private.selectedDeviceObject.sendBeatClock;
                 }
-                Zynthian.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -450,7 +450,7 @@ QQC2.ScrollView {
                         inputFiltersRepeater.currentlySelectedFilter = modelData;
                         inputFiltersRepeaterDelegate.knob0down();
                     }
-                    Zynthian.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left
@@ -713,7 +713,7 @@ QQC2.ScrollView {
                     onClicked: {
                         outputFiltersRepeaterDelegate.knob0down();
                     }
-                    Zynthian.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left
@@ -810,7 +810,7 @@ QQC2.ScrollView {
                     onClicked: {
                         _private.selectedDeviceObject.setSendToChannels([model.index], !_private.selectedDeviceObject.channelsToSendTo[model.index]);
                     }
-                    Zynthian.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             left: parent.left
                             bottom: parent.bottom
@@ -825,7 +825,7 @@ QQC2.ScrollView {
             }
         }
     }
-    Zynthian.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: deviceActionPicker
         actions: [
             Kirigami.Action {
@@ -848,7 +848,7 @@ QQC2.ScrollView {
             }
         ]
     }
-    Zynthian.FilePickerDialog {
+    ZUI.FilePickerDialog {
         id: deviceFilePickerDialog
 
         function pick(save) {

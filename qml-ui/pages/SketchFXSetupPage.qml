@@ -29,9 +29,9 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
     property var screenIds: ["sketch_effects_for_channel", "sketch_effect_preset"]
     property QtObject selectedChannel: null
@@ -121,14 +121,14 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
 
-            Zynthian.LibraryPagePicker {
+            ZUI.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "sketchfx"
                 selectedChannel: root.selectedChannel
             }
 
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: fixedEffectsView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -154,7 +154,7 @@ Zynthian.ScreenPage {
                 Component.onCompleted: {
                     fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: Zynthian.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: delegate
                     screenId: fixedEffectsView.screenId
                     selector: fixedEffectsView.selector
@@ -207,7 +207,7 @@ Zynthian.ScreenPage {
                 }
             }
 
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 model: []
@@ -241,7 +241,7 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: effectPresetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true

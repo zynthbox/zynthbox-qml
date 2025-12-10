@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
 Item {
     id: titleStack
@@ -68,7 +68,7 @@ Item {
         }
     }
 
-    Zynthian.Dialog {
+    ZUI.Dialog {
         id: editDialog
         parent: QQC2.Overlay.overlay
         x: parent.width/2 - width/2

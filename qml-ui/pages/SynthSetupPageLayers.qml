@@ -30,9 +30,9 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
-import Zynthian 1.0 as Zynthian
+import io.zynthbox.ui 1.0 as ZUI
 
-Zynthian.ScreenPage {
+ZUI.ScreenPage {
     id: root
     backAction: Kirigami.Action {
         text: qsTr("Back")
@@ -252,7 +252,7 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -260,7 +260,7 @@ Zynthian.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                delegate: Zynthian.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: delegate
                     screenId: layersView.screenId
                     selector: layersView.selector
@@ -425,7 +425,7 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-                Zynthian.SelectorView {
+                ZUI.SelectorView {
                     id: bankView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -433,7 +433,7 @@ Zynthian.ScreenPage {
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                    delegate: Zynthian.SelectorDelegate {
+                    delegate: ZUI.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
@@ -461,7 +461,7 @@ Zynthian.ScreenPage {
                         onClicked: middleColumnStack.currentIndex = 0
                     }
                 }
-                Zynthian.Card {
+                ZUI.Card {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     contentItem: ColumnLayout {
@@ -543,7 +543,7 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            Zynthian.SelectorView {
+            ZUI.SelectorView {
                 id: presetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -586,7 +586,7 @@ Zynthian.ScreenPage {
             }
         }
 
-        Zynthian.Dialog {
+        ZUI.Dialog {
             id: layerSetupDialog
             parent: applicationWindow().contentItem
             x: Math.round(parent.width/2 - width/2)
@@ -629,7 +629,7 @@ Zynthian.ScreenPage {
             }
         }
 
-        Zynthian.FilePickerDialog {
+        ZUI.FilePickerDialog {
             id: saveDialog
             property string mode: "sound"
 
@@ -709,7 +709,7 @@ Zynthian.ScreenPage {
             saveMode: true
         }
 
-        Zynthian.FilePickerDialog {
+        ZUI.FilePickerDialog {
             id: pickerDialog
             parent: root
             property string mode: "sound"

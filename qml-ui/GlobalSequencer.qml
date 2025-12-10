@@ -87,7 +87,7 @@ Item {
 
     function handleStepButtonPress(stepButtonIndex) {
         let workingModel = _private.pattern.workingModel;
-        if (_private.interactionMode == 0) {
+        if (_private.interactionMode === 0) {
             if (zynqtgui.altButtonPressed) {
                 if (zynqtgui.backButtonPressed) {
                     zynqtgui.ignoreNextBackButtonPress = true;
@@ -136,7 +136,7 @@ Item {
                     // TODO Pick the notes from that pad into the current selection
                 }
             }
-        } else if (_private.interactionMode == 1) {
+        } else if (_private.interactionMode === 1) {
             if (zynqtgui.backButtonPressed) {
                 zynqtgui.ignoreNextBackButtonPress = true;
                 // Clear the track/clip contents when holding down the back button and pressing a step
@@ -151,13 +151,30 @@ Item {
                     component.selectedChannel.selectedClip = stepButtonIndex - 11;
                 }
             }
-        } else if (_private.interactionMode == 2) {
+        } else if (_private.interactionMode === 2) {
             if (_private.stepKeyNotesActive[stepButtonIndex]) {
                 let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
                 activeNote.setOff();
                 activeNote.sendPitchChange(0);
                 _private.stepKeyNotesActive[stepButtonIndex] = null;
             }
+        } else if (_private.interactionMode === 3) {
+            // If we've released all the buttons... stop any active notes (to allow for aftertouch to be a thing)
+            let anyHeldButton = false;
+            for (let buttonIndex = 0; buttonIndex < _private.heldStepButtons.length; ++buttonIndex) {
+                if (_private.heldStepButtons[buttonIndex]) {
+                    anyHeldButton = true;
+                    break;
+                }
+            }
+            if (anyHeldButton === false) {
+                for (let noteIndex = 0; noteIndex < _private.velocityKeyNotesActive.length; ++noteIndex) {
+                    _private.velocityKeyNotesActive[noteIndex].setOff();
+                    _private.velocityKeyNotesActive[noteIndex].sendPitchChange(0);
+                }
+                _private.velocityKeyNotesActive = [];
+            }
+        } else if (_private.interactionMode === 4) {
         }
     }
     function handleStepButtonDown(stepButtonIndex) {
@@ -193,13 +210,30 @@ Item {
                     _private.stepKeyNotesActive[stepButtonIndex] = newNote;
                 }
             }
+        } else if (_private.interactionMode === 3) {
+            // Stop any currently active notes (because multiple velocities is a little odd when it's all the same notes)
+            if (_private.velocityKeyNotesActive.length > 0) {
+                // If we've got active notes, treat the new button as aftertouch
+                for (let noteIndex = 0; noteIndex < _private.velocityKeyNotesActive.length; ++noteIndex) {
+                    let activeNote = _private.velocityKeyNotesActive[noteIndex];
+                    Zynthbox.SyncTimer.sendMidiMessageImmediately(3, 160 + activeNote.activeChannel, activeNote.midiNote, _private.velocityKeysVelocities[stepButtonIndex] * 127, activeNote.sketchpadTrack);
+                }
+            } else {
+                let newNotes = [];
+                for (let noteIndex = 0; noteIndex < _private.heardNotes.length; ++noteIndex) {
+                    let newNote = _private.heardNotes[noteIndex];
+                    newNote.setOn(_private.velocityKeysVelocities[stepButtonIndex] * 127);
+                    newNotes.push(newNote);
+                }
+                _private.velocityKeyNotesActive = newNotes;
+            }
         }
     }
     function ignoreHeldStepButtonsReleases() {
         // If we're holding a step button down, make sure that we ignore the next release of those buttons
-        // Don't do this for the musical keys mode (otherwise we'll potentially end up not releasing notes, which would be sort of weird)
+        // Don't do this for the musical keys and velocity keys modes (otherwise we'll potentially end up not releasing notes, which would be sort of weird)
         let returnValue = false;
-        if (_private.interactionMode !== 2) {
+        if (_private.interactionMode !== 2 && _private.interactionMode !== 3) {
             if (zynqtgui.step1ButtonPressed) {
                 zynqtgui.ignoreNextStep1ButtonPress = true;
                 returnValue = true;
@@ -657,10 +691,16 @@ Item {
                 } else {
                     // When holding alt, always switch to the musical keys mode, otherwise toggle between steps and track/clip
                     if (zynqtgui.altButtonPressed) {
-                        _private.interactionMode = 2;
+                        if (_private.interactionMode === 2) {
+                            _private.interactionMode = 3;
+                        } else {
+                            _private.interactionMode = 2;
+                        }
                     } else {
                         if (_private.interactionMode === 0) {
                             _private.interactionMode = 1;
+                        } else if (_private.interactionMode === 1) {
+                            _private.interactionMode = 4;
                         } else {
                             _private.interactionMode = 0;
                         }
@@ -703,6 +743,12 @@ Item {
         property color stepHighlighted: Qt.rgba(0.1, 0.5, 0.5)
         property color stepCurrent: Qt.rgba(0.4, 0.4, 0.0)
 
+        property color sequencerModeColor: Qt.rgba(0.5, 0, 0)
+        property color trackClipModeColor: Qt.rgba(0.5, 0.5, 0)
+        property color musicalKeysModeColor: Qt.rgba(0, 0, 0.5)
+        property color velocityKeysModeColor: Qt.rgba(0, 0, 0.5)
+        property color slotModeColor: Qt.rgba(0, 0.5, 0)
+
         readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
         property int stepDuration: pattern ? (pattern.stepLength / patternSubbeatToTickMultiplier) : 0
 
@@ -720,16 +766,26 @@ Item {
         property var stepKeyNotes: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
         property var stepKeyNotesActive: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
 
+        property var velocityKeyNotesActive: []
+
         property var heldStepButtons: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
 
         // The interaction modes are:
         // 0: Step sequencer (displays the 16 steps of the current bar, tapping toggles the step's entry given either the currently held note, or the clip's key)
         // 1: Track/Clip Selector
         // 2: Musical keyboard for some basic music playings
+        // 3: Velocity keyboard (which plays the currently held note at 16 different velocities)
+        // 4: Slots (for selecting the 15 slots, with preview for the 10 sound source slots when that slot's button is tapped, colours appropriate for that slot (perhaps with volume indication per slot as a brightness thing and red for muted/bypassed?))
         property int interactionMode: 0
         onInteractionModeChanged: {
             updateLedColors();
             switch (interactionMode) {
+                case 4:
+                    applicationWindow().showPassiveNotification("Slots", 1500);
+                    break;
+                case 3:
+                    applicationWindow().showPassiveNotification("Velocity Keys", 1500);
+                    break;
                 case 2:
                     applicationWindow().showPassiveNotification("Musical Keys", 1500);
                     break;
@@ -743,6 +799,7 @@ Item {
             }
         }
         function updateLedsForStepSequencer() {
+            zynqtgui.led_config.setModeButtonColor(_private.sequencerModeColor);
             let workingModel = _private.pattern.workingModel;
             if (zynqtgui.altButtonPressed) {
                 // First the currently selected bar (steps are filled if they are less or equal to the available bars, and current is marked as current step, so tapping sets the current bar)
@@ -797,6 +854,7 @@ Item {
             }
         }
         function updateLedsForTrackClipSelector() {
+            zynqtgui.led_config.setModeButtonColor(_private.trackClipModeColor);
             for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
                 let stepColor = _private.stepEmpty;
                 let theTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
@@ -824,6 +882,7 @@ Item {
             }
         }
         function updateLedsForMusicalButtons() {
+            zynqtgui.led_config.setModeButtonColor(_private.musicalKeysModeColor);
             if (zynqtgui.altButtonPressed) {
                 let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
@@ -864,10 +923,26 @@ Item {
                 }
             }
         }
+        readonly property var velocityKeysVelocities: [1/16, 2/16, 3/16, 4/16, 5/16, 6/16, 7/16, 8/16, 9/16, 10/16, 11/16, 12/16, 13/16, 14/16, 15/16, 1]
+        function updateLedsForVelocityButtons() {
+            zynqtgui.led_config.setModeButtonColor(_private.velocityKeysModeColor);
+            for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
+                zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0, 0, velocityKeysVelocities[stepIndex] * 0.5));
+            }
+        }
+        function updateLedsForSlotButtons() {
+            zynqtgui.led_config.setModeButtonColor(_private.slotModeColor);
+        }
         function updateLedColors() {
             // TODO This might potentially want a throttle...
             if (_private.pattern) {
                 switch (_private.interactionMode) {
+                    case 4:
+                        _private.updateLedsForSlotButtons();
+                        break;
+                    case 3:
+                        _private.updateLedsForVelocityButtons();
+                        break;
                     case 2:
                         _private.updateLedsForMusicalButtons();
                         break;
@@ -888,6 +963,7 @@ Item {
         onScaleChanged: _private.handlePatternDataChange()
         onOctaveChanged: _private.handlePatternDataChange()
         onPitchChanged: _private.handlePatternDataChange()
+        onIsPlayingChanged: _private.handlePatternDataChange()
     }
     Connections {
         target: Zynthbox.MidiRouter

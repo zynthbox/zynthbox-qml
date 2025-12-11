@@ -175,6 +175,29 @@ Item {
                 _private.velocityKeyNotesActive = [];
             }
         } else if (_private.interactionMode === 4) {
+            if (stepButtonIndex < 5) {
+                // Release the note, if there's one set
+                let synthTestNoteInfo = _private.testSynthsActive[stepButtonIndex];
+                _private.testSynthsActive[stepButtonIndex] = null;
+                if (synthTestNoteInfo !== null) {
+                    Zynthbox.MidiRouter.sendMidiMessageToZynthianSynth(synthTestNoteInfo.midiChannel, 3, 128, synthTestNoteInfo.midiNote, _private.starVelocity);
+                }
+            } else if (stepButtonIndex < 10) {
+                // Stop the given slice, if it's ongoing
+                let sampleIndex = stepIndex - 5;
+                let sliceObject = _private.testSamplesSlicesActive[sampleIndex];
+                _private.testSamplesSlicesActive[sampleIndex] = null;
+                if (sliceObject) {
+                    if (sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.OneshotPlaybackStyle) {
+                        // Don't stop a one-shot (this should be done by the slice, really... remember to also stop any existing playback when changing playback style for a slice)
+                        sliceObject.stop();
+                    }
+                }
+            } else if (stepButtonIndex < 15) {
+                // Don't do anything on release here
+            } else if (stepButtonIndex === 15) {
+                _private.testEnabledForSlots = !_private.testEnabledForSlots;
+            }
         }
     }
     function handleStepButtonDown(stepButtonIndex) {
@@ -226,6 +249,37 @@ Item {
                     newNotes.push(newNote);
                 }
                 _private.velocityKeyNotesActive = newNotes;
+            }
+        } else if (_private.interactionMode === 4) {
+            if (stepButtonIndex < 5) {
+                // Select the appropriate synth slot
+                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", stepButtonIndex, true);
+                // Test fire only this slot, if there's a synth in it
+                let midiChannel = component.selectedChannel.chainedSounds[stepButtonIndex];
+                if (midiChannel > -1) {
+                    // Use the current clip's tonic as a test note
+                    let synthTestNoteInfo = {"midiChannel": midiChannel, "midiNote": Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey)};
+                    _private.testSynthsActive[stepButtonIndex] = synthTestNoteInfo;
+                    Zynthbox.MidiRouter.sendMidiMessageToZynthianSynth(synthTestNoteInfo.midiChannel, 3, 144, synthTestNoteInfo.midiNote, _private.starVelocity);
+                }
+            } else if (stepButtonIndex < 10) {
+                // Select the appropriate sample slot
+                let sampleIndex = stepIndex - 5;
+                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", sampleIndex, true);
+                // Test fire only this slot, if there's a sample in it
+                let sampleClip = component.selectedChannel.sampleSlotsData[sampleIndex];
+                if (sampleClip.cppObjId > -1) {
+                    let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
+                    let sliceObject = sampleObject.selectedSliceObject;
+                    _private.testSamplesSlicesActive[sampleIndex] = sliceObject;
+                    sliceObject.play();
+                }
+            } else if (stepButtonIndex < 15) {
+                // Select the appropriate fx slot (no test fire here, doesn't really make much sense)
+                let fxIndex = stepButtonIndex - 10;
+                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", fxIndex, true);
+            } else if (stepButtonIndex === 15) {
+                // Don't do anything on push for the last button, the others are fired on release so do that here as well
             }
         }
     }
@@ -768,6 +822,18 @@ Item {
 
         property var velocityKeyNotesActive: []
 
+        property bool testEnabledForSlots: true
+        property var testSynthsActive: [null, null, null, null, null]
+        property var testSamplesSlicesActive: [null, null, null, null, null]
+        onTestEnabledForSlotsChanged: {
+            if (testEnabledForSlots) {
+                applicationWindow().showPassiveNotification("Tap Slot Button To Test: Enabled", 1500);
+            } else {
+                applicationWindow().showPassiveNotification("Tap Slot Button To Test: Disabled", 1500);
+            }
+            updateLedColors();
+        }
+
         property var heldStepButtons: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
 
         // The interaction modes are:
@@ -932,6 +998,54 @@ Item {
         }
         function updateLedsForSlotButtons() {
             zynqtgui.led_config.setModeButtonColor(_private.slotModeColor);
+            for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
+                let stepColor = _private.stepEmpty;
+                let slotFilled = false;
+                let slotMuted = false;
+                let slotGain = 0.0;
+                if (stepIndex < 5) {
+                    // The five synth slots
+                    let midiChannel = component.selectedChannel.chainedSounds[stepIndex];
+                    if (midiChannel > -1) {
+                        slotFilled = true;
+                        let slotPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel];
+                        slotMuted = slotPassthroughClient.muted;
+                        slotGain = slotPassthroughClient.dryGainHandler.gainAbsolute;
+                    }
+                } else if (stepIndex < 10) {
+                    // The five sample slots
+                    let sampleClip = component.selectedChannel.sampleSlotsData[stepIndex - 5];
+                    if (sampleClip.cppObjId > -1) {
+                        slotFilled = true;
+                        let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
+                        slotMuted = sampleObject.selectedSliceObject.gainHandler.muted;
+                        slotGain = sampleObject.selectedSliceObject.gainHandler.gainAbsolute;
+                    }
+                } else if (stepIndex < 15) {
+                    // The five fx slots
+                    // Note that "muted" here is actually "bypass", and "gain" is "dry/wet mix", and it's range is from 0.0 through 2.0 so it needs scaling down by 0.5 to make sure it's the same range as the gain ones
+                    slotFilled = component.selectedChannel.occupiedFxSlots[stepIndex - 10];
+                    if (slotFilled) {
+                        let slotPassthroughClient = Zynthbox.Plugin.fxPassthroughClients[component.selectedChannel.id][stepIndex - 10];
+                        slotMuted = slotPassthroughClient.bypass;
+                        slotGain = slotPassthroughClient.dryWetMixAmount * 0.5;
+                    }
+                } else {
+                    // The last step button is a toggle for whether or not we preview when tapping the thing (use the musical keys colour here as the "on" state, to signify that a play thing will happen)
+                    slotFilled = _private.testEnabledForSlots;
+                }
+                if (slotFilled === false) {
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepEmpty);
+                } else if (slotMuted) {
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.5, 0.0, 0.0, 0.0));
+                } else {
+                    if (stepIndex < 15) {
+                        zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + 0.5 * slotGain, 0.01));
+                    } else {
+                        zynqtgui.led_config.setStepButtonColor(stepIndex, _private.musicalKeysModeColor);
+                    }
+                }
+            }
         }
         function updateLedColors() {
             // TODO This might potentially want a throttle...

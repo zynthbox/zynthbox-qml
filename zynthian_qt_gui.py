@@ -2536,6 +2536,7 @@ class zynthian_gui(QObject):
         if not lib_zyncoder: return
         last_zynswitch_index = lib_zyncoder.get_last_zynswitch_index()
         i = 0
+        kit_version = os.environ.get("ZYNTHIAN_KIT_VERSION", "Z2_V4")
 
         while i<=last_zynswitch_index:
             # Disable long press detection by setting to a very high value of 2 billion dtus which is 33.33 minutes' worth - this is a long time
@@ -2556,157 +2557,306 @@ class zynthian_gui(QObject):
                     # When 1-5 hw button is pressed during that 5000ms, * button state is retained and hence stop timer.
                     QMetaObject.invokeMethod(self.tracksModTimer, "stop", Qt.QueuedConnection)
 
-                # Handle button press event
-                if i == 4:
-                    self.menuButtonPressed = True
-                elif i == 10:
-                    self.starButtonPressed = True
-                elif i == 11:
-                    self.modeButtonPressed = True
-                elif i == 12:
-                    self.step1ButtonPressed = True
-                elif i == 13:
-                    self.step2ButtonPressed = True
-                elif i == 14:
-                    self.step3ButtonPressed = True
-                elif i == 15:
-                    self.step4ButtonPressed = True
-                elif i == 16:
-                    self.step5ButtonPressed = True
-                elif i == 34:
-                    self.step6ButtonPressed = True
-                elif i == 35:
-                    self.step7ButtonPressed = True
-                elif i == 36:
-                    self.step8ButtonPressed = True
-                elif i == 37:
-                    self.step9ButtonPressed = True
-                elif i == 38:
-                    self.step10ButtonPressed = True
-                elif i == 39:
-                    self.step11ButtonPressed = True
-                elif i == 40:
-                    self.step12ButtonPressed = True
-                elif i == 41:
-                    self.step13ButtonPressed = True
-                elif i == 42:
-                    self.step14ButtonPressed = True
-                elif i == 43:
-                    self.step15ButtonPressed = True
-                elif i == 44:
-                    self.step16ButtonPressed = True
-                elif i == 17:
-                    self.altButtonPressed = True
-                elif i == 18:
-                    self.startRecordButtonPressed = True
-                elif i == 19:
-                    self.playButtonPressed = True
-                elif i == 20:
-                    self.metronomeButtonPressed = True
-                elif i == 21:
-                    self.stopButtonPressed = True
-                elif i == 22:
-                    self.backButtonPressed = True
-                elif i == 23:
-                    self.upButtonPressed = True
-                elif i == 24:
-                    self.selectButtonPressed = True
-                elif i == 25:
-                    self.leftButtonPressed = True
-                elif i == 26:
-                    self.downButtonPressed = True
-                elif i == 27:
-                    self.rightButtonPressed = True
-                elif i == 28:
-                    self.globalButtonPressed = True
-                elif i == 31: # KNOB_0
-                    self.knob0Touched = True
-                elif i == 30: # KNOB_1
-                    self.knob1Touched = True
-                elif i == 32: # KNOB_2
-                    self.knob2Touched = True
-                elif i == 33: # KNOB_3 (big knob)
-                    self.knob3Touched = True
+                if kit_version == "Z2_V4":
+                    # Handle button press event
+                    if i == 4:
+                        self.menuButtonPressed = True
+                    elif i == 10:
+                        self.starButtonPressed = True
+                    elif i == 11:
+                        self.modeButtonPressed = True
+                    elif i == 12:
+                        self.step1ButtonPressed = True
+                    elif i == 13:
+                        self.step2ButtonPressed = True
+                    elif i == 14:
+                        self.step3ButtonPressed = True
+                    elif i == 15:
+                        self.step4ButtonPressed = True
+                    elif i == 16:
+                        self.step5ButtonPressed = True
+                    elif i == 34:
+                        self.step6ButtonPressed = True
+                    elif i == 35:
+                        self.step7ButtonPressed = True
+                    elif i == 36:
+                        self.step8ButtonPressed = True
+                    elif i == 37:
+                        self.step9ButtonPressed = True
+                    elif i == 38:
+                        self.step10ButtonPressed = True
+                    elif i == 39:
+                        self.step11ButtonPressed = True
+                    elif i == 40:
+                        self.step12ButtonPressed = True
+                    elif i == 41:
+                        self.step13ButtonPressed = True
+                    elif i == 42:
+                        self.step14ButtonPressed = True
+                    elif i == 43:
+                        self.step15ButtonPressed = True
+                    elif i == 44:
+                        self.step16ButtonPressed = True
+                    elif i == 17:
+                        self.altButtonPressed = True
+                    elif i == 18:
+                        self.startRecordButtonPressed = True
+                    elif i == 19:
+                        self.playButtonPressed = True
+                    elif i == 20:
+                        self.metronomeButtonPressed = True
+                    elif i == 21:
+                        self.stopButtonPressed = True
+                    elif i == 22:
+                        self.backButtonPressed = True
+                    elif i == 23:
+                        self.upButtonPressed = True
+                    elif i == 24:
+                        self.selectButtonPressed = True
+                    elif i == 25:
+                        self.leftButtonPressed = True
+                    elif i == 26:
+                        self.downButtonPressed = True
+                    elif i == 27:
+                        self.rightButtonPressed = True
+                    elif i == 28:
+                        self.globalButtonPressed = True
+                    elif i == 31: # KNOB_0
+                        self.knob0Touched = True
+                    elif i == 30: # KNOB_1
+                        self.knob1Touched = True
+                    elif i == 32: # KNOB_2
+                        self.knob2Touched = True
+                    elif i == 33: # KNOB_3 (big knob)
+                        self.knob3Touched = True
+                else:
+                    # Handle button press event
+                    if i == 4:
+                        self.menuButtonPressed = True
+                    elif i == 10:
+                        self.starButtonPressed = True
+                    elif i == 11:
+                        self.modeButtonPressed = True
+                    elif i == 34:
+                        self.step1ButtonPressed = True
+                    elif i == 35:
+                        self.step2ButtonPressed = True
+                    elif i == 36:
+                        self.step3ButtonPressed = True
+                    elif i == 37:
+                        self.step4ButtonPressed = True
+                    elif i == 38:
+                        self.step5ButtonPressed = True
+                    elif i == 39:
+                        self.step6ButtonPressed = True
+                    elif i == 40:
+                        self.step7ButtonPressed = True
+                    elif i == 41:
+                        self.step8ButtonPressed = True
+                    elif i == 42:
+                        self.step9ButtonPressed = True
+                    elif i == 43:
+                        self.step10ButtonPressed = True
+                    elif i == 44:
+                        self.step11ButtonPressed = True
+                    elif i == 45:
+                        self.step12ButtonPressed = True
+                    elif i == 46:
+                        self.step13ButtonPressed = True
+                    elif i == 47:
+                        self.step14ButtonPressed = True
+                    elif i == 48:
+                        self.step15ButtonPressed = True
+                    elif i == 49:
+                        self.step16ButtonPressed = True
+                    elif i == 12:
+                        self.altButtonPressed = True
+                    elif i == 13:
+                        self.startRecordButtonPressed = True
+                    elif i == 14:
+                        self.playButtonPressed = True
+                    elif i == 16:
+                        self.metronomeButtonPressed = True
+                    elif i == 15:
+                        self.stopButtonPressed = True
+                    elif i == 25:
+                        self.backButtonPressed = True
+                    elif i == 26:
+                        self.upButtonPressed = True
+                    elif i == 27:
+                        self.selectButtonPressed = True
+                    elif i == 22:
+                        self.leftButtonPressed = True
+                    elif i == 21:
+                        self.downButtonPressed = True
+                    elif i == 20:
+                        self.rightButtonPressed = True
+                    elif i == 28:
+                        self.globalButtonPressed = True
+                    elif i == 30: # KNOB_0
+                        self.knob0Touched = True
+                    elif i == 29: # KNOB_1
+                        self.knob1Touched = True
+                    elif i == 31: # KNOB_2
+                        self.knob2Touched = True
+                    elif i == 32: # KNOB_3 (big knob)
+                        self.knob3Touched = True
 
                 if self.fake_key_event_for_zynswitch(i, True):
                     return
             elif dtus > 0:
                 # logging.error("key release: {} {}".format(i, dtus))
 
-                # Handle button release event
-                if i == 4:
-                    self.menuButtonPressed = False
-                elif i == 10:
-                    self.starButtonPressed = False
-                elif i == 11:
-                    self.modeButtonPressed = False
-                elif i == 12:
-                    self.step1ButtonPressed = False
-                elif i == 13:
-                    self.step2ButtonPressed = False
-                elif i == 14:
-                    self.step3ButtonPressed = False
-                elif i == 15:
-                    self.step4ButtonPressed = False
-                elif i == 16:
-                    self.step5ButtonPressed = False
-                elif i == 34:
-                    self.step6ButtonPressed = False
-                elif i == 35:
-                    self.step7ButtonPressed = False
-                elif i == 36:
-                    self.step8ButtonPressed = False
-                elif i == 37:
-                    self.step9ButtonPressed = False
-                elif i == 38:
-                    self.step10ButtonPressed = False
-                elif i == 39:
-                    self.step11ButtonPressed = False
-                elif i == 40:
-                    self.step12ButtonPressed = False
-                elif i == 41:
-                    self.step13ButtonPressed = False
-                elif i == 42:
-                    self.step14ButtonPressed = False
-                elif i == 43:
-                    self.step15ButtonPressed = False
-                elif i == 44:
-                    self.step16ButtonPressed = False
-                elif i == 17:
-                    self.altButtonPressed = False
-                elif i == 18:
-                    self.startRecordButtonPressed = False
-                elif i == 19:
-                    self.playButtonPressed = False
-                elif i == 20:
-                    if self.__start_playback_on_metronome_release:
-                        self.__start_playback_on_metronome_release = False
-                        Zynthbox.SyncTimer.instance().startWithCountin()
-                    self.metronomeButtonPressed = False
-                elif i == 21:
-                    self.stopButtonPressed = False
-                elif i == 22:
-                    self.backButtonPressed = False
-                elif i == 23:
-                    self.upButtonPressed = False
-                elif i == 24:
-                    self.selectButtonPressed = False
-                elif i == 25:
-                    self.leftButtonPressed = False
-                elif i == 26:
-                    self.downButtonPressed = False
-                elif i == 27:
-                    self.rightButtonPressed = False
-                elif i == 28:
-                    self.globalButtonPressed = False
-                elif i == 31: # KNOB_0
-                    self.knob0Touched = False
-                elif i == 30: # KNOB_1
-                    self.knob1Touched = False
-                elif i == 32: # KNOB_2
-                    self.knob2Touched = False
-                elif i == 33: # KNOB_3 (big knob)
-                    self.knob3Touched = False
+                if kit_version == "Z2_V4":
+                    # Handle button release event
+                    if i == 4:
+                        self.menuButtonPressed = False
+                    elif i == 10:
+                        self.starButtonPressed = False
+                    elif i == 11:
+                        self.modeButtonPressed = False
+                    elif i == 12:
+                        self.step1ButtonPressed = False
+                    elif i == 13:
+                        self.step2ButtonPressed = False
+                    elif i == 14:
+                        self.step3ButtonPressed = False
+                    elif i == 15:
+                        self.step4ButtonPressed = False
+                    elif i == 16:
+                        self.step5ButtonPressed = False
+                    elif i == 34:
+                        self.step6ButtonPressed = False
+                    elif i == 35:
+                        self.step7ButtonPressed = False
+                    elif i == 36:
+                        self.step8ButtonPressed = False
+                    elif i == 37:
+                        self.step9ButtonPressed = False
+                    elif i == 38:
+                        self.step10ButtonPressed = False
+                    elif i == 39:
+                        self.step11ButtonPressed = False
+                    elif i == 40:
+                        self.step12ButtonPressed = False
+                    elif i == 41:
+                        self.step13ButtonPressed = False
+                    elif i == 42:
+                        self.step14ButtonPressed = False
+                    elif i == 43:
+                        self.step15ButtonPressed = False
+                    elif i == 44:
+                        self.step16ButtonPressed = False
+                    elif i == 17:
+                        self.altButtonPressed = False
+                    elif i == 18:
+                        self.startRecordButtonPressed = False
+                    elif i == 19:
+                        self.playButtonPressed = False
+                    elif i == 20:
+                        if self.__start_playback_on_metronome_release:
+                            self.__start_playback_on_metronome_release = False
+                            Zynthbox.SyncTimer.instance().startWithCountin()
+                        self.metronomeButtonPressed = False
+                    elif i == 21:
+                        self.stopButtonPressed = False
+                    elif i == 22:
+                        self.backButtonPressed = False
+                    elif i == 23:
+                        self.upButtonPressed = False
+                    elif i == 24:
+                        self.selectButtonPressed = False
+                    elif i == 25:
+                        self.leftButtonPressed = False
+                    elif i == 26:
+                        self.downButtonPressed = False
+                    elif i == 27:
+                        self.rightButtonPressed = False
+                    elif i == 28:
+                        self.globalButtonPressed = False
+                    elif i == 31: # KNOB_0
+                        self.knob0Touched = False
+                    elif i == 30: # KNOB_1
+                        self.knob1Touched = False
+                    elif i == 32: # KNOB_2
+                        self.knob2Touched = False
+                    elif i == 33: # KNOB_3 (big knob)
+                        self.knob3Touched = False
+                else:
+                    # Handle button release event
+                    if i == 4:
+                        self.menuButtonPressed = False
+                    elif i == 10:
+                        self.starButtonPressed = False
+                    elif i == 11:
+                        self.modeButtonPressed = False
+                    elif i == 34:
+                        self.step1ButtonPressed = False
+                    elif i == 35:
+                        self.step2ButtonPressed = False
+                    elif i == 36:
+                        self.step3ButtonPressed = False
+                    elif i == 37:
+                        self.step4ButtonPressed = False
+                    elif i == 38:
+                        self.step5ButtonPressed = False
+                    elif i == 39:
+                        self.step6ButtonPressed = False
+                    elif i == 40:
+                        self.step7ButtonPressed = False
+                    elif i == 41:
+                        self.step8ButtonPressed = False
+                    elif i == 42:
+                        self.step9ButtonPressed = False
+                    elif i == 43:
+                        self.step10ButtonPressed = False
+                    elif i == 44:
+                        self.step11ButtonPressed = False
+                    elif i == 45:
+                        self.step12ButtonPressed = False
+                    elif i == 46:
+                        self.step13ButtonPressed = False
+                    elif i == 47:
+                        self.step14ButtonPressed = False
+                    elif i == 48:
+                        self.step15ButtonPressed = False
+                    elif i == 49:
+                        self.step16ButtonPressed = False
+                    elif i == 12:
+                        self.altButtonPressed = False
+                    elif i == 13:
+                        self.startRecordButtonPressed = False
+                    elif i == 14:
+                        self.playButtonPressed = False
+                    elif i == 16:
+                        if self.__start_playback_on_metronome_release:
+                            self.__start_playback_on_metronome_release = False
+                            Zynthbox.SyncTimer.instance().startWithCountin()
+                        self.metronomeButtonPressed = False
+                    elif i == 15:
+                        self.stopButtonPressed = False
+                    elif i == 25:
+                        self.backButtonPressed = False
+                    elif i == 26:
+                        self.upButtonPressed = False
+                    elif i == 27:
+                        self.selectButtonPressed = False
+                    elif i == 22:
+                        self.leftButtonPressed = False
+                    elif i == 21:
+                        self.downButtonPressed = False
+                    elif i == 20:
+                        self.rightButtonPressed = False
+                    elif i == 28:
+                        self.globalButtonPressed = False
+                    elif i == 30: # KNOB_0
+                        self.knob0Touched = False
+                    elif i == 29: # KNOB_1
+                        self.knob1Touched = False
+                    elif i == 31: # KNOB_2
+                        self.knob2Touched = False
+                    elif i == 32: # KNOB_3 (big knob)
+                        self.knob3Touched = False
 
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
@@ -2759,83 +2909,162 @@ class zynthian_gui(QObject):
 
     def fake_key_event_for_zynswitch(self, i : int, press : bool):
         fake_key = None
+        kit_version = os.environ.get("ZYNTHIAN_KIT_VERSION", "Z2_V4")
 
-        # ALT
-        if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 17:
-            fake_key = Key.space
+        if kit_version == "Z2_V4":
+            # ALT
+            if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 17:
+                fake_key = Key.space
 
-        # NAV CLUSTER
-        match i:
-            case 23:
-                fake_key = Key.up
-            case 26:
-                fake_key = Key.down
-            case 25:
-                fake_key = Key.left
-            case 27:
-                fake_key = Key.right
-            case 24:
-                fake_key = Key.enter
-            case 22:
-                fake_key = Key.esc
+            # NAV CLUSTER
+            match i:
+                case 23:
+                    fake_key = Key.up
+                case 26:
+                    fake_key = Key.down
+                case 25:
+                    fake_key = Key.left
+                case 27:
+                    fake_key = Key.right
+                case 24:
+                    fake_key = Key.enter
+                case 22:
+                    fake_key = Key.esc
 
-            # Channel buttons
-            case 5:
-                fake_key = "1"
-            case 6:
-                fake_key = "2"
-            case 7:
-                fake_key = "3"
-            case 8:
-                fake_key = "4"
-            case 9:
-                fake_key = "5"
+                # Channel buttons
+                case 5:
+                    fake_key = "1"
+                case 6:
+                    fake_key = "2"
+                case 7:
+                    fake_key = "3"
+                case 8:
+                    fake_key = "4"
+                case 9:
+                    fake_key = "5"
 
-            # Disable emitting key 6 as it will act as modifier
-            # case 10:
-            #     fake_key = "6"
+                # Disable emitting key 6 as it will act as modifier
+                # case 10:
+                #     fake_key = "6"
 
-            #F1 .. F16
-            case 12 | 13 | 14 | 15 | 16 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44:
-                if self.ui_settings.hardwareSequencer:
-                    # When step buttons are pressed, stop key event propagation as the pressed handlers will emit appropriate CUIA events
-                    # If key event is not consumed, it will cause the gui_config.custom_switch_ui_actions to emit, which we do not want to happen in hardwareSequencer mode.
-                    return True
-                else:
-                    match i:
-                        case 12:
-                            fake_key = Key.f1
-                        case 13:
-                            fake_key = Key.f2
-                        case 14:
-                            fake_key = Key.f3
-                        case 15:
-                            fake_key = Key.f4
-                        case 16:
-                            fake_key = Key.f5
-                        # These new set of keys are from Z2_V5 c-board with 10 new buttons to be used as step buttons
-                        case 34:
-                            fake_key = Key.f6
-                        case 35:
-                            fake_key = Key.f7
-                        case 36:
-                            fake_key = Key.f8
-                        case 37:
-                            fake_key = Key.f9
-                        case 38:
-                            fake_key = Key.f10
-                        case 39:
-                            fake_key = Key.f11
-                        case 40:
-                            fake_key = Key.f12
-                        case 41:
-                            fake_key = Key.f13
-                        case 42:
-                            fake_key = Key.f14
-                        case 43:
-                            fake_key = Key.f15
-                        case 44:
-                            fake_key = Key.f16
+                #F1 .. F16
+                case 12 | 13 | 14 | 15 | 16 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44:
+                    if self.ui_settings.hardwareSequencer:
+                        # When step buttons are pressed, stop key event propagation as the pressed handlers will emit appropriate CUIA events
+                        # If key event is not consumed, it will cause the gui_config.custom_switch_ui_actions to emit, which we do not want to happen in hardwareSequencer mode.
+                        return True
+                    else:
+                        match i:
+                            case 12:
+                                fake_key = Key.f1
+                            case 13:
+                                fake_key = Key.f2
+                            case 14:
+                                fake_key = Key.f3
+                            case 15:
+                                fake_key = Key.f4
+                            case 16:
+                                fake_key = Key.f5
+                            # These new set of keys are from Z2_V5 c-board with 10 new buttons to be used as step buttons
+                            case 34:
+                                fake_key = Key.f6
+                            case 35:
+                                fake_key = Key.f7
+                            case 36:
+                                fake_key = Key.f8
+                            case 37:
+                                fake_key = Key.f9
+                            case 38:
+                                fake_key = Key.f10
+                            case 39:
+                                fake_key = Key.f11
+                            case 40:
+                                fake_key = Key.f12
+                            case 41:
+                                fake_key = Key.f13
+                            case 42:
+                                fake_key = Key.f14
+                            case 43:
+                                fake_key = Key.f15
+                            case 44:
+                                fake_key = Key.f16
+        else:
+            # ALT
+            if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 12:
+                fake_key = Key.space
+
+            # NAV CLUSTER
+            match i:
+                case 26:
+                    fake_key = Key.up
+                case 21:
+                    fake_key = Key.down
+                case 22:
+                    fake_key = Key.left
+                case 20:
+                    fake_key = Key.right
+                case 27:
+                    fake_key = Key.enter
+                case 25:
+                    fake_key = Key.esc
+
+                # Channel buttons
+                case 5:
+                    fake_key = "1"
+                case 6:
+                    fake_key = "2"
+                case 7:
+                    fake_key = "3"
+                case 8:
+                    fake_key = "4"
+                case 9:
+                    fake_key = "5"
+
+                # Disable emitting key 6 as it will act as modifier
+                # case 10:
+                #     fake_key = "6"
+
+                #F1 .. F16
+                case 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 :
+                    if self.ui_settings.hardwareSequencer:
+                        # When step buttons are pressed, stop key event propagation as the pressed handlers will emit appropriate CUIA events
+                        # If key event is not consumed, it will cause the gui_config.custom_switch_ui_actions to emit, which we do not want to happen in hardwareSequencer mode.
+                        return True
+                    else:
+                        match i:
+                            case 34:
+                                fake_key = Key.f1
+                            case 35:
+                                fake_key = Key.f2
+                            case 36:
+                                fake_key = Key.f3
+                            case 37:
+                                fake_key = Key.f4
+                            case 38:
+                                fake_key = Key.f5
+                            # These new set of keys are from Z2_V5 c-board with 10 new buttons to be used as step buttons
+                            case 39:
+                                fake_key = Key.f6
+                            case 40:
+                                fake_key = Key.f7
+                            case 41:
+                                fake_key = Key.f8
+                            case 42:
+                                fake_key = Key.f9
+                            case 43:
+                                fake_key = Key.f10
+                            case 44:
+                                fake_key = Key.f11
+                            case 45:
+                                fake_key = Key.f12
+                            case 46:
+                                fake_key = Key.f13
+                            case 47:
+                                fake_key = Key.f14
+                            case 48:
+                                fake_key = Key.f15
+                            case 49:
+                                fake_key = Key.f16
 
         if fake_key == None:
             return False

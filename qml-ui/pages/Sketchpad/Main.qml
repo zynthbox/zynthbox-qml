@@ -1305,7 +1305,7 @@ ZUI.ScreenPage {
                                                         }
                                                     }
                                                 }
-                                                Zynthian.ActionPickerPopup {
+                                                ZUI.ActionPickerPopup {
                                                     id: sendsActions
                                                     actions: [
                                                         Kirigami.Action {

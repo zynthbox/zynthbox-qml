@@ -2557,7 +2557,7 @@ class zynthian_gui(QObject):
                     # When 1-5 hw button is pressed during that 5000ms, * button state is retained and hence stop timer.
                     QMetaObject.invokeMethod(self.tracksModTimer, "stop", Qt.QueuedConnection)
 
-                if kit_version == "Z2_V4":
+                if kit_version == "Z2_V4" or kit_version == "Z1_V1":
                     # Handle button press event
                     if i == 4:
                         self.menuButtonPressed = True
@@ -2707,7 +2707,7 @@ class zynthian_gui(QObject):
             elif dtus > 0:
                 # logging.error("key release: {} {}".format(i, dtus))
 
-                if kit_version == "Z2_V4":
+                if kit_version == "Z2_V4" or kit_version == "Z1_V1":
                     # Handle button release event
                     if i == 4:
                         self.menuButtonPressed = False
@@ -2911,7 +2911,7 @@ class zynthian_gui(QObject):
         fake_key = None
         kit_version = os.environ.get("ZYNTHIAN_KIT_VERSION", "Z2_V4")
 
-        if kit_version == "Z2_V4":
+        if kit_version == "Z2_V4" or kit_version == "Z1_V1":
             # ALT
             if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 17:
                 fake_key = Key.space

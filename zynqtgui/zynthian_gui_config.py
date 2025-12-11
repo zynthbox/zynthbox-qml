@@ -133,7 +133,7 @@ logging.debug("SWITCHES layout: %s" % zynswitch_pin)
 
 kit_version = os.environ.get('ZYNTHIAN_KIT_VERSION',"Z2_V4")
 
-if kit_version == "Z2_V4":
+if kit_version == "Z2_V4" or kit_version == "Z1_V1":
     custom_switch_ui_actions = {
         0: {'S': "SCREEN_MAIN", 'B': '', 'L': ''},
         1: {'S': "CHANNEL_1", 'B': '', 'L': ''},

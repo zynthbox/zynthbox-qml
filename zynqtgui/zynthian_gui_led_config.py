@@ -161,7 +161,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
         kit_version = os.getenv("ZYNTHIAN_KIT_VERSION")
 
-        if kit_version == "Z2_V4":
+        if kit_version == "Z2_V4" or kit_version == "Z1_V1":
             self.button_menu = 0
             self.button_1 = 1
             self.button_2 = 2

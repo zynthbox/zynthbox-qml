@@ -253,7 +253,7 @@ Item {
         } else if (_private.interactionMode === 4) {
             if (stepButtonIndex < 5) {
                 // Select the appropriate synth slot
-                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", stepButtonIndex, true);
+                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", stepButtonIndex);
                 // Test fire only this slot, if there's a synth in it
                 let midiChannel = component.selectedChannel.chainedSounds[stepButtonIndex];
                 if (midiChannel > -1) {
@@ -265,7 +265,7 @@ Item {
             } else if (stepButtonIndex < 10) {
                 // Select the appropriate sample slot
                 let sampleIndex = stepIndex - 5;
-                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", sampleIndex, true);
+                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", sampleIndex);
                 // Test fire only this slot, if there's a sample in it
                 let sampleClip = component.selectedChannel.sampleSlotsData[sampleIndex];
                 if (sampleClip.cppObjId > -1) {
@@ -277,7 +277,7 @@ Item {
             } else if (stepButtonIndex < 15) {
                 // Select the appropriate fx slot (no test fire here, doesn't really make much sense)
                 let fxIndex = stepButtonIndex - 10;
-                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", fxIndex, true);
+                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", fxIndex);
             } else if (stepButtonIndex === 15) {
                 // Don't do anything on push for the last button, the others are fired on release so do that here as well
             }
@@ -771,7 +771,10 @@ Item {
         property QtObject sequence: component.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
         property QtObject pattern: sequence && component.selectedChannel ? sequence.getByClipId(component.selectedChannel.id, component.selectedChannel.selectedClip) : null
         // property QtObject clip: component.selectedChannel ? component.selectedChannel.getClipsModelById(component.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
-        onPatternChanged: handlePatternDataChange()
+        onPatternChanged: {
+            updateSlotPassthroughClients();
+            handlePatternDataChange();
+        }
         function handlePatternDataChange() {
             let keyNote = Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey);
             heardNotes = [Zynthbox.PlayGridManager.getNote(keyNote, pattern.sketchpadTrack)];
@@ -822,6 +825,35 @@ Item {
 
         property var velocityKeyNotesActive: []
 
+        property var slotPassthroughClients: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+        function updateSlotPassthroughClients() {
+            for (let slotIndex = 0; slotIndex < 15; ++slotIndex) {
+                let slotPassthroughClient = null;
+                if (slotIndex < 5) {
+                    // The five synth slots
+                    let midiChannel = component.selectedChannel.chainedSounds[slotIndex];
+                    if (midiChannel > -1) {
+                        slotPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel];
+                    }
+                } else if (slotIndex < 10) {
+                    // The five sample slots
+                    let sampleClip = component.selectedChannel.sampleSlotsData[slotIndex - 5];
+                    if (sampleClip.cppObjId > -1) {
+                        slotFilled = true;
+                        let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
+                        slotPassthroughClient = sampleObject.selectedSliceObject;
+                    }
+                } else if (slotIndex < 15) {
+                    // The five fx slots
+                    // Note that "muted" here is actually "bypass", and "gain" is "dry/wet mix", and it's range is from 0.0 through 2.0 so it needs scaling down by 0.5 to make sure it's the same range as the gain ones
+                    if (component.selectedChannel.occupiedFxSlots[slotIndex - 10]) {
+                        slotPassthroughClient = Zynthbox.Plugin.fxPassthroughClients[component.selectedChannel.id][slotIndex - 10];
+                    }
+                }
+                slotPassthroughClients[slotIndex] = slotPassthroughClient;
+            }
+            updateLedColors();
+        }
         property bool testEnabledForSlots: true
         property var testSynthsActive: [null, null, null, null, null]
         property var testSamplesSlicesActive: [null, null, null, null, null]
@@ -999,34 +1031,26 @@ Item {
         function updateLedsForSlotButtons() {
             zynqtgui.led_config.setModeButtonColor(_private.slotModeColor);
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
-                let stepColor = _private.stepEmpty;
-                let slotFilled = false;
                 let slotMuted = false;
                 let slotGain = 0.0;
+                let slotPassthroughClient = _private.slotPassthroughClients[stepIndex];
+                let slotFilled = slotPassthroughClient != null;
                 if (stepIndex < 5) {
                     // The five synth slots
-                    let midiChannel = component.selectedChannel.chainedSounds[stepIndex];
-                    if (midiChannel > -1) {
-                        slotFilled = true;
-                        let slotPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel];
+                    if (slotPassthroughClient) {
                         slotMuted = slotPassthroughClient.muted;
                         slotGain = slotPassthroughClient.dryGainHandler.gainAbsolute;
                     }
                 } else if (stepIndex < 10) {
                     // The five sample slots
-                    let sampleClip = component.selectedChannel.sampleSlotsData[stepIndex - 5];
-                    if (sampleClip.cppObjId > -1) {
-                        slotFilled = true;
-                        let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
+                    if (slotPassthroughClient) {
                         slotMuted = sampleObject.selectedSliceObject.gainHandler.muted;
                         slotGain = sampleObject.selectedSliceObject.gainHandler.gainAbsolute;
                     }
                 } else if (stepIndex < 15) {
                     // The five fx slots
                     // Note that "muted" here is actually "bypass", and "gain" is "dry/wet mix", and it's range is from 0.0 through 2.0 so it needs scaling down by 0.5 to make sure it's the same range as the gain ones
-                    slotFilled = component.selectedChannel.occupiedFxSlots[stepIndex - 10];
-                    if (slotFilled) {
-                        let slotPassthroughClient = Zynthbox.Plugin.fxPassthroughClients[component.selectedChannel.id][stepIndex - 10];
+                    if (slotPassthroughClient) {
                         slotMuted = slotPassthroughClient.bypass;
                         slotGain = slotPassthroughClient.dryWetMixAmount * 0.5;
                     }
@@ -1070,6 +1094,45 @@ Item {
                 }
             }
         }
+    }
+    Repeater {
+        model: 5
+        Item {
+            Connections {
+                target: _private.slotPassthroughClients[index] ? _private.slotPassthroughClients[index].dryGainHandler : null
+                onGainChanged: _private.updateLedColors()
+            }
+            Connections {
+                target: _private.slotPassthroughClients[index]
+                onMutedChanged: _private.updateLedColors()
+            }
+        }
+    }
+    Repeater {
+        model: 5
+        Item {
+            Connections {
+                target: _private.slotPassthroughClients[index + 5] ? _private.slotPassthroughClients[index + 5].gainHandler : null
+                onGainChanged: _private.updateLedColors()
+                onMutedChanged: _private.updateLedColors()
+            }
+        }
+    }
+    Repeater {
+        model: 5
+        Item {
+            Connections {
+                target: _private.slotPassthroughClients[index + 10]
+                onDryWetMixAmountChanged: _private.updateLedColors()
+                onBypassChanged: _private.updateLedColors()
+            }
+        }
+    }
+    Connections {
+        target: component.selectedChannel
+        onSamples_changed: _private.updateSlotPassthroughClients()
+        onChainedSoundsNamesChanged: _private.updateSlotPassthroughClients()
+        onChainedFxNamesChanged: _private.updateSlotPassthroughClients()
     }
     Connections {
         target: _private.pattern

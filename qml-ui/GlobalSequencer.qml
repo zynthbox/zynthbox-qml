@@ -87,7 +87,7 @@ Item {
 
     function handleStepButtonPress(stepButtonIndex) {
         let workingModel = _private.pattern.workingModel;
-        if (_private.interactionMode === 0) {
+        if (_private.interactionMode === _private.interactionModeSequencer) {
             if (zynqtgui.altButtonPressed) {
                 if (zynqtgui.backButtonPressed) {
                     zynqtgui.ignoreNextBackButtonPress = true;
@@ -136,7 +136,7 @@ Item {
                     // TODO Pick the notes from that pad into the current selection
                 }
             }
-        } else if (_private.interactionMode === 1) {
+        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
             if (zynqtgui.backButtonPressed) {
                 zynqtgui.ignoreNextBackButtonPress = true;
                 // Clear the track/clip contents when holding down the back button and pressing a step
@@ -151,14 +151,14 @@ Item {
                     component.selectedChannel.selectedClip = stepButtonIndex - 11;
                 }
             }
-        } else if (_private.interactionMode === 2) {
+        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
             if (_private.stepKeyNotesActive[stepButtonIndex]) {
                 let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
                 activeNote.setOff();
                 activeNote.sendPitchChange(0);
                 _private.stepKeyNotesActive[stepButtonIndex] = null;
             }
-        } else if (_private.interactionMode === 3) {
+        } else if (_private.interactionMode === _private.interactionModeVelocityKeys) {
             // If we've released all the buttons... stop any active notes (to allow for aftertouch to be a thing)
             let anyHeldButton = false;
             for (let buttonIndex = 0; buttonIndex < _private.heldStepButtons.length; ++buttonIndex) {
@@ -174,7 +174,7 @@ Item {
                 }
                 _private.velocityKeyNotesActive = [];
             }
-        } else if (_private.interactionMode === 4) {
+        } else if (_private.interactionMode === _private.interactionModeSlots) {
             if (stepButtonIndex < 5) {
                 // Release the note, if there's one set
                 let synthTestNoteInfo = _private.testSynthsActive[stepButtonIndex];
@@ -202,7 +202,7 @@ Item {
         }
     }
     function handleStepButtonDown(stepButtonIndex) {
-        if (_private.interactionMode === 2) {
+        if (_private.interactionMode === _private.interactionModeMusicalKeys) {
             if (zynqtgui.altButtonPressed) {
                 let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                 if (stepButtonIndex < 11) {
@@ -234,7 +234,7 @@ Item {
                     _private.stepKeyNotesActive[stepButtonIndex] = newNote;
                 }
             }
-        } else if (_private.interactionMode === 3) {
+        } else if (_private.interactionMode === _private.interactionModeVelocityKeys) {
             // Stop any currently active notes (because multiple velocities is a little odd when it's all the same notes)
             if (_private.velocityKeyNotesActive.length > 0) {
                 // If we've got active notes, treat the new button as aftertouch
@@ -251,7 +251,7 @@ Item {
                 }
                 _private.velocityKeyNotesActive = newNotes;
             }
-        } else if (_private.interactionMode === 4) {
+        } else if (_private.interactionMode === _private.interactionModeSlots) {
             if (stepButtonIndex < 5) {
                 // Select the appropriate synth slot
                 pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", stepButtonIndex);
@@ -289,7 +289,7 @@ Item {
         // If we're holding a step button down, make sure that we ignore the next release of those buttons
         // Don't do this for the musical keys and velocity keys modes (otherwise we'll potentially end up not releasing notes, which would be sort of weird)
         let returnValue = false;
-        if (_private.interactionMode !== 2 && _private.interactionMode !== 3) {
+        if (_private.interactionMode !== _private.interactionModeMusicalKeys && _private.interactionMode !== _private.interactionModeVelocityKeys) {
             if (zynqtgui.step1ButtonPressed) {
                 zynqtgui.ignoreNextStep1ButtonPress = true;
                 returnValue = true;
@@ -502,9 +502,9 @@ Item {
                 } else {
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.interactionMode === 0) {
+                            if (_private.interactionMode === _private.interactionModeSequencer) {
                                 component.updateStepVelocity(0, stepButtonIndex);
-                            } else if (_private.interactionMode === 1) {
+                            } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(0, stepButtonIndex);
                                 }
@@ -524,9 +524,9 @@ Item {
                 } else {
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.interactionMode === 0) {
+                            if (_private.interactionMode === _private.interactionModeSequencer) {
                                 component.updateStepVelocity(1, stepButtonIndex);
-                            } else if (_private.interactionMode === 1) {
+                            } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(1, stepButtonIndex);
                                 }
@@ -544,9 +544,9 @@ Item {
                 } else {
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.interactionMode === 0) {
+                            if (_private.interactionMode === _private.interactionModeSequencer) {
                                 component.updateStepVelocity(-1, stepButtonIndex);
-                            } else if (_private.interactionMode === 1) {
+                            } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(-1, stepButtonIndex);
                                 }
@@ -562,9 +562,9 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === 0) {
+                        if (_private.interactionMode === _private.interactionModeSequencer) {
                             // component.updateStepLength(0, stepButtonIndex);
-                        } else if (_private.interactionMode === 1) {
+                        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
                             }
@@ -579,9 +579,9 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === 0) {
+                        if (_private.interactionMode === _private.interactionModeSequencer) {
                             // component.updateStepLength(1, stepButtonIndex);
-                        } else if (_private.interactionMode === 1) {
+                        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
                             }
@@ -594,9 +594,9 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === 0) {
+                        if (_private.interactionMode === _private.interactionModeSequencer) {
                             // component.updateStepLength(-1, stepButtonIndex);
-                        } else if (_private.interactionMode === 1) {
+                        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
                             }
@@ -630,7 +630,7 @@ Item {
                         .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
                         , 1000);
                     returnValue = true;
-                } else if (_private.interactionMode === 2 && zynqtgui.altButtonPressed) {
+                } else if (_private.interactionMode === _private.interactionModeMusicalKeys && zynqtgui.altButtonPressed) {
                     applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
                     returnValue = true;
                 }
@@ -661,7 +661,7 @@ Item {
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
-                } else if (_private.interactionMode === 2 && zynqtgui.altButtonPressed) {
+                } else if (_private.interactionMode === _private.interactionModeMusicalKeys && zynqtgui.altButtonPressed) {
                     applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
                     returnValue = true;
                 }
@@ -686,7 +686,7 @@ Item {
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
-                } else if (_private.interactionMode === 2 && zynqtgui.altButtonPressed) {
+                } else if (_private.interactionMode === _private.interactionModeMusicalKeys && zynqtgui.altButtonPressed) {
                     applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
                     returnValue = true;
                 }
@@ -708,7 +708,7 @@ Item {
                 break;
 
             case "SWITCH_PLAY":
-                if (_private.interactionMode === 0 && (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed)) {
+                if (_private.interactionMode === _private.interactionModeSequencer && (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed)) {
                     // When in stepsequencer mode and holding down any step button, test-run that step's entries when you tap play
                     // TODO This probably want to pass through PatternModel, using some manner of fanciness to reuse the scheduling logic so we can ensure all the various settings are included (like probability, ratchet, etc)
                     component.ignoreHeldStepButtonsReleases();
@@ -747,18 +747,18 @@ Item {
                 } else {
                     // When holding alt, always switch to the musical keys mode, otherwise toggle between steps and track/clip
                     if (zynqtgui.altButtonPressed) {
-                        if (_private.interactionMode === 2) {
-                            _private.interactionMode = 3;
+                        if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                            _private.interactionMode = _private.interactionModeVelocityKeys;
                         } else {
-                            _private.interactionMode = 2;
+                            _private.interactionMode = _private.interactionModeMusicalKeys;
                         }
                     } else {
-                        if (_private.interactionMode === 0) {
-                            _private.interactionMode = 1;
-                        } else if (_private.interactionMode === 1) {
-                            _private.interactionMode = 4;
+                        if (_private.interactionMode === _private.interactionModeSequencer) {
+                            _private.interactionMode = _private.interactionModeTrackClip;
+                        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
+                            _private.interactionMode = _private.interactionModeSlots;
                         } else {
-                            _private.interactionMode = 0;
+                            _private.interactionMode = _private.interactionModeSequencer;
                         }
                     }
                 }
@@ -876,22 +876,27 @@ Item {
         // 3: Velocity keyboard (which plays the currently held note at 16 different velocities)
         // 4: Slots (for selecting the 15 slots, with preview for the 10 sound source slots when that slot's button is tapped, colours appropriate for that slot (perhaps with volume indication per slot as a brightness thing and red for muted/bypassed?))
         property int interactionMode: 0
+        readonly property int interactionModeSequencer: 0
+        readonly property int interactionModeTrackClip: 1
+        readonly property int interactionModeMusicalKeys: 2
+        readonly property int interactionModeVelocityKeys: 3
+        readonly property int interactionModeSlots: 4
         onInteractionModeChanged: {
             updateLedColors();
             switch (interactionMode) {
-                case 4:
+                case interactionModeSlots:
                     applicationWindow().showPassiveNotification("Slots", 1500);
                     break;
-                case 3:
+                case interactionModeVelocityKeys:
                     applicationWindow().showPassiveNotification("Velocity Keys", 1500);
                     break;
-                case 2:
+                case interactionModeMusicalKeys:
                     applicationWindow().showPassiveNotification("Musical Keys", 1500);
                     break;
-                case 1:
+                case interactionModeTrackClip:
                     applicationWindow().showPassiveNotification("Track and Clip", 1500);
                     break;
-                case 0:
+                case interactionModeSequencer:
                 default:
                     applicationWindow().showPassiveNotification("Sequencer", 1500);
                     break;
@@ -910,7 +915,7 @@ Item {
                     if (stepIndex == workingModel.activeBar) {
                         stepColor = Qt.tint(stepColor, _private.stepCurrent);
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);
                 }
                 // Second is the available bar length (steps are filled if they are less or equal to the available bars, and not filled otherwise, and tapping sets the pattern length in 16 step increments)
                 for (let stepIndex = 0; stepIndex < 8; ++stepIndex) {
@@ -918,7 +923,7 @@ Item {
                     if (stepIndex < workingModel.availableBars) {
                         stepColor = _private.stepWithNotes;
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex + 8, stepColor);
+                    zynqtgui.led_config.setStepButtonColor(stepIndex + 8, stepColor, 1.0);
                 }
             } else {
                 let heardNoteValues = [];
@@ -948,7 +953,7 @@ Item {
                     if (workingModel.playbackPosition === actualStepIndex) {
                         stepColor = Qt.tint(stepColor, _private.stepCurrent);
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);
                 }
             }
         }
@@ -964,10 +969,10 @@ Item {
                     stepColor = Qt.tint(stepColor, _private.stepCurrent);
                 }
                 // Maybe mark red when muted?
-                zynqtgui.led_config.setStepButtonColor(trackIndex, stepColor);
+                zynqtgui.led_config.setStepButtonColor(trackIndex, stepColor, 1.0);
             }
             // Last button's not really a thing for now, grey it out...
-            zynqtgui.led_config.setStepButtonColor(10, _private.stepEmpty);
+            zynqtgui.led_config.setStepButtonColor(10, _private.stepEmpty, 1.0);
             for (let clipIndex = 0; clipIndex < 5; ++clipIndex) {
                 let stepColor = _private.stepEmpty;
                 let clipPattern = _private.sequence.getByClipId(component.selectedChannel.id, clipIndex);
@@ -977,7 +982,7 @@ Item {
                 if (component.selectedChannel.selectedClip === clipIndex) {
                     stepColor = Qt.tint(stepColor, _private.stepCurrent);
                 }
-                zynqtgui.led_config.setStepButtonColor(clipIndex + 11, stepColor);
+                zynqtgui.led_config.setStepButtonColor(clipIndex + 11, stepColor, 1.0);
             }
         }
         function updateLedsForMusicalButtons() {
@@ -1005,20 +1010,19 @@ Item {
                             stepColor = _private.stepWithNotes;
                         }
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);
                 }
             } else {
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                     let stepColor = _private.stepEmpty;
                     let stepNote = stepKeyNotes[stepIndex];
+                    let brightness = 1.0;
                     if (stepNote) {
-                        if (stepNote.midiNote % 12 == 0) {
-                            stepColor = _private.stepHighlighted;
-                        } else {
-                            stepColor = _private.stepWithNotes;
-                        }
+                        // Normalise the colours to all be on C8 because even brightness is useful in this case
+                        stepColor = zynqtgui.theme_chooser.noteColors[(stepNote.midiNote % 12) + 108];
+                        brightness = stepNote.isPlaying ? 1.0 : 0.8;
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor);
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, brightness);
                 }
             }
         }
@@ -1026,7 +1030,7 @@ Item {
         function updateLedsForVelocityButtons() {
             zynqtgui.led_config.setModeButtonColor(_private.velocityKeysModeColor);
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
-                zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0, 0, velocityKeysVelocities[stepIndex] * 0.5));
+                zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0, 0, velocityKeysVelocities[stepIndex] * 0.5), 1.0);
             }
         }
         function updateLedsForSlotButtons() {
@@ -1060,35 +1064,41 @@ Item {
                     slotFilled = _private.testEnabledForSlots;
                 }
                 if (slotFilled === false) {
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepEmpty);
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepEmpty, 1.0);
                 } else if (slotMuted) {
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(1, 0.0, 0.0, 0.0));
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(1, 0.0, 0.0, 0.0), 1.0);
                 } else {
                     if (stepIndex < 15) {
-                        zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + slotGain, 0.01));
+                        zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + slotGain, 0.01), 1.0);
                     } else {
-                        zynqtgui.led_config.setStepButtonColor(stepIndex, _private.musicalKeysModeColor);
+                        zynqtgui.led_config.setStepButtonColor(stepIndex, _private.musicalKeysModeColor, 1.0);
                     }
                 }
             }
         }
         function updateLedColors() {
-            // TODO This might potentially want a throttle...
+            ledColorUpdateThrottle.restart();
+        }
+    }
+    Timer {
+        id: ledColorUpdateThrottle
+        interval: 0; running: false; repeat: false;
+        onTriggered: {
             if (_private.pattern) {
                 switch (_private.interactionMode) {
-                    case 4:
+                    case _private.interactionModeSlots:
                         _private.updateLedsForSlotButtons();
                         break;
-                    case 3:
+                    case _private.interactionModeVelocityKeys:
                         _private.updateLedsForVelocityButtons();
                         break;
-                    case 2:
+                    case _private.interactionModeMusicalKeys:
                         _private.updateLedsForMusicalButtons();
                         break;
-                    case 1:
+                    case _private.interactionModeTrackClip:
                         _private.updateLedsForTrackClipSelector();
                         break;
-                    case 0:
+                    case _private.interactionModeSequencer:
                     default:
                         _private.updateLedsForStepSequencer();
                         break;
@@ -1126,6 +1136,17 @@ Item {
                 target: _private.slotPassthroughClients[index + 10]
                 onDryWetMixAmountChanged: _private.updateLedColors()
                 onBypassChanged: _private.updateLedColors()
+            }
+        }
+    }
+    Repeater {
+        model: 16
+        Item {
+            Connections {
+                target: _private.stepKeyNotes[index]
+                // Only activate this for musical keys, no particular reason otherwise
+                enabled: _private.interactionMode === _private.interactionModeMusicalKeys
+                onIsPlayingChanged: _private.updateLedColors()
             }
         }
     }
@@ -1242,6 +1263,12 @@ Item {
         onStep14_button_pressed_changed: { _private.heldStepButtons[13] = zynqtgui.step14ButtonPressed; }
         onStep15_button_pressed_changed: { _private.heldStepButtons[14] = zynqtgui.step15ButtonPressed; }
         onStep16_button_pressed_changed: { _private.heldStepButtons[15] = zynqtgui.step16ButtonPressed; }
+    }
+    Connections {
+        target: Zynthbox.PlayGridManager
+        // Only do this when we're in musical keys mode
+        enabled: zynqtgui.ui_settings.hardwareSequencer && _private.interactionMode === _private.interactionModeMusicalKeys
+        onActiveNotesChanged: _private.updateLedColors()
     }
 
     Binding {

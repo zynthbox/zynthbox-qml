@@ -185,12 +185,13 @@ Item {
             } else if (stepButtonIndex < 10) {
                 // Stop the given slice, if it's ongoing
                 let sampleIndex = stepIndex - 5;
-                let sliceObject = _private.testSamplesSlicesActive[sampleIndex];
+                let sampleTestNoteInfo = _private.testSamplesSlicesActive[sampleIndex];
                 _private.testSamplesSlicesActive[sampleIndex] = null;
-                if (sliceObject) {
+                if (sampleTestNoteInfo) {
+                    let sliceObject = sampleTestNoteInfo.sliceObject;
                     if (sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.OneshotPlaybackStyle) {
                         // Don't stop a one-shot (this should be done by the slice, really... remember to also stop any existing playback when changing playback style for a slice)
-                        sliceObject.stop();
+                        sliceObject.stop(sampleTestNoteInfo.midiNote);
                     }
                 }
             } else if (stepButtonIndex < 15) {
@@ -271,8 +272,9 @@ Item {
                 if (sampleClip.cppObjId > -1) {
                     let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
                     let sliceObject = sampleObject.selectedSliceObject;
-                    _private.testSamplesSlicesActive[sampleIndex] = sliceObject;
-                    sliceObject.play();
+                    let sampleTestNoteInfo = {"sliceObject": sliceObject, "midiNote": Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey)};
+                    _private.testSamplesSlicesActive[sampleIndex] = sampleTestNoteInfo;
+                    sliceObject.play(sampleTestNoteInfo.midiNote, _private.starVelocity);
                 }
             } else if (stepButtonIndex < 15) {
                 // Select the appropriate fx slot (no test fire here, doesn't really make much sense)
@@ -794,17 +796,17 @@ Item {
             updateLedColors();
         }
 
-        property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
-        property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.2)
-        property color stepWithNotes: Qt.rgba(0.1, 0.1, 0.5)
-        property color stepHighlighted: Qt.rgba(0.1, 0.5, 0.5)
-        property color stepCurrent: Qt.rgba(0.4, 0.4, 0.0)
+        property color stepEmpty: Qt.rgba(0.5, 0.5, 0.5)
+        property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.8)
+        property color stepWithNotes: Qt.rgba(0.5, 0.5, 1)
+        property color stepHighlighted: Qt.rgba(0.5, 1, 1)
+        property color stepCurrent: Qt.rgba(1, 1, 0.0)
 
-        property color sequencerModeColor: Qt.rgba(0.5, 0, 0)
-        property color trackClipModeColor: Qt.rgba(0.5, 0.5, 0)
-        property color musicalKeysModeColor: Qt.rgba(0, 0, 0.5)
-        property color velocityKeysModeColor: Qt.rgba(0, 0, 0.5)
-        property color slotModeColor: Qt.rgba(0, 0.5, 0)
+        property color sequencerModeColor: Qt.rgba(1, 0, 0)
+        property color trackClipModeColor: Qt.rgba(1, 1, 0)
+        property color musicalKeysModeColor: Qt.rgba(0, 0, 1)
+        property color velocityKeysModeColor: Qt.rgba(0, 0, 1)
+        property color slotModeColor: Qt.rgba(0, 1, 0)
 
         readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
         property int stepDuration: pattern ? (pattern.stepLength / patternSubbeatToTickMultiplier) : 0
@@ -839,7 +841,6 @@ Item {
                     // The five sample slots
                     let sampleClip = component.selectedChannel.sampleSlotsData[slotIndex - 5];
                     if (sampleClip.cppObjId > -1) {
-                        slotFilled = true;
                         let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
                         slotPassthroughClient = sampleObject.selectedSliceObject;
                     }
@@ -1061,10 +1062,10 @@ Item {
                 if (slotFilled === false) {
                     zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepEmpty);
                 } else if (slotMuted) {
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.5, 0.0, 0.0, 0.0));
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(1, 0.0, 0.0, 0.0));
                 } else {
                     if (stepIndex < 15) {
-                        zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + 0.5 * slotGain, 0.01));
+                        zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + slotGain, 0.01));
                     } else {
                         zynqtgui.led_config.setStepButtonColor(stepIndex, _private.musicalKeysModeColor);
                     }

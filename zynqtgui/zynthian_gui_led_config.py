@@ -271,12 +271,14 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     @Slot(int, 'QColor')
     def setStepButtonColor(self, stepIndex, stepColor):
         if -1 < stepIndex and stepIndex < 16:
-            self.step_button_colors[stepIndex] = (stepColor.red(), stepColor.green(), stepColor.blue())
+            tempColor = stepColor.darker(darkening_factor)
+            self.step_button_colors[stepIndex] = (tempColor.red(), tempColor.green(), tempColor.blue())
             self.update_button_colors()
 
     @Slot('QColor')
     def setModeButtonColor(self, buttonColor):
-        self.mode_button_color = (buttonColor.red(), buttonColor.green(), buttonColor.blue())
+        tempColor = buttonColor.darker(darkening_factor)
+        self.mode_button_color = (tempColor.red(), tempColor.green(), tempColor.blue())
         self.update_button_colors()
 
     def show(self):

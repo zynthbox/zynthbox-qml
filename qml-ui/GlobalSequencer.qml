@@ -156,6 +156,9 @@ Item {
                 let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
                 activeNote.setOff();
                 activeNote.sendPitchChange(0);
+                activeNote.sendPolyphonicAftertouch(0);
+                _private.stepKeyPitchBend[stepButtonIndex] = 0;
+                _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = 0;
                 _private.stepKeyNotesActive[stepButtonIndex] = null;
             }
         } else if (_private.interactionMode === _private.interactionModeVelocityKeys) {
@@ -225,6 +228,9 @@ Item {
                     let activeNote = _private.stepKeyNotesActive[stepButtonIndex];
                     activeNote.setOff();
                     activeNote.sendPitchChange(0);
+                    activeNote.sendPolyphonicAftertouch(0);
+                    _private.stepKeyPitchBend[stepButtonIndex] = 0;
+                    _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = 0;
                     _private.stepKeyNotesActive[stepButtonIndex] = null;
                 }
                 let newNote = _private.stepKeyNotes[stepButtonIndex];
@@ -508,6 +514,8 @@ Item {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(0, stepButtonIndex);
                                 }
+                            } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                                // Send aftertouch to any held note - no display, so don't actually do anything for touched
                             }
                             returnValue = true;
                         }
@@ -530,6 +538,15 @@ Item {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(1, stepButtonIndex);
                                 }
+                            } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                                // Send aftertouch to any held note
+                                let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                                if (stepNote) {
+                                    if (_private.stepKeyPolyphonicAftertouch[stepButtonIndex] < 127) {
+                                        _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = _private.stepKeyPolyphonicAftertouch[stepButtonIndex] + 1;
+                                        stepNote.sendPolyphonicAftertouch(_private.stepKeyPolyphonicAftertouch[stepButtonIndex]);
+                                    }
+                                }
                             }
                             returnValue = true;
                         }
@@ -550,6 +567,15 @@ Item {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(-1, stepButtonIndex);
                                 }
+                            } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                                // Send aftertouch to any held note
+                                let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                                if (stepNote) {
+                                    if (0 < _private.stepKeyPolyphonicAftertouch[stepButtonIndex]) {
+                                        _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = _private.stepKeyPolyphonicAftertouch[stepButtonIndex] - 1;
+                                        stepNote.sendPolyphonicAftertouch(_private.stepKeyPolyphonicAftertouch[stepButtonIndex]);
+                                    }
+                                }
                             }
                             returnValue = true;
                         }
@@ -568,6 +594,8 @@ Item {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
                             }
+                        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                            // Send pitch bend to any active note - no display, so don't actually do anything here
                         }
                         returnValue = true;
                     }
@@ -585,6 +613,15 @@ Item {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
                             }
+                        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                            // Send pitch bend to any held note
+                            let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                            if (stepNote) {
+                                if (_private.stepKeyPitchBend[stepButtonIndex] < 1) {
+                                    _private.stepKeyPitchBend[stepButtonIndex] = Math.min(_private.stepKeyPitchBend[stepButtonIndex] + 0.005, 1);
+                                    stepNote.sendPitchChange(Math.max(-8192, Math.min(_private.stepKeyPitchBend[stepButtonIndex] * 8192, 8191)));
+                                }
+                            }
                         }
                         returnValue = true;
                     }
@@ -600,6 +637,15 @@ Item {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
                             }
+                        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                            // Send pitch bend to any held note
+                            let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                            if (stepNote) {
+                                if (-1 < _private.stepKeyPitchBend[stepButtonIndex]) {
+                                    _private.stepKeyPitchBend[stepButtonIndex] = Math.max(-1, _private.stepKeyPitchBend[stepButtonIndex] - 0.005);
+                                    stepNote.sendPitchChange(Math.max(-8192, Math.min(_private.stepKeyPitchBend[stepButtonIndex] * 8192, 8191)));
+                                }
+                            }
                         }
                         returnValue = true;
                     }
@@ -609,14 +655,40 @@ Item {
             // K3 controls position
             case "KNOB2_TOUCHED":
                 component.ignoreHeldStepButtonsReleases();
+                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                    if (_private.heldStepButtons[stepButtonIndex]) {
+                        if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                            // Send mod wheel to any held note - no display, so don't actually do anything here
+                            returnValue = true;
+                        }
+                    }
+                }
                 break;
             case "KNOB2_RELEASED":
                 break;
             case "KNOB2_UP":
                 component.ignoreHeldStepButtonsReleases();
+                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                    if (_private.heldStepButtons[stepButtonIndex]) {
+                        // Send mod wheel to any held note
+                        _private.modulationValue = Math.max(0, Math.min(_private.modulationValue + 1, 127));
+                        returnValue = true;
+                        // The mod value is global, so only send that once per twist
+                        break;
+                    }
+                }
                 break;
             case "KNOB2_DOWN":
                 component.ignoreHeldStepButtonsReleases();
+                for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                    if (_private.heldStepButtons[stepButtonIndex]) {
+                        // Send mod wheel to any held note
+                        _private.modulationValue = Math.max(0, Math.min(_private.modulationValue - 1, 127));
+                        returnValue = true;
+                        // The mod value is global, so only send that once per twist
+                        break;
+                    }
+                }
                 break;
 
             // BK controls the note values (transposing the note, and also adjusting the current global captured note, so the display keeps making sense)
@@ -630,9 +702,12 @@ Item {
                         .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
                         , 1000);
                     returnValue = true;
-                } else if (_private.interactionMode === _private.interactionModeMusicalKeys && zynqtgui.altButtonPressed) {
-                    applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
-                    returnValue = true;
+                } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                    if (zynqtgui.altButtonPressed) {
+                        applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
+                        returnValue = true;
+                    } else {
+                    }
                 }
                 break;
             case "KNOB3_RELEASED":
@@ -661,9 +736,12 @@ Item {
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
-                } else if (_private.interactionMode === _private.interactionModeMusicalKeys && zynqtgui.altButtonPressed) {
-                    applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
-                    returnValue = true;
+                } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                    if (zynqtgui.altButtonPressed) {
+                        applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
+                        returnValue = true;
+                    } else {
+                    }
                 }
                 break;
             case "KNOB3_DOWN":
@@ -686,9 +764,12 @@ Item {
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
-                } else if (_private.interactionMode === _private.interactionModeMusicalKeys && zynqtgui.altButtonPressed) {
-                    applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
-                    returnValue = true;
+                } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                    if (zynqtgui.altButtonPressed) {
+                        applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
+                        returnValue = true;
+                    } else {
+                    }
                 }
                 break;
 
@@ -824,6 +905,13 @@ Item {
         // Should probably do a thing where we show when notes are playing when in keys mode...
         property var stepKeyNotes: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
         property var stepKeyNotesActive: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+        property var stepKeyPolyphonicAftertouch: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        // This is a floating point value from -1 through 1, with 0 being no pitch bend.
+        // This would really be usually for each channel instead of each note, but the active notes keep
+        // track of the active channels, so... we just store the local value per activation for ease of access
+        property var stepKeyPitchBend: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        property int modulationValue: 0
+        onModulationValueChanged: Zynthbox.PlayGridManager.modulation = modulationValue;
 
         property var velocityKeyNotesActive: []
 

@@ -105,6 +105,8 @@ Item {
             } else if (zynqtgui.backButtonPressed) {
                 zynqtgui.ignoreNextBackButtonPress = true;
                 // Clear the step contents when holding down the back button and pressing a step
+            } else if (zynqtgui.playButtonPressed) {
+                // Do nothing (the test play wants to happen on down)
             } else {
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
                 // console.log("Toggle entry for step", stepOffset + stepButtonIndex);
@@ -114,9 +116,9 @@ Item {
                     let removedAtLeastOne = false;
                     // First, let's see if any of the notes in our list are already on this position, and if so, remove them
                     for (var i = 0; i < _private.heardNotes.length; ++i) {
-                        var subNoteIndex = workingModel.subnoteIndex(padNoteRow, stepButtonIndex, _private.heardNotes[i].midiNote);
+                        var subNoteIndex = workingModel.subnoteIndex(padNoteRow, stepOffset + stepButtonIndex, _private.heardNotes[i].midiNote);
                         if (subNoteIndex > -1) {
-                            workingModel.removeSubnote(padNoteRow, stepButtonIndex, subNoteIndex);
+                            workingModel.removeSubnote(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex);
                             removedAtLeastOne = true;
                         }
                     }
@@ -125,10 +127,10 @@ Item {
                     if (!removedAtLeastOne) {
                         var subNoteIndex = -1;
                         for (var i = 0; i < _private.heardNotes.length; ++i) {
-                            subNoteIndex = workingModel.insertSubnoteSorted(padNoteRow, stepButtonIndex, _private.heardNotes[i]);
-                            workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subNoteIndex, "velocity", _private.heardVelocities[i]);
+                            subNoteIndex = workingModel.insertSubnoteSorted(padNoteRow, stepOffset + stepButtonIndex, _private.heardNotes[i]);
+                            workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "velocity", _private.heardVelocities[i]);
                             if (workingModel.defaultNoteDuration > 0) {
-                                workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subNoteIndex, "duration", workingModel.defaultNoteDuration);
+                                workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "duration", workingModel.defaultNoteDuration);
                             }
                         }
                     }
@@ -205,7 +207,14 @@ Item {
         }
     }
     function handleStepButtonDown(stepButtonIndex) {
-        if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+        if (_private.interactionMode === _private.interactionModeSequencer) {
+            if (zynqtgui.playButtonPressed) {
+                zynqtgui.ignoreNextPlayButtonPress = true;
+                // Test-play the entries of the step pressed while holding down the play button
+                let stepOffset = (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width;
+                _private.pattern.playStep(stepOffset + stepButtonIndex);
+            }
+        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
             if (zynqtgui.altButtonPressed) {
                 let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                 if (stepButtonIndex < 11) {

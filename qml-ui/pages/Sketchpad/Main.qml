@@ -233,7 +233,7 @@ ZUI.ScreenPage {
                 if (root.bottomStack.slotsBar.mixerButton.checked === false) {
                     applicationWindow().showOsd({
                                                     parameterName: "track_pan",
-                                                    description: qsTr("Track %1 Pan").arg(channelId),
+                                                    description: qsTr("Track %1 Pan").arg(channelId + 1),
                                                     start: -1,
                                                     stop: 1,
                                                     step: 0.05,

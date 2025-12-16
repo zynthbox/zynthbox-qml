@@ -85,6 +85,80 @@ Item {
         }
     }
 
+    /**
+     * Update the given property of the given pattern in the given track
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param propertyName The name of the property to change
+     * @param trackIndex The index of the track the clip is in
+     * @param clipIndex The index of the pattern in that track
+     */
+    function updatePatternProperty(sign, propertyName, trackIndex, clipIndex) {
+        let patternModel = _private.sequence.getByClipId(trackIndex, clipIndex);
+        let workingModel = patternModel.workingModel;
+        let initialValue = 0;
+        let valueAdjustment = 0;
+        if (propertyName == "stepLength") {
+            initialValue = workingModel.stepLength;
+        } else if (propertyName == "swing") {
+            initialValue = workingModel.swing;
+        } else if (propertyName == "patternLength") {
+            initialValue = workingModel.patternLength;
+        }
+
+        function valueSetter(value) {
+            let theDescripton = "";
+            let theDefaultValue = 0;
+            let theCurrentValue = 0;
+            let theStartValue = 0;
+            let theStopValue = 0;
+            let theCurrentValueLabel = "";
+            if (propertyName == "stepLength") {
+                theDescripton = qsTr("Clip %1%2 Step Length").arg(trackIndex + 1).arg(workingModel.clipName);
+                theStartValue = 1;
+                theStopValue = 6144;
+                workingModel.stepLength = ZUI.CommonUtils.clamp(value, theStartValue, theStopValue);
+                theDefaultValue = 24;
+                theCurrentValue = workingModel.stepLength;
+                theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
+            } else if (propertyName == "swing") {
+                theDescripton = qsTr("Clip %1%2 Swing").arg(trackIndex + 1).arg(workingModel.clipName);
+                theStartValue = 1;
+                theStopValue = 99;
+                workingModel.swing = ZUI.CommonUtils.clamp(value, theStartValue, theStopValue);
+                theDefaultValue = 50;
+                theCurrentValue = workingModel.swing;
+                theCurrentValueLabel = workingModel.swing == 50 ? qsTr("No Swing") : qsTr("%1").arg(workingModel.swing);
+            } else if (propertyName == "patternLength") {
+                theDescripton = qsTr("Clip %1%2 Pattern Length").arg(trackIndex + 1).arg(workingModel.clipName);
+                theStartValue = 1;
+                theStopValue = workingModel.bankLength * workingModel.width;
+                workingModel.patternLength = ZUI.CommonUtils.clamp(value, theStartValue, theStopValue);
+                theDefaultValue = workingModel.width;
+                theCurrentValue = workingModel.patternLength;
+                theCurrentValueLabel = workingModel.availableBars * workingModel.width === workingModel.patternLength
+                    ? workingModel.availableBars + " Bars"
+                    : "%1.%2 Bars".arg(workingModel.availableBars - 1).arg(workingModel.patternLength - ((workingModel.availableBars - 1) * workingModel.width))
+            }
+            applicationWindow().showOsd({
+                                            parameterName: "pattern_%1".arg(propertyName),
+                                            description: theDescripton,
+                                            start: theStartValue,
+                                            stop: theStopValue,
+                                            step: 1,
+                                            defaultValue: theDefaultValue,
+                                            currentValue: parseFloat(theCurrentValue),
+                                            startLabel: qsTr("%1").arg(theStartValue),
+                                            stopLabel: qsTr("%1").arg(theStopValue),
+                                            valueLabel: theCurrentValueLabel,
+                                            setValueFunction: valueSetter,
+                                            showValueLabel: true,
+                                            showResetToDefault: true,
+                                            showVisualZero: true
+                                        });
+        }
+        valueSetter(initialValue + sign);
+    }
+
     function handleStepButtonPress(stepButtonIndex) {
         let workingModel = _private.pattern.workingModel;
         if (_private.interactionMode === _private.interactionModeSequencer) {
@@ -522,6 +596,9 @@ Item {
                             } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(0, stepButtonIndex);
+                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Clip button + k1 adjusts the clip's step length
+                                    component.updatePatternProperty(0, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
                                 }
                             } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                                 // Send aftertouch to any held note - no display, so don't actually do anything for touched
@@ -546,6 +623,9 @@ Item {
                             } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(1, stepButtonIndex);
+                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Clip button + k1 adjusts the clip's step length
+                                    component.updatePatternProperty(1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
                                 }
                             } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                                 // Send aftertouch to any held note
@@ -575,6 +655,9 @@ Item {
                             } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(-1, stepButtonIndex);
+                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Clip button + k1 adjusts the clip's step length
+                                    component.updatePatternProperty(-1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
                                 }
                             } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                                 // Send aftertouch to any held note
@@ -602,6 +685,9 @@ Item {
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
+                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k2 adjusts the pattern's swing
+                                    component.updatePatternProperty(0, "swing", component.selectedChannel.id, stepButtonIndex - 10);
                             }
                         } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                             // Send pitch bend to any active note - no display, so don't actually do anything here
@@ -621,6 +707,9 @@ Item {
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
+                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k2 adjusts the pattern's swing
+                                component.updatePatternProperty(1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
                             }
                         } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                             // Send pitch bend to any held note
@@ -645,6 +734,9 @@ Item {
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
+                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k2 adjusts the pattern's swing
+                                    component.updatePatternProperty(-1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
                             }
                         } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                             // Send pitch bend to any held note
@@ -666,10 +758,15 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                        if (_private.interactionMode === _private.interactionModeTrackClip) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k3 adjusts pattern length
+                                component.updatePatternProperty(0, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                             // Send mod wheel to any held note - no display, so don't actually do anything here
-                            returnValue = true;
                         }
+                        returnValue = true;
                     }
                 }
                 break;
@@ -679,8 +776,15 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        // Send mod wheel to any held note
-                        _private.modulationValue = Math.max(0, Math.min(_private.modulationValue + 1, 127));
+                        if (_private.interactionMode === _private.interactionModeTrackClip) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k3 adjusts pattern length
+                                component.updatePatternProperty(1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                            // Send mod wheel to any held note
+                            _private.modulationValue = Math.max(0, Math.min(_private.modulationValue + 1, 127));
+                        }
                         returnValue = true;
                         // The mod value is global, so only send that once per twist
                         break;
@@ -691,8 +795,15 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        // Send mod wheel to any held note
-                        _private.modulationValue = Math.max(0, Math.min(_private.modulationValue - 1, 127));
+                        if (_private.interactionMode === _private.interactionModeTrackClip) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k3 adjusts pattern length
+                                component.updatePatternProperty(-1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                        } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                            // Send mod wheel to any held note
+                            _private.modulationValue = Math.max(0, Math.min(_private.modulationValue - 1, 127));
+                        }
                         returnValue = true;
                         // The mod value is global, so only send that once per twist
                         break;

@@ -999,6 +999,7 @@ Item {
         property color stepHighlighted: Qt.rgba(0.5, 1, 1)
         property color stepMuted: Qt.rgba(0.5, 0, 0)
         property color stepCurrent: Qt.rgba(1, 1, 0)
+        property color stepRecording: Qt.rgba(1, 0, 0)
 
         property color sequencerModeColor: Qt.rgba(1, 0, 0)
         property color trackClipModeColor: Qt.rgba(1, 1, 0)
@@ -1160,7 +1161,11 @@ Item {
                         }
                         let actualStepIndex = stepOffset + stepIndex;
                         if (workingModel.playbackPosition === actualStepIndex) {
-                            stepColor = Qt.tint(stepColor, _private.stepCurrent);
+                            if (workingModel.recordLive) {
+                                stepColor = _private.stepRecording;
+                            } else {
+                                stepColor = Qt.tint(stepColor, _private.stepCurrent);
+                            }
                         }
                     }
                     zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);

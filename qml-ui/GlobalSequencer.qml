@@ -909,37 +909,33 @@ Item {
                 break;
 
             case "SWITCH_PLAY":
-                if (_private.interactionMode === _private.interactionModeSequencer && (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed)) {
-                    // When in stepsequencer mode and holding down any step button, test-run that step's entries when you tap play
-                    // TODO This probably want to pass through PatternModel, using some manner of fanciness to reuse the scheduling logic so we can ensure all the various settings are included (like probability, ratchet, etc)
-                    component.ignoreHeldStepButtonsReleases();
+                if (_private.interactionMode === _private.interactionModeSequencer) {
+                    // When in stepsequencer mode and holding down any step button, and then tapping play, toggle enabled for that step to "on" (that is, clear enabled as it's the default)
                     let workingModel = _private.pattern.workingModel;
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
-                            let stepNote = workingModel.getNote(workingModel.activeBar, stepButtonIndex);
-                            if (stepNote) {
-                                for (let subnoteIndex = 0; subnoteIndex < stepNote.subnotes.length; ++subnoteIndex) {
-                                    let subnote = stepNote.subnotes[subnoteIndex];
-                                    let velocity = workingModel.subnoteMetadata(workingModel.activeBar, stepButtonIndex, subnoteIndex, "velocity");
-                                    if (typeof(velocity) === "undefined") {
-                                        velocity = 64;
-                                    }
-                                    let duration = workingModel.subnoteMetadata(workingModel.activeBar, stepButtonIndex, subnoteIndex, "duration");
-                                    if (typeof(duration) === "undefined") {
-                                        duration = _private.stepDuration;
-                                    }
-                                    let delay = workingModel.subnoteMetadata(workingModel.activeBar, stepButtonIndex, subnoteIndex, "delay");
-                                    if (typeof(delay) === "undefined") {
-                                        delay = 0;
-                                    }
-                                    Zynthbox.PlayGridManager.scheduleNote(subnote.midiNote, 0, true, velocity, duration, delay, subnote.sketchpadTrack);
-                                }
-                            }
+                            workingModel.setKeyedDataValue(workingModel.barOffset + workingModel.activeBar, stepButtonIndex, "enabled", undefined);
+                            component.ignoreHeldStepButtonsReleases();
+                            returnValue = true;
                         }
                     }
-                    returnValue = true;
                 } else {
                     // Don't do anything with the play button unless a step button is held down
+                }
+                break;
+            case "SWITCH_STOP":
+                if (_private.interactionMode === _private.interactionModeSequencer) {
+                    // When in stepsequencer mode and holding down any step button, and then tapping stop, toggle enabled for that step to "off" (that is, set the value to false)
+                    let workingModel = _private.pattern.workingModel;
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            workingModel.setKeyedDataValue(workingModel.barOffset + workingModel.activeBar, stepButtonIndex, "enabled", false);
+                            component.ignoreHeldStepButtonsReleases();
+                            returnValue = true;
+                        }
+                    }
+                } else {
+                    // Don't do anything with the stop button unless a step button is held down
                 }
                 break;
             case "SWITCH_MODE_RELEASED":
@@ -1001,7 +997,8 @@ Item {
         property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.8)
         property color stepWithNotes: Qt.rgba(0.5, 0.5, 1)
         property color stepHighlighted: Qt.rgba(0.5, 1, 1)
-        property color stepCurrent: Qt.rgba(1, 1, 0.0)
+        property color stepMuted: Qt.rgba(0.5, 0, 0)
+        property color stepCurrent: Qt.rgba(1, 1, 0)
 
         property color sequencerModeColor: Qt.rgba(1, 0, 0)
         property color trackClipModeColor: Qt.rgba(1, 1, 0)
@@ -1141,25 +1138,30 @@ Item {
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                     let stepColor = _private.stepEmpty;
-                    let stepNote = workingModel.getNote(workingModel.activeBar + workingModel.bankOffset, stepIndex)
-                    if (stepNote != null && stepNote.subnotes.length > 0) {
-                        let atLeastOneHeard = false;
-                        for (let subnoteIndex = 0; subnoteIndex < stepNote.subnotes.length; ++subnoteIndex) {
-                            let subnote = stepNote.subnotes[subnoteIndex];
-                            if (heardNoteValues.includes(subnote.midiNote)) {
-                                atLeastOneHeard = true;
-                                break;
+                    let stepMuted = (workingModel.getKeyedDataValue(workingModel.activeBar + workingModel.barOffset, stepIndex, "enabled") === false);
+                    if (stepMuted) {
+                        stepColor = _private.stepMuted;
+                    } else {
+                        let stepNote = workingModel.getNote(workingModel.activeBar + workingModel.bankOffset, stepIndex);
+                        if (stepNote != null && stepNote.subnotes.length > 0) {
+                            let atLeastOneHeard = false;
+                            for (let subnoteIndex = 0; subnoteIndex < stepNote.subnotes.length; ++subnoteIndex) {
+                                let subnote = stepNote.subnotes[subnoteIndex];
+                                if (heardNoteValues.includes(subnote.midiNote)) {
+                                    atLeastOneHeard = true;
+                                    break;
+                                }
+                            }
+                            if (atLeastOneHeard) {
+                                stepColor = _private.stepWithNotes;
+                            } else {
+                                stepColor = _private.stepWithNotesDimmed;
                             }
                         }
-                        if (atLeastOneHeard) {
-                            stepColor = _private.stepWithNotes;
-                        } else {
-                            stepColor = _private.stepWithNotesDimmed;
+                        let actualStepIndex = stepOffset + stepIndex;
+                        if (workingModel.playbackPosition === actualStepIndex) {
+                            stepColor = Qt.tint(stepColor, _private.stepCurrent);
                         }
-                    }
-                    let actualStepIndex = stepOffset + stepIndex;
-                    if (workingModel.playbackPosition === actualStepIndex) {
-                        stepColor = Qt.tint(stepColor, _private.stepCurrent);
                     }
                     zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);
                 }
@@ -1274,7 +1276,7 @@ Item {
                 if (slotFilled === false) {
                     zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepEmpty, 1.0);
                 } else if (slotMuted) {
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(1, 0.0, 0.0, 0.0), 1.0);
+                    zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepMuted, 1.0);
                 } else {
                     if (stepIndex < 15) {
                         zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + slotGain, 0.01), 1.0);
@@ -1371,6 +1373,7 @@ Item {
         onOctaveChanged: _private.handlePatternDataChange()
         onPitchChanged: _private.handlePatternDataChange()
         onIsPlayingChanged: _private.handlePatternDataChange()
+        onLastModifiedChanged: _private.updateLedColors()
     }
     Connections {
         target: Zynthbox.MidiRouter

@@ -35,6 +35,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 ZUI.ScreenPage {
     id: root
@@ -1198,7 +1199,7 @@ ZUI.ScreenPage {
         ColumnLayout {
             anchors.fill: parent
             anchors.bottomMargin: Kirigami.Units.largeSpacing
-            spacing: PlasmaCore.Theme.spacing
+            spacing: ZUI2.Theme.spacing
 
             QQC2.Control {
                 Layout.fillWidth: true
@@ -1233,7 +1234,7 @@ ZUI.ScreenPage {
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: PlasmaCore.Theme.spacing
+                        spacing: ZUI2.Theme.spacing
 
                         QQC2.Control
                         {
@@ -1245,7 +1246,7 @@ ZUI.ScreenPage {
                                 ColumnLayout {
                                     id: sketchpadSketchHeadersColumn
                                     anchors.fill: parent
-                                    spacing: PlasmaCore.Theme.spacing
+                                    spacing: ZUI2.Theme.spacing
 
                                     Item {
                                         Layout.fillWidth: true
@@ -1277,7 +1278,7 @@ ZUI.ScreenPage {
 
                                         ColumnLayout {
                                             anchors.fill: parent
-                                            spacing: PlasmaCore.Theme.spacing
+                                            spacing: ZUI2.Theme.spacing
                                             visible: bottomStack.slotsBar.mixerButton.checked
                                             QQC2.Button {
                                                 Layout.fillWidth: true
@@ -1890,7 +1891,7 @@ ZUI.ScreenPage {
                             Layout.fillWidth: false
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                            spacing: PlasmaCore.Theme.spacing
+                            spacing: ZUI2.Theme.spacing
 
                             // Common copy button to set the object to copy
                             QQC2.Button {
@@ -2057,4 +2058,40 @@ ZUI.ScreenPage {
             }
         }
     }
+
+
+Rectangle {
+    color: "pink"
+    height: 10
+    width: 10*3
+    Row {
+        Rectangle {
+            height: 10
+            width: height
+            color: Kirigami.Theme.backgroundColor
+        }
+
+         Rectangle {
+            height: 10
+            width: height
+            color: PlasmaCore.Theme.backgroundColor
+        }
+
+         Rectangle {
+            height: 10
+            width: height
+            color: PlasmaCore.Theme.textColor
+        }
+
+        QQC2.Button {
+                // ZUI2.Theme.themeName: PlasmaCore.Theme.themeName
+
+            text: "Hekll<<" + ZUI2.Theme.wallpaperPath
+           onClicked: {
+            // ZUI2.Theme.themeName = PlasmaCore.Theme.themeName
+            console.log(ZUI2.Theme.themeName)
+           }
+        }
+    }
+}
 }

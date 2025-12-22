@@ -34,6 +34,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 QQC2.Pane {
     id: root
@@ -141,7 +142,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: PlasmaCore.Theme.spacing
+                spacing: ZUI2.Theme.spacing
 
                 BottomStackTabs {
                     id: buttonsColumn

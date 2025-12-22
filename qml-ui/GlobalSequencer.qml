@@ -687,7 +687,7 @@ Item {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
                             } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k2 adjusts the pattern's swing
-                                    component.updatePatternProperty(0, "swing", component.selectedChannel.id, stepButtonIndex - 10);
+                                component.updatePatternProperty(0, "swing", component.selectedChannel.id, stepButtonIndex - 10);
                             }
                         } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                             // Send pitch bend to any active note - no display, so don't actually do anything here
@@ -736,7 +736,7 @@ Item {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
                             } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k2 adjusts the pattern's swing
-                                    component.updatePatternProperty(-1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
+                                component.updatePatternProperty(-1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
                             }
                         } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                             // Send pitch bend to any held note
@@ -856,6 +856,56 @@ Item {
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
+                } else if (_private.interactionMode === _private.interactionModeSequencer) {
+                    let workingModel = _private.pattern.workingModel;
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            if (zynqtgui.altButtonPressed) {
+                                // Hold down a bar button and twist BK to transpose all that bar's notes
+                                if (stepButtonIndex < 8) {
+                                    workingModel.startLongOperation();
+                                    for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
+                                        workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, 1);
+                                    }
+                                    workingModel.endLongOperation();
+                                }
+                            } else {
+                                // Hold down a step button and twist BK to transpose that step's notes
+                                workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, 1);
+                                let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
+                                if (theNote) {
+                                    applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
+                                        .arg((workingModel.activeBar * workingModel.width) + stepButtonIndex + 1)
+                                        .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
+                                        , 1000);
+                                }
+                            }
+                            returnValue = true;
+                        }
+                    }
+                } else if (_private.interactionMode === _private.interactionModeTrackClip) {
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Hold down a clip button and twist BK to transpose all notes in that clip
+                                let workingModel = _private.sequence.getClipById(component.selectedChannel.id, stepButtonIndex - 10).workingModel;
+                                workingModel.startLongOperation();
+                                let allDone = false;
+                                for (let row = 0; row < workingModel.bankLength; ++row) {
+                                    for (let column = 0; column < workingModel.width; ++column) {
+                                        if ((row * workingModel.width) + column == workingModel.patternLength) {
+                                            allDone = true;
+                                            break;
+                                        }
+                                        workingModel.transposeNote(row, column, 1);
+                                    }
+                                    if (allDone) { break; }
+                                }
+                                workingModel.endLongOperation();
+                                returnValue = true;
+                            }
+                        }
+                    }
                 } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                     if (zynqtgui.altButtonPressed) {
                         applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
@@ -884,6 +934,56 @@ Item {
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                     _private.starNote.setOn(_private.starVelocity);
                     returnValue = true;
+                } else if (_private.interactionMode === _private.interactionModeSequencer) {
+                    let workingModel = _private.pattern.workingModel;
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            if (zynqtgui.altButtonPressed) {
+                                // Hold down a bar button and twist BK to transpose all that bar's notes
+                                if (stepButtonIndex < 8) {
+                                    workingModel.startLongOperation();
+                                    for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
+                                        workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, -1);
+                                    }
+                                    workingModel.endLongOperation();
+                                }
+                            } else {
+                                // Hold down a step button and twist BK to transpose that step's notes
+                                workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, -1);
+                                let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
+                                if (theNote) {
+                                    applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
+                                        .arg((workingModel.activeBar * workingModel.width) + stepButtonIndex + 1)
+                                        .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
+                                        , 1000);
+                                }
+                            }
+                            returnValue = true;
+                        }
+                    }
+                } else if (_private.interactionMode === _private.interactionModeTrackClip) {
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex]) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Hold down a clip button and twist BK to transpose all notes in that clip
+                                let workingModel = _private.sequence.getClipById(component.selectedChannel.id, stepButtonIndex - 10).workingModel;
+                                workingModel.startLongOperation();
+                                let allDone = false;
+                                for (let row = 0; row < workingModel.bankLength; ++row) {
+                                    for (let column = 0; column < workingModel.width; ++column) {
+                                        if ((row * workingModel.width) + column == workingModel.patternLength) {
+                                            allDone = true;
+                                            break;
+                                        }
+                                        workingModel.transposeNote(row, column, -1);
+                                    }
+                                    if (allDone) { break; }
+                                }
+                                workingModel.endLongOperation();
+                                returnValue = true;
+                            }
+                        }
+                    }
                 } else if (_private.interactionMode === _private.interactionModeMusicalKeys) {
                     if (zynqtgui.altButtonPressed) {
                         applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);

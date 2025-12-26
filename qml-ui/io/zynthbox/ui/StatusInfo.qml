@@ -31,6 +31,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import "private" as Private
 
 QQC2.Pane
@@ -451,8 +453,8 @@ QQC2.Pane
                 GridLayout {
                     anchors.fill: parent
                     columns: 3
-                    rowSpacing:  PlasmaCore.Theme.padding
-                    columnSpacing: PlasmaCore.Theme.padding
+                    rowSpacing:  ZUI2.Theme.padding
+                    columnSpacing: ZUI2.Theme.padding
                     Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true

@@ -31,6 +31,8 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
 QQC2.Control {
@@ -84,7 +86,7 @@ QQC2.Control {
         // An overlay for channel muted state
         Rectangle {
             anchors.fill: parent
-            // anchors.margins: PlasmaCore.Theme.padding
+            // anchors.margins: ZUI2.Theme.padding
             color: Kirigami.Theme.negativeBackgroundColor
             opacity: root.channel.muted ? 0.7 : 0
 
@@ -129,7 +131,7 @@ QQC2.Control {
 
                 background: Rectangle {
                     color: root.color
-                    radius: PlasmaCore.Theme.radius
+                    radius: ZUI2.Theme.radius
                 }
             }
 

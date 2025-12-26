@@ -26,12 +26,13 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
+import io.zynthbox.ui2 1.0 as ZUI2
 
 ColumnLayout {
     id: root
 
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
-    spacing: PlasmaCore.Theme.spacing
+    spacing: ZUI2.Theme.spacing
     // Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
 
     QQC2.Button {

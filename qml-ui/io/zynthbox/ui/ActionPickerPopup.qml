@@ -29,7 +29,10 @@ import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
+
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 ZUI.Popup {
@@ -119,8 +122,8 @@ ZUI.Popup {
         anchors.fill: parent
         // rowSpacing: Kirigami.Units.largeSpacing
         // columnSpacing: Kirigami.Units.largeSpacing
-        rowSpacing: PlasmaCore.Theme.padding
-        columnSpacing: PlasmaCore.Theme.padding
+        rowSpacing: ZUI2.Theme.padding
+        columnSpacing: ZUI2.Theme.padding
         columns: component.columns
         rows: component.rows
         flow: GridLayout.TopToBottom

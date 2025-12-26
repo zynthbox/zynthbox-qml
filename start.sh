@@ -77,14 +77,14 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=0
 export QT_IM_MODULE=qtvirtualkeyboard
 export QT_QPA_PLATFORMTHEME=generic
 export QT_QUICK_CONTROLS_MOBILE=1
-export QT_QUICK_CONTROLS_STYLE=Plasma
+# export QT_QUICK_CONTROLS_STYLE=Plasma
 export QT_SCALE_FACTOR=1
 export QT_SCREEN_SCALE_FACTORS=1
 export XDG_CURRENT_DESKTOP=kde
 export XDG_DATA_DIRS=/usr/share
 export QT_MESSAGE_PATTERN="qml:%{if-debug}DEBUG:%{endif}%{if-info}INFO:%{endif}%{if-warning}WARNING:%{endif}%{if-critical}CRITICAL:%{endif}%{if-fatal}FATAL:%{endif}%{file}:%{line}:%{message}"
 export QT_VIRTUALKEYBOARD_STYLE=Zynthbox
-
+export QT_QUICK_CONTROLS_STYLE=Zynthbox
 if command -v kwin_x11 &> /dev/null; then
     kwin_x11 &
 

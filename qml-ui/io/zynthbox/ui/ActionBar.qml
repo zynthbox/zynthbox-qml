@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
+import io.zynthbox.ui2 1.0 as ZUI2
 
 import "private"
 
@@ -35,7 +36,7 @@ QQC2.ToolBar {
     id: root
 
     property Item currentPage
-    padding: PlasmaCore.Theme.padding
+    padding: ZUI2.Theme.padding
     // leftPadding: Kirigami.Units.smallSpacing
     // rightPadding: Kirigami.Units.smallSpacing
     // topPadding: Kirigami.Units.smallSpacing
@@ -49,7 +50,7 @@ QQC2.ToolBar {
     }
 
     contentItem: RowLayout {
-        spacing: PlasmaCore.Theme.spacing
+        spacing: ZUI2.Theme.spacing
         ActionButton {
             id: backButton
             Layout.fillWidth: true

@@ -26,7 +26,10 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
+
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import "../io/zynthbox/ui/private" as ZynthianPrivate
 
 import org.kde.kirigami 2.4 as Kirigami
@@ -136,7 +139,7 @@ ZUI.ScreenPage {
         highlighted: index === root.currentIndex
         width: parent.width
         implicitHeight: _layout.implicitHeight + topPadding + bottomPadding
-        padding: PlasmaCore.Theme.padding
+        padding: ZUI2.Theme.padding
 
         background: ZynthianPrivate.DelegateBackground {
             delegate: _delegate
@@ -146,7 +149,7 @@ ZUI.ScreenPage {
         contentItem: RowLayout {
             id: _layout
 
-            spacing: PlasmaCore.Theme.spacing
+            spacing: ZUI2.Theme.spacing
 
             QQC2.Label {
                 Layout.fillWidth: true
@@ -172,7 +175,7 @@ ZUI.ScreenPage {
                     color: Kirigami.Theme.backgroundColor
                     border.color: "#ff999999"
                     border.width: 2
-                    radius: PlasmaCore.Theme.radius
+                    radius: ZUI2.Theme.radius
                 }
 
             }
@@ -192,7 +195,7 @@ ZUI.ScreenPage {
         contentItem: Column {
             id: content
 
-            spacing: PlasmaCore.Theme.padding
+            spacing: ZUI2.Theme.padding
 
             EntryDelegate {
                 text: qsTr("Double Click Threshold Amount")

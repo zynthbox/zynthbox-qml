@@ -41,48 +41,151 @@ Item {
      * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the velocity for
      */
     function updateStepVelocity(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "velocity");
+    }
+    /**
+     * Update the duration of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the duration for
+     */
+    function updateStepDuration(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "duration");
+    }
+    /**
+     * Update the delay/position of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the delay/position for
+     */
+    function updateStepDelay(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "delay");
+    }
+    /**
+     * Update the delay/position of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the delay/position for
+     */
+    function updateStepPosition(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "delay");
+    }
+    /**
+     * Update the given property of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the property for
+     * @param propertyName The name of the property you wish to adjust (currently supported: velocity, duration, delay)
+     */
+    function updateStepProperty(sign, stepButtonIndex, propertyName) {
         let workingModel = _private.pattern.workingModel;
         let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
+        let stepIndex = padNoteRow * workingModel.width + stepButtonIndex;
         let subnoteIndices = [];
-        let subnoteVelocities = [];
-        let velocityAdjustment = 0;
+        let subnoteValues = [];
+        let valueAdjustment = 0;
+        let initialValue = undefined;
+        if (propertyName == "velocity") {
+            initialValue = workingModel.defaultVelocity;
+        }
 
         for (let i = 0; i < _private.heardNotes.length; ++i) {
             let subnoteIndex = workingModel.subnoteIndex(padNoteRow, stepButtonIndex, _private.heardNotes[i].midiNote);
             if (subnoteIndex > -1) {
                 subnoteIndices.push(subnoteIndex);
-                subnoteVelocities.push(workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndex, "velocity"));
+                let tempData = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndex, propertyName);
+                if (tempData == undefined) {
+                    tempData = 0;
+                }
+                subnoteValues.push(tempData);
             }
         }
-        // console.log(subnoteIndices, subnoteVelocities);
+        // console.log(subnoteIndices, subnoteValues);
         if (subnoteIndices.length > 0) {
             function valueSetter(value) {
-                velocityAdjustment = value;
-                // console.log("Adjusting velocity by", velocityAdjustment);
-                for (let i = 0; i < subnoteIndices.length; ++i) {
-                    workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], "velocity", ZUI.CommonUtils.clamp(subnoteVelocities[i] + velocityAdjustment, 1, 127));
+                valueAdjustment = value;
+                // console.log("Adjusting", propertyName, "by", valueAdjustment);
+                let theDescripton = "";
+                let theDefaultValue = 0;
+                let theCurrentValue = 0;
+                let theStartValue = 0;
+                let theStopValue = 0;
+                let theCurrentValueLabel = "";
+                if (propertyName == "velocity") {
+                    theDescripton = qsTr("Step %1 Entry %2 Velocity").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    theStartValue = -1;
+                    theStopValue = 127;
+                    for (let i = 0; i < subnoteIndices.length; ++i) {
+                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, ZUI.CommonUtils.clamp(subnoteValues[i] + valueAdjustment, theStartValue, theStopValue));
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], propertyName);
+                    if (theCurrentValue == -1) {
+                        theCurrentValueLabel = qsTr("Untriggered");
+                    } else if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("64 (default)");
+                    } else {
+                        theCurrentValueLabel = qsTr("%1").arg(theCurrentValue);
+                    }
+                } else if (propertyName == "duration") {
+                    theDescripton = qsTr("Step %1 Entry %2 Length").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    theStartValue = -1;
+                    theStopValue = 1024;
+                    for (let i = 0; i < subnoteIndices.length; ++i) {
+                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, ZUI.CommonUtils.clamp(subnoteValues[i] + valueAdjustment, theStartValue, theStopValue));
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], propertyName);
+                    if (theCurrentValue == -1) {
+                        if (workingModel.defaultNoteDuration === 0) {
+                            theCurrentValueLabel = qsTr("Use default note length (currently: step length %1)").arg(workingModel.stepLengthName(workingModel.stepLength));
+                        } else {
+                            theCurrentValueLabel = qsTr("Use default note length (currently: %1)").arg(workingModel.stepLengthName(workingModel.defaultNoteDuration));
+                        }
+                    } else if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("Use step length (currently %1)").arg(workingModel.stepLengthName(workingModel.stepLength));
+                    } else {
+                        theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
+                    }
+                } else if (propertyName == "delay" || propertyName == "position") {
+                    theDescripton = qsTr("Step %1 Entry %2 Position").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    theStartValue = -workingModel.stepLength;
+                    theStopValue = workingModel.stepLength;
+                    for (let i = 0; i < subnoteIndices.length; ++i) {
+                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], "delay", ZUI.CommonUtils.clamp(subnoteValues[i] + valueAdjustment, theStartValue, theStopValue));
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "delay");
+                    if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("On-grid (no adjustment)");
+                    } else if (theCurrentValue < 0) {
+                        theCurrentValueLabel = qsTr("-%1").arg(workingModel.stepLengthName(theCurrentValue));
+                    } else {
+                        theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
+                    }
                 }
-                let firstStepEntryVelocity = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "velocity");
-                // console.log("The first entry's velocity is", firstStepEntryVelocity);
+                // console.log("The first entry's", propertyName, "is", theCurrentValue);
                 applicationWindow().showOsd({
-                                                parameterName: "subnote_velocity",
-                                                description: qsTr("Step Entry %1 Velocity Adjustment").arg(subnoteIndices[0] + 1),
-                                                start: 1,
-                                                stop: 127,
+                                                parameterName: "subnote_value",
+                                                description: theDescripton,
+                                                start: theStartValue,
+                                                stop: theStopValue,
                                                 step: 1,
-                                                defaultValue: 64,
-                                                currentValue: parseFloat(firstStepEntryVelocity),
-                                                startLabel: "1",
-                                                stopLabel: "127",
-                                                valueLabel: qsTr("%1").arg(firstStepEntryVelocity),
+                                                defaultValue: initialValue,
+                                                currentValue: parseFloat(theCurrentValue),
+                                                startLabel: qsTr("%1").arg(theStartValue),
+                                                stopLabel: qsTr("%1").arg(theStopValue),
+                                                valueLabel: theCurrentValueLabel,
                                                 setValueFunction: valueSetter,
                                                 showValueLabel: true,
                                                 showResetToDefault: true,
                                                 showVisualZero: true
                                             });
-                component.handleStepDataChanged(padNoteRow * workingModel.width + stepButtonIndex);
+                if (sign != 0) {
+                    // sign 0 is a kind of shorthand for "just looking", don't preview things when nothing actually changed...
+                    component.handleStepDataChanged(stepIndex);
+                }
             }
-            valueSetter(velocityAdjustment + sign);
+            valueSetter(valueAdjustment + sign);
+        } else {
+            if (_private.heardNotes.length == 0) {
+                applicationWindow().showPassiveNotification(qsTr("Step %1 does not contain %2").arg(stepIndex + 1).arg(Zynthbox.Chords.shorthand(_private.heardNotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey)));
+            } else {
+                applicationWindow().showPassiveNotification(qsTr("Step %1 does not contain any of %2").arg(stepIndex + 1).arg(Zynthbox.Chords.shorthand(_private.heardNotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey)));
+            }
         }
     }
 
@@ -682,7 +785,7 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            // component.updateStepLength(0, stepButtonIndex);
+                            component.updateStepDuration(0, stepButtonIndex);
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
@@ -704,7 +807,7 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            // component.updateStepLength(1, stepButtonIndex);
+                            component.updateStepDuration(1, stepButtonIndex);
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
@@ -731,7 +834,7 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            // component.updateStepLength(-1, stepButtonIndex);
+                            component.updateStepDuration(-1, stepButtonIndex);
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
@@ -759,7 +862,9 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === _private.interactionModeTrackClip) {
+                        if (_private.interactionMode === _private.interactionModeSequencer) {
+                            component.updateStepPosition(0, stepButtonIndex);
+                        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k3 adjusts pattern length
                                 component.updatePatternProperty(0, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
@@ -777,7 +882,9 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === _private.interactionModeTrackClip) {
+                        if (_private.interactionMode === _private.interactionModeSequencer) {
+                            component.updateStepPosition(1, stepButtonIndex);
+                        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k3 adjusts pattern length
                                 component.updatePatternProperty(1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
@@ -796,7 +903,9 @@ Item {
                 component.ignoreHeldStepButtonsReleases();
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
-                        if (_private.interactionMode === _private.interactionModeTrackClip) {
+                        if (_private.interactionMode === _private.interactionModeSequencer) {
+                            component.updateStepPosition(-1, stepButtonIndex);
+                        } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k3 adjusts pattern length
                                 component.updatePatternProperty(-1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
@@ -1573,7 +1682,7 @@ Item {
             if (-1 < stepToAutoPreview && stepToAutoPreview < _private.pattern.workingModel.patternLength) {
                 if (zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 1 // If we're wanting to just always preview
                     || (zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 0 && Zynthbox.SyncTimer.timerRunning === false)) // Or if we're stopped, and want to preview when stopped
-                _private.pattern.workingModel.playStep(stepToAutoPreview);
+                _private.pattern.workingModel.playStep(stepToAutoPreview, true);
             }
             stepToAutoPreview = -1;
         }

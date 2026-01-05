@@ -80,6 +80,7 @@ Item {
                                                 showResetToDefault: true,
                                                 showVisualZero: true
                                             });
+                component.handleStepDataChanged(padNoteRow * workingModel.width + stepButtonIndex);
             }
             valueSetter(velocityAdjustment + sign);
         }
@@ -873,11 +874,13 @@ Item {
                                 // Hold down a step button and twist BK to transpose that step's notes
                                 workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, 1);
                                 let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
+                                let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
                                 if (theNote) {
                                     applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
-                                        .arg((workingModel.activeBar * workingModel.width) + stepButtonIndex + 1)
+                                        .arg(stepIndex + 1)
                                         .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
                                         , 1000);
+                                    component.handleStepDataChanged(stepIndex);
                                 }
                             }
                             returnValue = true;
@@ -951,11 +954,13 @@ Item {
                                 // Hold down a step button and twist BK to transpose that step's notes
                                 workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, -1);
                                 let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
+                                let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
                                 if (theNote) {
                                     applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
-                                        .arg((workingModel.activeBar * workingModel.width) + stepButtonIndex + 1)
+                                        .arg(stepIndex + 1)
                                         .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
                                         , 1000);
+                                    component.handleStepDataChanged(stepIndex);
                                 }
                             }
                             returnValue = true;
@@ -1549,6 +1554,28 @@ Item {
                     _private.noteListeningVelocities = [];
                 }
             }
+        }
+    }
+
+    // Call this function whenever something changes on a step which would directly impact the step's sound output
+    function handleStepDataChanged(stepIndex) {
+        stepDataAutoPreviewThrottle.stepToAutoPreview = stepIndex;
+        stepDataAutoPreviewThrottle.restart();
+    }
+    Timer {
+        id: stepDataAutoPreviewThrottle
+        // A bit of a wait, to ensure we hang back just a tiny bit, so when people do a bunch of knob twiddling, we don't fire too many tests...
+        interval: 50
+        repeat: false; running: false;
+        // To avoid many noisy noises, we only auto-preview a single step at a time (we allow editing multiple steps at the same time, but if we preview them all, it could end up pretty cacophonous)
+        property int stepToAutoPreview: -1
+        onTriggered: {
+            if (-1 < stepToAutoPreview && stepToAutoPreview < _private.pattern.workingModel.patternLength) {
+                if (zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 1 // If we're wanting to just always preview
+                    || (zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 0 && Zynthbox.SyncTimer.timerRunning === false)) // Or if we're stopped, and want to preview when stopped
+                _private.pattern.workingModel.playStep(stepToAutoPreview);
+            }
+            stepToAutoPreview = -1;
         }
     }
 

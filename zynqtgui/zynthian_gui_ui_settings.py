@@ -40,7 +40,9 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__doubleClickThreshold = int(self.zynqtgui.global_settings.value("UI/doubleClickThreshhold", 200))
         self.doubleClickThresholdChanged.emit()
         self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "false") == "true" else False
-        self.hardwareSequencerChanged.emit();
+        self.hardwareSequencerChanged.emit()
+        self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
+        self.hardwareSequencerPreviewStyleChanged.emit()
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
         self.__showCursor = True if os.environ.get("ZYNTHIAN_UI_ENABLE_CURSOR", "0") == "1" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
@@ -84,6 +86,21 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     hardwareSequencer = Property(bool, get_hardwareSequencer, set_hardwareSequencer, notify=hardwareSequencerChanged)
     ### END Property hardwareSequencer
+
+    ### BEGIN Property hardwareSequencerPreviewStyle
+    def get_hardwareSequencerPreviewStyle(self):
+        return self.__hardwareSequencerPreviewStyle
+
+    def set_hardwareSequencerPreviewStyle(self, value):
+        if value != self.__hardwareSequencerPreviewStyle:
+            self.__hardwareSequencerPreviewStyle = value
+            self.zynqtgui.global_settings.setValue("UI/hardwareSequencerPreviewStyle", self.__hardwareSequencerPreviewStyle)
+            self.hardwareSequencerPreviewStyleChanged.emit()
+
+    hardwareSequencerPreviewStyleChanged = Signal()
+
+    hardwareSequencerPreviewStyle = Property(int, get_hardwareSequencerPreviewStyle, set_hardwareSequencerPreviewStyle, notify=hardwareSequencerPreviewStyleChanged)
+    ### END Property hardwareSequencerPreviewStyle
 
     ### BEGIN Property debugMode
     def get_debugMode(self):

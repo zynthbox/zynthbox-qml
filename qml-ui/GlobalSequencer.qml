@@ -1255,8 +1255,8 @@ Item {
             updateLedColors();
         }
 
-        property color stepEmpty: Qt.rgba(0.5, 0.5, 0.5)
-        property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.8)
+        property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
+        property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.7)
         property color stepWithNotes: Qt.rgba(0.5, 0.5, 1)
         property color stepHighlighted: Qt.rgba(0.5, 1, 1)
         property color stepMuted: Qt.rgba(0.5, 0, 0)

@@ -82,7 +82,7 @@ ZUI.Popup {
 
     readonly property bool invertedScale: zynqtgui.osd.start > zynqtgui.osd.stop
     Item {
-        implicitWidth: Kirigami.Units.gridUnit * 20
+        implicitWidth: Kirigami.Units.gridUnit * 30
         implicitHeight: Kirigami.Units.gridUnit * 10
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.View

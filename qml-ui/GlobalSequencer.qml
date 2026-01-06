@@ -79,21 +79,34 @@ Item {
         let stepIndex = padNoteRow * workingModel.width + stepButtonIndex;
         let subnoteIndices = [];
         let subnoteValues = [];
+        let subnoteDifferences = [];
         let valueAdjustment = 0;
-        let initialValue = undefined;
+        let initialValue = 0;
         if (propertyName == "velocity") {
             initialValue = workingModel.defaultVelocity;
         }
 
+        let stepNote = workingModel.getNote(padNoteRow, stepButtonIndex);
+        let totalSubnoteCount = 0;
+        if (stepNote != null) {
+            totalSubnoteCount = stepNote.subnotes.length;
+        }
         for (let i = 0; i < _private.heardNotes.length; ++i) {
             let subnoteIndex = workingModel.subnoteIndex(padNoteRow, stepButtonIndex, _private.heardNotes[i].midiNote);
             if (subnoteIndex > -1) {
                 subnoteIndices.push(subnoteIndex);
                 let tempData = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndex, propertyName);
                 if (tempData == undefined) {
-                    tempData = 0;
+                    tempData = initialValue;
                 }
                 subnoteValues.push(tempData);
+                if (i == 0) {
+                    // The first element has no difference to itself (that is, that's our reference)
+                    subnoteDifferences.push(0);
+                } else {
+                    // All subsequent entries are those entries' difference from the reference value
+                    subnoteDifferences.push(tempData - subnoteDifferences[0]);
+                }
             }
         }
         // console.log(subnoteIndices, subnoteValues);
@@ -102,39 +115,69 @@ Item {
                 valueAdjustment = value;
                 // console.log("Adjusting", propertyName, "by", valueAdjustment);
                 let theDescripton = "";
-                let theDefaultValue = 0;
+                let theDefaultValue = undefined;
                 let theCurrentValue = 0;
                 let theStartValue = 0;
                 let theStopValue = 0;
                 let theCurrentValueLabel = "";
+                let doPreview = false;
+                function setValue(value) {
+                    for (let i = 0; i < subnoteIndices.length; ++i) {
+                        let newValue = ZUI.CommonUtils.clamp(value + subnoteDifferences[i], theStartValue, theStopValue);
+                        if (newValue == initialValue) {
+                            // If we're setting to the property's default value, then we really should be *unsetting* it instead
+                            newValue = theDefaultValue;
+                        }
+                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, newValue);
+                    }
+                    component.handleStepDataChanged(stepIndex);
+                }
                 if (propertyName == "velocity") {
-                    theDescripton = qsTr("Step %1 Entry %2 Velocity").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Velocity for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Velocity for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Velocity").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
                     theStartValue = -1;
                     theStopValue = 127;
-                    for (let i = 0; i < subnoteIndices.length; ++i) {
-                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, ZUI.CommonUtils.clamp(subnoteValues[i] + valueAdjustment, theStartValue, theStopValue));
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
                     }
                     theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], propertyName);
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
                     if (theCurrentValue == -1) {
                         theCurrentValueLabel = qsTr("Untriggered");
                     } else if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("64 (default)");
+                        theCurrentValueLabel = qsTr("%1 (auto, clip default)").arg(workingModel.defaultVelocity);
                     } else {
                         theCurrentValueLabel = qsTr("%1").arg(theCurrentValue);
                     }
                 } else if (propertyName == "duration") {
-                    theDescripton = qsTr("Step %1 Entry %2 Length").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Length for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Length for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Length").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
                     theStartValue = -1;
                     theStopValue = 1024;
-                    for (let i = 0; i < subnoteIndices.length; ++i) {
-                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, ZUI.CommonUtils.clamp(subnoteValues[i] + valueAdjustment, theStartValue, theStopValue));
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
                     }
                     theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], propertyName);
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
                     if (theCurrentValue == -1) {
                         if (workingModel.defaultNoteDuration === 0) {
-                            theCurrentValueLabel = qsTr("Use default note length (currently: step length %1)").arg(workingModel.stepLengthName(workingModel.stepLength));
+                            theCurrentValueLabel = qsTr("Use default note length (currently step length: %1)").arg(workingModel.stepLengthName(workingModel.stepLength));
                         } else {
-                            theCurrentValueLabel = qsTr("Use default note length (currently: %1)").arg(workingModel.stepLengthName(workingModel.defaultNoteDuration));
+                            theCurrentValueLabel = qsTr("Use default note length (currently %1)").arg(workingModel.stepLengthName(workingModel.defaultNoteDuration));
                         }
                     } else if (theCurrentValue == 0) {
                         theCurrentValueLabel = qsTr("Use step length (currently %1)").arg(workingModel.stepLengthName(workingModel.stepLength));
@@ -142,13 +185,22 @@ Item {
                         theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
                     }
                 } else if (propertyName == "delay" || propertyName == "position") {
-                    theDescripton = qsTr("Step %1 Entry %2 Position").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Position for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Position for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Position").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
                     theStartValue = -workingModel.stepLength;
                     theStopValue = workingModel.stepLength;
-                    for (let i = 0; i < subnoteIndices.length; ++i) {
-                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], "delay", ZUI.CommonUtils.clamp(subnoteValues[i] + valueAdjustment, theStartValue, theStopValue));
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
                     }
                     theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "delay");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
                     if (theCurrentValue == 0) {
                         theCurrentValueLabel = qsTr("On-grid (no adjustment)");
                     } else if (theCurrentValue < 0) {
@@ -169,15 +221,11 @@ Item {
                                                 startLabel: qsTr("%1").arg(theStartValue),
                                                 stopLabel: qsTr("%1").arg(theStopValue),
                                                 valueLabel: theCurrentValueLabel,
-                                                setValueFunction: valueSetter,
+                                                setValueFunction: setValue,
                                                 showValueLabel: true,
                                                 showResetToDefault: true,
-                                                showVisualZero: true
+                                                showVisualZero: false
                                             });
-                if (sign != 0) {
-                    // sign 0 is a kind of shorthand for "just looking", don't preview things when nothing actually changed...
-                    component.handleStepDataChanged(stepIndex);
-                }
             }
             valueSetter(valueAdjustment + sign);
         } else {
@@ -1683,6 +1731,7 @@ Item {
                 if (zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 1 // If we're wanting to just always preview
                     || (zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 0 && Zynthbox.SyncTimer.timerRunning === false)) // Or if we're stopped, and want to preview when stopped
                 _private.pattern.workingModel.playStep(stepToAutoPreview, true);
+                // TODO How do we deal reasonably with negative positions in our step's data? Preview the previous step at the same time maybe?
             }
             stepToAutoPreview = -1;
         }

@@ -87,14 +87,13 @@ GridLayout {
             }
         }
 
-        Image {
+        Zynthbox.PatternModelVisualiserItem {
             id: patternVisualiser
             Layout.fillWidth: true
             Layout.fillHeight: true
-            smooth: false
 
             visible: controlObj != null && controlObj.clipChannel != null && root.pattern != null
-            source: root.pattern && controlObj.clipChannel ? root.pattern.thumbnailUrl : ""
+            patternModel: root.pattern && controlObj.clipChannel ? root.pattern : null
             Rectangle { // Progress
                 anchors {
                     top: parent.top

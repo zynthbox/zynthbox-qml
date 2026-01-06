@@ -1700,13 +1700,11 @@ QQC2.Pane {
 
                                         visible: root.pattern != null
 
-                                        Image {
+                                        Zynthbox.PatternModelVisualiserItem {
                                             id: patternVisualiser
 
                                             anchors.fill: parent
-                                            smooth: false
-                                            asynchronous: true
-                                            source: root.pattern ? root.pattern.thumbnailUrl : ""
+                                            patternModel: root.pattern
                                             Rectangle { // Progress
                                                 anchors {
                                                     top: parent.top

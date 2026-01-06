@@ -1008,7 +1008,7 @@ ZUI.BasePlayGrid {
                                         horizontalAlignment: Text.AlignHCenter
                                         text: clipPicker.clipPattern ? "%1%2".arg(clipPicker.clipPattern.sketchpadTrack + 1).arg(String.fromCharCode(clipPicker.clipIndex + 97)) : ""
                                     }
-                                    // Image {
+                                    // Zynthbox.PatternModelVisualiserItem {
                                     //     id: patternBarsVisualiser
                                     //     visible: _private.associatedChannel !== null && _private.associatedChannel.trackType !== "sample-loop"
                                     //     anchors {
@@ -1018,8 +1018,7 @@ ZUI.BasePlayGrid {
                                     //         margins: 2
                                     //     }
                                     //     height: parent.height * 0.3
-                                    //     source: clipPicker.clipPattern ? clipPicker.clipPattern.thumbnailUrl : ""
-                                    //     asynchronous: true
+                                    //     patternModel: clipPicker.clipPattern
                                     //     Rectangle {
                                     //         anchors {
                                     //             top: parent.top
@@ -2106,7 +2105,7 @@ ZUI.BasePlayGrid {
                         Item {
                             Layout.preferredWidth: parent.width / 2
                             Layout.fillHeight: true
-                            Image {
+                            Zynthbox.PatternModelVisualiserItem {
                                 id: patternBarsVisualiser
                                 visible: !patternBarsLayout.channelIsLoopType
                                 anchors {
@@ -2116,8 +2115,7 @@ ZUI.BasePlayGrid {
                                     bottom: parent.verticalCenter
                                     bottomMargin: Kirigami.Units.largeSpacing
                                 }
-                                source: _private.activePatternModel ? _private.activePatternModel.thumbnailUrl : ""
-                                asynchronous: true
+                                patternModel: _private.activePatternModel
                                 Rectangle {
                                     anchors {
                                         top: parent.top

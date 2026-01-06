@@ -2536,7 +2536,7 @@ class zynthian_gui(QObject):
         if not lib_zyncoder: return
         last_zynswitch_index = lib_zyncoder.get_last_zynswitch_index()
         i = 0
-        kit_version = os.environ.get("ZYNTHIAN_KIT_VERSION", "Z2_V4")
+        wiring_layout = os.environ.get("ZYNTHIAN_WIRING_LAYOUT", "Z2_V4")
 
         while i<=last_zynswitch_index:
             # Disable long press detection by setting to a very high value of 2 billion dtus which is 33.33 minutes' worth - this is a long time
@@ -2557,7 +2557,7 @@ class zynthian_gui(QObject):
                     # When 1-5 hw button is pressed during that 5000ms, * button state is retained and hence stop timer.
                     QMetaObject.invokeMethod(self.tracksModTimer, "stop", Qt.QueuedConnection)
 
-                if kit_version == "Z2_V4" or kit_version == "Z1_V1":
+                if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
                     # Handle button press event
                     if i == 4:
                         self.menuButtonPressed = True
@@ -2707,7 +2707,7 @@ class zynthian_gui(QObject):
             elif dtus > 0:
                 # logging.error("key release: {} {}".format(i, dtus))
 
-                if kit_version == "Z2_V4" or kit_version == "Z1_V1":
+                if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
                     # Handle button release event
                     if i == 4:
                         self.menuButtonPressed = False
@@ -2909,9 +2909,9 @@ class zynthian_gui(QObject):
 
     def fake_key_event_for_zynswitch(self, i : int, press : bool):
         fake_key = None
-        kit_version = os.environ.get("ZYNTHIAN_KIT_VERSION", "Z2_V4")
+        wiring_layout = os.environ.get("ZYNTHIAN_WIRING_LAYOUT", "Z2_V4")
 
-        if kit_version == "Z2_V4" or kit_version == "Z1_V1":
+        if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
             # ALT
             if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 17:
                 fake_key = Key.space

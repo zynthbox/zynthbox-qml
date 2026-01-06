@@ -150,15 +150,13 @@ ColumnLayout {
                         x: visible ? ZUI.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
                     }
                 }
-                Image {
+                Zynthbox.PatternModelVisualiserItem {
                     anchors.fill: parent
                     anchors.margins: 2
-                    smooth: false
                     visible: root.visible && root.channel.trackType !== "sample-loop" &&
                              clipDelegate.pattern &&
                              clipDelegate.pattern.hasNotes
-                    source: clipDelegate.pattern ? clipDelegate.pattern.thumbnailUrl : ""
-                    cache: false
+                    patternModel: clipDelegate.pattern
                     Rectangle {
                         anchors {
                             top: parent.top

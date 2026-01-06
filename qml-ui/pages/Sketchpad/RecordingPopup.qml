@@ -1135,7 +1135,7 @@ ZUI.Popup {
                                     }
                                 }
                             }
-                            Image {
+                            Zynthbox.PatternModelVisualiserItem {
                                 id: patternVisualiser
 
                                 visible: _private.selectedPattern !== null && recordingTypeSettingsStack.currentIndex === 1
@@ -1144,13 +1144,11 @@ ZUI.Popup {
                                     fill: parent
                                     // margins: Kirigami.Units.smallSpacing
                                 }
-                                smooth: false
-                                asynchronous: true
                                 Timer {
                                     id: patternVisualiserThumbnailUpdater
                                     interval: 10; repeat: false; running: false;
                                     onTriggered: {
-                                        patternVisualiser.source = _private.selectedPattern.thumbnailUrl;
+                                        patternVisualiser.patternModel = _private.selectedPattern;
                                     }
                                 }
                                 Connections {

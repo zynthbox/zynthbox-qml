@@ -159,9 +159,9 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.update_botton_colors_timer.setSingleShot(True)
         self.update_botton_colors_timer.timeout.connect(self.update_button_colors_actual)
 
-        kit_version = os.getenv("ZYNTHIAN_KIT_VERSION")
+        wiring_layout = os.getenv("ZYNTHIAN_WIRING_LAYOUT")
 
-        if kit_version == "Z2_V4" or kit_version == "Z1_V1":
+        if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
             self.button_menu = 0
             self.button_1 = 1
             self.button_2 = 2

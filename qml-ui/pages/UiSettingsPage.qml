@@ -244,15 +244,17 @@ ZUI.ScreenPage {
                     ? qsTr("When Stopped")
                     : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 1
                         ? qsTr("Always")
-                        : qsTr("Never")
+                        : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 2
+                            ? qsTr("Never")
+                            : qsTr("Step Release")
                 index: 2
-                onIncrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.min(2, zynqtgui.ui_settings.hardwareSequencerPreviewStyle + 1)
+                onIncrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.min(3, zynqtgui.ui_settings.hardwareSequencerPreviewStyle + 1)
                 onDecrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.max(0, zynqtgui.ui_settings.hardwareSequencerPreviewStyle - 1)
 
                 QQC2.Slider {
                     width: Kirigami.Units.gridUnit * 20
                     from: 0
-                    to: 2
+                    to: 3
                     stepSize: 1
                     value: zynqtgui.ui_settings.hardwareSequencerPreviewStyle
                     onPressedChanged: {
@@ -264,10 +266,39 @@ ZUI.ScreenPage {
             }
 
             EntryDelegate {
+                text: qsTr("Hardware Sequencer Edit Step Notes")
+                infoText: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 0
+                    ? qsTr("Selection")
+                    : qsTr("All Entries")
+                index: 3
+                onIncrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.min(1, zynqtgui.ui_settings.hardwareSequencerEditInclusions + 1)
+                onDecrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.max(0, zynqtgui.ui_settings.hardwareSequencerEditInclusions - 1)
+
+                QQC2.Switch {
+                    checked: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1
+                    onClicked: {
+                        zynqtgui.ui_settings.hardwareSequencerEditInclusions = checked ? 1 : 0;
+                    }
+                }
+                // QQC2.Slider {
+                //     width: Kirigami.Units.gridUnit * 20
+                //     from: 0
+                //     to: 1
+                //     stepSize: 1
+                //     value: zynqtgui.ui_settings.hardwareSequencerEditInclusions
+                //     onPressedChanged: {
+                //         // Set the value on release to save the value only when needed
+                //         if (!pressed)
+                //             zynqtgui.ui_settings.hardwareSequencerEditInclusions = value;
+                //     }
+                // }
+            }
+
+            EntryDelegate {
                 text: qsTr("Debug Mode")
                 infoText: zynqtgui.ui_settings.debugMode ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.debugMode = !zynqtgui.ui_settings.debugMode
-                index: 3
+                index: 4
                 onIncrementValue: zynqtgui.ui_settings.debugMode = true
                 onDecrementValue: zynqtgui.ui_settings.debugMode = false
 
@@ -284,7 +315,7 @@ ZUI.ScreenPage {
                 text: qsTr("Show Cursor")
                 infoText: zynqtgui.ui_settings.showCursor ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.showCursor = !zynqtgui.ui_settings.showCursor
-                index: 4
+                index: 5
                 onIncrementValue: zynqtgui.ui_settings.showCursor = true
                 onDecrementValue: zynqtgui.ui_settings.showCursor = false
 

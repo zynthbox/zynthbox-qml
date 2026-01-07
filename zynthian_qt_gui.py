@@ -1905,13 +1905,21 @@ class zynthian_gui(QObject):
         if len(params) == 0:
             params = [-1]
 
+        def printJSValueError(initialString, jsValue):
+            fileName = jsValue.property("fileName").toString()
+            lineNumber = jsValue.property("lineNumber").toInt()
+            errorDescription = jsValue.property("message").toString()
+            logging.error(f"{initialString}:\n{fileName}:{lineNumber}: {errorDescription}")
         # Before anything else, try and ask the main window whether there's anything to be done
         try:
             cuia_callback = zynthian_gui_config.top.property("cuiaCallback")
             if cuia_callback is not None and cuia_callback.isCallable():
                 _result = cuia_callback.call([cuia, originId, track, slot, params[0]])
-                if _result is not None and _result.toBool():
-                    Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
+                if _result is not None:
+                    if _result.isError():
+                        printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                    elif _result.toBool():
+                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
                     return
         except Exception as e:
             logging.error("Attempted to run callbacks on the main window, which apparently failed badly, with the error: {}".format(e))
@@ -1925,9 +1933,12 @@ class zynthian_gui(QObject):
                 if cuia_callback is not None and cuia_callback.isCallable() and visible:
                     _result = cuia_callback.call([cuia, originId, track, slot, params[0]])
 
-                    if _result is not None and _result.toBool():
-                        # If cuiaCallback returned true, then CUIA event has been handled by qml. Return
-                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
+                    if _result is not None:
+                        if _result.isError():
+                            printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                        elif _result.toBool():
+                            # If cuiaCallback returned true, then CUIA event has been handled by qml. Return
+                            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
                         return
 
                 if visible:
@@ -1950,8 +1961,11 @@ class zynthian_gui(QObject):
                 js_value = self.current_qml_page_prop.property("cuiaCallback")
                 if js_value is not None and js_value.isCallable():
                     _result = js_value.call([cuia, originId, track, slot, params[0]])
-                    if _result is not None and _result.toBool():
-                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
+                    if _result is not None:
+                        if _result.isError():
+                            printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                        elif _result.toBool():
+                            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
                         return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))

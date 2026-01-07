@@ -34,6 +34,10 @@ Item {
     readonly property alias heardVelocities: _private.heardVelocities
 
     property QtObject selectedChannel: null
+    readonly property alias parameterPage: _private.parameterPage
+    function setParameterPage(parameterPage) {
+        _private.parameterPage = Math.max(0, Math.min(parameterPage, 2));
+    }
 
     /**
      * Update the velocity of all matching subnotes on the given step
@@ -1238,8 +1242,10 @@ Item {
 
     QtObject {
         id: _private
+        property int parameterPage: 0
         property QtObject sequence: component.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
         property QtObject pattern: sequence && component.selectedChannel ? sequence.getByClipId(component.selectedChannel.id, component.selectedChannel.selectedClip) : null
+        property QtObject patternKeyNote: pattern ? Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey), pattern.sketchpadTrack) : null
         // property QtObject clip: component.selectedChannel ? component.selectedChannel.getClipsModelById(component.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
         onPatternChanged: {
             updateSlotPassthroughClients();
@@ -1590,6 +1596,12 @@ Item {
                         break;
                 }
             }
+            // the star note is a thing when the star button itself is pressed, otherwise we have to test that the pattern's root key is pressed
+            if ((_private.starNote && _private.starNote.isPlaying) || (_private.patternKeyNote && _private.patternKeyNote.isPlaying)) {
+                zynqtgui.led_config.setStarButtonColor(zynqtgui.theme_chooser.noteColors[((_private.starNote ? _private.starNote.midiNote : _private.patternKeyNote.midiNote) % 12) + 108]);
+            } else {
+                zynqtgui.led_config.setStarButtonColor(_private.stepWithNotesDimmed);
+            }
         }
     }
     Repeater {
@@ -1650,6 +1662,14 @@ Item {
         onPitchChanged: _private.handlePatternDataChange()
         onIsPlayingChanged: _private.handlePatternDataChange()
         onLastModifiedChanged: _private.updateLedColors()
+    }
+    Connections {
+        target: _private.starNote
+        onIsPlayingChanged: _private.updateLedColors()
+    }
+    Connections {
+        target: _private.patternKeyNote
+        onIsPlayingChanged: _private.updateLedColors()
     }
     Connections {
         target: Zynthbox.MidiRouter

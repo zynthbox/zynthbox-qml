@@ -437,6 +437,7 @@ class zynthian_gui(QObject):
         self.__ignoreNextGlobalButtonPress = False
         self.__ignoreNextSelectButtonPress = False
         self.__ignoreNextBackButtonPress = False
+        self.__any_step_button_pressed__ = False
         self.__step1_button_pressed__ = False
         self.__ignoreNextStep1ButtonPress__ = False
         self.__step2_button_pressed__ = False
@@ -4378,6 +4379,17 @@ class zynthian_gui(QObject):
     ### END Property ignoreNextStarButtonPress
 
     ### BEGIN Sequencer Strip Buttons
+    ### BEGIN Property anyStepButtonPressed
+    def get_anyStepButtonPressed(self):
+        return self.__any_step_button_pressed__
+    def update_anyStepButtonPressed(self):
+        anyButtonPressed = self.__step1_button_pressed__ or self.__step2_button_pressed__ or self.__step3_button_pressed__ or self.__step4_button_pressed__ or self.__step5_button_pressed__ or self.__step6_button_pressed__ or self.__step7_button_pressed__ or self.__step8_button_pressed__ or self.__step9_button_pressed__ or self.__step10_button_pressed__ or self.__step11_button_pressed__ or self.__step12_button_pressed__ or self.__step13_button_pressed__ or self.__step14_button_pressed__ or self.__step15_button_pressed__ or self.__step16_button_pressed__
+        if self.__any_step_button_pressed__ != anyButtonPressed:
+            self.__any_step_button_pressed__ = anyButtonPressed
+            self.anyStepButtonPressedChanged.emit()
+    anyStepButtonPressedChanged = Signal()
+    anyStepButtonPressed = Property(bool, get_anyStepButtonPressed, anyStepButtonPressedChanged)
+    ### END Property anyStepButtonPressed
     ### BEGIN Property step1ButtonPressed
     def get_step1_button_pressed(self):
         return self.__step1_button_pressed__
@@ -4389,6 +4401,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP1_RELEASED")
             self.step1_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step1_button_pressed_changed = Signal()
     step1ButtonPressed = Property(bool, get_step1_button_pressed, set_step1_button_pressed, notify=step1_button_pressed_changed)
     ### END Property step1ButtonPressed
@@ -4413,6 +4426,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP2_RELEASED")
             self.step2_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step2_button_pressed_changed = Signal()
     step2ButtonPressed = Property(bool, get_step2_button_pressed, set_step2_button_pressed, notify=step2_button_pressed_changed)
     ### END Property step2ButtonPressed
@@ -4437,6 +4451,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP3_RELEASED")
             self.step3_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step3_button_pressed_changed = Signal()
     step3ButtonPressed = Property(bool, get_step3_button_pressed, set_step3_button_pressed, notify=step3_button_pressed_changed)
     ### END Property step3ButtonPressed
@@ -4461,6 +4476,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP4_RELEASED")
             self.step4_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step4_button_pressed_changed = Signal()
     step4ButtonPressed = Property(bool, get_step4_button_pressed, set_step4_button_pressed, notify=step4_button_pressed_changed)
     ### END Property step4ButtonPressed
@@ -4485,6 +4501,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP5_RELEASED")
             self.step5_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step5_button_pressed_changed = Signal()
     step5ButtonPressed = Property(bool, get_step5_button_pressed, set_step5_button_pressed, notify=step5_button_pressed_changed)
     ### END Property step5ButtonPressed
@@ -4509,6 +4526,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP6_RELEASED")
             self.step6_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step6_button_pressed_changed = Signal()
     step6ButtonPressed = Property(bool, get_step6_button_pressed, set_step6_button_pressed, notify=step6_button_pressed_changed)
     ### END Property step6ButtonPressed
@@ -4533,6 +4551,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP7_RELEASED")
             self.step7_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step7_button_pressed_changed = Signal()
     step7ButtonPressed = Property(bool, get_step7_button_pressed, set_step7_button_pressed, notify=step7_button_pressed_changed)
     ### END Property step7ButtonPressed
@@ -4557,6 +4576,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP8_RELEASED")
             self.step8_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step8_button_pressed_changed = Signal()
     step8ButtonPressed = Property(bool, get_step8_button_pressed, set_step8_button_pressed, notify=step8_button_pressed_changed)
     ### END Property step8ButtonPressed
@@ -4581,6 +4601,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP9_RELEASED")
             self.step9_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step9_button_pressed_changed = Signal()
     step9ButtonPressed = Property(bool, get_step9_button_pressed, set_step9_button_pressed, notify=step9_button_pressed_changed)
     ### END Property step9ButtonPressed
@@ -4605,6 +4626,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP10_RELEASED")
             self.step10_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step10_button_pressed_changed = Signal()
     step10ButtonPressed = Property(bool, get_step10_button_pressed, set_step10_button_pressed, notify=step10_button_pressed_changed)
     ### END Property step10ButtonPressed
@@ -4629,6 +4651,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP11_RELEASED")
             self.step11_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step11_button_pressed_changed = Signal()
     step11ButtonPressed = Property(bool, get_step11_button_pressed, set_step11_button_pressed, notify=step11_button_pressed_changed)
     ### END Property step11ButtonPressed
@@ -4653,6 +4676,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP12_RELEASED")
             self.step12_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step12_button_pressed_changed = Signal()
     step12ButtonPressed = Property(bool, get_step12_button_pressed, set_step12_button_pressed, notify=step12_button_pressed_changed)
     ### END Property step12ButtonPressed
@@ -4677,6 +4701,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP13_RELEASED")
             self.step13_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step13_button_pressed_changed = Signal()
     step13ButtonPressed = Property(bool, get_step13_button_pressed, set_step13_button_pressed, notify=step13_button_pressed_changed)
     ### END Property step13ButtonPressed
@@ -4701,6 +4726,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP14_RELEASED")
             self.step14_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step14_button_pressed_changed = Signal()
     step14ButtonPressed = Property(bool, get_step14_button_pressed, set_step14_button_pressed, notify=step14_button_pressed_changed)
     ### END Property step14ButtonPressed
@@ -4725,6 +4751,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP15_RELEASED")
             self.step15_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step15_button_pressed_changed = Signal()
     step15ButtonPressed = Property(bool, get_step15_button_pressed, set_step15_button_pressed, notify=step15_button_pressed_changed)
     ### END Property step15ButtonPressed
@@ -4749,6 +4776,7 @@ class zynthian_gui(QObject):
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP16_RELEASED")
             self.step16_button_pressed_changed.emit()
+            self.update_anyStepButtonPressed()
     step16_button_pressed_changed = Signal()
     step16ButtonPressed = Property(bool, get_step16_button_pressed, set_step16_button_pressed, notify=step16_button_pressed_changed)
     ### END Property step16ButtonPressed

@@ -72,6 +72,46 @@ Item {
         updateStepProperty(sign, stepButtonIndex, "delay");
     }
     /**
+     * Update the probability of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the probability for
+     */
+    function updateStepProbability(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "probability");
+    }
+    /**
+     * Update the next-step property of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the next-step property for
+     */
+    function updateStepNextStep(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "next-step");
+    }
+    /**
+     * Update the ratchet style of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the ratchet style for
+     */
+    function updateStepRatchetStyle(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "ratchet-style");
+    }
+    /**
+     * Update the ratchet count of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the ratchet count for
+     */
+    function updateStepRatchetCount(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "ratchet-count");
+    }
+    /**
+     * Update the ratchet probability of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the ratchet probability for
+     */
+    function updateStepRatchetProbability(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "ratchet-probability");
+    }
+    /**
      * Update the given property of all matching subnotes on the given step
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
      * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the property for
@@ -220,6 +260,118 @@ Item {
                         theCurrentValueLabel = qsTr("-%1").arg(workingModel.stepLengthName(theCurrentValue));
                     } else {
                         theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
+                    }
+                } else if (propertyName == "probability") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Probability for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Probability for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Probability").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = workingModel.probabilityMax() - 1;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "probability");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    theCurrentValueLabel = workingModel.probabilityName(theCurrentValue);
+                } else if (propertyName == "next-step") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Next Step for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Next Step for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Next Step").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = workingModel.width * workingModel.bankLength;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "next-step");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("Next Step (default)");
+                    } else if ((theCurrentValue - 1)% workingModel.width == 0) {
+                        theCurrentValueLabel = qsTr("Bar %1").arg((theCurrentValue - 1) % 12 + 1);
+                    } else {
+                        theCurrentValueLabel = qsTr("Step %1").arg(theCurrentValue);
+                    }
+                } else if (propertyName == "ratchet-style") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Style for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Style for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Style").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = 4;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-style");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("Split Step, Overlap (default)");
+                    } else if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("Split Step, Choke");
+                    } else if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("Split Length, Overlap");
+                    } else {
+                        theCurrentValueLabel = qsTr("Split Length, Choke");
+                    }
+                } else if (propertyName == "ratchet-count") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Count for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Count for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Count").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = 12;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-count");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("No Ratchet (default)");
+                    } else {
+                        theCurrentValueLabel = qsTr("Repeat %1 times").arg(theCurrentValue);
+                    }
+                } else if (propertyName == "ratchet-probability") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Probability for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Probability for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Probability").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = 100;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-probability");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("All Repeats Always Play (default)");
+                    } else {
+                        theCurrentValueLabel = qsTr("%1% Per Repeat").arg(theCurrentValue);
                     }
                 }
                 // console.log("The first entry's", propertyName, "is", theCurrentValue);
@@ -743,6 +895,43 @@ Item {
                 returnValue = true;
                 break;
 
+            // Would perhaps make sense that the sidebar buttons should be less strictly named and just... also be numbered buttons?
+            case "SCREEN_SKETCHPAD":
+                if (zynqtgui.anyStepButtonPressed && _private.interactionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
+                    component.setParameterPage(0);
+                    component.ignoreHeldStepButtonsReleases();
+                    returnValue = true;
+                }
+                break;
+            case "SCREEN_LAYER":
+                if (zynqtgui.anyStepButtonPressed && _private.interactionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
+                    component.setParameterPage(1);
+                    component.ignoreHeldStepButtonsReleases();
+                    returnValue = true;
+                }
+                break;
+            case "SCREEN_EDIT_CONTEXTUAL":
+                if (zynqtgui.anyStepButtonPressed && _private.interactionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
+                    component.setParameterPage(2);
+                    component.ignoreHeldStepButtonsReleases();
+                    returnValue = true;
+                }
+                break;
+            case "SCREEN_PLAYGRID":
+                if (zynqtgui.anyStepButtonPressed && _private.interactionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
+                    component.setParameterPage(3);
+                    component.ignoreHeldStepButtonsReleases();
+                    returnValue = true;
+                }
+                break;
+            case "SCREEN_SONG_MANAGER":
+                if (zynqtgui.anyStepButtonPressed && _private.interactionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
+                    component.setParameterPage(4);
+                    component.ignoreHeldStepButtonsReleases();
+                    returnValue = true;
+                }
+                break;
+
             case "SWITCH_BACK_SHORT":
                 component.ignoreHeldStepButtonsReleases();
                 break;
@@ -757,7 +946,18 @@ Item {
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
                             if (_private.interactionMode === _private.interactionModeSequencer) {
-                                component.updateStepVelocity(0, stepButtonIndex);
+                                switch (_private.parameterPage) {
+                                    case 2:
+                                        component.updateStepRatchetStyle(0, stepButtonIndex);
+                                        break;
+                                    case 1:
+                                        component.updateStepProbability(0, stepButtonIndex);
+                                        break;
+                                    case 0:
+                                    default:
+                                        component.updateStepVelocity(0, stepButtonIndex);
+                                        break;
+                                }
                             } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(0, stepButtonIndex);
@@ -784,7 +984,18 @@ Item {
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
                             if (_private.interactionMode === _private.interactionModeSequencer) {
-                                component.updateStepVelocity(1, stepButtonIndex);
+                                switch (_private.parameterPage) {
+                                    case 2:
+                                        component.updateStepRatchetStyle(1, stepButtonIndex);
+                                        break;
+                                    case 1:
+                                        component.updateStepProbability(1, stepButtonIndex);
+                                        break;
+                                    case 0:
+                                    default:
+                                        component.updateStepVelocity(1, stepButtonIndex);
+                                        break;
+                                }
                             } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(1, stepButtonIndex);
@@ -816,7 +1027,18 @@ Item {
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
                             if (_private.interactionMode === _private.interactionModeSequencer) {
-                                component.updateStepVelocity(-1, stepButtonIndex);
+                                switch (_private.parameterPage) {
+                                    case 2:
+                                        component.updateStepRatchetStyle(-1, stepButtonIndex);
+                                        break;
+                                    case 1:
+                                        component.updateStepProbability(-1, stepButtonIndex);
+                                        break;
+                                    case 0:
+                                    default:
+                                        component.updateStepVelocity(-1, stepButtonIndex);
+                                        break;
+                                }
                             } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                                 if (stepButtonIndex < 10) {
                                     applicationWindow().updateChannelVolume(-1, stepButtonIndex);
@@ -846,7 +1068,17 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            component.updateStepDuration(0, stepButtonIndex);
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetCount(0, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepDuration(0, stepButtonIndex);
+                                    break;
+                            }
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
@@ -868,7 +1100,17 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            component.updateStepDuration(1, stepButtonIndex);
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetCount(1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepDuration(1, stepButtonIndex);
+                                    break;
+                            }
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
@@ -895,7 +1137,17 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            component.updateStepDuration(-1, stepButtonIndex);
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetCount(-1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepDuration(-1, stepButtonIndex);
+                                    break;
+                            }
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (stepButtonIndex < 10) {
                                 applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
@@ -924,7 +1176,18 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            component.updateStepPosition(0, stepButtonIndex);
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetProbability(0, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    component.updateStepNextStep(0, stepButtonIndex);
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepPosition(0, stepButtonIndex);
+                                    break;
+                            }
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k3 adjusts pattern length
@@ -944,7 +1207,18 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            component.updateStepPosition(1, stepButtonIndex);
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetProbability(1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    component.updateStepNextStep(1, stepButtonIndex);
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepPosition(1, stepButtonIndex);
+                                    break;
+                            }
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k3 adjusts pattern length
@@ -965,7 +1239,18 @@ Item {
                 for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                     if (_private.heldStepButtons[stepButtonIndex]) {
                         if (_private.interactionMode === _private.interactionModeSequencer) {
-                            component.updateStepPosition(-1, stepButtonIndex);
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetProbability(-1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    component.updateStepNextStep(-1, stepButtonIndex);
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepPosition(-1, stepButtonIndex);
+                                    break;
+                            }
                         } else if (_private.interactionMode === _private.interactionModeTrackClip) {
                             if (10 < stepButtonIndex && stepButtonIndex < 16) {
                                 // Clip+k3 adjusts pattern length
@@ -1243,6 +1528,21 @@ Item {
     QtObject {
         id: _private
         property int parameterPage: 0
+        onParameterPageChanged: {
+            switch(parameterPage) {
+                case 2:
+                    applicationWindow().showPassiveNotification(qsTr("Parameter Page: Ratchet (style, count, probability)"));
+                    break;
+                case 1:
+                    applicationWindow().showPassiveNotification(qsTr("Parameter Page: Probability (probability, blank, next step)"));
+                    break;
+                case 0:
+                default:
+                    applicationWindow().showPassiveNotification(qsTr("Parameter Page: General (velocity, length, position)"));
+                    break;
+            }
+            updateLedColors();
+        }
         property QtObject sequence: component.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
         property QtObject pattern: sequence && component.selectedChannel ? sequence.getByClipId(component.selectedChannel.id, component.selectedChannel.selectedClip) : null
         property QtObject patternKeyNote: pattern ? Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey), pattern.sketchpadTrack) : null
@@ -1283,6 +1583,10 @@ Item {
         property color musicalKeysModeColor: Qt.rgba(0, 0, 1)
         property color velocityKeysModeColor: Qt.rgba(0, 0, 1)
         property color slotModeColor: Qt.rgba(0, 1, 0)
+
+        property color redColor: Qt.rgba(1, 0, 0)
+        property color greenColor: Qt.rgba(0, 1, 1)
+        property color blueColor: Qt.rgba(0, 0, 1)
 
         readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
         property int stepDuration: pattern ? (pattern.stepLength / patternSubbeatToTickMultiplier) : 0
@@ -1568,6 +1872,23 @@ Item {
                 }
             }
         }
+        readonly property var libraryPages: ["layers_for_channel", "bank", "preset", "fixed_effects", "effect_preset", "sketch_effect_preset", "sample_library", "effects_for_channel", "sketch_effects_for_channel", "sound_categories"]
+        readonly property var editPages: ["control", "channel_wave_editor", "channel_external_setup"]
+        function updateNumberButtonColors() {
+            if (zynqtgui.anyStepButtonPressed && _private.interactionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
+                zynqtgui.led_config.setNumberButtonColor(0, _private.parameterPage === 0 ? _private.stepHighlighted : _private.stepWithNotes, 1);
+                zynqtgui.led_config.setNumberButtonColor(1, _private.parameterPage === 1 ? _private.stepHighlighted : _private.stepWithNotes, 1);
+                zynqtgui.led_config.setNumberButtonColor(2, _private.parameterPage === 2 ? _private.stepHighlighted : _private.stepWithNotes, 1);
+                zynqtgui.led_config.setNumberButtonColor(3, _private.stepEmpty, 1);
+                zynqtgui.led_config.setNumberButtonColor(4, _private.stepEmpty, 1);
+            } else {
+                zynqtgui.led_config.setNumberButtonColor(0, zynqtgui.current_screen_id == "sketchpad" ? _private.greenColor : _private.blueColor, 1);
+                zynqtgui.led_config.setNumberButtonColor(1, libraryPages.includes(zynqtgui.current_screen_id) ? _private.greenColor : _private.blueColor, 1);
+                zynqtgui.led_config.setNumberButtonColor(2, editPages.includes(zynqtgui.current_screen_id) ? _private.greenColor : _private.blueColor, 1);
+                zynqtgui.led_config.setNumberButtonColor(3, zynqtgui.current_screen_id == "playgrid" ? _private.greenColor : _private.blueColor, 1);
+                zynqtgui.led_config.setNumberButtonColor(4, zynqtgui.current_screen_id == "song_manager" ? _private.greenColor : _private.blueColor, 1);
+            }
+        }
         function updateLedColors() {
             ledColorUpdateThrottle.restart();
         }
@@ -1596,6 +1917,7 @@ Item {
                         break;
                 }
             }
+            _private.updateNumberButtonColors();
             // the star note is a thing when the star button itself is pressed, otherwise we have to test that the pattern's root key is pressed
             if ((_private.starNote && _private.starNote.isPlaying) || (_private.patternKeyNote && _private.patternKeyNote.isPlaying)) {
                 zynqtgui.led_config.setStarButtonColor(zynqtgui.theme_chooser.noteColors[((_private.starNote ? _private.starNote.midiNote : _private.patternKeyNote.midiNote) % 12) + 108]);
@@ -1751,7 +2073,7 @@ Item {
     Timer {
         id: stepDataAutoPreviewThrottle
         // A bit of a wait, to ensure we hang back just a tiny bit, so when people do a bunch of knob twiddling, we don't fire too many tests...
-        interval: 50
+        interval: 200
         repeat: false; running: false;
         // To avoid many noisy noises, we only auto-preview a single step at a time (we allow editing multiple steps at the same time, but if we preview them all, it could end up pretty cacophonous)
         property int stepToAutoPreview: -1
@@ -1777,6 +2099,7 @@ Item {
     Connections {
         target: zynqtgui
         onAltButtonPressedChanged: _private.updateLedColors()
+        onAnyStepButtonPressedChanged: _private.updateLedColors()
         onStep1_button_pressed_changed: { _private.heldStepButtons[0] = zynqtgui.step1ButtonPressed; }
         onStep2_button_pressed_changed: { _private.heldStepButtons[1] = zynqtgui.step2ButtonPressed; }
         onStep3_button_pressed_changed: { _private.heldStepButtons[2] = zynqtgui.step3ButtonPressed; }

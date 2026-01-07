@@ -758,7 +758,7 @@ ColumnLayout {
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 // END Page 1 (Velocity, Length, Position)
-                // BEGIN Page 2 (Probability, ???, ???)
+                // BEGIN Page 2 (Probability, ???, Next Step)
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20

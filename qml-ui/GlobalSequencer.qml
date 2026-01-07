@@ -91,21 +91,30 @@ Item {
         if (stepNote != null) {
             totalSubnoteCount = stepNote.subnotes.length;
         }
-        for (let i = 0; i < _private.heardNotes.length; ++i) {
-            let subnoteIndex = workingModel.subnoteIndex(padNoteRow, stepButtonIndex, _private.heardNotes[i].midiNote);
-            if (subnoteIndex > -1) {
-                subnoteIndices.push(subnoteIndex);
-                let tempData = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndex, propertyName);
-                if (tempData == undefined) {
-                    tempData = initialValue;
-                }
-                subnoteValues.push(tempData);
-                if (i == 0) {
-                    // The first element has no difference to itself (that is, that's our reference)
-                    subnoteDifferences.push(0);
-                } else {
-                    // All subsequent entries are those entries' difference from the reference value
-                    subnoteDifferences.push(tempData - subnoteDifferences[0]);
+        function addSubnoteForEditing(subnoteIndex) {
+            subnoteIndices.push(subnoteIndex);
+            let tempData = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndex, propertyName);
+            if (tempData == undefined) {
+                tempData = initialValue;
+            }
+            subnoteValues.push(tempData);
+            if (subnoteDifferences.length == 0) {
+                // The first element has no difference to itself (that is, that's our reference)
+                subnoteDifferences.push(0);
+            } else {
+                // All subsequent entries are those entries' difference from the reference value
+                subnoteDifferences.push(tempData - subnoteDifferences[0]);
+            }
+        }
+        if (zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1) {
+            for (let i = 0; i < totalSubnoteCount; ++i) {
+                addSubnoteForEditing(i);
+            }
+        } else {
+            for (let i = 0; i < _private.heardNotes.length; ++i) {
+                let subnoteIndex = workingModel.subnoteIndex(padNoteRow, stepButtonIndex, _private.heardNotes[i].midiNote);
+                if (subnoteIndex > -1) {
+                    addSubnoteForEditing(subnoteIndex);
                 }
             }
         }

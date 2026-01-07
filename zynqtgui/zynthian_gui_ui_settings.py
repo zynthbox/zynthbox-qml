@@ -43,6 +43,8 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.hardwareSequencerChanged.emit()
         self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
         self.hardwareSequencerPreviewStyleChanged.emit()
+        self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
+        self.hardwareSequencerEditInclusionsChanged.emit()
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
         self.__showCursor = True if os.environ.get("ZYNTHIAN_UI_ENABLE_CURSOR", "0") == "1" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
@@ -101,6 +103,21 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     hardwareSequencerPreviewStyle = Property(int, get_hardwareSequencerPreviewStyle, set_hardwareSequencerPreviewStyle, notify=hardwareSequencerPreviewStyleChanged)
     ### END Property hardwareSequencerPreviewStyle
+
+    ### BEGIN Property hardwareSequencerEditInclusions
+    def get_hardwareSequencerEditInclusions(self):
+        return self.__hardwareSequencerEditInclusions
+
+    def set_hardwareSequencerEditInclusions(self, value):
+        if value != self.__hardwareSequencerEditInclusions:
+            self.__hardwareSequencerEditInclusions = value
+            self.zynqtgui.global_settings.setValue("UI/hardwareSequencerEditInclusions", self.__hardwareSequencerEditInclusions)
+            self.hardwareSequencerEditInclusionsChanged.emit()
+
+    hardwareSequencerEditInclusionsChanged = Signal()
+
+    hardwareSequencerEditInclusions = Property(int, get_hardwareSequencerEditInclusions, set_hardwareSequencerEditInclusions, notify=hardwareSequencerEditInclusionsChanged)
+    ### END Property hardwareSequencerEditInclusions
 
     ### BEGIN Property debugMode
     def get_debugMode(self):

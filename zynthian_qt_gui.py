@@ -1918,9 +1918,10 @@ class zynthian_gui(QObject):
                 if _result is not None:
                     if _result.isError():
                         printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                        return
                     elif _result.toBool():
                         Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
-                    return
+                        return
         except Exception as e:
             logging.error("Attempted to run callbacks on the main window, which apparently failed badly, with the error: {}".format(e))
 
@@ -1936,10 +1937,11 @@ class zynthian_gui(QObject):
                     if _result is not None:
                         if _result.isError():
                             printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                            return
                         elif _result.toBool():
                             # If cuiaCallback returned true, then CUIA event has been handled by qml. Return
                             Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
-                        return
+                            return
 
                 if visible:
                     # If control reaches here it means either cuiaCallback property was not found or returned false
@@ -1964,9 +1966,10 @@ class zynthian_gui(QObject):
                     if _result is not None:
                         if _result.isError():
                             printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                            return
                         elif _result.toBool():
                             Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
-                        return
+                            return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
 

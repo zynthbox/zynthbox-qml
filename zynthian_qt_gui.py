@@ -77,7 +77,6 @@ from zyncoder import *
 from zyncoder.zyncoder import lib_zyncoder_init
 from zyngine import zynthian_controller, zynthian_zcmidi, zynthian_layer
 from zyngine import zynthian_midi_filter
-# from zyngine import zynthian_engine_transport
 from zynqtgui import zynthian_gui_config, zynthian_gui_controller
 from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
 from zynqtgui.zynthian_gui_info import zynthian_gui_info
@@ -100,7 +99,6 @@ from zynqtgui.zynthian_gui_midi_chan import zynthian_gui_midi_chan
 from zynqtgui.zynthian_gui_midi_cc import zynthian_gui_midi_cc
 from zynqtgui.zynthian_gui_midi_key_range import zynthian_gui_midi_key_range
 from zynqtgui.zynthian_gui_audio_out import zynthian_gui_audio_out
-# from zynqtgui.zynthian_gui_midi_out import zynthian_gui_midi_out
 from zynqtgui.zynthian_gui_audio_in import zynthian_gui_audio_in
 from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset
@@ -110,7 +108,6 @@ from zynqtgui.zynthian_gui_sample_library import zynthian_gui_sample_library
 from zynqtgui.zynthian_gui_channel_external_setup import zynthian_gui_channel_external_setup
 from zynqtgui.zynthian_gui_channel_wave_editor import zynthian_gui_channel_wave_editor
 from zynqtgui.zynthian_gui_confirm import zynthian_gui_confirm
-# from zynqtgui.zynthian_gui_keyboard import zynthian_gui_keyboard
 from zynqtgui.zynthian_gui_keybinding import zynthian_gui_keybinding
 from zynqtgui.zynthian_gui_main import zynthian_gui_main
 from zynqtgui.zynthian_gui_audio_recorder import zynthian_gui_audio_recorder
@@ -1128,9 +1125,6 @@ class zynthian_gui(QObject):
     # ---------------------------------------------------------------------------
 
     def start(self):
-        # Initialize jack Transport
-        # self.zyntransport = zynthian_engine_transport()
-
         # Create Core UI Screens
         self.currentTaskMessage = "Creating Core Control Objects"
 
@@ -1141,7 +1135,6 @@ class zynthian_gui(QObject):
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
         self.screens["confirm"] = zynthian_gui_confirm(self)
-        # self.screens['keyboard'] = zynthian_gui_keyboard(self)
         self.screens["option"] = zynthian_gui_option(self)
         self.screens["engine"] = zynthian_gui_engine(self)
         self.screens["layer"] = zynthian_gui_layer(self)
@@ -1160,7 +1153,6 @@ class zynthian_gui(QObject):
         self.screens["midi_cc"] = zynthian_gui_midi_cc(self)
         self.screens['midi_key_range'] = zynthian_gui_midi_key_range(self)
         self.screens['audio_out'] = zynthian_gui_audio_out(self)
-        # self.screens['midi_out'] = zynthian_gui_midi_out(self)
         self.screens['audio_in'] = zynthian_gui_audio_in(self)
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)

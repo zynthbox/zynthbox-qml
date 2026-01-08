@@ -13,7 +13,6 @@ __all__ = [
     "zynthian_gui_midi_chan",
     "zynthian_gui_midi_cc",
     "zynthian_gui_audio_out",
-    "zynthian_gui_midi_out",
     "zynthian_gui_audio_in",
     "zynthian_gui_bank",
     "zynthian_gui_preset",
@@ -39,7 +38,6 @@ from zynqtgui.zynthian_gui_engine import zynthian_gui_engine
 from zynqtgui.zynthian_gui_midi_chan import zynthian_gui_midi_chan
 from zynqtgui.zynthian_gui_midi_cc import zynthian_gui_midi_cc
 from zynqtgui.zynthian_gui_audio_out import zynthian_gui_audio_out
-from zynqtgui.zynthian_gui_midi_out import zynthian_gui_midi_out
 from zynqtgui.zynthian_gui_audio_in import zynthian_gui_audio_in
 from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset

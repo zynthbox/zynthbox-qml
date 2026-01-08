@@ -217,13 +217,6 @@ class zynthian_gui_engine(zynthian_gui_selector):
         super().fill_list()
 
 
-    # def fill_listbox(self):
-    #     super().fill_listbox()
-    #     for i, val in enumerate(self.list_data):
-    #         if val[0]==None:
-    #             self.listbox.itemconfig(i, {'bg':zynthian_gui_config.color_off,'fg':zynthian_gui_config.color_tx_off})
-
-
     def select_action(self, i, t='S'):
         # during hte event processing done while the spinner is running, sometimes a spurious secondary action is invked...
         # this causes a second invisible layer to be added, causing the sound of two engines at a time to be heard.

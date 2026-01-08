@@ -59,10 +59,6 @@ class zynthian_gui_audio_in(zynthian_gui_selector):
         super().fill_list()
 
 
-    def fill_listbox(self):
-        super().fill_listbox()
-
-
     def select_action(self, i, t='S'):
         self.layer.toggle_audio_in(self.list_data[i][1])
         self.fill_list()

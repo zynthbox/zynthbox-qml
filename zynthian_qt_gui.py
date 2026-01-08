@@ -389,6 +389,7 @@ class zynthian_gui(QObject):
         self.__ignoreNextMetronomeButtonPress = False
         self.__ignoreNextPlayButtonPress = False
         self.__ignoreNextStopButtonPress = False
+        self.__ignoreNextKnob3Press = False
         self.__ignoreNextGlobalButtonPress = False
         self.__ignoreNextSelectButtonPress = False
         self.__ignoreNextBackButtonPress = False
@@ -450,6 +451,7 @@ class zynthian_gui(QObject):
         self.__star_button_pressed__ = False
         self.__mode_button_pressed__ = False
         self.__alt_button_pressed__ = False
+        self.__knob3_pressed__ = False
         self.__global_button_pressed__ = False
         self.__startRecord_button_pressed__ = False
         self.__play_button_pressed__ = False
@@ -1687,6 +1689,8 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_METRONOME_SHORT" and self.ignoreNextMetronomeButtonPress == True:
             self.ignoreNextMetronomeButtonPress = False
             return
+        elif cuia == "SWITCH_KNOB3_RELEASED" and self.ignoreNextKnob3Press == True:
+            self.ignoreNextKnob3Press = False
         elif cuia == "SWITCH_GLOBAL_RELEASED" and self.ignoreNextGlobalButtonPress == True:
             self.globalButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextGlobalButtonPress = False
@@ -1750,6 +1754,9 @@ class zynthian_gui(QObject):
         # buttons are held down, abort that button's release actions
         if cuia == "SWITCH_BACK_SHORT":
             changedAnything = False
+            if self.knob3Pressed == True and self.ignoreNextKnob3Press == False:
+                self.ignoreNextKnob3Press = True
+                changedAnything = True
             if self.globalButtonPressed == True and self.ignoreNextGlobalButtonPress == False:
                 self.ignoreNextGlobalButtonPress = True
                 changedAnything = True
@@ -2487,6 +2494,8 @@ class zynthian_gui(QObject):
                         self.rightButtonPressed = True
                     elif i == 28:
                         self.globalButtonPressed = True
+                    elif i == 29:
+                        self.knob3Pressed = True
                     elif i == 31: # KNOB_0
                         self.knob0Touched = True
                     elif i == 30: # KNOB_1
@@ -2640,6 +2649,8 @@ class zynthian_gui(QObject):
                         self.rightButtonPressed = False
                     elif i == 28:
                         self.globalButtonPressed = False
+                    elif i == 29:
+                        self.knob3Pressed = False
                     elif i == 31: # KNOB_0
                         self.knob0Touched = False
                     elif i == 30: # KNOB_1
@@ -4649,6 +4660,39 @@ class zynthian_gui(QObject):
 
     altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=altButtonPressedChanged)
     ### END Property altButtonPressed
+
+    ### BEGIN Property knob3Pressed
+    def get_knob3_pressed(self):
+        return self.__knob3_pressed__
+
+    def set_knob3_pressed(self, pressed):
+        if self.__knob3_pressed__ != pressed:
+            logging.debug(f"Knob 3 pressed : {pressed}")
+            self.__knob3_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_KNOB3_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_KNOB3_RELEASED")
+            self.knob3_pressed_changed.emit()
+
+    knob3_pressed_changed = Signal()
+
+    knob3Pressed = Property(bool, get_knob3_pressed, set_knob3_pressed, notify=knob3_pressed_changed)
+    ### END Property knob3Pressed
+
+    ### BEGIN Property ignoreNextKnob3Press
+    def get_ignoreNextKnob3Press(self):
+        return self.__ignoreNextKnob3Press
+
+    def set_ignoreNextKnob3Press(self, val):
+        if self.__ignoreNextKnob3Press != val:
+            self.__ignoreNextKnob3Press = val
+            self.ignoreNextKnob3PressChanged.emit()
+
+    ignoreNextKnob3PressChanged = Signal()
+
+    ignoreNextKnob3Press = Property(bool, get_ignoreNextKnob3Press, set_ignoreNextKnob3Press, notify=ignoreNextKnob3PressChanged)
+    ### END Property ignoreNextKnob3Press
 
     ### BEGIN Property globalButtonPressed
     def get_global_button_pressed(self):

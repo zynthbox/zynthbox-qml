@@ -213,15 +213,6 @@ class zynthian_gui_hardware(zynthian_gui_selector):
         logging.info("Testing Knobs")
         self.zynqtgui.show_modal("test_knobs")
 
-    def last_state_action(self):
-        if (
-            zynthian_gui_config.restore_last_state
-            and len(self.zynqtgui.screens["layer"].layers) > 0
-        ):
-            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
-        else:
-            self.zynqtgui.screens["snapshot"].delete_last_state_snapshot()
-
     # def back_action(self):
     #     self.zynqtgui.show_screen("main")
     #     return ''

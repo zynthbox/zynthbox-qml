@@ -24,11 +24,8 @@
 #******************************************************************************
 
 import os
-import re
 import sys
 import logging
-import tkinter
-from PIL import Image, ImageTk
 
 # Zynthian specific modules
 import zynconf
@@ -74,58 +71,7 @@ reset_log_level()
 
 logging.info("ZYNTHIAN-UI CONFIG ...")
 
-#------------------------------------------------------------------------------
-# Wiring layout
-#------------------------------------------------------------------------------
-
 wiring_layout=os.environ.get('ZYNTHIAN_WIRING_LAYOUT',"DUMMIES")
-if wiring_layout=="DUMMIES":
-    logging.info("No Wiring Layout configured. Only touch interface is available.")
-else:
-    logging.info("Wiring Layout %s" % wiring_layout)
-
-if os.environ.get('ZYNTHIAN_WIRING_ENCODER_A'):
-    zyncoder_pin_a=list(map(int, os.environ.get('ZYNTHIAN_WIRING_ENCODER_A').split(',')))
-else:
-    zyncoder_pin_a=None
-
-if os.environ.get('ZYNTHIAN_WIRING_ENCODER_B'):
-    zyncoder_pin_b=list(map(int, os.environ.get('ZYNTHIAN_WIRING_ENCODER_B').split(',')))
-else:
-    zyncoder_pin_b=None
-
-if os.environ.get('ZYNTHIAN_WIRING_SWITCHES'):
-    zynswitch_pin=list(map(int, os.environ.get('ZYNTHIAN_WIRING_SWITCHES').split(',')))
-else:
-    zynswitch_pin=None
-
-num_zynswitches = 32
-last_zynswitch_index = 32
-
-#------------------------------------------------------------------------------
-# Encoder & Switches GPIO pin assignment (wiringPi numbering)
-#------------------------------------------------------------------------------
-
-# No HW Controllers => Dummy Controllers
-if wiring_layout=="DUMMIES":
-    if not zyncoder_pin_a: zyncoder_pin_a=[0,0,0,0]
-    if not zyncoder_pin_b: zyncoder_pin_b=[0,0,0,0]
-    if not zynswitch_pin: zynswitch_pin=[0,0,0,0]
-    select_ctrl=3
-# Custom Config => blank
-elif wiring_layout=="CUSTOM":
-    select_ctrl=3
-# Default to DUMMIES
-else:
-    if not zyncoder_pin_a: zyncoder_pin_a=[0,0,0,0]
-    if not zyncoder_pin_b: zyncoder_pin_b=[0,0,0,0]
-    if not zynswitch_pin: zynswitch_pin=[0,0,0,0]
-    select_ctrl=3
-
-# Print Wiring Layout
-logging.debug("ZYNCODER A: %s" % zyncoder_pin_a)
-logging.debug("ZYNCODER B: %s" % zyncoder_pin_b)
-logging.debug("SWITCHES layout: %s" % zynswitch_pin)
 
 #------------------------------------------------------------------------------
 # Custom Switches Action Configuration

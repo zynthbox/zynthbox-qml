@@ -455,13 +455,13 @@ ZUI.Popup {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.leftMargin: root.spacing
-                enabled: zynqtgui.sketchpad.isRecording === false
 
                 RowLayout { // Common Settings Section
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
                     Layout.maximumHeight: Layout.preferredHeight
                     Layout.minimumHeight: Layout.preferredHeight
+                    enabled: zynqtgui.sketchpad.isRecording === false
 
                     ZUI.Card {
                         Layout.fillWidth: true
@@ -663,6 +663,7 @@ ZUI.Popup {
                     Layout.fillHeight: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 10
                     Layout.topMargin: root.spacing
+                    enabled: zynqtgui.sketchpad.isRecording === false
 
                     // RowLayout {
                     //     QQC2.Button {
@@ -1250,6 +1251,8 @@ ZUI.Popup {
                         Layout.preferredWidth: height
                         icon.name: "edit-clear-symbolic"
                         icon.color: Kirigami.Theme.textColor
+                        // Always allow clearing when recording midi (for easy retakes, and clearing specific notes)
+                        enabled: (zynqtgui.sketchpad.recordingType === "midi" && _private.selectedPattern && _private.selectedPattern.hasNotes) || (zynqtgui.sketchpad.recordingType === "audio" && zynqtgui.sketchpad.isRecording === false)
                         onClicked: {
                             switch(recordingTypeSettingsStack.currentIndex) {
                             case 0: // Audio Recording

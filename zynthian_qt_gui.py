@@ -125,11 +125,6 @@ from zynqtgui.zynthian_gui_channel import zynthian_gui_channel
 from zynqtgui.zynthian_gui_sample_library import zynthian_gui_sample_library
 from zynqtgui.zynthian_gui_channel_external_setup import zynthian_gui_channel_external_setup
 from zynqtgui.zynthian_gui_channel_wave_editor import zynthian_gui_channel_wave_editor
-
-# from zynqtgui.zynthian_gui_control_xy import zynthian_gui_control_xy
-# from zynqtgui.zynthian_gui_midi_profile import zynthian_gui_midi_profile
-# from zynqtgui.zynthian_gui_zs3_learn import zynthian_gui_zs3_learn
-# from zynqtgui.zynthian_gui_zs3_options import zynthian_gui_zs3_options
 from zynqtgui.zynthian_gui_confirm import zynthian_gui_confirm
 
 # from zynqtgui.zynthian_gui_keyboard import zynthian_gui_keyboard
@@ -143,12 +138,6 @@ from zynqtgui.zynthian_gui_playgrid import zynthian_gui_playgrid
 from zynqtgui.sketchpad.zynthian_gui_sketchpad import (
     zynthian_gui_sketchpad,
 )
-
-# if "autoeq" in zynthian_gui_config.experimental_features:
-# from zynqtgui.zynthian_gui_autoeq import zynthian_gui_autoeq
-# from zynqtgui.zynthian_gui_touchscreen_calibration import zynthian_gui_touchscreen_calibration
-
-# from zynqtgui.zynthian_gui_control_osc_browser import zynthian_gui_osc_browser
 
 from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
 from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
@@ -1224,10 +1213,6 @@ class zynthian_gui(QObject):
         self.screens["channel"] = zynthian_gui_channel(self)
         self.screens["channel_external_setup"] = zynthian_gui_channel_external_setup(self)
         self.screens["channel_wave_editor"] = zynthian_gui_channel_wave_editor(self)
-        # self.screens['control_xy'] = zynthian_gui_control_xy(self)
-        # self.screens['midi_profile'] = zynthian_gui_midi_profile(self)
-        # self.screens['zs3_learn'] = zynthian_gui_zs3_learn(self)
-        # self.screens['zs3_options'] = zynthian_gui_zs3_options(self)
         self.screens["main"] = zynthian_gui_main(self)
         self.screens["apps_downloader"] = zynthian_gui_newstuff(self)
         self.screens["admin"] = zynthian_gui_admin(self)
@@ -1269,9 +1254,6 @@ class zynthian_gui(QObject):
         self.screens["effects_for_channel"] = zynthian_gui_effects_for_channel(self)
         self.screens["sketch_effects_for_channel"] = zynthian_gui_sketch_effects_for_channel(self)
 
-        # if "autoeq" in zynthian_gui_config.experimental_features:
-        # self.screens['autoeq'] = zynthian_gui_autoeq(self)
-        # self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
         self.screens["sketch_downloader"] = zynthian_gui_newstuff(self)
@@ -1565,7 +1547,6 @@ class zynthian_gui(QObject):
         lib_zyncoder.set_midi_learning_mode(1)
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
-        # self.show_modal('zs3_learn')
 
     def exit_midi_learn_mode(self):
         self.midi_learn_mode = False
@@ -1574,18 +1555,6 @@ class zynthian_gui(QObject):
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
         self.show_active_screen()
-
-    def show_control_xy(self, xctrl, yctrl):
-        self.modal_screen = "control_xy"
-        self.screens["control_xy"].set_controllers(xctrl, yctrl)
-        self.screens["control_xy"].show()
-        self.hide_screens(exclude="control_xy")
-        self.active_screen = "control"
-        self.screens["control"].set_mode_control()
-        logging.debug(
-            "SHOW CONTROL-XY => %s, %s" % (xctrl.symbol, yctrl.symbol)
-        )
-        self.current_modal_screen_id_changed.emit()
 
     def set_curlayer(self, layer, save=False, queue=True):
         if layer is not None:
@@ -5827,23 +5796,6 @@ if __name__ == "__main__":
     zynqtgui.sketchpad.init() # Call init after zynqtgui initialization is complete
     QIcon.setThemeName("breeze")    
     palette = app.palette()
-    # bgColor = QColor(zynthian_gui_config.color_bg)
-    # txColor = QColor(zynthian_gui_config.color_tx)
-    # palette.setColor(QPalette.Window, bgColor)
-    # palette.setColor(QPalette.WindowText, txColor)
-    # ratio = 0.2
-    # btnColor = QColor(
-    #     bgColor.red() * (1 - ratio) + txColor.red() * ratio,
-    #     bgColor.green() * (1 - ratio) + txColor.green() * ratio,
-    #     bgColor.blue() * (1 - ratio) + txColor.blue() * ratio,
-    #     255,
-    # )
-    # palette.setColor(QPalette.Button, btnColor)
-    # palette.setColor(QPalette.ButtonText, QColor(zynthian_gui_config.color_tx))
-    # palette.setColor(QPalette.Highlight, QColor(zynthian_gui_config.color_on))
-    # palette.setColor(QPalette.Base, QColor(zynthian_gui_config.color_panel_bd))
-    # palette.setColor(QPalette.Text, QColor(zynthian_gui_config.color_tx))
-    # palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
     app.setPalette(palette)
     zynqtgui.screens["theme_chooser"].apply_font()
     zynqtgui.show_screen(zynqtgui.home_screen)

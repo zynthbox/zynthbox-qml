@@ -1062,11 +1062,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
     def cb_listbox_push(self,event):
-        if self.xyselect_mode:
-            logging.debug("XY-Controller Mode ...")
-            self.zynqtgui.show_control_xy(self.x_zctrl, self.y_zctrl)
-        else:
-            super().cb_listbox_push(event)
+        super().cb_listbox_push(event)
 
 
     # TODO: remove?

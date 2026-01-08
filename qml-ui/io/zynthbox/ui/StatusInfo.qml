@@ -358,7 +358,7 @@ QQC2.Pane
             }
         }
 
-        ZUI.Popup {
+        ZUI2.Popup {
             id: popup
 
             property var cuiaCallback: function(cuia) {

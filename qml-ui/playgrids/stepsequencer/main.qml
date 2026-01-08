@@ -33,6 +33,8 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
 ZUI.BasePlayGrid {
@@ -2208,7 +2210,7 @@ ZUI.BasePlayGrid {
                     }
                 }
             }
-            ZUI.Popup {
+            ZUI2.Popup {
                 id: noteSettingsPopup
                 parent: QQC2.Overlay.overlay
                 y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y

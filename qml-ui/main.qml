@@ -32,6 +32,7 @@ import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 import io.zynthbox.components 1.0 as Zynthbox
 import "pages" as Pages
 import "pages/Sketchpad" as Sketchpad
@@ -1974,7 +1975,7 @@ Kirigami.AbstractApplicationWindow {
         id: osd
     }
 
-    ZUI.Popup {
+    ZUI2.Popup {
         id: messageDialog
 
         property alias text: messageLabel.text

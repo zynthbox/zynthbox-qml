@@ -31,6 +31,8 @@ import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
@@ -478,7 +480,7 @@ Item {
         }
     }
 
-    ZUI.Popup {
+    ZUI2.Popup {
         id: trackPicker
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
         x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x

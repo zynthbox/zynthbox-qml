@@ -31,8 +31,9 @@ import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.components 1.0 as Zynthbox
+import io.zynthbox.ui2 1.0 as ZUI2
 
+import io.zynthbox.components 1.0 as Zynthbox
 
 ZUI.ActionPickerPopup {
     id: root
@@ -56,7 +57,7 @@ ZUI.ActionPickerPopup {
     Component.onCompleted: {
         selectedChannelThrottle.restart()
     }
-    ZUI.Popup {
+    ZUI2.Popup {
         id: noFreeSlotsPopup
         parent: QQC2.Overlay.overlay
         y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y

@@ -31,8 +31,9 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.Popup {
+ZUI2.Popup {
     id: component
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y

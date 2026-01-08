@@ -30,8 +30,9 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.Popup {
+ZUI2.Popup {
     id: root
     function pickChannel(channel) {
         _private.selectedChannel = channel;

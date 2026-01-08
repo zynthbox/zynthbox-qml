@@ -35,7 +35,7 @@ import io.zynthbox.ui2 1.0 as ZUI2
 
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-ZUI.Popup {
+ZUI2.Popup {
     id: component
 
     property list<QQC2.Action> actions

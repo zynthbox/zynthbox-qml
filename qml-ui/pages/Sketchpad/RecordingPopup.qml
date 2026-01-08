@@ -33,8 +33,9 @@ import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.Popup {
+ZUI2.Popup {
     id: root
     property QtObject selectedChannel: null
     property string selectedSlotType: "synth"

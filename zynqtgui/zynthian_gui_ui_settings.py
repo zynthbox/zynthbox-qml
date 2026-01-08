@@ -142,12 +142,13 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     def set_showCursor(self, value, force_set=False):
         if value != self.__showCursor or force_set:
             self.__showCursor = value
-            if value == True or value == "1":
+            if value == True:
                 zynthian_gui_config.app.restoreOverrideCursor()
             else:
                 nullCursor = QPixmap(16, 16);
                 nullCursor.fill(Qt.transparent);
-                zynthian_gui_config.app.setOverrideCursor(QCursor(nullCursor));
+                zynthian_gui_config.app.setOverrideCursor(QCursor(nullCursor));            
+            self.zynqtgui.global_settings.setValue("UI/showCursor", self.__showCursor)
             self.showCursorChanged.emit()
 
     showCursorChanged = Signal()

@@ -46,7 +46,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
         self.hardwareSequencerEditInclusionsChanged.emit()
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
-        self.__showCursor = True if os.environ.get("ZYNTHIAN_UI_ENABLE_CURSOR", "0") == "1" else False
+        self.__showCursor = True if self.zynqtgui.global_settings.value("UI/showCursor", "false") == "true" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
         self.debugModeChanged.emit();
 
@@ -139,8 +139,8 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     def get_showCursor(self):
         return self.__showCursor
 
-    def set_showCursor(self, value):
-        if value != self.__showCursor:
+    def set_showCursor(self, value, force_set=False):
+        if value != self.__showCursor or force_set:
             self.__showCursor = value
             if value == True or value == "1":
                 zynthian_gui_config.app.restoreOverrideCursor()
@@ -148,7 +148,6 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
                 nullCursor = QPixmap(16, 16);
                 nullCursor.fill(Qt.transparent);
                 zynthian_gui_config.app.setOverrideCursor(QCursor(nullCursor));
-            zynconf.save_config({"ZYNTHIAN_UI_ENABLE_CURSOR": "1" if value == True or value == "1" else "0"})
             self.showCursorChanged.emit()
 
     showCursorChanged = Signal()

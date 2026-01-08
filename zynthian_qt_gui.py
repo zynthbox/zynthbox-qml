@@ -5695,11 +5695,6 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    if zynthian_gui_config.force_enable_cursor == False:
-        nullCursor = QPixmap(16, 16);
-        nullCursor.fill(Qt.transparent);
-        app.setOverrideCursor(QCursor(nullCursor));
-
     logging.info("REGISTERING QML TYPES")
     qmlRegisterType(file_properties_helper, "Helpers", 1, 0, "FilePropertiesHelper")
     Zynthbox.Plugin.instance().registerTypes(engine, "io.zynthbox.components")
@@ -5734,6 +5729,9 @@ if __name__ == "__main__":
             # assuming there is one and only one window for now
             zynthian_gui_config.top = app.topLevelWindows()[0]
             zynthian_gui_config.app = app
+
+            # Restore cursor visibility setting
+            zynqtgui.ui_settings.set_showCursor(zynqtgui.ui_settings.showCursor, force_set=True)
 
             # Notify isExternalActive changed when top window active value changes
             zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())

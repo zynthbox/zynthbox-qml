@@ -843,7 +843,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def restart_gui_confirmed(self, params=None):
         logging.info("RESTART ZYNTHIAN-UI")
         self.zynqtgui.showMessageDialog.emit("Restarting GUI", 0)
-        self.last_state_action()
         self.zynqtgui.exit(102)
 
     @Slot()
@@ -855,7 +854,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def reboot_confirmed(self, params=None):
         logging.info("REBOOT")
         self.zynqtgui.showMessageDialog.emit("Rebooting device", 0)
-        self.last_state_action()
         self.zynqtgui.exit(101)
     @Slot()
     def power_off(self):
@@ -866,17 +864,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def power_off_confirmed(self, params=None):
         logging.info("POWER OFF")
         self.zynqtgui.showMessageDialog.emit("Powering off device", 0)
-        self.last_state_action()
         self.zynqtgui.exit(100)
-
-    def last_state_action(self):
-        if (
-            zynthian_gui_config.restore_last_state
-            and len(self.zynqtgui.screens["layer"].layers) > 0
-        ):
-            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
-        else:
-            self.zynqtgui.screens["snapshot"].delete_last_state_snapshot()
 
     def back_action(self):
         return 'main'

@@ -1920,9 +1920,6 @@ class zynthian_gui(QObject):
         elif cuia == "RELOAD_KEY_BINDING":
             zynthian_gui_keybinding.getInstance(self).load()
 
-        elif cuia == "LAST_STATE_ACTION":
-            self.screens["admin"].last_state_action()
-
         elif cuia == "ALL_NOTES_OFF":
             self.all_notes_off()
 

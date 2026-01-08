@@ -22,52 +22,47 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+
+
 import os
 import re
 import sys
 import copy
-
 import alsaaudio
 import liblo
 import signal
 import math
-
-# import psutil
-# import alsaseq
 import logging
 import threading
-
 import numpy as np
 import time
+import xml.etree.ElementTree as ET
+import faulthandler
+import Xlib.display
+import Xlib.Xatom
+import Xlib.X
+from pathlib import Path
 from datetime import datetime
 from threading import Thread, Lock, Event
 from subprocess import Popen, check_output
 from ctypes import c_float, c_double, CDLL
-import xml.etree.ElementTree as ET
-
-# Qt modules
-from PySide2.QtCore import (
-    QProcess, Qt,
-    QObject,
-    QMetaObject,
-    SIGNAL, Slot,
-    Signal,
-    Property,
-    QTimer,
-    QEventLoop,
-    QSettings
-)
-from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap, QFont
-
-# from PySide2.QtWidgets import QApplication
-from PySide2.QtQml import QQmlApplicationEngine, QQmlDebuggingEnabler, qmlRegisterType
 from soundfile import SoundFile
-
 from pynput.keyboard import Key, Controller
-
 from timeit import default_timer as timer
 from datetime import timedelta
+# Qt modules
+from PySide2.QtCore import QProcess, Qt, QObject, QMetaObject, SIGNAL, Slot, Signal, Property, QTimer, QEventLoop, QSettings
+from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap, QFont
+from PySide2.QtQml import QQmlApplicationEngine, QQmlDebuggingEnabler, qmlRegisterType
 
+sys.path.insert(1, "/zynthian/zynthbox-qml/")
+sys.path.insert(1, "./zynqtgui")
+faulthandler.enable()
+
+# Zynthbox imports
+import zynconf
+import zynautoconnect
+import Zynthbox
 from zynqtgui.zynthian_gui_bluetooth_config import zynthian_gui_bluetooth_config
 from zynqtgui.zynthian_gui_song_manager import zynthian_gui_song_manager
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
@@ -78,18 +73,10 @@ from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
 from zynqtgui.zynthian_gui_midicontroller_settings import zynthian_gui_midicontroller_settings
 from zynqtgui.zynthian_gui_multi_controller import MultiController
-
-sys.path.insert(1, "/zynthian/zynthbox-qml/")
-sys.path.insert(1, "./zynqtgui")
-
-# Zynthian specific modules
-import zynconf
-import zynautoconnect
 from zyncoder import *
 from zyncoder.zyncoder import lib_zyncoder_init
 from zyngine import zynthian_controller, zynthian_zcmidi, zynthian_layer
 from zyngine import zynthian_midi_filter
-
 # from zyngine import zynthian_engine_transport
 from zynqtgui import zynthian_gui_config, zynthian_gui_controller
 from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
@@ -107,13 +94,10 @@ from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_effect_types import zynthian_gui_effect_types
-from zynqtgui.zynthian_gui_layer_effect_chooser import (
-    zynthian_gui_layer_effect_chooser,
-)
+from zynqtgui.zynthian_gui_layer_effect_chooser import zynthian_gui_layer_effect_chooser
 from zynqtgui.zynthian_gui_engine import zynthian_gui_engine
 from zynqtgui.zynthian_gui_midi_chan import zynthian_gui_midi_chan
 from zynqtgui.zynthian_gui_midi_cc import zynthian_gui_midi_cc
-
 from zynqtgui.zynthian_gui_midi_key_range import zynthian_gui_midi_key_range
 from zynqtgui.zynthian_gui_audio_out import zynthian_gui_audio_out
 # from zynqtgui.zynthian_gui_midi_out import zynthian_gui_midi_out
@@ -126,19 +110,13 @@ from zynqtgui.zynthian_gui_sample_library import zynthian_gui_sample_library
 from zynqtgui.zynthian_gui_channel_external_setup import zynthian_gui_channel_external_setup
 from zynqtgui.zynthian_gui_channel_wave_editor import zynthian_gui_channel_wave_editor
 from zynqtgui.zynthian_gui_confirm import zynthian_gui_confirm
-
 # from zynqtgui.zynthian_gui_keyboard import zynthian_gui_keyboard
 from zynqtgui.zynthian_gui_keybinding import zynthian_gui_keybinding
 from zynqtgui.zynthian_gui_main import zynthian_gui_main
 from zynqtgui.zynthian_gui_audio_recorder import zynthian_gui_audio_recorder
-from zynqtgui.zynthian_gui_test_touchpoints import (
-    zynthian_gui_test_touchpoints,
-)
+from zynqtgui.zynthian_gui_test_touchpoints import zynthian_gui_test_touchpoints
 from zynqtgui.zynthian_gui_playgrid import zynthian_gui_playgrid
-from zynqtgui.sketchpad.zynthian_gui_sketchpad import (
-    zynthian_gui_sketchpad,
-)
-
+from zynqtgui.sketchpad.zynthian_gui_sketchpad import zynthian_gui_sketchpad
 from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
 from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
 from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
@@ -150,14 +128,6 @@ from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.zynthian_osd import zynthian_osd
 from zynqtgui.utils.webconf_fifo_handler import webconf_fifo_handler
 
-import Zynthbox
-
-from pathlib import Path
-
-import faulthandler
-faulthandler.enable()
-
-import Xlib.display, Xlib.Xatom, Xlib.X
 
 # -------------------------------------------------------------------------------
 # QObject to bridge status data to QML (ie audio levels, cpu levels etc
@@ -316,7 +286,6 @@ class zynthian_gui_status_data(QObject):
 # -------------------------------------------------------------------------------
 
 class zynthian_gui(QObject):
-
     screens_sequence = (
         "sketchpad",
         "layers_for_channel",

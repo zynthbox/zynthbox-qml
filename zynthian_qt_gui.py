@@ -5651,8 +5651,9 @@ if __name__ == "__main__":
             zynthian_gui_config.top = app.topLevelWindows()[0]
             zynthian_gui_config.app = app
 
-            # Restore cursor visibility setting
+            # Restore cursor and vncserver state
             zynqtgui.ui_settings.set_showCursor(zynqtgui.ui_settings.showCursor, force_set=True)
+            zynqtgui.ui_settings.set_vncserverEnabled(zynqtgui.ui_settings.vncserverEnabled, force_set=True)
 
             # Notify isExternalActive changed when top window active value changes
             zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())

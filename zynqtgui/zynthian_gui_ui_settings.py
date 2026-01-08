@@ -25,11 +25,11 @@
 
 import os
 import logging
+from subprocess import check_output
 
 from PySide2.QtCore import Signal, Property, Qt
 from PySide2.QtGui import QPixmap, QCursor, QGuiApplication
 from . import zynthian_qt_gui_base, zynthian_gui_config
-import zynconf
 
 class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     data_dir = os.environ.get("ZYNTHIAN_DATA_DIR", "/zynthian/zynthian-data")
@@ -38,17 +38,13 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_ui_settings, self).__init__(parent)
         self.__doubleClickThreshold = int(self.zynqtgui.global_settings.value("UI/doubleClickThreshhold", 200))
-        self.doubleClickThresholdChanged.emit()
         self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "false") == "true" else False
-        self.hardwareSequencerChanged.emit()
         self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
-        self.hardwareSequencerPreviewStyleChanged.emit()
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
-        self.hardwareSequencerEditInclusionsChanged.emit()
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
         self.__showCursor = True if self.zynqtgui.global_settings.value("UI/showCursor", "false") == "true" else False
+        self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
-        self.debugModeChanged.emit();
 
     def fill_list(self):
         super().fill_list()
@@ -57,6 +53,23 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.select_path = "UiSettings"
         self.select_path_element = "UiSettings"
         super().set_select_path()
+
+    def start_vncserver(self):
+        logging.info("STARTING VNC SERVICES")
+        try:
+            check_output("systemctl start vncserver0; systemctl start novnc0", shell=True)
+            self.vncserverEnabled = True
+        except Exception as e:
+            logging.error(e)
+
+    def stop_vncserver(self):
+        logging.info("STOPPING VNC SERVICES")
+
+        try:
+            check_output("systemctl stop novnc0;", shell=True)
+            self.vncserverEnabled = False
+        except Exception as e:
+            logging.error(e)
 
     ### BEGIN Property doubleClickThreshhold
     def get_doubleClickThreshhold(self):
@@ -155,6 +168,25 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     showCursor = Property(bool, get_showCursor, set_showCursor, notify=showCursorChanged)
     ### END Property showCursor
+
+    ### BEGIN Property vncserverEnabled
+    def get_vncserverEnabled(self):
+        return self.__vncserverEnabled
+
+    def set_vncserverEnabled(self, value, force_set=False):
+        if value != self.__vncserverEnabled or force_set:
+            self.__vncserverEnabled = value
+            self.zynqtgui.global_settings.setValue("UI/vncserverEnabled", self.__vncserverEnabled)
+            if value == True:
+                self.start_vncserver()
+            else:
+                self.stop_vncserver()
+            self.vncserverEnabledChanged.emit()
+
+    vncserverEnabledChanged = Signal()
+
+    vncserverEnabled = Property(bool, get_vncserverEnabled, set_vncserverEnabled, notify=vncserverEnabledChanged)
+    ### END Property vncserverEnabled
 
     ### BEGIN Property fontSize
     def get_fontSize(self):

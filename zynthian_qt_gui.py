@@ -3080,29 +3080,10 @@ class zynthian_gui(QObject):
         # logging.info("Short Switch " + str(i))
         # Standard 4 ZynSwitches
         if i == 0:
-            if (
-                self.active_screen == "control"
-                or self.modal_screen == "alsa_mixer"
-            ):
-                if self.screens["layer"].get_num_root_layers() > 1:
-                    logging.info("Next layer")
-                    self.screens["layer"].next(True)
-                else:
-                    self.show_screen("layer")
-
-            elif self.active_screen == "layer":
-                if self.modal_screen is not None:
-                    self.show_screen("layer")
-                elif self.screens["layer"].get_num_root_layers() > 1:
-                    logging.info("Next layer")
-                    self.screens["layer"].next(False)
-
-            else:
-                if self.active_screen == "preset":
-                    self.screens["preset"].restore_preset()
-                self.show_screen("layer")
-
+            # Unused switch in zynthbox
+            pass
         elif i == 1:
+            # Back switch
             screen_back = None
             if  self.__forced_screen_back != None and self.__forced_screen_back != "":
                 if self.__forced_screen_back in self.non_modal_screens:
@@ -3168,35 +3149,12 @@ class zynthian_gui(QObject):
                 else:
                     self.show_modal(screen_back)
                     self.modal_screen_back = None
-
         elif i == 2:
-            if self.modal_screen == "snapshot":
-                self.screens["snapshot"].next()
-            elif (
-                self.active_screen == "control"
-                or self.modal_screen == "alsa_mixer"
-            ) and self.screens["control"].mode == "control":
-                if self.midi_learn_mode or self.midi_learn_zctrl:
-                    if self.modal_screen == "zs3_learn":
-                        self.show_screen("control")
-                    elif zynthian_gui_config.midi_prog_change_zs3:
-                        self.show_modal("zs3_learn")
-                else:
-                    self.enter_midi_learn_mode()
-
-            elif len(self.screens["layer"].layers) > 0:
-                self.enter_midi_learn_mode()
-                self.show_modal("zs3_learn")
-
-            else:
-                self.load_snapshot()
-
+            # Unused switch in zynthbox
+            pass
         elif i == 3:
-            if self.modal_screen:
-                self.screens[self.modal_screen].switch_select("S")
-            else:
-                self.screens[self.active_screen].switch_select("S")
-
+            # Unused switch in zynthbox
+            pass
         # Custom ZynSwitches
         elif i >= 4:
             self.custom_switch_ui_action(i - 4, "S")

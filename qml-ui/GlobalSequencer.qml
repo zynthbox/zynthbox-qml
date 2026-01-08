@@ -1297,7 +1297,12 @@ Item {
                 if (zynqtgui.starButtonPressed) {
                     let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
                     if (currentKey > 0) {
-                        currentKey = currentKey + 1;
+                        if (zynqtgui.selectButtonPressed) {
+                            zynqtgui.ignoreNextSelectButtonPress = true;
+                            currentKey = Math.min(127, currentKey + 12);
+                        } else {
+                            currentKey = Math.min(127, currentKey + 1);
+                        }
                         _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
                         _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
                     }
@@ -1316,18 +1321,23 @@ Item {
                     let workingModel = _private.pattern.workingModel;
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
+                            let transposeOctave = false;
+                            if (zynqtgui.knob3Pressed) {
+                                zynqtgui.ignoreNextKnob3PressedPress = true;
+                                transposeOctave = true;
+                            }
                             if (zynqtgui.altButtonPressed) {
                                 // Hold down a bar button and twist BK to transpose all that bar's notes
                                 if (stepButtonIndex < 8) {
                                     workingModel.startLongOperation();
                                     for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
-                                        workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, 1);
+                                        workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, 1, -1, transposeOctave);
                                     }
                                     workingModel.endLongOperation();
                                 }
                             } else {
                                 // Hold down a step button and twist BK to transpose that step's notes
-                                workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, 1);
+                                workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, 1, -1, transposeOctave);
                                 let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
                                 let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
                                 if (theNote) {
@@ -1377,7 +1387,12 @@ Item {
                 if (zynqtgui.starButtonPressed) {
                     let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
                     if (currentKey < 127) {
-                        currentKey = currentKey - 1;
+                        if (zynqtgui.selectButtonPressed) {
+                            zynqtgui.ignoreNextSelectButtonPress = true;
+                            currentKey = Math.max(0, currentKey - 12);
+                        } else {
+                            currentKey = currentKey - 1;
+                        }
                         _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
                         _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
                     }
@@ -1396,18 +1411,23 @@ Item {
                     let workingModel = _private.pattern.workingModel;
                     for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
                         if (_private.heldStepButtons[stepButtonIndex]) {
+                            let transposeOctave = false;
+                            if (zynqtgui.knob3Pressed) {
+                                zynqtgui.ignoreNextKnob3PressedPress = true;
+                                transposeOctave = true;
+                            }
                             if (zynqtgui.altButtonPressed) {
                                 // Hold down a bar button and twist BK to transpose all that bar's notes
                                 if (stepButtonIndex < 8) {
                                     workingModel.startLongOperation();
                                     for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
-                                        workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, -1);
+                                        workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, -1, -1, transposeOctave);
                                     }
                                     workingModel.endLongOperation();
                                 }
                             } else {
                                 // Hold down a step button and twist BK to transpose that step's notes
-                                workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, -1);
+                                workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, -1, -1, transposeOctave);
                                 let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
                                 let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
                                 if (theNote) {

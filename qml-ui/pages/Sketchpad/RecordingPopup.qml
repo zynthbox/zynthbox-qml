@@ -164,7 +164,7 @@ ZUI.Popup {
                         root.selectedClip = root.selectedChannel.selectedClip;
                         // Take a snapshot of our lastSelectedObj, so we can keep that stable when changing settings
                         root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
-                        root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value
+                        root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value ? zynqtgui.sketchpad.lastSelectedObj.value : null
                         root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
                         root.lastSelectedTrack = zynqtgui.sketchpad.lastSelectedObj.track
                         // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
@@ -282,7 +282,8 @@ ZUI.Popup {
             root.selectedClip = root.selectedChannel.selectedClip;
             // If we're not already recording, take a snapshot of our lastSelectedObj, so we can keep that stable when changing settings
             root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
-            root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value
+            // value can be undefined (which won't work, but we can check for falsity and just go with null)
+            root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value ? zynqtgui.sketchpad.lastSelectedObj.value : null
             root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
             root.lastSelectedTrack = zynqtgui.sketchpad.lastSelectedObj.track
             // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously

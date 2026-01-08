@@ -765,20 +765,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
     def set_selector_screen(self): 
-        for i in range(0,len(self.zgui_controllers)):
-            self.zgui_controllers[i].set_hl(zynthian_gui_config.color_ctrl_bg_off)
         self.set_selector()
 
 
     def set_mode_select(self):
         self.mode='select'
         self.set_selector_screen()
-        #self.listbox.config(selectbackground=zynthian_gui_config.color_ctrl_bg_on,
-        #    selectforeground=zynthian_gui_config.color_ctrl_tx,
-        #    fg=zynthian_gui_config.color_ctrl_tx)
-        #self.listbox.config(selectbackground=zynthian_gui_config.color_ctrl_bg_off,
-            #selectforeground=zynthian_gui_config.color_ctrl_tx,
-            #fg=zynthian_gui_config.color_ctrl_tx_off)
         self.select(self.index)
         self.set_select_path()
 

@@ -155,20 +155,6 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
         return res
 
 
-    def fill_listbox(self):
-        super().fill_listbox()
-        self.highlight()
-
-
-    # Highlight command and current record played, if any ...
-    def highlight(self):
-        for i, row in enumerate(self.list_data):
-            if row[0] is not None and row[0]==self.current_playback_fpath:
-                self.listbox.itemconfig(i, {'bg':zynthian_gui_config.color_hl})
-            else:
-                self.listbox.itemconfig(i, {'fg':zynthian_gui_config.color_panel_tx})
-
-
     def select_action(self, i, t='S'):
         fpath=self.list_data[i][0]
 

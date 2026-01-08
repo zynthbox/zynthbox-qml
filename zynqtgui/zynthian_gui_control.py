@@ -888,106 +888,6 @@ class zynthian_gui_control(zynthian_gui_selector):
     def selectPrevPage(self):
         self.selectedPage = max(0, self.selectedPage - 1)
 
-#    @Slot()
-#    def zyncoder_set_knob1_value(self):
-#        try:
-#            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
-#            controller = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
-#            if controller.index in [0, 1, 2, 3]:
-#                controller.read_zyncoder()
-#        except:
-#            pass
-
-#    @Slot()
-#    def zyncoder_set_knob2_value(self):
-#        try:
-#            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
-#            controller = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
-#            if controller.index in [0, 1, 2, 3]:
-#                controller.read_zyncoder()
-#        except:
-#            pass
-
-#    @Slot()
-#    def zyncoder_set_knob3_value(self):
-#        try:
-#            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
-#            controller = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
-#            if controller.index in [0, 1, 2, 3]:
-#                controller.read_zyncoder()
-#        except:
-#            pass
-
-#    @Slot()
-#    def zyncoder_set_big_knob_value(self):
-#        try:
-#            if self.zynqtgui.get_current_screen() == self and self.custom_control_page == "":
-#                self.selected_column_gui_controller.read_zyncoder()
-
-#                if (self.selected_column_gui_controller.value // self.bigknob_multiplier) != self.selectedColumn:
-#                    self.selectedColumn = self.selected_column_gui_controller.value // self.bigknob_multiplier
-#        except:
-#            pass
-
-#    def zyncoder_read(self, zcnums=None):
-#        if not self.zynqtgui.isBootingComplete:
-#            return
-
-#        if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self:
-#            return
-
-#        #Read Controller
-#        if self.controllers_lock and self.mode=='control' and self.zcontrollers:
-#            # If there is no custom page, use small knobs to set values of selected columns controllers
-#            # If there is a custom page selected, use big knob to set active controller's value
-#            if self.__custom_control_page == "":
-#                QMetaObject.invokeMethod(self, "zyncoder_set_knob1_value", Qt.QueuedConnection)
-#                QMetaObject.invokeMethod(self, "zyncoder_set_knob2_value", Qt.QueuedConnection)
-#                QMetaObject.invokeMethod(self, "zyncoder_set_knob3_value", Qt.QueuedConnection)
-#                QMetaObject.invokeMethod(self, "zyncoder_set_big_knob_value", Qt.QueuedConnection)
-#            else:
-#                # for i, zctrl in enumerate(self.zcontrollers):
-#                #     #print('Read Control ' + str(self.zgui_controllers[i].title))
-#                #
-#                #     if not zcnums or i in zcnums:
-#                #         if i >= len(self.zgui_controllers):
-#                #             continue
-#                #         res=self.zgui_controllers[i].read_zyncoder()
-#                #
-#                #         if res and self.zynqtgui.midi_learn_mode:
-#                #             logging.debug("MIDI-learn ZController {}".format(i))
-#                #             self.zynqtgui.midi_learn_mode = False
-#                #             self.midi_learn(i)
-#                #
-#                #         if res and self.xyselect_mode:
-#                #             self.zyncoder_read_xyselect(zctrl, i)
-
-#                for ctrl in self.zgui_custom_controllers_map.values():
-#                    if ctrl.index <= zynthian_gui_config.select_ctrl:
-#                        ctrl.read_zyncoder()
-
-#        elif self.mode=='select':
-#            super().zyncoder_read()
-
-
-#    def zyncoder_read_xyselect(self, zctrl, i):
-#        #Detect a serie of changes in the same controller
-#        if zctrl==self.xyselect_zread_last_zctrl:
-#            self.xyselect_zread_counter+=1
-#        else:
-#            self.xyselect_zread_last_zctrl=zctrl
-#            self.xyselect_zread_counter=0
-
-#        #If the change counter is major of ...
-#        if self.xyselect_zread_counter>5:
-#            if self.xyselect_zread_axis=='X' and self.set_xyselect_x(i):
-#                self.xyselect_zread_axis='Y'
-#                self.xyselect_zread_counter=0
-#            elif self.xyselect_zread_axis=='Y' and self.set_xyselect_y(i):
-#                self.xyselect_zread_axis='X'
-#                self.xyselect_zread_counter=0
-
-
     def get_zgui_controller(self, zctrl):
         for zgui_controller in self.zgui_controllers:
             if zgui_controller.zctrl==zctrl:
@@ -1018,7 +918,7 @@ class zynthian_gui_control(zynthian_gui_selector):
             zctrl.set_value(val)
         for i,zgui_controller in enumerate(self.zgui_controllers):
             if zgui_controller.zctrl==zctrl:
-                if i==zynthian_gui_config.select_ctrl and self.mode=='select':
+                if i==3 and self.mode=='select':
                     zgui_controller.zctrl_sync(False)
                 else:
                     zgui_controller.zctrl_sync(True)
@@ -1028,7 +928,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         zgui_controller=self.zgui_controllers[i]
         if val is not None:
             zgui_controller.zctrl.set_value(val)
-        if i==zynthian_gui_config.select_ctrl and self.mode=='select':
+        if i==3 and self.mode=='select':
             zgui_controller.zctrl_sync(False)
         else:
             zgui_controller.zctrl_sync(True)

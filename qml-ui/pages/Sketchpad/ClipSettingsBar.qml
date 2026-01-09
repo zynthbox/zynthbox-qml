@@ -33,6 +33,7 @@ import Qt.labs.folderlistmodel 2.11
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 // GridLayout so TabbedControlView knows how to navigate it
 ColumnLayout {
@@ -270,7 +271,7 @@ ColumnLayout {
                         bpmGuessedDialog.open();
                         zynqtgui.stop_loading();
                     }
-                    ZUI.DialogQuestion {
+                    ZUI2.DialogQuestion {
                         id: bpmGuessedDialog
                         property double guessedBPM: 0
                         title: "Estimated BPM"
@@ -379,7 +380,7 @@ ColumnLayout {
                 onClicked: {
                     playbackStylePicker.open();
                 }
-                ZUI.ActionPickerPopup {
+                ZUI2.ActionPickerPopup {
                     id: playbackStylePicker
                     actions: [
                         Kirigami.Action {
@@ -457,7 +458,7 @@ ColumnLayout {
                 onClicked: {
                     timeStretchingPopup.open();
                 }
-                ZUI.ActionPickerPopup {
+                ZUI2.ActionPickerPopup {
                     id: timeStretchingPopup
                     actions: [
                         Kirigami.Action {

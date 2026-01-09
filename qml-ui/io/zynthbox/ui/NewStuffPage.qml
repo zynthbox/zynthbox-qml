@@ -30,8 +30,9 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: component
     property bool isVisible: zynqtgui.current_screen_id === component.screenId
 

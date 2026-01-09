@@ -28,9 +28,11 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import "Sketchpad" as Sketchpad
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: root
 
     signal openCaptivePortal(string url)
@@ -90,7 +92,7 @@ ZUI.ScreenPage {
         }
     }
 
-    ZUI.Dialog {
+    ZUI2.Dialog {
         id: connectDialog
 
         property string ssid
@@ -221,7 +223,7 @@ ZUI.ScreenPage {
                 text: qsTr("Country")
             }
 
-            ZUI.ComboBox {
+            ZUI2.ComboBox {
                 id: countryCodesCombo
                 Layout.fillWidth: false
                 Layout.fillHeight: false

@@ -933,7 +933,7 @@ QQC2.Pane {
         id: channelKeyZoneSetup
     }
 
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: sketchPickerPopup
         objectName: "sketchPickerPopup"
         columns: 3
@@ -998,7 +998,7 @@ QQC2.Pane {
         ]
     }
 
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: samplePickerPopup
         objectName: "samplePickerPopup"
         property QtObject sketch: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.samples[root.selectedChannel.selectedSlot.value] : null
@@ -1101,7 +1101,7 @@ QQC2.Pane {
     ExternalMidiChannelPicker {
         id: externalMidiChannelPicker
     }
-    ZUI.ComboBox {
+    ZUI2.ComboBox {
         id: externalMidiOutPicker
         visible: false
         function pickOutput(channel) {
@@ -1134,7 +1134,7 @@ QQC2.Pane {
         }
     }
 
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: fxSetupDialog
         property var selectedFx: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_fxslot"
                                  ? root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value]

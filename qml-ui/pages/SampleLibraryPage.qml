@@ -32,9 +32,11 @@ import Qt.labs.folderlistmodel 2.15
 
 import Helpers 1.0 as Helpers
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: component
 
     property bool isVisible: ["sample_library"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -228,7 +230,7 @@ ZUI.ScreenPage {
             filePath: "/zynthian/zynthian-my-data"
         }
     }
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: sampleSlotAssigner
         objectName: ""
         rows: 5

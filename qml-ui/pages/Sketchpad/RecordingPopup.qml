@@ -710,7 +710,7 @@ ZUI2.Popup {
                                     Layout.alignment: Qt.AlignCenter
                                     text: qsTr("Audio Source:")
                                 }
-                                ZUI.ComboBox {
+                                ZUI2.ComboBox {
                                     id: sourceCombo
 
                                     Layout.fillWidth: true
@@ -738,7 +738,7 @@ ZUI2.Popup {
                                     Layout.alignment: Qt.AlignCenter
                                     text: qsTr("Recording Channel:")
                                 }
-                                ZUI.ComboBox {
+                                ZUI2.ComboBox {
                                     id: recordingChannelCombo
 
                                     Layout.fillWidth: true
@@ -767,7 +767,7 @@ ZUI2.Popup {
                                     enabled: parent.enabled
                                     text: qsTr("Source Track:")
                                 }
-                                ZUI.ComboBox {
+                                ZUI2.ComboBox {
                                     id: channelCombo
 
                                     Layout.fillWidth: true
@@ -829,7 +829,7 @@ ZUI2.Popup {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                                     text: qsTr("Midi Source:")
                                 }
-                                ZUI.ComboBox {
+                                ZUI2.ComboBox {
                                     id: midiSourceCombo
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
@@ -898,7 +898,7 @@ ZUI2.Popup {
                                 Layout.preferredHeight: _private.preferredRowHeight
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-remove-symbolic"
@@ -917,7 +917,7 @@ ZUI2.Popup {
                                         horizontalAlignment: Text.AlignHCenter
                                         text: _private.selectedPattern ? qsTr("Step Length: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.stepLength)) : ""
                                     }
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-add-symbolic"
@@ -937,7 +937,7 @@ ZUI2.Popup {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-remove-symbolic"
@@ -987,7 +987,7 @@ ZUI2.Popup {
                                             ]
                                         }
                                     }
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-add-symbolic"
@@ -1002,7 +1002,7 @@ ZUI2.Popup {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-remove-symbolic"
@@ -1053,7 +1053,7 @@ ZUI2.Popup {
                                         }
                                     }
 
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-add-symbolic"

@@ -30,11 +30,14 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.15
+
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.6 as Kirigami
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: root
 
     property bool isVisible: ["midicontroller_settings"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -232,7 +235,7 @@ ZUI.ScreenPage {
 
     }
 
-    ZUI.DialogQuestion {
+    ZUI2.DialogQuestion {
         id: confirmer
 
         property var callbackFunction: null
@@ -251,7 +254,7 @@ ZUI.ScreenPage {
         }
     }
 
-    ZUI.ComboBox {
+    ZUI2.ComboBox {
         id: trackPicker
 
         property int trackValue: -1
@@ -348,7 +351,7 @@ ZUI.ScreenPage {
 
     }
 
-    ZUI.ComboBox {
+    ZUI2.ComboBox {
         id: slotPicker
 
         property int slotValue: -1
@@ -430,7 +433,7 @@ ZUI.ScreenPage {
 
     }
 
-    ZUI.ComboBox {
+    ZUI2.ComboBox {
         id: midiChannelPicker
 
         property int channelValue: -1
@@ -542,7 +545,7 @@ ZUI.ScreenPage {
 
     }
 
-    ZUI.ComboBox {
+    ZUI2.ComboBox {
         id: cuiaEventPicker
 
         property int cuiaEvent: -1
@@ -582,7 +585,7 @@ ZUI.ScreenPage {
 
     }
 
-    ZUI.ComboBox {
+    ZUI2.ComboBox {
         id: valueSpecifierPicker
 
         property int valueSpecifier: -1
@@ -642,7 +645,7 @@ ZUI.ScreenPage {
 
     }
 
-    ZUI.DialogQuestion {
+    ZUI2.DialogQuestion {
         id: midiEventListener
 
         property var selectedEvent: []

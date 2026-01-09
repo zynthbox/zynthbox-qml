@@ -31,9 +31,11 @@ import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.DialogQuestion {
+ZUI2.DialogQuestion {
     id: component
     function showEqualizer(channel, slotType, slotIndex) {
         _private.slotIndex = slotIndex;
@@ -497,7 +499,7 @@ ZUI.DialogQuestion {
                                         color: bandDelegate.filterSettings ? bandDelegate.filterSettings.color : "black"
                                     }
                                 }
-                                ZUI.PlayGridButton {
+                                ZUI2.PlayGridButton {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -506,7 +508,7 @@ ZUI.DialogQuestion {
                                         filterTypeCombo.currentIndex = bandDelegate.filterSettings.filterType;
                                         filterTypeCombo.onClicked()
                                     }
-                                    ZUI.ComboBox {
+                                    ZUI2.ComboBox {
                                         id: filterTypeCombo
                                         visible: false;
                                         model: bandDelegate.filterSettings ? bandDelegate.filterSettings.filterTypeNames() : 0
@@ -698,7 +700,7 @@ ZUI.DialogQuestion {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                         Layout.fillHeight: false
@@ -712,7 +714,7 @@ ZUI.DialogQuestion {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 1
                                     }
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                         Layout.fillHeight: false
@@ -782,7 +784,7 @@ ZUI.DialogQuestion {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit
                     }
-                    ZUI.PlayGridButton {
+                    ZUI2.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -795,7 +797,7 @@ ZUI.DialogQuestion {
                             sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 0);
                         }
                     }
-                    ZUI.PlayGridButton {
+                    ZUI2.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -808,7 +810,7 @@ ZUI.DialogQuestion {
                             sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 1);
                         }
                     }
-                    ZUI.ComboBox {
+                    ZUI2.ComboBox {
                         id: sideChainSourcePicker
                         visible: false;
                         model: Zynthbox.MidiRouter.model.audioInSources

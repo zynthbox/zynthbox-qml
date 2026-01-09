@@ -277,7 +277,7 @@ Item {
         }
     }
 
-    ZUI.Dialog {
+    ZUI2.Dialog {
         id: loadedSequenceOptionsPicker
         property QtObject loadedSequence
         width: component.Window.width - Kirigami.Units.largeSpacing * 2
@@ -330,7 +330,7 @@ Item {
         }
     }
 
-    ZUI.Dialog {
+    ZUI2.Dialog {
         id: loadedPatternOptionsPicker
         property QtObject loadedPattern
         width: component.Window.width - Kirigami.Units.largeSpacing * 2
@@ -500,7 +500,7 @@ Item {
                 columns: 4
                 Repeater {
                     model: zynqtgui.sketchpad.song.channelsModel
-                    delegate: ZUI.PlayGridButton {
+                    delegate: ZUI2.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.preferredWidth: trackPicker.width / 4
                         Layout.fillHeight: true

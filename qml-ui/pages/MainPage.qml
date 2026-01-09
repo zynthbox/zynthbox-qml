@@ -32,7 +32,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     screenId: "main"
     backAction.visible: false
 

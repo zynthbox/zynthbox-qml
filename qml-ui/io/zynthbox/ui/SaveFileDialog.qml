@@ -6,9 +6,11 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.Dialog {
+ZUI2.Dialog {
     property alias headerText: header.text
     property bool conflict: false
     property alias fileName: fileName.text

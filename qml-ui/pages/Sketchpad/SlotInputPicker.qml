@@ -30,9 +30,11 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.DialogQuestion {
+ZUI2.DialogQuestion {
     id: component
     function pickSlotInputs(channel, slotType, slotIndex) {
         _private.slotIndex = slotIndex;
@@ -101,7 +103,7 @@ ZUI.DialogQuestion {
         ColumnLayout {
             visible: _private.displayedSection === 0
             Layout.fillWidth: true
-            ZUI.ComboBox {
+            ZUI2.ComboBox {
                 id: sourceComboBox
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -189,7 +191,7 @@ ZUI.DialogQuestion {
         ColumnLayout {
             visible: _private.displayedSection === 1
             Layout.fillWidth: true
-            ZUI.ComboBox {
+            ZUI2.ComboBox {
                 id: midiSourceComboBox
                 Layout.fillWidth: true
                 Layout.fillHeight: true

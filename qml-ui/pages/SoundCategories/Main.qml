@@ -29,10 +29,12 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import '../../io/zynthbox/ui' 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import '../Sketchpad' as Sketchpad
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: root
 
     property QtObject selectedChannel: applicationWindow().selectedChannel
@@ -590,7 +592,7 @@ ZUI.ScreenPage {
             Kirigami.Separator {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 2
-                ZUI.ActionPickerPopup {
+                ZUI2.ActionPickerPopup {
                     id: slotsActionPicker
                     property string slotType: "synth"
                     readonly property string slotTypeName: slotType === "synth"

@@ -82,7 +82,7 @@ ZUI2.Popup {
                     }
                 }
             }
-            ZUI.DialogQuestion {
+            ZUI2.DialogQuestion {
                 id: modelRemover
                 function removeVariant(variantIndex) {
                     modelRemover.variantIndex = variantIndex;

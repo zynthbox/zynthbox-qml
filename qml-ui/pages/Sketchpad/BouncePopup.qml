@@ -489,7 +489,7 @@ ZUI2.Popup {
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit / 2
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 enabled: _private.bounceProgress === -1
                 checked: _private.bounceLevel === 0
@@ -498,7 +498,7 @@ ZUI2.Popup {
                     _private.bounceLevel = 0;
                 }
             }
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 enabled: _private.bounceProgress === -1
                 checked: _private.bounceLevel === 1
@@ -507,7 +507,7 @@ ZUI2.Popup {
                     _private.bounceLevel = 1;
                 }
             }
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 enabled: _private.bounceProgress === -1
                 checked: _private.bounceLevel === 2
@@ -553,7 +553,7 @@ ZUI2.Popup {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     Layout.fillHeight: true
                     Layout.fillWidth: false
                     Layout.minimumWidth: Kirigami.Units.iconSizes.large
@@ -568,7 +568,7 @@ ZUI2.Popup {
                     Layout.fillHeight: true
                     text: qsTr("Repeat pattern %1 times").arg(_private.patternRepeatCount)
                 }
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     Layout.fillHeight: true
                     Layout.fillWidth: false
                     Layout.minimumWidth: Kirigami.Units.iconSizes.large
@@ -593,7 +593,7 @@ ZUI2.Popup {
             Layout.fillHeight: true
             Layout.preferredHeight: Kirigami.Units.gridUnit
             columns: 3
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 enabled: _private.bounceProgress === -1
                 checked: _private.includeLeadin
@@ -616,7 +616,7 @@ ZUI2.Popup {
                     color: Kirigami.Theme.textColor
                 }
             }
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 enabled: _private.bounceProgress === -1
                 checked: _private.includeFadeout
@@ -625,7 +625,7 @@ ZUI2.Popup {
                     _private.includeFadeout = !_private.includeFadeout;
                 }
             }
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 checked: _private.includeLeadinInLoop
                 enabled: _private.bounceProgress === -1 && _private.includeLeadin
@@ -649,7 +649,7 @@ ZUI2.Popup {
                     color: Kirigami.Theme.textColor
                 }
             }
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 checked: _private.includeFadeoutInLoop
                 enabled: _private.bounceProgress === -1 && _private.includeFadeout

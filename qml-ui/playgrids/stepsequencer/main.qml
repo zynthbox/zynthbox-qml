@@ -895,7 +895,7 @@ ZUI.BasePlayGrid {
                             Layout.preferredWidth: Kirigami.Units.gridUnit
                             ColumnLayout {
                                 anchors.fill: parent
-                                ZUI.PlayGridButton {
+                                ZUI2.PlayGridButton {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     text: "+"
@@ -935,7 +935,7 @@ ZUI.BasePlayGrid {
                                         ]
                                     }
                                 }
-                                ZUI.PlayGridButton {
+                                ZUI2.PlayGridButton {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     text: "-"
@@ -1864,7 +1864,7 @@ ZUI.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.minimumWidth: parent.width / 5
                                     Layout.maximumWidth: Layout.minimumWidth
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         text: "+"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.stepLength < _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, 1)
                                         onClicked: {
@@ -1878,7 +1878,7 @@ ZUI.BasePlayGrid {
                                         text: _private.workingPatternModel ? "step length:\n%1".arg(_private.workingPatternModel.stepLengthName(_private.stepLength)) : ""
                                     }
 
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         text:"-"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.stepLength > _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, -1)
                                         onClicked: {
@@ -1901,7 +1901,7 @@ ZUI.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.minimumWidth: parent.width / 5
                                     Layout.maximumWidth: Layout.minimumWidth
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         text: "+"
                                         enabled: _private.swing < 99
                                         onClicked: {
@@ -1949,7 +1949,7 @@ ZUI.BasePlayGrid {
                                         }
                                     }
 
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         text:"-"
                                         enabled: _private.swing > 0
                                         onClicked: {
@@ -1972,7 +1972,7 @@ ZUI.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.minimumWidth: parent.width / 5
                                     Layout.maximumWidth: Layout.minimumWidth
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         text: "+"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.patternLength < (_private.workingPatternModel.bankLength * _private.workingPatternModel.width)
                                         onClicked: {
@@ -2013,7 +2013,7 @@ ZUI.BasePlayGrid {
                                         }
                                     }
 
-                                    ZUI.PlayGridButton {
+                                    ZUI2.PlayGridButton {
                                         text:"-"
                                         enabled: _private.workingPatternModel && _private.workingPatternModel.patternLength > _private.workingPatternModel.width
                                         onClicked: {
@@ -2032,7 +2032,7 @@ ZUI.BasePlayGrid {
                                     }
                                 }
 
-                                ZUI.PlayGridButton {
+                                ZUI2.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "copy\n"
                                     onPressed: {
@@ -2053,7 +2053,7 @@ ZUI.BasePlayGrid {
                                     }
                                 }
 
-                                ZUI.PlayGridButton {
+                                ZUI2.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
                                     enabled: _private.clipBoard !== undefined
@@ -2070,7 +2070,7 @@ ZUI.BasePlayGrid {
                                     }
                                 }
 
-                                ZUI.PlayGridButton {
+                                ZUI2.PlayGridButton {
                                     Layout.fillWidth: true
                                     text: "clear\n"
                                     visualPressAndHold: true
@@ -2086,14 +2086,14 @@ ZUI.BasePlayGrid {
 
                                 //ColumnLayout {
                                     //Layout.fillHeight: true
-                                    //ZUI.PlayGridButton {
+                                    //ZUI2.PlayGridButton {
                                         //text: "bank I"
                                         //checked: _private.bankOffset === 0
                                         //onClicked: {
                                             //_private.sequence.setPatternProperty(_private.activePattern, "bankOffset", 0)
                                         //}
                                     //}
-                                    //ZUI.PlayGridButton {
+                                    //ZUI2.PlayGridButton {
                                         //text: "bank II"
                                         //checked: _private.bankOffset === 8
                                         //onClicked: {
@@ -2282,7 +2282,7 @@ ZUI.BasePlayGrid {
                 id: sidebarRoot
                 anchors.fill: parent
 
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.sequence
                         ? _private.sequence.soloPatternObject
@@ -2319,7 +2319,7 @@ ZUI.BasePlayGrid {
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "arrow-up"
                     onClicked: {
@@ -2332,7 +2332,7 @@ ZUI.BasePlayGrid {
                     Layout.alignment: Qt.AlignHCenter
                 }
 
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "arrow-down"
                     onClicked: {
@@ -2342,7 +2342,7 @@ ZUI.BasePlayGrid {
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: "Note:\n" + (component.heardNotes.length > 0
                         ? Zynthbox.Chords.symbol(component.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
@@ -2378,7 +2378,7 @@ ZUI.BasePlayGrid {
                         visible: component.heardNotes.length > 0 || _private.selectedStep > -1
                         source: "edit-clear-locationbar"
                     }
-                    ZUI.ActionPickerPopup {
+                    ZUI2.ActionPickerPopup {
                         id: clearNotesPopup
                         columns: 2
                         rows: 2
@@ -2424,7 +2424,7 @@ ZUI.BasePlayGrid {
                         ]
                     }
                 }
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     id: defaultNoteSettingsButton
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.selectedStep > -1
@@ -2497,7 +2497,7 @@ ZUI.BasePlayGrid {
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "settings-configure"
                     onClicked: {

@@ -35,7 +35,7 @@ import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.ActionPickerPopup {
+ZUI2.ActionPickerPopup {
     id: root
     property QtObject selectedChannel: null
     signal requestSlotPicker(QtObject channel, string slotType, int slotIndex)

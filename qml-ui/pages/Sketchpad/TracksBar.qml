@@ -875,7 +875,7 @@ QQC2.Pane {
                                         unusedStuffWarning.text = theText;
                                         unusedStuffWarning.open();
                                     }
-                                    ZUI.DialogQuestion {
+                                    ZUI2.DialogQuestion {
                                         id: unusedStuffWarning
                                         width: Kirigami.Units.gridUnit * 30
                                         height: Kirigami.Units.gridUnit * 18

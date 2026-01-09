@@ -34,7 +34,7 @@ import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.DialogQuestion {
+ZUI2.DialogQuestion {
     id: root
     function showTrackSettings(track) {
         _private.selectedTrack = track;
@@ -208,7 +208,7 @@ ZUI.DialogQuestion {
                     Zynthbox.MidiRouter.setSketchpadTrackTargetTrack(_private.selectedTrack.id, _private.selectedTrack.id);
                 }
             }
-            ZUI.ComboBox {
+            ZUI2.ComboBox {
                 id: trackPicker
                 visible: false
                 property int trackValue: -1

@@ -9,6 +9,7 @@ import Qt.labs.folderlistmodel 2.15
 import Helpers 1.0 as Helpers
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 import io.zynthbox.components 1.0 as Zynthbox
 
 /**
@@ -32,7 +33,7 @@ import io.zynthbox.components 1.0 as Zynthbox
   *      }
   * }
   */
-ZUI.Dialog {
+ZUI2.Dialog {
     id: root
     property alias headerText: heading.text
     property string rootFolder: "/"
@@ -198,7 +199,7 @@ ZUI.Dialog {
                 }
             }
             onClicked: newFolderDialog.open()
-            ZUI.DialogQuestion {
+            ZUI2.DialogQuestion {
                 id: newFolderDialog
                 textInputVisible: true
                 adjectiveNounButtonVisible: true
@@ -234,7 +235,7 @@ ZUI.Dialog {
                 renameEntryDialog.containingDirectory = filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.substring(0, filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.lastIndexOf("/"));
                 renameEntryDialog.open();
             }
-            ZUI.DialogQuestion {
+            ZUI2.DialogQuestion {
                 id: renameEntryDialog
                 textInputVisible: true
                 adjectiveNounButtonVisible: true
@@ -294,7 +295,7 @@ ZUI.Dialog {
             }
             // Show the type-local hierarchy (don't allow moving samples to sketches etc) as potential destinations
             // TODO and also any removable drives and their file system structure
-            ZUI.ComboBox {
+            ZUI2.ComboBox {
                 id: moveEntryLocationPicker
                 visible: false;
                 model: subfolderSubpaths
@@ -328,7 +329,7 @@ ZUI.Dialog {
             text: qsTr("Delete...")
             enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
             onClicked: deleteEntryDialog.open()
-            ZUI.DialogQuestion {
+            ZUI2.DialogQuestion {
                 id: deleteEntryDialog
                 title: qsTr("Delete?")
                 text: filePropertiesColumn.filePropertiesHelperObj

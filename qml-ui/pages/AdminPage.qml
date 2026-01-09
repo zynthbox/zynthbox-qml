@@ -29,6 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 ZUI.SelectorPage {
     screenId: "admin"
@@ -74,7 +75,7 @@ ZUI.SelectorPage {
         }
     }
 
-    ZUI.Dialog {
+    ZUI2.Dialog {
         property string label
 
         id: errorDialog

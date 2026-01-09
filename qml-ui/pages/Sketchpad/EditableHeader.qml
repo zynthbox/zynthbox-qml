@@ -32,6 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 Item {
     id: titleStack
@@ -68,7 +69,7 @@ Item {
         }
     }
 
-    ZUI.Dialog {
+    ZUI2.Dialog {
         id: editDialog
         parent: QQC2.Overlay.overlay
         x: parent.width/2 - width/2

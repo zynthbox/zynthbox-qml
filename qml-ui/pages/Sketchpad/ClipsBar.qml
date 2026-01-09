@@ -81,7 +81,7 @@ QQC2.Pane {
     }
 
     contentItem: Item {
-        ZUI.ActionPickerPopup {
+        ZUI2.ActionPickerPopup {
             id: clipSettingsPopup
 
             columns: 3

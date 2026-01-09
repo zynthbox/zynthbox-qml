@@ -33,9 +33,11 @@ import "../../../pages"
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import Helpers 1.0 as Helpers
 
-ZUI.Dialog {
+ZUI2.Dialog {
     id: component
 
     /**
@@ -351,7 +353,7 @@ ZUI.Dialog {
                 color: Kirigami.Theme.textColor
                 opacity: 0.3
             }
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 Layout.fillWidth: true
                 text: qsTr("Song")
                 enabled: !_private.isRecording
@@ -360,7 +362,7 @@ ZUI.Dialog {
             }
             Repeater {
                 model: _private.song ? 10 : 0
-                delegate: ZUI.PlayGridButton {
+                delegate: ZUI2.PlayGridButton {
                     Layout.fillWidth: true
                     text: "T" + (model.index + 1)
                     enabled: !_private.isRecording
@@ -512,7 +514,7 @@ ZUI.Dialog {
         }
     }
     footer: RowLayout {
-        ZUI.PlayGridButton {
+        ZUI2.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
@@ -524,7 +526,7 @@ ZUI.Dialog {
                 component.close();
             }
         }
-        ZUI.PlayGridButton {
+        ZUI2.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true

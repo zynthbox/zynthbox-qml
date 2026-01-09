@@ -30,6 +30,7 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 ZUI.BaseExternalEditor {
     id: component
@@ -646,7 +647,7 @@ ZUI.BaseExternalEditor {
         }
     }
 
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: optionPickerPopup
         // Pick options for this element (specifically: which CC value should this be, and what midi channel)
         function pickOptions(theEntryIndex) {
@@ -679,7 +680,7 @@ ZUI.BaseExternalEditor {
             }
         ]
     }
-    ZUI.ComboBox {
+    ZUI2.ComboBox {
         id: midiChannelPicker
         visible: false;
         property int channelValue: -1

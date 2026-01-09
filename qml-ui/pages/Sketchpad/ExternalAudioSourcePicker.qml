@@ -30,8 +30,9 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.7 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.DialogQuestion {
+ZUI2.DialogQuestion {
     id: root
     function pickChannel(channel) {
         _private.selectedChannel = channel;

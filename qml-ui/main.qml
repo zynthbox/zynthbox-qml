@@ -1314,14 +1314,14 @@ Kirigami.AbstractApplicationWindow {
         id: passiveNotificationComponent
     }
 
-    ZUI.DialogQuestion {
+    ZUI2.DialogQuestion {
         id: confirmDialog
         text: zynqtgui.confirm.text
         onAccepted: zynqtgui.confirm.accept()
         onRejected: zynqtgui.confirm.reject()
     }
 
-    ZUI.DialogQuestion {
+    ZUI2.DialogQuestion {
         id: confirmer
         function confirmSomething(title, description, callbackFunction) {
             confirmer.title = title;
@@ -1435,7 +1435,7 @@ Kirigami.AbstractApplicationWindow {
     }
 
     readonly property QtObject libraryTypePicker: libraryTypePicker
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: libraryTypePicker
         actions: [
             QQC2.Action {
@@ -1485,7 +1485,7 @@ Kirigami.AbstractApplicationWindow {
         confirmClearPatternDialog.pattern = pattern;
         confirmClearPatternDialog.open();
     }
-    ZUI.DialogQuestion {
+    ZUI2.DialogQuestion {
         id: confirmClearPatternDialog
         property QtObject channel
         property QtObject pattern
@@ -1500,7 +1500,7 @@ Kirigami.AbstractApplicationWindow {
         confirmClearClipDialog.clipToClear = clipToClear;
         confirmClearClipDialog.open();
     }
-    ZUI.DialogQuestion {
+    ZUI2.DialogQuestion {
         id: confirmClearClipDialog
         property QtObject clipToClear: null
         text: confirmClearClipDialog.clipToClear != null ? qsTr("Are you sure you want to clear %1 from clip %2").arg(confirmClearClipDialog.clipToClear.path.split("/").pop()).arg(confirmClearClipDialog.clipToClear.name) : ""
@@ -1528,7 +1528,7 @@ Kirigami.AbstractApplicationWindow {
         id: midiBytePicker
     }
 
-    ZUI.Drawer {
+    ZUI2.Drawer {
         id: miniPlayGridDrawer
         width: root.width
         height: root.height * 0.66
@@ -1548,7 +1548,7 @@ Kirigami.AbstractApplicationWindow {
         contentItem: MiniPlayGrid {}
     }
 
-    ZUI.Drawer {
+    ZUI2.Drawer {
         id: slotSelectionDrawer
         width: Kirigami.Units.gridUnit * 24
         height: root.height

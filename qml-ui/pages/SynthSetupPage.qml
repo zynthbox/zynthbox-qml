@@ -31,9 +31,11 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.15
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: root
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -769,7 +771,7 @@ ZUI.ScreenPage {
         onRequestCloseLayerSetupDialog: layerSetupDialog.reject()
     }
 
-    ZUI.Dialog {
+    ZUI2.Dialog {
         id: layerSetupDialog
         parent: applicationWindow().contentItem
         x: Math.round(parent.width/2 - width/2)

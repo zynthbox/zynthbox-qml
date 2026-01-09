@@ -31,9 +31,11 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import "./Sketchpad" as Sketchpad
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: component
     screenId: "channel_wave_editor"
     title: qsTr("Track Wave Editor")

@@ -30,6 +30,7 @@ import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
@@ -144,7 +145,7 @@ ColumnLayout {
                 }
                 Repeater {
                     model: 5
-                    ZUI.PlayGridButton {
+                    ZUI2.PlayGridButton {
                         property QtObject sample: delegate.channel && delegate.channel.samples ? delegate.channel.samples[index] : null
                         property QtObject sampleCppObject: sample === null ? null : Zynthbox.PlayGridManager.getClipById(sample.cppObjId)
                         Layout.preferredWidth: index === 0 ? Kirigami.Units.gridUnit * 5 : Kirigami.Units.gridUnit * 2
@@ -210,7 +211,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     text: component.selectedSampleCppObject === null ? qsTr("No sample in selected slot. Hit Record to record something.") : qsTr("Current sample duration: %1 seconds").arg(component.selectedSample.duration.toFixed(2))
                 }
-                ZUI.PlayGridButton {
+                ZUI2.PlayGridButton {
                     property bool isPlaying: component.selectedSample && component.selectedSample.isPlaying
                     enabled: component.selectedSampleCppObject !== null
                     text: isPlaying ? qsTr("Stop") : qsTr("Play")

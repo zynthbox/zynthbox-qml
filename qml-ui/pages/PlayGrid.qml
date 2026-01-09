@@ -31,9 +31,11 @@ import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: component
     screenId: "playgrid"
     controlsVisible: false
@@ -183,7 +185,7 @@ don't want to have to dig too far...
             Layout.fillHeight: true
             Layout.margins: 8
 
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 id: settingsButton
                 // Let's put our friend here on top of the things underneath (which would usually be stacked above)
                 z: 1000
@@ -230,7 +232,7 @@ don't want to have to dig too far...
                         sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.popup ? playGridStack.currentPlayGridItem.popup : null
                     }
                 }
-                ZUI.Dialog {
+                ZUI2.Dialog {
                     id: settingsDialog
                     visible: false
                     title: qsTr("%1 Settings").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ")
@@ -591,7 +593,7 @@ don't want to have to dig too far...
         ColumnLayout {
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 icon.name: "arrow-up"
                 enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
@@ -606,7 +608,7 @@ don't want to have to dig too far...
                 Layout.alignment: Qt.AlignHCenter
             }
 
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 icon.name: "arrow-down"
                 enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
@@ -618,7 +620,7 @@ don't want to have to dig too far...
 
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 text: "Mod\nulate"
                 MultiPointTouchArea {
                     anchors.fill: parent
@@ -641,7 +643,7 @@ don't want to have to dig too far...
 
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 icon.name: "arrow-up"
                 onPressed: {
                     Zynthbox.PlayGridManager.pitch = 8191;
@@ -654,7 +656,7 @@ don't want to have to dig too far...
                 text: "Pitch"
                 Layout.alignment: Qt.AlignHCenter
             }
-            ZUI.PlayGridButton {
+            ZUI2.PlayGridButton {
                 icon.name: "arrow-down"
                 onPressed: {
                     Zynthbox.PlayGridManager.pitch = -8192;

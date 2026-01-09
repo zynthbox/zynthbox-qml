@@ -32,6 +32,7 @@ import org.kde.newstuff 1.91 as NewStuff
 import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 Item {
     id: component
@@ -600,7 +601,7 @@ Item {
                 width: paintedWidth
             }
         }
-        ZUI.DialogQuestion {
+        ZUI2.DialogQuestion {
             id: errorPopup
             rejectText: ""
             acceptText: qsTr("OK")

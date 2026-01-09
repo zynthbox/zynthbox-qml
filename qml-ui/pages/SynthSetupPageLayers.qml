@@ -31,8 +31,9 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: root
     backAction: Kirigami.Action {
         text: qsTr("Back")
@@ -586,7 +587,7 @@ ZUI.ScreenPage {
             }
         }
 
-        ZUI.Dialog {
+        ZUI2.Dialog {
             id: layerSetupDialog
             parent: applicationWindow().contentItem
             x: Math.round(parent.width/2 - width/2)

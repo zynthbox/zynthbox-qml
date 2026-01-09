@@ -30,9 +30,11 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.7 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.ScreenPage {
+ZUI2.ScreenPage {
     id: root
     title: zynqtgui.control.selector_path_element
 
@@ -319,7 +321,7 @@ ZUI.ScreenPage {
         }
     }
 
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: modPackPicker
         actions: [
             QQC2.Action {
@@ -354,7 +356,7 @@ ZUI.ScreenPage {
         controlActions.control = control;
         controlActions.open();
     }
-    ZUI.ActionPickerPopup {
+    ZUI2.ActionPickerPopup {
         id: controlActions
         property QtObject control: null
         property int oldLearnChannel: -1
@@ -390,7 +392,7 @@ ZUI.ScreenPage {
             }
         }
     }
-    ZUI.DialogQuestion {
+    ZUI2.DialogQuestion {
         id: midiLearner
         text: zynqtgui.midiLearnZctrl !== null ? qsTr("Learning %1\nWaiting for midi control change input...").arg(zynqtgui.midiLearnZctrl.shortName) : ""
         acceptText: ""

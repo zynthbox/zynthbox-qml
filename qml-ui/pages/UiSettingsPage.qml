@@ -331,6 +331,22 @@ ZUI2.ScreenPage {
 
             }
 
+
+            EntryDelegate {
+                text: qsTr("VNC Server")
+                infoText: zynqtgui.ui_settings.vncserverEnabled ? qsTr("Enabled") : qsTr("Disabled")
+                onClicked: zynqtgui.ui_settings.vncserverEnabled = !zynqtgui.ui_settings.vncserverEnabled
+                index: 5
+                onIncrementValue: zynqtgui.ui_settings.vncserverEnabled = true
+                onDecrementValue: zynqtgui.ui_settings.vncserverEnabled = false
+
+                QQC2.Switch {
+                    checked: zynqtgui.ui_settings.vncserverEnabled
+                    onClicked: {
+                        zynqtgui.ui_settings.vncserverEnabled = checked;
+                    }
+                }
+            }
         }
 
         background: ZynthianPrivate.SelectorViewBackground {

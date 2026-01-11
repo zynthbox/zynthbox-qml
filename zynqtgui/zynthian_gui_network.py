@@ -73,12 +73,6 @@ class zynthian_gui_network(zynthian_gui_selector):
             #)
         self.list_data.append((self.wifi_settings, 0, "Wifi"))
 
-
-        if zynconf.is_service_active("vncserver@:1"):
-            self.list_data.append((self.stop_vncserver, 0, "[x] VNC Server"))
-        else:
-            self.list_data.append((self.start_vncserver, 0, "[  ] VNC Server"))
-
         super().fill_list()
 
     def select_action(self, i, t="S"):
@@ -228,82 +222,6 @@ class zynthian_gui_network(zynthian_gui_selector):
             self.zynqtgui.hide_info_timer(2000)
 
         self.fill_list()
-
-    def start_vncserver(self, save_config=True):
-        logging.info("STARTING VNC SERVICES")
-
-        # Save state and stop engines
-        if len(self.zynqtgui.screens["layer"].layers) > 0:
-            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
-            self.zynqtgui.screens["layer"].reset()
-            restore_state = True
-        else:
-            restore_state = False
-
-        try:
-            check_output(
-                "systemctl start vncserver@:1; systemctl start novnc",
-                shell=True,
-            )
-            zynthian_gui_config.vncserver_enabled = 1
-            # Update Config
-            if save_config:
-                zynconf.save_config(
-                    {
-                        "ZYNTHIAN_VNCSERVER_ENABLED": str(
-                            zynthian_gui_config.vncserver_enabled
-                        )
-                    }
-                )
-        except Exception as e:
-            logging.error(e)
-
-        # Restore state
-        if restore_state:
-            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
-
-        self.fill_list()
-
-    def stop_vncserver(self, save_config=True):
-        logging.info("STOPPING VNC SERVICES")
-
-        # Save state and stop engines
-        if len(self.zynqtgui.screens["layer"].layers) > 0:
-            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
-            self.zynqtgui.screens["layer"].reset()
-            restore_state = True
-        else:
-            restore_state = False
-
-        try:
-            check_output(
-                "systemctl stop novnc; systemctl stop vncserver@:1", shell=True
-            )
-            zynthian_gui_config.vncserver_enabled = 0
-            # Update Config
-            if save_config:
-                zynconf.save_config(
-                    {
-                        "ZYNTHIAN_VNCSERVER_ENABLED": str(
-                            zynthian_gui_config.vncserver_enabled
-                        )
-                    }
-                )
-        except Exception as e:
-            logging.error(e)
-
-        # Restore state
-        if restore_state:
-            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
-
-        self.fill_list()
-
-    # Start/Stop VNC Server depending on configuration
-    def default_vncserver(self):
-        if zynthian_gui_config.vncserver_enabled:
-            self.start_vncserver(False)
-        else:
-            self.stop_vncserver(False)
 
     @Slot(None, result='QVariantMap')
     def getNetworkInfo(self):

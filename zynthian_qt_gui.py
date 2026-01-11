@@ -22,52 +22,47 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+
+
 import os
 import re
 import sys
 import copy
-
 import alsaaudio
 import liblo
 import signal
 import math
-
-# import psutil
-# import alsaseq
 import logging
 import threading
-
 import numpy as np
 import time
+import xml.etree.ElementTree as ET
+import faulthandler
+import Xlib.display
+import Xlib.Xatom
+import Xlib.X
+from pathlib import Path
 from datetime import datetime
 from threading import Thread, Lock, Event
 from subprocess import Popen, check_output
 from ctypes import c_float, c_double, CDLL
-import xml.etree.ElementTree as ET
-
-# Qt modules
-from PySide2.QtCore import (
-    QProcess, Qt,
-    QObject,
-    QMetaObject,
-    SIGNAL, Slot,
-    Signal,
-    Property,
-    QTimer,
-    QEventLoop,
-    QSettings
-)
-from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap, QFont
-
-# from PySide2.QtWidgets import QApplication
-from PySide2.QtQml import QQmlApplicationEngine, QQmlDebuggingEnabler, qmlRegisterType
 from soundfile import SoundFile
-
 from pynput.keyboard import Key, Controller
-
 from timeit import default_timer as timer
 from datetime import timedelta
+# Qt modules
+from PySide2.QtCore import QProcess, Qt, QObject, QMetaObject, SIGNAL, Slot, Signal, Property, QTimer, QEventLoop, QSettings
+from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap, QFont
+from PySide2.QtQml import QQmlApplicationEngine, QQmlDebuggingEnabler, qmlRegisterType
 
+sys.path.insert(1, "/zynthian/zynthbox-qml/")
+sys.path.insert(1, "./zynqtgui")
+faulthandler.enable()
+
+# Zynthbox imports
+import zynconf
+import zynautoconnect
+import Zynthbox
 from zynqtgui.zynthian_gui_bluetooth_config import zynthian_gui_bluetooth_config
 from zynqtgui.zynthian_gui_song_manager import zynthian_gui_song_manager
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
@@ -78,19 +73,10 @@ from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
 from zynqtgui.zynthian_gui_midicontroller_settings import zynthian_gui_midicontroller_settings
 from zynqtgui.zynthian_gui_multi_controller import MultiController
-
-sys.path.insert(1, "/zynthian/zynthbox-qml/")
-sys.path.insert(1, "./zynqtgui")
-
-# Zynthian specific modules
-import zynconf
-import zynautoconnect
 from zyncoder import *
 from zyncoder.zyncoder import lib_zyncoder_init
 from zyngine import zynthian_controller, zynthian_zcmidi, zynthian_layer
 from zyngine import zynthian_midi_filter
-
-# from zyngine import zynthian_engine_transport
 from zynqtgui import zynthian_gui_config, zynthian_gui_controller
 from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
 from zynqtgui.zynthian_gui_info import zynthian_gui_info
@@ -107,16 +93,12 @@ from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_effect_types import zynthian_gui_effect_types
-from zynqtgui.zynthian_gui_layer_effect_chooser import (
-    zynthian_gui_layer_effect_chooser,
-)
+from zynqtgui.zynthian_gui_layer_effect_chooser import zynthian_gui_layer_effect_chooser
 from zynqtgui.zynthian_gui_engine import zynthian_gui_engine
 from zynqtgui.zynthian_gui_midi_chan import zynthian_gui_midi_chan
 from zynqtgui.zynthian_gui_midi_cc import zynthian_gui_midi_cc
-
 from zynqtgui.zynthian_gui_midi_key_range import zynthian_gui_midi_key_range
 from zynqtgui.zynthian_gui_audio_out import zynthian_gui_audio_out
-# from zynqtgui.zynthian_gui_midi_out import zynthian_gui_midi_out
 from zynqtgui.zynthian_gui_audio_in import zynthian_gui_audio_in
 from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset
@@ -125,31 +107,13 @@ from zynqtgui.zynthian_gui_channel import zynthian_gui_channel
 from zynqtgui.zynthian_gui_sample_library import zynthian_gui_sample_library
 from zynqtgui.zynthian_gui_channel_external_setup import zynthian_gui_channel_external_setup
 from zynqtgui.zynthian_gui_channel_wave_editor import zynthian_gui_channel_wave_editor
-
-# from zynqtgui.zynthian_gui_control_xy import zynthian_gui_control_xy
-# from zynqtgui.zynthian_gui_midi_profile import zynthian_gui_midi_profile
-# from zynqtgui.zynthian_gui_zs3_learn import zynthian_gui_zs3_learn
-# from zynqtgui.zynthian_gui_zs3_options import zynthian_gui_zs3_options
 from zynqtgui.zynthian_gui_confirm import zynthian_gui_confirm
-
-# from zynqtgui.zynthian_gui_keyboard import zynthian_gui_keyboard
 from zynqtgui.zynthian_gui_keybinding import zynthian_gui_keybinding
 from zynqtgui.zynthian_gui_main import zynthian_gui_main
 from zynqtgui.zynthian_gui_audio_recorder import zynthian_gui_audio_recorder
-from zynqtgui.zynthian_gui_test_touchpoints import (
-    zynthian_gui_test_touchpoints,
-)
+from zynqtgui.zynthian_gui_test_touchpoints import zynthian_gui_test_touchpoints
 from zynqtgui.zynthian_gui_playgrid import zynthian_gui_playgrid
-from zynqtgui.sketchpad.zynthian_gui_sketchpad import (
-    zynthian_gui_sketchpad,
-)
-
-# if "autoeq" in zynthian_gui_config.experimental_features:
-# from zynqtgui.zynthian_gui_autoeq import zynthian_gui_autoeq
-# from zynqtgui.zynthian_gui_touchscreen_calibration import zynthian_gui_touchscreen_calibration
-
-# from zynqtgui.zynthian_gui_control_osc_browser import zynthian_gui_osc_browser
-
+from zynqtgui.sketchpad.zynthian_gui_sketchpad import zynthian_gui_sketchpad
 from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
 from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
 from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
@@ -161,14 +125,6 @@ from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.zynthian_osd import zynthian_osd
 from zynqtgui.utils.webconf_fifo_handler import webconf_fifo_handler
 
-import Zynthbox
-
-from pathlib import Path
-
-import faulthandler
-faulthandler.enable()
-
-import Xlib.display, Xlib.Xatom, Xlib.X
 
 # -------------------------------------------------------------------------------
 # QObject to bridge status data to QML (ie audio levels, cpu levels etc
@@ -327,7 +283,6 @@ class zynthian_gui_status_data(QObject):
 # -------------------------------------------------------------------------------
 
 class zynthian_gui(QObject):
-
     screens_sequence = (
         "sketchpad",
         "layers_for_channel",
@@ -434,6 +389,7 @@ class zynthian_gui(QObject):
         self.__ignoreNextMetronomeButtonPress = False
         self.__ignoreNextPlayButtonPress = False
         self.__ignoreNextStopButtonPress = False
+        self.__ignoreNextKnob3Press = False
         self.__ignoreNextGlobalButtonPress = False
         self.__ignoreNextSelectButtonPress = False
         self.__ignoreNextBackButtonPress = False
@@ -495,6 +451,7 @@ class zynthian_gui(QObject):
         self.__star_button_pressed__ = False
         self.__mode_button_pressed__ = False
         self.__alt_button_pressed__ = False
+        self.__knob3_pressed__ = False
         self.__global_button_pressed__ = False
         self.__startRecord_button_pressed__ = False
         self.__play_button_pressed__ = False
@@ -674,9 +631,6 @@ class zynthian_gui(QObject):
             lib_zyncoder_init()
             lib_zyncoder = zyncoder.get_lib_zyncoder()
             self.zynmidi = zynthian_zcmidi()
-            # Init Switches
-            self.zynswitches_init()
-            self.zynswitches_midi_setup()
         except Exception as e:
             logging.error(
                 "ERROR initializing Controllers & MIDI-router: %s" % e
@@ -1170,9 +1124,6 @@ class zynthian_gui(QObject):
     # ---------------------------------------------------------------------------
 
     def start(self):
-        # Initialize jack Transport
-        # self.zyntransport = zynthian_engine_transport()
-
         # Create Core UI Screens
         self.currentTaskMessage = "Creating Core Control Objects"
 
@@ -1183,7 +1134,6 @@ class zynthian_gui(QObject):
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
         self.screens["confirm"] = zynthian_gui_confirm(self)
-        # self.screens['keyboard'] = zynthian_gui_keyboard(self)
         self.screens["option"] = zynthian_gui_option(self)
         self.screens["engine"] = zynthian_gui_engine(self)
         self.screens["layer"] = zynthian_gui_layer(self)
@@ -1202,7 +1152,6 @@ class zynthian_gui(QObject):
         self.screens["midi_cc"] = zynthian_gui_midi_cc(self)
         self.screens['midi_key_range'] = zynthian_gui_midi_key_range(self)
         self.screens['audio_out'] = zynthian_gui_audio_out(self)
-        # self.screens['midi_out'] = zynthian_gui_midi_out(self)
         self.screens['audio_in'] = zynthian_gui_audio_in(self)
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)
@@ -1224,10 +1173,6 @@ class zynthian_gui(QObject):
         self.screens["channel"] = zynthian_gui_channel(self)
         self.screens["channel_external_setup"] = zynthian_gui_channel_external_setup(self)
         self.screens["channel_wave_editor"] = zynthian_gui_channel_wave_editor(self)
-        # self.screens['control_xy'] = zynthian_gui_control_xy(self)
-        # self.screens['midi_profile'] = zynthian_gui_midi_profile(self)
-        # self.screens['zs3_learn'] = zynthian_gui_zs3_learn(self)
-        # self.screens['zs3_options'] = zynthian_gui_zs3_options(self)
         self.screens["main"] = zynthian_gui_main(self)
         self.screens["apps_downloader"] = zynthian_gui_newstuff(self)
         self.screens["admin"] = zynthian_gui_admin(self)
@@ -1269,9 +1214,6 @@ class zynthian_gui(QObject):
         self.screens["effects_for_channel"] = zynthian_gui_effects_for_channel(self)
         self.screens["sketch_effects_for_channel"] = zynthian_gui_sketch_effects_for_channel(self)
 
-        # if "autoeq" in zynthian_gui_config.experimental_features:
-        # self.screens['autoeq'] = zynthian_gui_autoeq(self)
-        # self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
         self.screens["sketch_downloader"] = zynthian_gui_newstuff(self)
@@ -1565,7 +1507,6 @@ class zynthian_gui(QObject):
         lib_zyncoder.set_midi_learning_mode(1)
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
-        # self.show_modal('zs3_learn')
 
     def exit_midi_learn_mode(self):
         self.midi_learn_mode = False
@@ -1574,18 +1515,6 @@ class zynthian_gui(QObject):
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
         self.show_active_screen()
-
-    def show_control_xy(self, xctrl, yctrl):
-        self.modal_screen = "control_xy"
-        self.screens["control_xy"].set_controllers(xctrl, yctrl)
-        self.screens["control_xy"].show()
-        self.hide_screens(exclude="control_xy")
-        self.active_screen = "control"
-        self.screens["control"].set_mode_control()
-        logging.debug(
-            "SHOW CONTROL-XY => %s, %s" % (xctrl.symbol, yctrl.symbol)
-        )
-        self.current_modal_screen_id_changed.emit()
 
     def set_curlayer(self, layer, save=False, queue=True):
         if layer is not None:
@@ -1663,7 +1592,6 @@ class zynthian_gui(QObject):
                     pass
 
         lib_zyncoder.set_midi_active_chan(active_chan)
-        self.zynswitches_midi_setup(curlayer_chan)
         self.active_midi_channel_changed.emit()
 
     def get_curlayer_wait(self):
@@ -1761,6 +1689,8 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_METRONOME_SHORT" and self.ignoreNextMetronomeButtonPress == True:
             self.ignoreNextMetronomeButtonPress = False
             return
+        elif cuia == "SWITCH_KNOB3_RELEASED" and self.ignoreNextKnob3Press == True:
+            self.ignoreNextKnob3Press = False
         elif cuia == "SWITCH_GLOBAL_RELEASED" and self.ignoreNextGlobalButtonPress == True:
             self.globalButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextGlobalButtonPress = False
@@ -1824,6 +1754,9 @@ class zynthian_gui(QObject):
         # buttons are held down, abort that button's release actions
         if cuia == "SWITCH_BACK_SHORT":
             changedAnything = False
+            if self.knob3Pressed == True and self.ignoreNextKnob3Press == False:
+                self.ignoreNextKnob3Press = True
+                changedAnything = True
             if self.globalButtonPressed == True and self.ignoreNextGlobalButtonPress == False:
                 self.ignoreNextGlobalButtonPress = True
                 changedAnything = True
@@ -1989,9 +1922,6 @@ class zynthian_gui(QObject):
 
         elif cuia == "RELOAD_KEY_BINDING":
             zynthian_gui_keybinding.getInstance(self).load()
-
-        elif cuia == "LAST_STATE_ACTION":
-            self.screens["admin"].last_state_action()
 
         elif cuia == "ALL_NOTES_OFF":
             self.all_notes_off()
@@ -2475,81 +2405,6 @@ class zynthian_gui(QObject):
     # Switches
     # -------------------------------------------------------------------
 
-    # Init GPIO Switches
-    def zynswitches_init(self):
-        if not lib_zyncore: return
-        logging.info("INIT {} ZYNSWITCHES ...".format(zynthian_gui_config.num_zynswitches))
-        ts=datetime.now()
-        self.dtsw = [ts] * (zynthian_gui_config.num_zynswitches + 4)
-
-    def zynswitches_midi_setup(self, curlayer_chan=None):
-        # logging.info("MIDI SWITCHES SETUP...")
-
-        # # Configure Custom Switches
-        # for i in range(0, zynthian_gui_config.n_custom_switches):
-        #     swi = 4 + i
-        #     event = zynthian_gui_config.custom_switch_midi_events[i]
-        #     if event is not None:
-        #         if event["chan"] is not None:
-        #             midi_chan = event["chan"]
-        #         else:
-        #             midi_chan = curlayer_chan
-
-        #         if midi_chan is not None:
-        #             lib_zyncoder.setup_zynswitch_midi(
-        #                 swi, event["type"], midi_chan, event["num"]
-        #             )
-        #             logging.info(
-        #                 "MIDI ZYNSWITCH {}: {} CH#{}, {}".format(
-        #                     swi, event["type"], midi_chan, event["num"]
-        #                 )
-        #             )
-        #         else:
-        #             lib_zyncoder.setup_zynswitch_midi(swi, 0, 0, 0)
-        #             logging.info("MIDI ZYNSWITCH {}: DISABLED!".format(swi))
-
-        # Configure Zynaptik Analog Inputs (CV-IN)
-        for i, event in enumerate(zynthian_gui_config.zynaptik_ad_midi_events):
-            if event is not None:
-                if event["chan"] is not None:
-                    midi_chan = event["chan"]
-                else:
-                    midi_chan = curlayer_chan
-
-                if midi_chan is not None:
-                    lib_zyncoder.setup_zynaptik_cvin(
-                        i, event["type"], midi_chan, event["num"]
-                    )
-                    logging.info(
-                        "ZYNAPTIK CV-IN {}: {} CH#{}, {}".format(
-                            i, event["type"], midi_chan, event["num"]
-                        )
-                    )
-                else:
-                    lib_zyncoder.disable_zynaptik_cvin(i)
-                    logging.info("ZYNAPTIK CV-IN {}: DISABLED!".format(i))
-
-        # Configure Zyntof Inputs (Distance Sensor)
-        for i, event in enumerate(zynthian_gui_config.zyntof_midi_events):
-            if event is not None:
-                if event["chan"] is not None:
-                    midi_chan = event["chan"]
-                else:
-                    midi_chan = curlayer_chan
-
-                if midi_chan is not None:
-                    lib_zyncoder.setup_zyntof(
-                        i, event["type"], midi_chan, event["num"]
-                    )
-                    logging.info(
-                        "ZYNTOF {}: {} CH#{}, {}".format(
-                            i, event["type"], midi_chan, event["num"]
-                        )
-                    )
-                else:
-                    lib_zyncoder.disable_zyntof(i)
-                    logging.info("ZYNTOF {}: DISABLED!".format(i))
-
     def zynswitches(self):
         if not lib_zyncoder: return
         last_zynswitch_index = lib_zyncoder.get_last_zynswitch_index()
@@ -2639,6 +2494,8 @@ class zynthian_gui(QObject):
                         self.rightButtonPressed = True
                     elif i == 28:
                         self.globalButtonPressed = True
+                    elif i == 29:
+                        self.knob3Pressed = True
                     elif i == 31: # KNOB_0
                         self.knob0Touched = True
                     elif i == 30: # KNOB_1
@@ -2792,6 +2649,8 @@ class zynthian_gui(QObject):
                         self.rightButtonPressed = False
                     elif i == 28:
                         self.globalButtonPressed = False
+                    elif i == 29:
+                        self.knob3Pressed = False
                     elif i == 31: # KNOB_0
                         self.knob0Touched = False
                     elif i == 30: # KNOB_1
@@ -3111,29 +2970,10 @@ class zynthian_gui(QObject):
         # logging.info("Short Switch " + str(i))
         # Standard 4 ZynSwitches
         if i == 0:
-            if (
-                self.active_screen == "control"
-                or self.modal_screen == "alsa_mixer"
-            ):
-                if self.screens["layer"].get_num_root_layers() > 1:
-                    logging.info("Next layer")
-                    self.screens["layer"].next(True)
-                else:
-                    self.show_screen("layer")
-
-            elif self.active_screen == "layer":
-                if self.modal_screen is not None:
-                    self.show_screen("layer")
-                elif self.screens["layer"].get_num_root_layers() > 1:
-                    logging.info("Next layer")
-                    self.screens["layer"].next(False)
-
-            else:
-                if self.active_screen == "preset":
-                    self.screens["preset"].restore_preset()
-                self.show_screen("layer")
-
+            # Unused switch in zynthbox
+            pass
         elif i == 1:
+            # Back switch
             screen_back = None
             if  self.__forced_screen_back != None and self.__forced_screen_back != "":
                 if self.__forced_screen_back in self.non_modal_screens:
@@ -3199,35 +3039,12 @@ class zynthian_gui(QObject):
                 else:
                     self.show_modal(screen_back)
                     self.modal_screen_back = None
-
         elif i == 2:
-            if self.modal_screen == "snapshot":
-                self.screens["snapshot"].next()
-            elif (
-                self.active_screen == "control"
-                or self.modal_screen == "alsa_mixer"
-            ) and self.screens["control"].mode == "control":
-                if self.midi_learn_mode or self.midi_learn_zctrl:
-                    if self.modal_screen == "zs3_learn":
-                        self.show_screen("control")
-                    elif zynthian_gui_config.midi_prog_change_zs3:
-                        self.show_modal("zs3_learn")
-                else:
-                    self.enter_midi_learn_mode()
-
-            elif len(self.screens["layer"].layers) > 0:
-                self.enter_midi_learn_mode()
-                self.show_modal("zs3_learn")
-
-            else:
-                self.load_snapshot()
-
+            # Unused switch in zynthbox
+            pass
         elif i == 3:
-            if self.modal_screen:
-                self.screens[self.modal_screen].switch_select("S")
-            else:
-                self.screens[self.active_screen].switch_select("S")
-
+            # Unused switch in zynthbox
+            pass
         # Custom ZynSwitches
         elif i >= 4:
             self.custom_switch_ui_action(i - 4, "S")
@@ -4844,6 +4661,39 @@ class zynthian_gui(QObject):
     altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=altButtonPressedChanged)
     ### END Property altButtonPressed
 
+    ### BEGIN Property knob3Pressed
+    def get_knob3_pressed(self):
+        return self.__knob3_pressed__
+
+    def set_knob3_pressed(self, pressed):
+        if self.__knob3_pressed__ != pressed:
+            logging.debug(f"Knob 3 pressed : {pressed}")
+            self.__knob3_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_KNOB3_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_KNOB3_RELEASED")
+            self.knob3_pressed_changed.emit()
+
+    knob3_pressed_changed = Signal()
+
+    knob3Pressed = Property(bool, get_knob3_pressed, set_knob3_pressed, notify=knob3_pressed_changed)
+    ### END Property knob3Pressed
+
+    ### BEGIN Property ignoreNextKnob3Press
+    def get_ignoreNextKnob3Press(self):
+        return self.__ignoreNextKnob3Press
+
+    def set_ignoreNextKnob3Press(self, val):
+        if self.__ignoreNextKnob3Press != val:
+            self.__ignoreNextKnob3Press = val
+            self.ignoreNextKnob3PressChanged.emit()
+
+    ignoreNextKnob3PressChanged = Signal()
+
+    ignoreNextKnob3Press = Property(bool, get_ignoreNextKnob3Press, set_ignoreNextKnob3Press, notify=ignoreNextKnob3PressChanged)
+    ### END Property ignoreNextKnob3Press
+
     ### BEGIN Property globalButtonPressed
     def get_global_button_pressed(self):
         return self.__global_button_pressed__
@@ -5810,11 +5660,6 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    if zynthian_gui_config.force_enable_cursor == False:
-        nullCursor = QPixmap(16, 16);
-        nullCursor.fill(Qt.transparent);
-        app.setOverrideCursor(QCursor(nullCursor));
-
     logging.info("REGISTERING QML TYPES")
     qmlRegisterType(file_properties_helper, "Helpers", 1, 0, "FilePropertiesHelper")
     Zynthbox.Plugin.instance().registerTypes(engine, "io.zynthbox.components")
@@ -5827,23 +5672,6 @@ if __name__ == "__main__":
     zynqtgui.sketchpad.init() # Call init after zynqtgui initialization is complete
     QIcon.setThemeName("breeze")    
     palette = app.palette()
-    # bgColor = QColor(zynthian_gui_config.color_bg)
-    # txColor = QColor(zynthian_gui_config.color_tx)
-    # palette.setColor(QPalette.Window, bgColor)
-    # palette.setColor(QPalette.WindowText, txColor)
-    # ratio = 0.2
-    # btnColor = QColor(
-    #     bgColor.red() * (1 - ratio) + txColor.red() * ratio,
-    #     bgColor.green() * (1 - ratio) + txColor.green() * ratio,
-    #     bgColor.blue() * (1 - ratio) + txColor.blue() * ratio,
-    #     255,
-    # )
-    # palette.setColor(QPalette.Button, btnColor)
-    # palette.setColor(QPalette.ButtonText, QColor(zynthian_gui_config.color_tx))
-    # palette.setColor(QPalette.Highlight, QColor(zynthian_gui_config.color_on))
-    # palette.setColor(QPalette.Base, QColor(zynthian_gui_config.color_panel_bd))
-    # palette.setColor(QPalette.Text, QColor(zynthian_gui_config.color_tx))
-    # palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
     app.setPalette(palette)
     zynqtgui.screens["theme_chooser"].apply_font()
     zynqtgui.show_screen(zynqtgui.home_screen)
@@ -5866,6 +5694,10 @@ if __name__ == "__main__":
             # assuming there is one and only one window for now
             zynthian_gui_config.top = app.topLevelWindows()[0]
             zynthian_gui_config.app = app
+
+            # Restore cursor and vncserver state
+            zynqtgui.ui_settings.set_showCursor(zynqtgui.ui_settings.showCursor, force_set=True)
+            zynqtgui.ui_settings.set_vncserverEnabled(zynqtgui.ui_settings.vncserverEnabled, force_set=True)
 
             # Notify isExternalActive changed when top window active value changes
             zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())

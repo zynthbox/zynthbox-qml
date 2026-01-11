@@ -1483,17 +1483,33 @@ Kirigami.AbstractApplicationWindow {
     function confirmClearPattern(channel, pattern) {
         confirmClearPatternDialog.channel = channel;
         confirmClearPatternDialog.pattern = pattern;
+        confirmClearPatternDialog.notesToClear = Zynthbox.PlayGridManager.activeControllerNotes;
         confirmClearPatternDialog.open();
     }
     ZUI2.DialogQuestion {
         id: confirmClearPatternDialog
         property QtObject channel
         property QtObject pattern
-        text: confirmClearPatternDialog.channel && confirmClearPatternDialog.pattern ? qsTr("Clear the notes in the pattern for Clip %1%2").arg(confirmClearPatternDialog.channel.name).arg(confirmClearPatternDialog.pattern.clipName) : ""
+        property var notesToClear: []
+        text: confirmClearPatternDialog.channel && confirmClearPatternDialog.pattern
+            ? confirmClearPatternDialog.notesToClear.length > 0
+                ? qsTr("Clear any entries of %1 in the pattern for Clip %2%3").arg(Zynthbox.Chords.shorthand(confirmClearPatternDialog.notesToClear, confirmClearPatternDialog.pattern.scaleKey, confirmClearPatternDialog.pattern.pitchKey, confirmClearPatternDialog.pattern.octaveKey)).arg(confirmClearPatternDialog.channel.name).arg(confirmClearPatternDialog.pattern.clipName)
+                : qsTr("Clear the notes in the pattern for Clip %1%2").arg(confirmClearPatternDialog.channel.name).arg(confirmClearPatternDialog.pattern.clipName)
+            : ""
         acceptText: qsTr("Clear Pattern")
         rejectText: qsTr("Don't Clear")
         onAccepted: {
-            confirmClearPatternDialog.pattern.workingModel.clear();
+            // Two options:
+            // - Either we aren't holding down any notes on a controller, and we're asking to clear the entire pattern
+            // - Or we *are* holding some notes down on a controller, and we want to clear only those notes
+            let workingModel = confirmClearPatternDialog.pattern.workingModel;
+            if (confirmClearPatternDialog.notesToClear.length > 0) {
+                let firstStep = workingModel.bankOffset * workingModel.width;
+                let lastStep = firstStep + (workingModel.width * workingModel.bankLength);
+                workingModel.removeSubnotesByNoteValue(confirmClearPatternDialog.notesToClear, firstStep, lastStep);
+            } else {
+                workingModel.clear();
+            }
         }
     }
     function confirmClearClip(clipToClear) {

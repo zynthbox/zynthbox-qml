@@ -58,8 +58,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
         if self.zynqtgui.allow_headphones():
             self.default_rbpi_headphones()
 
-        self.default_vncserver()
-
     def fill_list(self):
         self.list_data = []
         self.list_metadata = []
@@ -635,82 +633,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
         self.fill_list()
 
-    def start_vncserver(self, save_config=True):
-        logging.info("STARTING VNC SERVICES")
-
-        # Save state and stop engines
-        if len(self.zynqtgui.screens["layer"].layers) > 0:
-            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
-            self.zynqtgui.screens["layer"].reset()
-            restore_state = True
-        else:
-            restore_state = False
-
-        try:
-            check_output(
-                "systemctl start vncserver@:1; systemctl start novnc",
-                shell=True,
-            )
-            zynthian_gui_config.vncserver_enabled = 1
-            # Update Config
-            if save_config:
-                zynconf.save_config(
-                    {
-                        "ZYNTHIAN_VNCSERVER_ENABLED": str(
-                            zynthian_gui_config.vncserver_enabled
-                        )
-                    }
-                )
-        except Exception as e:
-            logging.error(e)
-
-        # Restore state
-        if restore_state:
-            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
-
-        self.fill_list()
-
-    def stop_vncserver(self, save_config=True):
-        logging.info("STOPPING VNC SERVICES")
-
-        # Save state and stop engines
-        if len(self.zynqtgui.screens["layer"].layers) > 0:
-            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
-            self.zynqtgui.screens["layer"].reset()
-            restore_state = True
-        else:
-            restore_state = False
-
-        try:
-            check_output(
-                "systemctl stop novnc; systemctl stop vncserver@:1", shell=True
-            )
-            zynthian_gui_config.vncserver_enabled = 0
-            # Update Config
-            if save_config:
-                zynconf.save_config(
-                    {
-                        "ZYNTHIAN_VNCSERVER_ENABLED": str(
-                            zynthian_gui_config.vncserver_enabled
-                        )
-                    }
-                )
-        except Exception as e:
-            logging.error(e)
-
-        # Restore state
-        if restore_state:
-            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
-
-        self.fill_list()
-
-    # Start/Stop VNC Server depending on configuration
-    def default_vncserver(self):
-        if zynthian_gui_config.vncserver_enabled:
-            self.start_vncserver(False)
-        else:
-            self.stop_vncserver(False)
-
     # ------------------------------------------------------------------------------
     # SYSTEM FEATURES
     # ------------------------------------------------------------------------------
@@ -843,7 +765,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def restart_gui_confirmed(self, params=None):
         logging.info("RESTART ZYNTHIAN-UI")
         self.zynqtgui.showMessageDialog.emit("Restarting GUI", 0)
-        self.last_state_action()
         self.zynqtgui.exit(102)
 
     @Slot()
@@ -855,7 +776,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def reboot_confirmed(self, params=None):
         logging.info("REBOOT")
         self.zynqtgui.showMessageDialog.emit("Rebooting device", 0)
-        self.last_state_action()
         self.zynqtgui.exit(101)
     @Slot()
     def power_off(self):
@@ -866,17 +786,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def power_off_confirmed(self, params=None):
         logging.info("POWER OFF")
         self.zynqtgui.showMessageDialog.emit("Powering off device", 0)
-        self.last_state_action()
         self.zynqtgui.exit(100)
-
-    def last_state_action(self):
-        if (
-            zynthian_gui_config.restore_last_state
-            and len(self.zynqtgui.screens["layer"].layers) > 0
-        ):
-            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
-        else:
-            self.zynqtgui.screens["snapshot"].delete_last_state_snapshot()
 
     def back_action(self):
         return 'main'

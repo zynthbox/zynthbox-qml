@@ -83,23 +83,6 @@ class zynthian_gui_midi_chan(zynthian_gui_selector):
         super().fill_list()
 
 
-    def fill_listbox(self):
-        super().fill_listbox()
-        #if self.mode=='CLONE':
-        #    self.highlight_cloned()
-
-
-    # Highlight current channels to which is cloned to ...
-    def highlight_cloned(self):
-        i=0
-        for item in self.list_data:
-            if item[2][:2]=='[x':
-                self.listbox.itemconfig(i, {'fg':zynthian_gui_config.color_hl})
-            else:
-                self.listbox.itemconfig(i, {'fg':zynthian_gui_config.color_panel_tx})
-            i += 1
-
-
     def get_midi_chan_index(self, chan):
         for i,ch in enumerate(self.chan_list):
             if ch==chan:

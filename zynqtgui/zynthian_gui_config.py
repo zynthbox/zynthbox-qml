@@ -24,11 +24,8 @@
 #******************************************************************************
 
 import os
-import re
 import sys
 import logging
-import tkinter
-from PIL import Image, ImageTk
 
 # Zynthian specific modules
 import zynconf
@@ -74,58 +71,7 @@ reset_log_level()
 
 logging.info("ZYNTHIAN-UI CONFIG ...")
 
-#------------------------------------------------------------------------------
-# Wiring layout
-#------------------------------------------------------------------------------
-
 wiring_layout=os.environ.get('ZYNTHIAN_WIRING_LAYOUT',"DUMMIES")
-if wiring_layout=="DUMMIES":
-    logging.info("No Wiring Layout configured. Only touch interface is available.")
-else:
-    logging.info("Wiring Layout %s" % wiring_layout)
-
-if os.environ.get('ZYNTHIAN_WIRING_ENCODER_A'):
-    zyncoder_pin_a=list(map(int, os.environ.get('ZYNTHIAN_WIRING_ENCODER_A').split(',')))
-else:
-    zyncoder_pin_a=None
-
-if os.environ.get('ZYNTHIAN_WIRING_ENCODER_B'):
-    zyncoder_pin_b=list(map(int, os.environ.get('ZYNTHIAN_WIRING_ENCODER_B').split(',')))
-else:
-    zyncoder_pin_b=None
-
-if os.environ.get('ZYNTHIAN_WIRING_SWITCHES'):
-    zynswitch_pin=list(map(int, os.environ.get('ZYNTHIAN_WIRING_SWITCHES').split(',')))
-else:
-    zynswitch_pin=None
-
-num_zynswitches = 32
-last_zynswitch_index = 32
-
-#------------------------------------------------------------------------------
-# Encoder & Switches GPIO pin assignment (wiringPi numbering)
-#------------------------------------------------------------------------------
-
-# No HW Controllers => Dummy Controllers
-if wiring_layout=="DUMMIES":
-    if not zyncoder_pin_a: zyncoder_pin_a=[0,0,0,0]
-    if not zyncoder_pin_b: zyncoder_pin_b=[0,0,0,0]
-    if not zynswitch_pin: zynswitch_pin=[0,0,0,0]
-    select_ctrl=3
-# Custom Config => blank
-elif wiring_layout=="CUSTOM":
-    select_ctrl=3
-# Default to DUMMIES
-else:
-    if not zyncoder_pin_a: zyncoder_pin_a=[0,0,0,0]
-    if not zyncoder_pin_b: zyncoder_pin_b=[0,0,0,0]
-    if not zynswitch_pin: zynswitch_pin=[0,0,0,0]
-    select_ctrl=3
-
-# Print Wiring Layout
-logging.debug("ZYNCODER A: %s" % zyncoder_pin_a)
-logging.debug("ZYNCODER B: %s" % zyncoder_pin_b)
-logging.debug("SWITCHES layout: %s" % zynswitch_pin)
 
 #------------------------------------------------------------------------------
 # Custom Switches Action Configuration
@@ -202,140 +148,9 @@ else:
 custom_switch_midi_events = []
 
 #------------------------------------------------------------------------------
-# Zynaptik & Zyntof configuration helpers
-#------------------------------------------------------------------------------
-
-def get_zynsensor_config(root_varname):
-    midi_event = None
-    evtype = None
-
-    event_type = os.environ.get(root_varname, "")
-    if event_type=="MIDI_CC":
-        evtype = 0xB
-    elif event_type=="MIDI_PITCH_BEND":
-        evtype = 0xE
-    elif event_type=="MIDI_CHAN_PRESS":
-        evtype = 0xD
-
-    if evtype:
-        chan = os.environ.get(root_varname + "__MIDI_CHAN")
-        try:
-            chan = int(chan) - 1
-            if chan<0 or chan>15:
-                chan = None
-        except:
-            chan = None
-
-        num = os.environ.get(root_varname + "__MIDI_NUM")
-        try:
-            num = int(num)
-            if num>=0 and num<=127:
-                midi_event = {
-                    'type': evtype,
-                    'chan': chan,
-                    'num': num
-                }
-        except:
-            pass
-
-    return midi_event
-
-#------------------------------------------------------------------------------
-# Zynaptik Configuration
-#------------------------------------------------------------------------------
-
-zynaptik_ad_midi_events = []
-
-zynaptik_config = os.environ.get("ZYNTHIAN_WIRING_ZYNAPTIK_CONFIG")
-if zynaptik_config:
-    # Zynaptik AD Action Configuration
-    n_zynaptik_ad = 4
-    for i in range(0, n_zynaptik_ad):
-        root_varname = "ZYNTHIAN_WIRING_ZYNAPTIK_AD{:02d}".format(i+1)
-        zynaptik_ad_midi_events.append(get_zynsensor_config(root_varname))
-
-#------------------------------------------------------------------------------
-# Zyntof Configuration
-#------------------------------------------------------------------------------
-
-zyntof_midi_events = []
-
-zyntof_config = os.environ.get("ZYNTHIAN_WIRING_ZYNTOF_CONFIG")
-if zyntof_config:
-    # Zyntof Action Configuration
-    n_zyntofs = int(zyntof_config)
-    for i in range(0, n_zyntofs):
-        root_varname = "ZYNTHIAN_WIRING_ZYNTOF{:02d}".format(i+1)
-        zyntof_midi_events.append(get_zynsensor_config(root_varname))
-
-#------------------------------------------------------------------------------
-# UI Geometric Parameters
-#------------------------------------------------------------------------------
-
-# Controller Positions
-ctrl_pos=[
-    (1,0,"nw"),
-    (2,0,"sw"),
-    (1,2,"ne"),
-    (2,2,"se")
-]
-
-
-#------------------------------------------------------------------------------
-# UI Color Parameters
-#------------------------------------------------------------------------------
-
-color_bg=os.environ.get('ZYNTHIAN_UI_COLOR_BG',"#31363b")
-color_tx=os.environ.get('ZYNTHIAN_UI_COLOR_TX',"#eff0f1")
-color_tx_off=os.environ.get('ZYNTHIAN_UI_COLOR_TX_OFF',"#e0e0e0")
-color_on=os.environ.get('ZYNTHIAN_UI_COLOR_ON',"#2196F3")
-color_off=os.environ.get('ZYNTHIAN_UI_COLOR_OFF',"#5a626d")
-color_hl=os.environ.get('ZYNTHIAN_UI_COLOR_HL',"#00b000")
-color_ml=os.environ.get('ZYNTHIAN_UI_COLOR_ML',"#f0f000")
-color_low_on=os.environ.get('ZYNTHIAN_UI_COLOR_LOW_ON',"#b00000")
-color_panel_bg=os.environ.get('ZYNTHIAN_UI_COLOR_PANEL_BG',"#3a424d")
-color_info=os.environ.get('ZYNTHIAN_UI_COLOR_INFO',"#8080ff")
-color_error=os.environ.get('ZYNTHIAN_UI_COLOR_ERROR',"#ff0000")
-
-# Color Scheme
-color_panel_bd=color_bg
-color_panel_tx=color_tx
-color_header_bg=color_bg
-color_header_tx=color_tx
-color_ctrl_bg_off=color_off
-color_ctrl_bg_on=color_on
-color_ctrl_tx=color_tx
-color_ctrl_tx_off=color_tx_off
-color_status_midi=color_info
-color_status_play=color_hl
-color_status_record=color_low_on
-color_status_error=color_error
-
-#------------------------------------------------------------------------------
-# UI Font Parameters
-#------------------------------------------------------------------------------
-
-font_family=os.environ.get('ZYNTHIAN_UI_FONT_FAMILY',"Audiowide")
-#font_family="Helvetica" #=> the original ;-)
-#font_family="Economica" #=> small
-#font_family="Orbitron" #=> Nice, but too strange
-#font_family="Abel" #=> Quite interesting, also "Strait"
-
-font_size=int(os.environ.get('ZYNTHIAN_UI_FONT_SIZE',None))
-
-#------------------------------------------------------------------------------
-# Touch Options
-#------------------------------------------------------------------------------
-
-enable_touch_widgets=int(os.environ.get('ZYNTHIAN_UI_TOUCH_WIDGETS',False))
-enable_onscreen_buttons=int(os.environ.get('ZYNTHIAN_UI_ONSCREEN_BUTTONS',False))
-force_enable_cursor=int(os.environ.get('ZYNTHIAN_UI_ENABLE_CURSOR',False))
-
-#------------------------------------------------------------------------------
 # UI Options
 #------------------------------------------------------------------------------
 
-restore_last_state=int(os.environ.get('ZYNTHIAN_UI_RESTORE_LAST_STATE',False))
 snapshot_mixer_settings=int(os.environ.get('ZYNTHIAN_UI_SNAPSHOT_MIXER_SETTINGS',False))
 show_cpu_status=int(os.environ.get('ZYNTHIAN_UI_SHOW_CPU_STATUS',False))
 
@@ -344,12 +159,6 @@ show_cpu_status=int(os.environ.get('ZYNTHIAN_UI_SHOW_CPU_STATUS',False))
 #------------------------------------------------------------------------------
 
 rbpi_headphones=int(os.environ.get('ZYNTHIAN_RBPI_HEADPHONES',False))
-
-#------------------------------------------------------------------------------
-# Networking Options
-#------------------------------------------------------------------------------
-
-vncserver_enabled=int(os.environ.get('ZYNTHIAN_VNCSERVER_ENABLED',False))
 
 #------------------------------------------------------------------------------
 # MIDI Configuration
@@ -458,89 +267,3 @@ audio_play_loop=int(os.environ.get('ZYNTHIAN_AUDIO_PLAY_LOOP',0))
 experimental_features = os.environ.get('ZYNTHIAN_EXPERIMENTAL_FEATURES',"").split(',')
 
 automatically_show_control_page = False
-
-#------------------------------------------------------------------------------
-# X11 Related Stuff
-#------------------------------------------------------------------------------
-
-if "zynthian_gui.py" in sys.argv[0]:
-    try:
-        #------------------------------------------------------------------------------
-        # Create & Configure Top Level window 
-        #------------------------------------------------------------------------------
-
-        top = tkinter.Tk()
-
-        # Screen Size => Autodetect if None
-        if os.environ.get('DISPLAY_WIDTH'):
-            display_width=int(os.environ.get('DISPLAY_WIDTH'))
-        else:
-            try:
-                display_width = top.winfo_screenwidth()
-            except:
-                logging.warning("Can't get screen width. Using default 320!")
-                display_width=320
-
-        if os.environ.get('DISPLAY_HEIGHT'):
-            display_height=int(os.environ.get('DISPLAY_HEIGHT'))
-        else:
-            try:
-                display_height = top.winfo_screenheight()
-            except:
-                logging.warning("Can't get screen height. Using default 240!")
-                display_height=240
-
-        ctrl_width = display_width//4
-        button_width = display_width//4
-        topbar_height = display_height//10
-        buttonbar_height = enable_onscreen_buttons and display_height//7 or 0
-        body_height = display_height-topbar_height-buttonbar_height
-        ctrl_height = body_height//2
-
-        # Adjust font size, if not defined
-        if not font_size:
-            font_size = int(display_width/32)
-
-        # Adjust Root Window Geometry
-        top.geometry(str(display_width)+'x'+str(display_height))
-        top.maxsize(display_width,display_height)
-        top.minsize(display_width,display_height)
-
-        # Disable cursor for real Zynthian Boxes
-        if wiring_layout!="EMULATOR" and wiring_layout!="DUMMIES" and not force_enable_cursor:
-            top.config(cursor="none")
-        else:
-            top.config(cursor="cross")
-
-        #------------------------------------------------------------------------------
-        # Global Variables
-        #------------------------------------------------------------------------------
-
-        # Fonts
-        font_listbox = (font_family,int(1.0*font_size))
-        font_topbar = (font_family,int(1.1*font_size))
-        font_buttonbar = (font_family,int(0.8*font_size))
-
-        # Loading Logo Animation
-        loading_imgs=[]
-        pil_frame = Image.open("./img/zynthian_gui_loading.gif")
-        fw, fh = pil_frame.size
-        fw2=ctrl_width-8
-        fh2=int(fh*fw2/fw)
-        nframes = 0
-        while pil_frame:
-            pil_frame2 = pil_frame.resize((fw2, fh2), Image.ANTIALIAS)
-            # convert PIL image object to Tkinter PhotoImage object
-            loading_imgs.append(ImageTk.PhotoImage(pil_frame2))
-            nframes += 1
-            try:
-                pil_frame.seek(nframes)
-            except EOFError:
-                break
-        #for i in range(13):
-        #    loading_imgs.append(tkinter.PhotoImage(file="./img/zynthian_gui_loading.gif", format="gif -index "+str(i)))
-
-    except Exception as e:
-        logging.error("Failed to configure geometry => {}".format(e))
-
-#------------------------------------------------------------------------------

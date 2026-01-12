@@ -2082,16 +2082,6 @@ Rectangle {
             width: height
             color: PlasmaCore.Theme.textColor
         }
-
-        QQC2.Button {
-                // ZUI2.Theme.themeName: PlasmaCore.Theme.themeName
-
-            text: "Hekll<<" + ZUI2.Theme.wallpaperPath
-           onClicked: {
-            // ZUI2.Theme.themeName = PlasmaCore.Theme.themeName
-            console.log(ZUI2.Theme.themeName)
-           }
-        }
     }
 }
 }

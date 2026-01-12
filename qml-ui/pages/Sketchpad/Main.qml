@@ -2058,30 +2058,4 @@ ZUI.ScreenPage {
             }
         }
     }
-
-
-Rectangle {
-    color: "pink"
-    height: 10
-    width: 10*3
-    Row {
-        Rectangle {
-            height: 10
-            width: height
-            color: Kirigami.Theme.backgroundColor
-        }
-
-         Rectangle {
-            height: 10
-            width: height
-            color: PlasmaCore.Theme.backgroundColor
-        }
-
-         Rectangle {
-            height: 10
-            width: height
-            color: PlasmaCore.Theme.textColor
-        }
-    }
-}
 }

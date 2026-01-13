@@ -2058,40 +2058,4 @@ ZUI2.ScreenPage {
             }
         }
     }
-
-
-Rectangle {
-    color: "pink"
-    height: 10
-    width: 10*3
-    Row {
-        Rectangle {
-            height: 10
-            width: height
-            color: Kirigami.Theme.backgroundColor
-        }
-
-         Rectangle {
-            height: 10
-            width: height
-            color: PlasmaCore.Theme.backgroundColor
-        }
-
-         Rectangle {
-            height: 10
-            width: height
-            color: PlasmaCore.Theme.textColor
-        }
-
-        QQC2.Button {
-                // ZUI2.Theme.themeName: PlasmaCore.Theme.themeName
-
-            text: "Hekll<<" + ZUI2.Theme.wallpaperPath
-           onClicked: {
-            // ZUI2.Theme.themeName = PlasmaCore.Theme.themeName
-            console.log(ZUI2.Theme.themeName)
-           }
-        }
-    }
-}
 }

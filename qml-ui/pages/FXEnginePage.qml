@@ -183,7 +183,7 @@ ZUI2.ScreenPage {
         //     //     }
         //     // }
         // }
-        ZUI.Card {
+        ZUI2.Card {
             Layout.fillWidth: true
             Layout.fillHeight: true
             contentItem: QQC2.ScrollView {

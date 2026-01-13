@@ -512,7 +512,7 @@ Item {
                     }
                 }
             }
-            ZUI.ActionBar {
+            ZUI2.ActionBar {
                 Layout.fillWidth: true
                 currentPage: Item {
                     property QtObject backAction: Kirigami.Action {

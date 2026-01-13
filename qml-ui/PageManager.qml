@@ -4,8 +4,9 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.Stack {
+ZUI2.Stack {
     id: root
     
     // Any new screen should be added here for PageManager to find and load page

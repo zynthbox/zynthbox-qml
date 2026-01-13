@@ -220,7 +220,7 @@ don't want to have to dig too far...
                     }
                     width: component.width - settingsPopup.width - settingsPopup.x - Kirigami.Units.largeSpacing * 4
                     visible: settingsPopup.visible && gridSettingsPopup.item !== null
-                    ZUI.Card {
+                    ZUI2.Card {
                         anchors.fill: parent
                     }
                     Loader {
@@ -257,7 +257,7 @@ don't want to have to dig too far...
                             color: Kirigami.Theme.textColor
                         }
                     }
-                    footer: ZUI.ActionBar {
+                    footer: ZUI2.ActionBar {
                         Layout.fillWidth: true
                         currentPage: Item {
                             property QtObject backAction: Kirigami.Action {
@@ -287,7 +287,7 @@ don't want to have to dig too far...
                     }
                     height: controlsPanel.height / 2
                     width: component.width / 3
-                    ZUI.Card {
+                    ZUI2.Card {
                         anchors.fill: parent
                     }
                     onVisibleChanged: {
@@ -365,7 +365,7 @@ don't want to have to dig too far...
                         }
                         height: playGridSwitcherRepeater.count * settingsButton.width
                         width: component.width / 3
-                        ZUI.Card {
+                        ZUI2.Card {
                             anchors.fill: parent
                         }
                         ColumnLayout {

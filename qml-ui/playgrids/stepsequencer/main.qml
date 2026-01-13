@@ -874,7 +874,7 @@ ZUI.BasePlayGrid {
                                         }
                                     }
                                 }
-                                ZUI.KnobIndicator {
+                                ZUI2.KnobIndicator {
                                     anchors {
                                         left: parent.left
                                         bottom: parent.bottom
@@ -1052,7 +1052,7 @@ ZUI.BasePlayGrid {
                                         }
                                     }
                                 }
-                                // ZUI.KnobIndicator {
+                                // ZUI2.KnobIndicator {
                                 //     anchors {
                                 //         left: parent.left
                                 //         bottom: parent.bottom
@@ -1884,7 +1884,7 @@ ZUI.BasePlayGrid {
                                         onClicked: {
                                             _private.stepLengthDown();
                                         }
-                                        ZUI.KnobIndicator {
+                                        ZUI2.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.top
@@ -1955,7 +1955,7 @@ ZUI.BasePlayGrid {
                                         onClicked: {
                                             _private.swingDown();
                                         }
-                                        ZUI.KnobIndicator {
+                                        ZUI2.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.top
@@ -2019,7 +2019,7 @@ ZUI.BasePlayGrid {
                                         onClicked: {
                                             _private.patternLengthDown();
                                         }
-                                        ZUI.KnobIndicator {
+                                        ZUI2.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.top
@@ -2152,7 +2152,7 @@ ZUI.BasePlayGrid {
                                         activeBar: _private.activeBar
                                         playedBar: visible && _private.activePatternModel ? _private.activePatternModel.playingRow - _private.workingPatternModel.bankOffset : 0
                                         playgrid: component
-                                        ZUI.KnobIndicator {
+                                        ZUI2.KnobIndicator {
                                             anchors {
                                                 left: parent.left
                                                 bottom: parent.bottom

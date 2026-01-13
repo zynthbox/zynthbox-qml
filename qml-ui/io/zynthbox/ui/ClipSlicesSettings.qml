@@ -31,6 +31,7 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 Item {
     id: component
@@ -309,7 +310,7 @@ Item {
     RowLayout {
         anchors.fill: parent
         spacing: 0
-        ZUI.InfinitySlider {
+        ZUI2.InfinitySlider {
             id: sliceCountSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -339,7 +340,7 @@ Item {
                     }
                 }
             }
-            KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     top: parent.bottom
                     horizontalCenter: parent.right
@@ -350,7 +351,7 @@ Item {
                 knobId: 3
             }
         }
-        ZUI.InfinitySlider {
+        ZUI2.InfinitySlider {
             id: editSliceSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -424,7 +425,7 @@ Item {
                                     });
                                 }
                             }
-                            KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     top: parent.top
                                     left: parent.left
@@ -455,7 +456,7 @@ Item {
                                     });
                                 }
                             }
-                            KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     top: parent.top
                                     left: parent.left
@@ -475,7 +476,7 @@ Item {
                                 }
                                 height: 2
                                 color: _private.currentElement === 1 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                                KnobIndicator {
+                                ZUI2.KnobIndicator {
                                     anchors {
                                         top: parent.bottom
                                         horizontalCenter: parent.horizontalCenter
@@ -512,7 +513,7 @@ Item {
                                     
                                 }
                             }
-                            KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     top: parent.top
                                     left: parent.left
@@ -541,7 +542,7 @@ Item {
                                     
                                 }
                             }
-                            KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     top: parent.top
                                     left: parent.left
@@ -561,7 +562,7 @@ Item {
                                 }
                                 height: 2
                                 color: _private.currentElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                                KnobIndicator {
+                                ZUI2.KnobIndicator {
                                     anchors {
                                         top: parent.bottom
                                         horizontalCenter: parent.horizontalCenter
@@ -603,7 +604,7 @@ Item {
                         });
                     }
                 }
-                KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         top: parent.top
                         left: parent.left
@@ -633,7 +634,7 @@ Item {
                         // - one entry which is an unused group
                     }
                 }
-                KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         top: parent.top
                         left: parent.left
@@ -675,7 +676,7 @@ Item {
                     }
                     height: 2
                     color: _private.currentElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                    KnobIndicator {
+                    ZUI2.KnobIndicator {
                         anchors {
                             top: parent.bottom
                             horizontalCenter: parent.horizontalCenter
@@ -719,7 +720,7 @@ Item {
                         
                     }
                 }
-                KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         top: parent.top
                         left: parent.left
@@ -766,7 +767,7 @@ Item {
                     }
                     height: 2
                     color: _private.currentElement === 4 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                    KnobIndicator {
+                    ZUI2.KnobIndicator {
                         anchors {
                             top: parent.bottom
                             horizontalCenter: parent.horizontalCenter

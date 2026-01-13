@@ -122,14 +122,14 @@ ZUI2.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
 
-            ZUI.LibraryPagePicker {
+            ZUI2.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "sketchfx"
                 selectedChannel: root.selectedChannel
             }
 
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: fixedEffectsView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -155,7 +155,7 @@ ZUI2.ScreenPage {
                 Component.onCompleted: {
                     fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: ZUI.SelectorDelegate {
+                delegate: ZUI2.SelectorDelegate {
                     id: delegate
                     screenId: fixedEffectsView.screenId
                     selector: fixedEffectsView.selector
@@ -208,7 +208,7 @@ ZUI2.ScreenPage {
                 }
             }
 
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 model: []
@@ -242,7 +242,7 @@ ZUI2.ScreenPage {
                     }
                 }
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: effectPresetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true

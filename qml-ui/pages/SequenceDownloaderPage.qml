@@ -25,9 +25,9 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 
-import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.NewStuffPage {
+ZUI2.NewStuffPage {
     id: component
     screenId: "sequence_downloader"
     title: qsTr("Sequence Downloader")

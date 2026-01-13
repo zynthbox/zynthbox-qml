@@ -30,6 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
@@ -146,7 +147,7 @@ GridLayout {
         }
     }
 
-    ZUI.ADSRClipView {
+    ZUI2.ADSRClipView {
         // TODO : Metadata Knobs not working here on this tab
         id: clipSettingsADSR
         Layout.fillWidth: true

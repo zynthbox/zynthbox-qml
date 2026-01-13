@@ -30,6 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 Item {
     id: root
@@ -372,7 +373,7 @@ Item {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            ZUI.Stack {
+            ZUI2.Stack {
                 id: internalStack
                 property ZUI.TabbedControlViewAction activeAction: root.initialAction
                 property ZUI.TabbedControlViewAction activeSubAction: root.initialAction.children.length > 0 ? root.initialAction.children[0] : null

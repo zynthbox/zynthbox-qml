@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.SelectorPage {
+ZUI2.SelectorPage {
     screenId: "admin"
     contextualActions: [
         Kirigami.Action {

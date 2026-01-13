@@ -564,7 +564,7 @@ ZUI2.DialogQuestion {
                                                         lastPressed = newTimestamp;
                                                     }
                                                 }
-                                                ZUI.KnobIndicator {
+                                                ZUI2.KnobIndicator {
                                                     visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
@@ -624,7 +624,7 @@ ZUI2.DialogQuestion {
                                                         lastPressed = newTimestamp;
                                                     }
                                                 }
-                                                ZUI.KnobIndicator {
+                                                ZUI2.KnobIndicator {
                                                     visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
@@ -683,7 +683,7 @@ ZUI2.DialogQuestion {
                                                     ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(1))
                                                     : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
                                             : ""
-                                            ZUI.KnobIndicator {
+                                            ZUI2.KnobIndicator {
                                                 visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                 anchors {
                                                     top: parent.verticalCenter
@@ -891,7 +891,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI.KnobIndicator {
+                                    ZUI2.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -951,7 +951,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI.KnobIndicator {
+                                    ZUI2.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1015,7 +1015,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI.KnobIndicator {
+                                    ZUI2.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1075,7 +1075,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI.KnobIndicator {
+                                    ZUI2.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1139,7 +1139,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI.KnobIndicator {
+                                    ZUI2.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1199,7 +1199,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI.KnobIndicator {
+                                    ZUI2.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2

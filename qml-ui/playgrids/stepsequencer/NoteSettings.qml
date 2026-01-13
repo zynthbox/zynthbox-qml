@@ -429,7 +429,7 @@ ColumnLayout {
                 : component.currenParameterPageIndex === 1
                     ? "Probability"
                     : "Ratchet Style"
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
                     leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
@@ -452,7 +452,7 @@ ColumnLayout {
                 : component.currenParameterPageIndex === 1
                     ? ""
                     : "Ratchet Count"
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
                     leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
@@ -475,7 +475,7 @@ ColumnLayout {
                 : component.currenParameterPageIndex === 1
                     ? "Next Step"
                     : "Ratchet Probability"
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
                     leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing

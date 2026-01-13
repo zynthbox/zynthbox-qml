@@ -308,7 +308,7 @@ ZUI2.ScreenPage {
     //}
 
     bottomPadding: Kirigami.Units.gridUnit
-    contentItem: ZUI.Stack {
+    contentItem: ZUI2.Stack {
         id: stack
     }
 

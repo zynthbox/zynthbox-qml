@@ -326,7 +326,7 @@ ZUI.BaseExternalEditor {
                         }
                         height: Kirigami.Units.iconSizes.small
                         width: Kirigami.Units.iconSizes.small
-                        ZUI.KnobIndicator {
+                        ZUI2.KnobIndicator {
                             anchors.centerIn: parent
                             height: Kirigami.Units.iconSizes.small
                             width: Kirigami.Units.iconSizes.small
@@ -377,7 +377,7 @@ ZUI.BaseExternalEditor {
                         }
                         height: Kirigami.Units.iconSizes.medium
                         width: Kirigami.Units.iconSizes.medium
-                        ZUI.KnobIndicator {
+                        ZUI2.KnobIndicator {
                             anchors.centerIn: parent
                             height: Kirigami.Units.iconSizes.small
                             width: Kirigami.Units.iconSizes.small
@@ -484,7 +484,7 @@ ZUI.BaseExternalEditor {
                     }
                     height: Kirigami.Units.iconSizes.medium
                     width: Kirigami.Units.iconSizes.medium
-                    ZUI.KnobIndicator {
+                    ZUI2.KnobIndicator {
                         anchors.centerIn: parent
                         height: Kirigami.Units.iconSizes.small
                         width: Kirigami.Units.iconSizes.small
@@ -632,7 +632,7 @@ ZUI.BaseExternalEditor {
                                 }
                                 height: Kirigami.Units.iconSizes.medium
                                 width: Kirigami.Units.iconSizes.medium
-                                ZUI.KnobIndicator {
+                                ZUI2.KnobIndicator {
                                     anchors.centerIn: parent
                                     height: Kirigami.Units.iconSizes.small
                                     width: Kirigami.Units.iconSizes.small

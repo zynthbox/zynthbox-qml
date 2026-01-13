@@ -261,7 +261,7 @@ ZUI2.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: availableNetworksListView
                 anchors.fill: parent
                 qmlSelector: ZUI.SelectorWrapper {
@@ -332,7 +332,7 @@ ZUI2.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: savedNetworksListView
                 anchors.fill: parent
                 qmlSelector: ZUI.SelectorWrapper {

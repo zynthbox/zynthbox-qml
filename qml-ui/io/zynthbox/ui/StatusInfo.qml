@@ -455,7 +455,7 @@ QQC2.Pane
                     columns: 3
                     rowSpacing:  ZUI2.Theme.padding
                     columnSpacing: ZUI2.Theme.padding
-                    Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -485,7 +485,7 @@ QQC2.Pane
                             }
                         }
                     }
-                    Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -508,7 +508,7 @@ QQC2.Pane
                             }
                         }
                     }
-                    Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -562,7 +562,7 @@ QQC2.Pane
                         }
                     }
 
-                    Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -601,7 +601,7 @@ QQC2.Pane
                             }
                         }
                     }
-                    Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -634,7 +634,7 @@ QQC2.Pane
                             }
                         }
                     }
-                    Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -674,7 +674,7 @@ QQC2.Pane
                         }
                     }
 
-                    Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -728,7 +728,7 @@ QQC2.Pane
                         Item {
                             Layout.fillHeight: true
                             Layout.fillWidth: true
-                            Private.CardBackground {
+                            ZUI2.CardBackground {
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                     left: parent.left

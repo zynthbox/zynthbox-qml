@@ -160,7 +160,7 @@ RowLayout {
                 color: Kirigami.Theme.textColor
             }
         }
-        ZUI.KnobIndicator {
+        ZUI2.KnobIndicator {
             anchors {
                 left: parent.horizontalCenter
                 leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing

@@ -45,7 +45,7 @@ ZUI2.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                ZUI.KnobIndicator {
+                ZUI2.KnobIndicator {
                     knobId: index
                     anchors.centerIn: parent
                     width: Kirigami.Units.gridUnit * 6

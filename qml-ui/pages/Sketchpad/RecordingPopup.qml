@@ -465,12 +465,12 @@ ZUI2.Popup {
                     Layout.minimumHeight: Layout.preferredHeight
                     enabled: zynqtgui.sketchpad.isRecording === false
 
-                    ZUI.Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI.KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -501,12 +501,12 @@ ZUI2.Popup {
                             }
                         }
                     }
-                    ZUI.Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI.KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -579,12 +579,12 @@ ZUI2.Popup {
                             }
                         }
                     }
-                    ZUI.Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI.KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -621,12 +621,12 @@ ZUI2.Popup {
                             }
                         }
                     }
-                    ZUI.Card {
+                    ZUI2.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI.KnobIndicator {
+                            ZUI2.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom

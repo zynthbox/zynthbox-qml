@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import io.zynthbox.ui2 1.0 as ZUI2
 
 //TODO: Use ZUI.DialController?
 ColumnLayout {
@@ -148,7 +149,7 @@ ColumnLayout {
             height: 2
             color: root.selected ? Kirigami.Theme.highlightedTextColor : "transparent"
         }
-        KnobIndicator {
+        ZUI2.KnobIndicator {
             id: knobIndicator
             anchors {
                 top: parent.top

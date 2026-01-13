@@ -103,7 +103,7 @@ ZUI2.Popup {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 20
             clip: true
             model: component.opened ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelsCount : 0
-            delegate: ZUI.Card {
+            delegate: ZUI2.Card {
                 id: variantDelegate
                 width: ListView.view.width
                 height: ListView.view.height / 7.1

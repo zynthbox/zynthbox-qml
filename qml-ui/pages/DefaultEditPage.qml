@@ -31,6 +31,7 @@ import org.kde.kirigami 2.7 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 RowLayout {
     id: root
@@ -178,7 +179,7 @@ RowLayout {
                             text: qsTr("Page %1").arg(index+1)
                         }
 
-                        ZUI.KnobIndicator {
+                        ZUI2.KnobIndicator {
                             anchors {
                                 bottom: parent.bottom
                                 left: parent.left
@@ -309,7 +310,7 @@ RowLayout {
                                         onAll_controlsChanged: controlUpdater.restart()
                                     }
 
-                                    ZUI.ControllerLoader {
+                                    ZUI2.ControllerLoader {
                                         id: controllerLoader
                                         visible: controlDelegate.control != null
                                         knobId: columnDelegate.isCurrentColumn ? controlDelegate.rowIndex : -1

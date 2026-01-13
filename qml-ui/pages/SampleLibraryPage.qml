@@ -330,13 +330,13 @@ ZUI2.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
-            ZUI.LibraryPagePicker {
+            ZUI2.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "samples"
                 selectedChannel: component.selectedChannel
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: clipsListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -373,7 +373,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                delegate: ZUI.SelectorDelegate {
+                delegate: ZUI2.SelectorDelegate {
                     id: clipDelegate
                     height: clipsListView.view.height/5
                     enabled: true
@@ -502,7 +502,7 @@ ZUI2.ScreenPage {
                 }
                 // The header items want to be rowlayouts, so we can add buttons in later, should we want to
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: folderListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -530,7 +530,7 @@ ZUI2.ScreenPage {
                         current_index = 0;
                     }
                 }
-                delegate: ZUI.SelectorDelegate {
+                delegate: ZUI2.SelectorDelegate {
                     id: folderDelegate
                     width: ListView.view.width
                     height: Kirigami.Units.iconSizes.medium
@@ -580,7 +580,7 @@ ZUI2.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: filesListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -663,7 +663,7 @@ ZUI2.ScreenPage {
                         filesListView.itemActivated(screenId, index);
                     }
                 }
-                delegate: ZUI.SelectorDelegate {
+                delegate: ZUI2.SelectorDelegate {
                     id: fileDelegate
                     width: ListView.view.width
                     height: Kirigami.Units.iconSizes.large

@@ -27,8 +27,9 @@ import QtQuick 2.10
 import org.kde.newstuff 1.91 as NewStuff
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI.NewStuffPage {
+ZUI2.NewStuffPage {
     id: component
     screenId: "control_downloader"
     title: qsTr("Edit Pages Downloader")

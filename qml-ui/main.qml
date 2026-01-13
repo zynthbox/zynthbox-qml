@@ -1216,7 +1216,7 @@ Kirigami.AbstractApplicationWindow {
         //     }
         // }
     }
-    footer: ZUI.ActionBar {
+    footer: ZUI2.ActionBar {
         z: 999999
         currentPage: root.currentPage
         visible: root.visible && root.controlsVisible && !zynqtgui.doingLongTask
@@ -1535,7 +1535,7 @@ Kirigami.AbstractApplicationWindow {
     function pickNote(currentNote, callbackFunction) {
         notePicker.pickNote(currentNote, callbackFunction);
     }
-    ZUI.NotePickerPopup {
+    ZUI2.NotePickerPopup {
         id: notePicker
     }
 

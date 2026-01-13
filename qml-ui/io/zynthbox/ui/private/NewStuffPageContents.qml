@@ -379,7 +379,7 @@ Item {
                 // We're using this as our de-facto single-item view, so just make these the full size of the ListView
                 width: ListView.view.width
                 height: ListView.view.height
-                ZUI.Card {
+                ZUI2.Card {
                     anchors.fill: parent;
                     ColumnLayout {
                         opacity: busyInstallingStuff.running ? 0.3 : 1
@@ -567,7 +567,7 @@ Item {
             }
             height: Kirigami.Units.gridUnit * 5
             visible: component.isLoading;
-            ZUI.Card {
+            ZUI2.Card {
                 anchors {
                     top: parent.top
                     left: busyWithEngineStuffLabel.left

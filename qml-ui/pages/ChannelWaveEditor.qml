@@ -825,7 +825,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI.ADSRClipView {
+                ZUI2.ADSRClipView {
                     id: clipSettingsADSR
                     objectName: "clipSettingsADSR"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName

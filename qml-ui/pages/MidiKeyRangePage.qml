@@ -46,7 +46,7 @@ ZUI2.ScreenPage {
         columns: 3
         rowSpacing: Kirigami.Units.gridUnit
 
-        ZUI.MultiSwitchController {
+        ZUI2.MultiSwitchController {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             Layout.preferredHeight: Layout.preferredWidth
@@ -62,7 +62,7 @@ ZUI2.ScreenPage {
             }
             //stepSize: 1
         }
-        ZUI.Card {
+        ZUI2.Card {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 15
             Layout.preferredHeight: Kirigami.Units.gridUnit * 10
@@ -126,7 +126,7 @@ ZUI2.ScreenPage {
                 }
             }
         }
-        ZUI.MultiSwitchController {
+        ZUI2.MultiSwitchController {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             Layout.preferredHeight: Layout.preferredWidth

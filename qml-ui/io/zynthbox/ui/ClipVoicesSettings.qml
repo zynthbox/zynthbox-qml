@@ -30,6 +30,7 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 Item {
     id: component
@@ -267,7 +268,7 @@ Item {
     RowLayout {
         anchors.fill: parent
         spacing: 0
-        ZUI.InfinitySlider {
+        ZUI2.InfinitySlider {
             id: subvoiceCountSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -297,7 +298,7 @@ Item {
                     }
                 }
             }
-            KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     top: parent.bottom
                     horizontalCenter: parent.right
@@ -308,7 +309,7 @@ Item {
                 knobId: 3
             }
         }
-        ZUI.InfinitySlider {
+        ZUI2.InfinitySlider {
             id: editVoiceSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -432,7 +433,7 @@ Item {
                     }
                 }
             }
-            KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     top: parent.bottom
                     horizontalCenter: parent.horizontalCenter

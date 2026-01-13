@@ -47,7 +47,7 @@ ZUI2.ScreenPage {
             onTriggered: zynqtgui.show_modal("theme_downloader")
         }
     ]
-    contentItem: ZUI.SelectorView {
+    contentItem: ZUI2.SelectorView {
         id: view
         implicitHeight: 1
         screenId: root.screenId

@@ -31,6 +31,8 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
@@ -192,7 +194,7 @@ ColumnLayout {
                     console.log("Something isn't working right, the byte size", component.filterRuleObject.byteSize, "was unknown");
                 }
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -253,7 +255,7 @@ ColumnLayout {
                     component.filterRuleObject.byte1 = Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte1;
                 }
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -277,7 +279,7 @@ ColumnLayout {
                     : qsTr("Byte 1 Value:\n%1").arg(applicationWindow().midiBytePicker.byteValueToMessageName(component.filterRuleObject.byte1 + 128))
             onClicked: {
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -302,7 +304,7 @@ ColumnLayout {
             onClicked: {
                 component.filterRuleObject.byte1AddChannel = !component.filterRuleObject.byte1AddChannel;
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -363,7 +365,7 @@ ColumnLayout {
                     component.filterRuleObject.byte2 = Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte2;
                 }
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -385,7 +387,7 @@ ColumnLayout {
                 : component.filterRuleObject.byte2 === Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte2
                     ? qsTr("Byte 2 Value:\n(original)")
                     : qsTr("Byte 2 Value:\n%1").arg(component.filterRuleObject.byte2)
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -410,7 +412,7 @@ ColumnLayout {
             onClicked: {
                 component.filterRuleObject.byte2AddChannel = !component.filterRuleObject.byte2AddChannel;
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -467,7 +469,7 @@ ColumnLayout {
                     component.filterRuleObject.byte3 = Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte3;
                 }
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -489,7 +491,7 @@ ColumnLayout {
                 : component.filterRuleObject.byte3 === Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte3
                     ? qsTr("Byte 3 Value:\n(original)")
                     : qsTr("Byte 3 Value:\n%1").arg(component.filterRuleObject.byte3)
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -514,7 +516,7 @@ ColumnLayout {
             onClicked: {
                 component.filterRuleObject.byte3AddChannel = !component.filterRuleObject.byte3AddChannel;
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -602,7 +604,7 @@ ColumnLayout {
                     component.filterRuleObject.cuiaTrack = newTrack;
                 });
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -640,7 +642,7 @@ ColumnLayout {
                     component.filterRuleObject.cuiaSlot = newSlot;
                 });
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom
@@ -672,7 +674,7 @@ ColumnLayout {
                     component.filterRuleObject.cuiaValue = newValue;
                 });
             }
-            ZUI.KnobIndicator {
+            ZUI2.KnobIndicator {
                 anchors {
                     left: parent.left
                     bottom: parent.bottom

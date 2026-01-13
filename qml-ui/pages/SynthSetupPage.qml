@@ -337,13 +337,13 @@ ZUI2.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
-            ZUI.LibraryPagePicker {
+            ZUI2.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "synths"
                 selectedChannel: root.selectedChannel
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -366,7 +366,7 @@ ZUI2.ScreenPage {
                 Component.onCompleted: {
                     layersView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: ZUI.SelectorDelegate {
+                delegate: ZUI2.SelectorDelegate {
                     id: delegate
                     screenId: layersView.screenId
                     selector: layersView.selector
@@ -570,7 +570,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI.SelectorView {
+                ZUI2.SelectorView {
                     id: bankView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -585,7 +585,7 @@ ZUI2.ScreenPage {
                     Component.onCompleted: {
                         bankView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                     }
-                    delegate: ZUI.SelectorDelegate {
+                    delegate: ZUI2.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
@@ -629,7 +629,7 @@ ZUI2.ScreenPage {
                         onClicked: middleColumnStack.currentIndex = 0
                     }
                 }
-                ZUI.Card {
+                ZUI2.Card {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     contentItem: ColumnLayout {
@@ -709,7 +709,7 @@ ZUI2.ScreenPage {
                     }
                 }
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: presetView
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 active: zynqtgui.isBootingComplete
@@ -731,7 +731,7 @@ ZUI2.ScreenPage {
                 Component.onCompleted: {
                     presetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: ZUI.SelectorDelegate {
+                delegate: ZUI2.SelectorDelegate {
                     screenId: presetView.screenId
                     selector: presetView.selector
                     // Show highlight frame only if current preset name matches selected one

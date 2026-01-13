@@ -170,7 +170,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.lowerMasterChannel = newChannel;
                     });
                 }
-                ZUI.KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -192,7 +192,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.upperMasterChannel = newChannel;
                     });
                 }
-                ZUI.KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -211,7 +211,7 @@ QQC2.ScrollView {
                 onClicked: {
                     _private.selectedDeviceObject.sendTimecode = !_private.selectedDeviceObject.sendTimecode;
                 }
-                ZUI.KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -269,7 +269,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.upperMasterChannel = 15;
                     });
                 }
-                ZUI.KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -291,7 +291,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.lastLowerZoneMemberChannel = newChannel;
                     });
                 }
-                ZUI.KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -310,7 +310,7 @@ QQC2.ScrollView {
                 onClicked: {
                     _private.selectedDeviceObject.sendBeatClock = !_private.selectedDeviceObject.sendBeatClock;
                 }
-                ZUI.KnobIndicator {
+                ZUI2.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -452,7 +452,7 @@ QQC2.ScrollView {
                         inputFiltersRepeater.currentlySelectedFilter = modelData;
                         inputFiltersRepeaterDelegate.knob0down();
                     }
-                    ZUI.KnobIndicator {
+                    ZUI2.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left
@@ -715,7 +715,7 @@ QQC2.ScrollView {
                     onClicked: {
                         outputFiltersRepeaterDelegate.knob0down();
                     }
-                    ZUI.KnobIndicator {
+                    ZUI2.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left
@@ -812,7 +812,7 @@ QQC2.ScrollView {
                     onClicked: {
                         _private.selectedDeviceObject.setSendToChannels([model.index], !_private.selectedDeviceObject.channelsToSendTo[model.index]);
                     }
-                    ZUI.KnobIndicator {
+                    ZUI2.KnobIndicator {
                         anchors {
                             left: parent.left
                             bottom: parent.bottom

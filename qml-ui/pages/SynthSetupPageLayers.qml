@@ -253,7 +253,7 @@ ZUI2.ScreenPage {
                     }
                 }
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -261,7 +261,7 @@ ZUI2.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                delegate: ZUI.SelectorDelegate {
+                delegate: ZUI2.SelectorDelegate {
                     id: delegate
                     screenId: layersView.screenId
                     selector: layersView.selector
@@ -426,7 +426,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI.SelectorView {
+                ZUI2.SelectorView {
                     id: bankView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -434,7 +434,7 @@ ZUI2.ScreenPage {
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                    delegate: ZUI.SelectorDelegate {
+                    delegate: ZUI2.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
@@ -462,7 +462,7 @@ ZUI2.ScreenPage {
                         onClicked: middleColumnStack.currentIndex = 0
                     }
                 }
-                ZUI.Card {
+                ZUI2.Card {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     contentItem: ColumnLayout {
@@ -544,7 +544,7 @@ ZUI2.ScreenPage {
                     }
                 }
             }
-            ZUI.SelectorView {
+            ZUI2.SelectorView {
                 id: presetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true

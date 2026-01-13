@@ -30,8 +30,6 @@ import QtQuick.Layouts 1.15
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.ui2 1.0 as ZUI2
 
-import "../io/zynthbox/ui/private" as ZynthianPrivate
-
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
@@ -141,7 +139,7 @@ ZUI2.ScreenPage {
         implicitHeight: _layout.implicitHeight + topPadding + bottomPadding
         padding: ZUI2.Theme.padding
 
-        background: ZynthianPrivate.DelegateBackground {
+        background: ZUI2.DelegateBackground {
             delegate: _delegate
             visible: delegate.highlighted
         }
@@ -349,7 +347,7 @@ ZUI2.ScreenPage {
             }
         }
 
-        background: ZynthianPrivate.SelectorViewBackground {
+        background: ZUI2.SelectorViewBackground {
             id: background
         }
 

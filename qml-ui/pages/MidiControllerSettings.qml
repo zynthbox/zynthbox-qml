@@ -210,7 +210,7 @@ ZUI2.ScreenPage {
 
                     }
 
-                    background: ZynthianPrivate.DelegateBackground {
+                    background: ZUI2.DelegateBackground {
                         delegate: devicesListViewDelegate
                         visible: devicesListViewDelegate.highlighted
                     }
@@ -219,7 +219,7 @@ ZUI2.ScreenPage {
 
             }
 
-            background: ZynthianPrivate.SelectorViewBackground {
+            background: ZUI2.SelectorViewBackground {
                 id: background
             }
 

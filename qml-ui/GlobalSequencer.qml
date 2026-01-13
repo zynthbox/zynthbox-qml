@@ -26,6 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.15
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
@@ -176,7 +177,7 @@ Item {
                 let doPreview = false;
                 function setValue(value) {
                     for (let i = 0; i < subnoteIndices.length; ++i) {
-                        let newValue = ZUI.CommonUtils.clamp(value + subnoteDifferences[i], theStartValue, theStopValue);
+                        let newValue = ZUI2.CommonUtils.clamp(value + subnoteDifferences[i], theStartValue, theStopValue);
                         if (newValue == initialValue) {
                             // If we're setting to the property's default value, then we really should be *unsetting* it instead
                             newValue = theDefaultValue;
@@ -433,7 +434,7 @@ Item {
                 theDescripton = qsTr("Clip %1%2 Step Length").arg(trackIndex + 1).arg(workingModel.clipName);
                 theStartValue = 1;
                 theStopValue = 6144;
-                workingModel.stepLength = ZUI.CommonUtils.clamp(value, theStartValue, theStopValue);
+                workingModel.stepLength = ZUI2.CommonUtils.clamp(value, theStartValue, theStopValue);
                 theDefaultValue = 24;
                 theCurrentValue = workingModel.stepLength;
                 theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
@@ -441,7 +442,7 @@ Item {
                 theDescripton = qsTr("Clip %1%2 Swing").arg(trackIndex + 1).arg(workingModel.clipName);
                 theStartValue = 1;
                 theStopValue = 99;
-                workingModel.swing = ZUI.CommonUtils.clamp(value, theStartValue, theStopValue);
+                workingModel.swing = ZUI2.CommonUtils.clamp(value, theStartValue, theStopValue);
                 theDefaultValue = 50;
                 theCurrentValue = workingModel.swing;
                 theCurrentValueLabel = workingModel.swing == 50 ? qsTr("No Swing") : qsTr("%1").arg(workingModel.swing);
@@ -449,7 +450,7 @@ Item {
                 theDescripton = qsTr("Clip %1%2 Pattern Length").arg(trackIndex + 1).arg(workingModel.clipName);
                 theStartValue = 1;
                 theStopValue = workingModel.bankLength * workingModel.width;
-                workingModel.patternLength = ZUI.CommonUtils.clamp(value, theStartValue, theStopValue);
+                workingModel.patternLength = ZUI2.CommonUtils.clamp(value, theStartValue, theStopValue);
                 theDefaultValue = workingModel.width;
                 theCurrentValue = workingModel.patternLength;
                 theCurrentValueLabel = workingModel.availableBars * workingModel.width === workingModel.patternLength

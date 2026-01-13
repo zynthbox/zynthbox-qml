@@ -234,7 +234,7 @@ ZUI2.Stack {
         } else {
             // console.log("Page cache not found for page :", pageResolvedUrl(page))
             console.log("Instantiating page", page, ":", pageResolvedUrl(page))
-            var cache = ZUI.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
+            var cache = ZUI2.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
 
             if (cache.errorString != "") {
                 console.log("Error instantiating page", cache.url, ":", cache.errorString);

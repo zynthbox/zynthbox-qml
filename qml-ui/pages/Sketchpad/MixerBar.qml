@@ -700,7 +700,7 @@ QQC2.Pane {
         }
     }
 
-    component PanSlider : ZUI.ResetableSlider {
+    component PanSlider : ZUI2.ResetableSlider {
 
         id: panSlider
         implicitHeight: Kirigami.Units.gridUnit

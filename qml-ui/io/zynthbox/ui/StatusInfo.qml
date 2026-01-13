@@ -463,7 +463,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                SketchpadDial {
+                                ZUI2.SketchpadDial {
                                     id: volumeDial
                                     property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
 
@@ -492,7 +492,7 @@ QQC2.Pane
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         contentItem: ColumnLayout {
                             visible: false // Hide scale for now
-                            SketchpadMultiSwitch {
+                            ZUI2.SketchpadMultiSwitch {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 controlObj: zynqtgui.sketchpad.song
@@ -516,7 +516,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                SketchpadDial {
+                                ZUI2.SketchpadDial {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     Layout.margins: Kirigami.Units.gridUnit
@@ -570,7 +570,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                SketchpadDial {
+                                ZUI2.SketchpadDial {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     Layout.margins: Kirigami.Units.gridUnit
@@ -642,7 +642,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                SketchpadDial {
+                                ZUI2.SketchpadDial {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.margins: Kirigami.Units.gridUnit

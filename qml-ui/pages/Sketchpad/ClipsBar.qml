@@ -60,11 +60,11 @@ QQC2.Pane {
             returnVal = true;
             break;
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;
         }

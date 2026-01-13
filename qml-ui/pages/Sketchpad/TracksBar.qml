@@ -358,12 +358,12 @@ QQC2.Pane {
         // console.log(`TracksBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             returnValue = true;
             break;
 
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             returnValue = true;
             break;
 
@@ -1454,7 +1454,7 @@ QQC2.Pane {
                                                 property real startPositionRelative: progressDots.cppClipObject
                                                                                      ? progressDots.cppClipObject.rootSlice.startPositionSamples / progressDots.cppClipObject.durationSamples
                                                                                      : 1
-                                                x: progressDots.cppClipObject != null ? ZUI.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
+                                                x: progressDots.cppClipObject != null ? ZUI2.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
                                             }
 
                                             // Loop line
@@ -1471,7 +1471,7 @@ QQC2.Pane {
                                                                                  ? progressDots.cppClipObject.rootSlice.loopDeltaSamples / progressDots.cppClipObject.durationSamples
                                                                                  : 0
                                                 x: progressDots.cppClipObject
-                                                   ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                                                   ? ZUI2.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
                                                    : 0
                                             }
 
@@ -1486,7 +1486,7 @@ QQC2.Pane {
                                                 opacity: 0.8
                                                 width: 1
                                                 x: progressDots.cppClipObject
-                                                   ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.rootSlice.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                                                   ? ZUI2.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.rootSlice.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
                                                    : 0
                                             }
 
@@ -1499,7 +1499,7 @@ QQC2.Pane {
                                                 visible: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
                                                 color: Kirigami.Theme.highlightColor
                                                 width: Kirigami.Units.smallSpacing
-                                                x: visible ? ZUI.CommonUtils.fitInWindow(progressDots.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
+                                                x: visible ? ZUI2.CommonUtils.fitInWindow(progressDots.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
                                             }
 
                                             // SamplerSynth progress dots
@@ -1541,7 +1541,7 @@ QQC2.Pane {
                                                         top: parent.verticalCenter
                                                         topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                                                     }
-                                                    x: visible ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                                                    x: visible ? Math.floor(ZUI2.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
                                                 }
                                             }
                                         }

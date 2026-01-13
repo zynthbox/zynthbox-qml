@@ -52,7 +52,7 @@ GridLayout {
         return false;
     }
 
-    ZUI.SketchpadDial {
+    ZUI2.SketchpadDial {
         id: bpmDial
         text: qsTr("BPM")
         controlObj: zynqtgui.bottomBarControlObj

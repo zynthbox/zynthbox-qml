@@ -210,7 +210,7 @@ ZUI2.Dialog {
                 } else {
                     // If we've not got a lead-in, just start playback immediately
                     console.log("No lead-in, just starting playback");
-                    ZUI.CommonUtils.startMetronomeAndPlayback();
+                    ZUI2.CommonUtils.startMetronomeAndPlayback();
                 }
                 _private.isRecording = true;
             }
@@ -225,7 +225,7 @@ ZUI2.Dialog {
                 _private.isRecording = false;
                 if (Zynthbox.PlayGridManager.metronomeActive) {
                     // Stop the playback, again, in case this was called by someone else (like the close button)
-                    ZUI.CommonUtils.stopMetronomeAndPlayback();
+                    ZUI2.CommonUtils.stopMetronomeAndPlayback();
                 }
                 // Save metadata into the newly created recordings
                 let recordingFilenames = Zynthbox.AudioLevels.recordingFilenames();
@@ -274,7 +274,7 @@ ZUI2.Dialog {
             interval: Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, _private.leadinDurationInTicks) * 1000
             onTriggered: {
                 console.log("Starting playback after", interval);
-                ZUI.CommonUtils.startMetronomeAndPlayback();
+                ZUI2.CommonUtils.startMetronomeAndPlayback();
             }
         }
         Timer {
@@ -296,7 +296,7 @@ ZUI2.Dialog {
                     _private.recordingProgress = _private.cumulativeBeats/_private.songDurationInTicks;
                 } else if (_private.songDurationInTicks === _private.cumulativeBeats) {
                     // Stop all the playback
-                    ZUI.CommonUtils.stopMetronomeAndPlayback();
+                    ZUI2.CommonUtils.stopMetronomeAndPlayback();
                     // Set progress back to 0, so we get a little spinny time while it fades out
                     _private.recordingProgress = 0;
                 } else {

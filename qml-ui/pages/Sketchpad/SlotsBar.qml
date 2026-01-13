@@ -72,11 +72,11 @@ QQC2.Pane {
             return true;
 
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             return true;
 
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             return true;
 
         case "SELECT_UP":

@@ -158,7 +158,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.maximumHeight: Kirigami.Units.gridUnit * 10
-        ZUI.SketchpadDial {
+        ZUI2.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)") + "\n"
             controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject.gainHandler : null
@@ -179,7 +179,7 @@ ColumnLayout {
             }
         }
 
-        ZUI.SketchpadDial {
+        ZUI2.SketchpadDial {
             id: panDial
             text: qsTr("Pan") + "\n"
             controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject : null
@@ -200,7 +200,7 @@ ColumnLayout {
             }
         }
 
-        ZUI.SketchpadDial {
+        ZUI2.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch") + "\n"
             controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject : null
@@ -221,7 +221,7 @@ ColumnLayout {
             }
         }
 
-        ZUI.SketchpadDial {
+        ZUI2.SketchpadDial {
             id: timeDial
             text: qsTr("Speed Ratio") + "\n"
             controlObj: root.clipAudioSource

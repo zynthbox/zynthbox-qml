@@ -102,11 +102,11 @@ ZUI2.Popup {
                     }
                     break;
                 case "KNOB1_UP":
-                    countIn.value = ZUI.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
+                    countIn.value = ZUI2.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
                     returnValue = true;
                     break;
                 case "KNOB1_DOWN":
-                    countIn.value = ZUI.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
+                    countIn.value = ZUI2.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
                     returnValue = true;
                     break;
                 case "KNOB2_UP":
@@ -219,7 +219,7 @@ ZUI2.Popup {
             if (startWithCountin && countIn.value > 0) {
                 Zynthbox.SyncTimer.startWithCountin(countIn.value);
             } else {
-                ZUI.CommonUtils.startMetronomeAndPlayback();
+                ZUI2.CommonUtils.startMetronomeAndPlayback();
             }
         }
     }
@@ -537,7 +537,7 @@ ZUI2.Popup {
                                         icon.name: "list-remove-symbolic"
                                         enabled: countIn.value > countIn.from
                                         onClicked: {
-                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
+                                            countIn.value = ZUI2.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
                                         }
                                     }
                                     Rectangle {
@@ -565,7 +565,7 @@ ZUI2.Popup {
                                         icon.name: "list-add-symbolic"
                                         enabled: countIn.value < countIn.to
                                         onClicked: {
-                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
+                                            countIn.value = ZUI2.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
                                         }
                                     }
                                 }
@@ -603,7 +603,7 @@ ZUI2.Popup {
                                     verticalAlignment: Text.AlignVCenter
                                     text: qsTr("Master\nVolume")
                                 }
-                                ZUI.SketchpadDial {
+                                ZUI2.SketchpadDial {
                                     property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
                                     Layout.fillHeight: true
                                     controlObj: gainHandler
@@ -644,7 +644,7 @@ ZUI2.Popup {
                                     horizontalAlignment: Text.AlignRight
                                     text: qsTr("BPM")
                                 }
-                                ZUI.SketchpadDial {
+                                ZUI2.SketchpadDial {
                                     Layout.fillHeight: true
                                     controlObj: Zynthbox.SyncTimer
                                     controlProperty: "bpm"
@@ -1216,7 +1216,7 @@ ZUI2.Popup {
                                             return -100
                                         }
                                     }
-                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.preferredWidth: parent.width * ZUI2.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
                                     Layout.minimumWidth: Layout.preferredWidth
                                     Layout.maximumWidth: Layout.preferredWidth
                                     Layout.fillHeight: true
@@ -1237,7 +1237,7 @@ ZUI2.Popup {
                                             return -100
                                         }
                                     }
-                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.preferredWidth: parent.width * ZUI2.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
                                     Layout.minimumWidth: Layout.preferredWidth
                                     Layout.maximumWidth: Layout.preferredWidth
                                     Layout.fillHeight: true

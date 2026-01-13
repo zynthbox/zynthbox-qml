@@ -567,7 +567,7 @@ ZUI2.ScreenPage {
                         testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 12);
                     }
                 }
-                ZUI.NotePad {
+                ZUI2.NotePad {
                     id: testNotePad
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -919,7 +919,7 @@ ZUI2.ScreenPage {
                             visible: component.isVisible && component.selectedChannel.trackType === "sample-loop" && clipDelegate.cppClipObject && clipDelegate.cppClipObject.isPlaying
                             color: Kirigami.Theme.highlightColor
                             width: Kirigami.Units.smallSpacing
-                            x: visible ? ZUI.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
+                            x: visible ? ZUI2.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
                         }
 
                         // SamplerSynth progress dots
@@ -959,7 +959,7 @@ ZUI2.ScreenPage {
                                     top: parent.verticalCenter
                                     topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                                 }
-                                x: visible ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                                x: visible ? Math.floor(ZUI2.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
                             }
                         }
                     }

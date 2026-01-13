@@ -69,11 +69,11 @@ ZUI2.Dialog {
                 result = true;
                 break;
             case "SELECT_UP":
-                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI2.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             case "SELECT_DOWN":
-                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI2.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
@@ -100,11 +100,11 @@ ZUI2.Dialog {
                 result = true;
                 break;
             case "KNOB3_UP":
-                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI2.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             case "KNOB3_DOWN":
-                root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
+                root.filesListView.currentIndex = ZUI2.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
             default:
@@ -450,7 +450,7 @@ ZUI2.Dialog {
                 Layout.leftMargin: 6
                 spacing: 2
 
-                ZUI.BreadcrumbButton {
+                ZUI2.BreadcrumbButton {
                     id: homeButton
                     icon.name: "user-home-symbolic"
                     onClicked: {
@@ -461,7 +461,7 @@ ZUI2.Dialog {
                 Repeater {
                     id: breadcrumbsRepeater
                     model: folderBreadcrumbs.folderSplitArray
-                    delegate: ZUI.BreadcrumbButton {
+                    delegate: ZUI2.BreadcrumbButton {
                         text: decodeURIComponent(modelData)
                         onClicked: {
                             folderModel.folder = root.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")

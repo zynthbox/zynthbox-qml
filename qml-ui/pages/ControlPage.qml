@@ -66,7 +66,7 @@ ZUI2.ScreenPage {
                 controller.value = sign > 0 ? controller.max_value : controller.value0;
             } else {
                 let stepSize = controller.step_size === 0 ? 1 : controller.step_size
-                controller.value = ZUI.CommonUtils.clamp(controller.value + sign * stepSize, controller.value0, controller.max_value)
+                controller.value = ZUI2.CommonUtils.clamp(controller.value + sign * stepSize, controller.value0, controller.max_value)
             }
         }
     }
@@ -213,7 +213,7 @@ ZUI2.ScreenPage {
         } else if (root.controlPageCache[actualPage] == null) {
             // console.log("Page cache not found for actualPage :", actualPage)
             // console.log("Instantiating page", actualPage, ":", actualPage);
-            var cache = ZUI.CommonUtils.instantiateComponent(actualPage, defaultParams);
+            var cache = ZUI2.CommonUtils.instantiateComponent(actualPage, defaultParams);
 
             if (cache.errorString != "") {
                 console.log("Error instantiating page", cache.url, ":", cache.errorString);

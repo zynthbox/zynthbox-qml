@@ -29,7 +29,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
 
 RowLayout {
     id: component
@@ -42,7 +42,7 @@ RowLayout {
     signal refetchNote()
     Repeater {
         model: component.model.columnCount(component.model.index(index, 0))
-        delegate: ZUI.NotePad {
+        delegate: ZUI2.NotePad {
             id: noteDelegate;
             positionalVelocity: component.positionalVelocity
             note: component.model.data(component.model.index(row, index), component.model.roles['note'])

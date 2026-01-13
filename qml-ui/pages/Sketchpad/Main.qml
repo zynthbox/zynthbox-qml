@@ -75,7 +75,7 @@ ZUI2.ScreenPage {
             var fxPassthroughClient = Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][slot]
 
             function valueSetter(value) {
-                root.selectedChannel.set_passthroughValue("fxPassthrough", slot, "dryWetMixAmount", ZUI.CommonUtils.clamp(value, 0, 2))
+                root.selectedChannel.set_passthroughValue("fxPassthrough", slot, "dryWetMixAmount", ZUI2.CommonUtils.clamp(value, 0, 2))
                 applicationWindow().showOsd({
                                                 parameterName: "fxlayer_volume",
                                                 description: qsTr("%1 Dry/Wet Mix").arg(fxName),
@@ -120,7 +120,7 @@ ZUI2.ScreenPage {
         }
 
         function valueSetter(value) {
-            synthPassthroughClient.dryGainHandler.gainAbsolute = ZUI.CommonUtils.clamp(value, 0, 1)
+            synthPassthroughClient.dryGainHandler.gainAbsolute = ZUI2.CommonUtils.clamp(value, 0, 1)
             applicationWindow().showOsd({
                                             parameterName: "layer_volume",
                                             description: qsTr("%1 Volume").arg(synthName),
@@ -157,7 +157,7 @@ ZUI2.ScreenPage {
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(sample.cppObjId);
         function valueSetter(value) {
             if (sample != null && !sample.isEmpty) {
-                clipCppObj.rootSlice.gainHandler.gainAbsolute = ZUI.CommonUtils.clamp(value, 0, 1)
+                clipCppObj.rootSlice.gainHandler.gainAbsolute = ZUI2.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                                                 parameterName: "sample_gain",
                                                 description: qsTr("%1 Gain").arg(sample.path.split("/").pop()),
@@ -192,7 +192,7 @@ ZUI2.ScreenPage {
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
         function valueSetter(value) {
             if (clip != null && !clip.isEmpty) {
-                clipCppObj.rootSlice.gainHandler.gainAbsolute = ZUI.CommonUtils.clamp(value, 0, 1)
+                clipCppObj.rootSlice.gainHandler.gainAbsolute = ZUI2.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                                                 parameterName: "clip_gain",
                                                 description: qsTr("%1 Gain").arg(clip.path.split("/").pop()),
@@ -230,7 +230,7 @@ ZUI2.ScreenPage {
         let theTrack = applicationWindow().channels[channelId];
         function valueSetter(value) {
             if (-1 < channelId && channelId < Zynthbox.Plugin.sketchpadTrackCount) {
-                theTrack.pan = ZUI.CommonUtils.clamp(Math.round((theTrack.pan + sign * 0.05 + Number.EPSILON) * 100) / 100, -1, 1);
+                theTrack.pan = ZUI2.CommonUtils.clamp(Math.round((theTrack.pan + sign * 0.05 + Number.EPSILON) * 100) / 100, -1, 1);
                 if (root.bottomStack.slotsBar.mixerButton.checked === false) {
                     applicationWindow().showOsd({
                                                     parameterName: "track_pan",
@@ -273,7 +273,7 @@ ZUI2.ScreenPage {
 
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
-                controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                controller.value = ZUI2.CommonUtils.clamp(value, controller.value_min, controller.value_max)
                 applicationWindow().showOsd({
                                                 parameterName: "layer_filter_cutoff",
                                                 description: qsTr("%1 Filter Cutoff").arg(synthName),
@@ -314,7 +314,7 @@ ZUI2.ScreenPage {
 
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
-                controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                controller.value = ZUI2.CommonUtils.clamp(value, controller.value_min, controller.value_max)
                 applicationWindow().showOsd({
                                                 parameterName: "layer_filter_resonance",
                                                 description: qsTr("%1 Filter Resonance").arg(synthName),
@@ -352,7 +352,7 @@ ZUI2.ScreenPage {
 
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
-                controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                controller.value = ZUI2.CommonUtils.clamp(value, controller.value_min, controller.value_max)
                 applicationWindow().showOsd({
                                                 parameterName: "layer_fx_filter_cutoff",
                                                 description: qsTr("%1 Filter Cutoff").arg(synthName),
@@ -390,7 +390,7 @@ ZUI2.ScreenPage {
 
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
-                controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                controller.value = ZUI2.CommonUtils.clamp(value, controller.value_min, controller.value_max)
                 applicationWindow().showOsd({
                                                 parameterName: "layer_fx_filter_resonance",
                                                 description: qsTr("%1 Filter Resonance").arg(synthName),
@@ -428,7 +428,7 @@ ZUI2.ScreenPage {
 
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
-                controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                controller.value = ZUI2.CommonUtils.clamp(value, controller.value_min, controller.value_max)
                 applicationWindow().showOsd({
                                                 parameterName: "layer_fx_filter_cutoff",
                                                 description: qsTr("%1 Filter Cutoff").arg(synthName),
@@ -466,7 +466,7 @@ ZUI2.ScreenPage {
 
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
-                controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                controller.value = ZUI2.CommonUtils.clamp(value, controller.value_min, controller.value_max)
                 applicationWindow().showOsd({
                                                 parameterName: "layer_fx_filter_resonance",
                                                 description: qsTr("%1 Filter Resonance").arg(synthName),
@@ -498,7 +498,7 @@ ZUI2.ScreenPage {
     function updateClipGain(clip, sign) {
         if (clip != null) {
             let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-            clipCppObj.rootSlice.gainHandler.gainAbsolute = ZUI.CommonUtils.clamp(clipCppObj.rootSlice.gainHandler.gainAbsolute + sign*0.01, 0, 1)
+            clipCppObj.rootSlice.gainHandler.gainAbsolute = ZUI2.CommonUtils.clamp(clipCppObj.rootSlice.gainHandler.gainAbsolute + sign*0.01, 0, 1)
         }
     }
     /**
@@ -509,7 +509,7 @@ ZUI2.ScreenPage {
     function updateClipPitch(clip, sign) {
         if (clip != null) {
             let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-            clipCppObj.rootSlice.pitch = ZUI.CommonUtils.clamp(clipCppObj.rootSlice.pitch + sign, -48, 48)
+            clipCppObj.rootSlice.pitch = ZUI2.CommonUtils.clamp(clipCppObj.rootSlice.pitch + sign, -48, 48)
         }
     }
     /**
@@ -520,7 +520,7 @@ ZUI2.ScreenPage {
     function updateClipSpeedRatio(clip, sign) {
         if (clip != null) {
             let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-            clipCppObj.speedRatio = ZUI.CommonUtils.clamp(clipCppObj.speedRatio + sign * 0.1, 0.5, 2)
+            clipCppObj.speedRatio = ZUI2.CommonUtils.clamp(clipCppObj.speedRatio + sign * 0.1, 0.5, 2)
         }
     }
     /**
@@ -531,7 +531,7 @@ ZUI2.ScreenPage {
     function updateClipBpm(clip, sign) {
         if (clip != null) {
             let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-            clipCppObj.bpm = ZUI.CommonUtils.clamp(clipCppObj.bpm + sign, 50, 200)
+            clipCppObj.bpm = ZUI2.CommonUtils.clamp(clipCppObj.bpm + sign, 50, 200)
         }
     }
     /**
@@ -547,7 +547,7 @@ ZUI2.ScreenPage {
                 let thePattern = sequence.getByClipId(trackId, clipId);
                 function valueSetter(value) {
                     let scaleIndex = Zynthbox.KeyScales.scaleEnumKeyToIndex(thePattern.scaleKey);
-                    scaleIndex = ZUI.CommonUtils.clamp(value, 0, 51);
+                    scaleIndex = ZUI2.CommonUtils.clamp(value, 0, 51);
                     thePattern.scaleKey = Zynthbox.KeyScales.scaleIndexToEnumKey(scaleIndex);
                     applicationWindow().showOsd({
                                                     parameterName: "clip_scale",
@@ -845,11 +845,11 @@ ZUI2.ScreenPage {
                     returnValue = true;
                     break;
                 case "KNOB3_UP":
-                    zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+                    zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
                     returnValue = true;
                     break;
                 case "KNOB3_DOWN":
-                    zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+                    zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
                     returnValue = true;
                     break;
                 }
@@ -1475,7 +1475,7 @@ ZUI2.ScreenPage {
                                                     highlighted: index === root.song.scenesModel.selectedSceneIndex
                                                     highlightOnFocus: false
                                                     onPressed: {
-                                                        ZUI.CommonUtils.switchToScene(index);
+                                                        ZUI2.CommonUtils.switchToScene(index);
                                                     }
                                                 }
 

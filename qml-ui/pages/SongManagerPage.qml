@@ -286,7 +286,7 @@ ZUI2.ScreenPage {
                             } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
                                 return " \n "
                             } else {
-                                let timeInSeconds = ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * ((segmentHeader.segment.barLength * 4) + segmentHeader.segment.beatLength)).toFixed(2));
+                                let timeInSeconds = ZUI2.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * ((segmentHeader.segment.barLength * 4) + segmentHeader.segment.beatLength)).toFixed(2));
                                 return timeInSeconds + "\n" + segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
                             }
                         }
@@ -414,7 +414,7 @@ ZUI2.ScreenPage {
                                     }
                                     font.pixelSize: Kirigami.Units.gridUnit / 2
                                     visible: segmentDelegate.isCurrentSegment && model.index > 0
-                                    text: ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.segment.beatStartPosition).toFixed(2))
+                                    text: ZUI2.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.segment.beatStartPosition).toFixed(2))
                                 }
                                 QQC2.Label {
                                     anchors {
@@ -423,7 +423,7 @@ ZUI2.ScreenPage {
                                     }
                                     font.pixelSize: Kirigami.Units.gridUnit / 2
                                     visible: segmentDelegate.isCurrentSegment && segmentDelegate.nextSegment !== null
-                                    text: segmentDelegate.nextSegment ? ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.nextSegment.beatStartPosition).toFixed(2)) : ""
+                                    text: segmentDelegate.nextSegment ? ZUI2.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.nextSegment.beatStartPosition).toFixed(2)) : ""
                                 }
                             }
                         }
@@ -464,7 +464,7 @@ ZUI2.ScreenPage {
                         }
                         font.pixelSize: Kirigami.Units.gridUnit / 2
                         horizontalAlignment: Text.AlignRight
-                        text: segmentsRepeater.totalDuration > 0 ? ZUI.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, segmentsRepeater.totalDuration).toFixed(2)) : ""
+                        text: segmentsRepeater.totalDuration > 0 ? ZUI2.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, segmentsRepeater.totalDuration).toFixed(2)) : ""
                     }
                 }
             }

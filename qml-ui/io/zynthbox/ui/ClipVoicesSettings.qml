@@ -358,7 +358,7 @@ Item {
                 RowLayout {
                     spacing: 0
                     Layout.bottomMargin: 2 // To give even space for the selected indicator that sits two pixels below the thing
-                    ZUI.SketchpadDial {
+                    ZUI2.SketchpadDial {
                         id: panDial
                         text: qsTr("Pan")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
@@ -382,7 +382,7 @@ Item {
                         }
                     }
 
-                    ZUI.SketchpadDial {
+                    ZUI2.SketchpadDial {
                         id: pitchDial
                         text: qsTr("Pitch")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
@@ -406,7 +406,7 @@ Item {
                         }
                     }
 
-                    ZUI.SketchpadDial {
+                    ZUI2.SketchpadDial {
                         id: gainDial
                         text: qsTr("Gain (dB)")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null

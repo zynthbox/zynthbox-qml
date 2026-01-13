@@ -264,7 +264,7 @@ ZUI2.ScreenPage {
             ZUI2.SelectorView {
                 id: availableNetworksListView
                 anchors.fill: parent
-                qmlSelector: ZUI.SelectorWrapper {
+                qmlSelector: ZUI2.SelectorWrapper {
                     selector_list: zynqtgui.wifi_settings.availableWifiNetworksModel
                     current_index: -1
                 }
@@ -335,7 +335,7 @@ ZUI2.ScreenPage {
             ZUI2.SelectorView {
                 id: savedNetworksListView
                 anchors.fill: parent
-                qmlSelector: ZUI.SelectorWrapper {
+                qmlSelector: ZUI2.SelectorWrapper {
                     selector_list: zynqtgui.wifi_settings.savedWifiNetworksModel
                     current_index: -1
                 }

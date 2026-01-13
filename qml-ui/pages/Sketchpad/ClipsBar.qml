@@ -28,7 +28,10 @@ import Qt.labs.folderlistmodel 2.11
 import QtQuick 2.10
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Layouts 1.4
+
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.ui2 1.0 as ZUI2
+
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -106,7 +109,7 @@ QQC2.Pane {
         }
 
         RowLayout {
-            spacing: PlasmaCore.Theme.spacing
+            spacing: ZUI2.Theme.spacing
             anchors.fill: parent
 
             BottomStackTabs {
@@ -228,7 +231,7 @@ QQC2.Pane {
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                 Layout.alignment: Qt.AlignTop
-                padding: PlasmaCore.Theme.padding
+                padding: ZUI2.Theme.padding
                 background: null
 
                 contentItem: Item {

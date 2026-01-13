@@ -490,7 +490,7 @@ Item {
                         }
                     } else {
                         let actualStepIndex = stepButtonIndex - 8;
-                        workingModel.patternLength = workingModel.width * (1 + stepButtonIndex);
+                        workingModel.patternLength = workingModel.width * (1 + actualStepIndex);
                     }
                 }
             } else if (zynqtgui.backButtonPressed) {

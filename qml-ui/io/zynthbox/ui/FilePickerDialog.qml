@@ -376,7 +376,7 @@ ZUI2.Dialog {
                         root.fileSelected(root.selectedFile);
                     }
                 }
-                PlayGridButton {
+                ZUI2.PlayGridButton {
                     id: adjectiveNounButton
                     Layout.fillHeight: true
                     Layout.fillWidth: false

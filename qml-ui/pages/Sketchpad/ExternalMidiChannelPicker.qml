@@ -87,7 +87,7 @@ ZUI2.Popup {
             columns: 4
             Repeater {
                 model: _private.selectedChannel ? 16 : 0
-                delegate: ZUI.PlayGridButton {
+                delegate: ZUI2.PlayGridButton {
                     id: channelDelegate
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5

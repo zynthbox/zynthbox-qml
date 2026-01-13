@@ -75,7 +75,7 @@ ZUI2.Dialog {
                     }
                 }
             }
-            PlayGridButton {
+            ZUI2.PlayGridButton {
                 id: adjectiveNounButton
                 height: parent.height
                 width: parent.height

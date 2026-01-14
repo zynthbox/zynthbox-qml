@@ -567,7 +567,7 @@ GridLayout {
                     bottom: parent.bottom
                     margins: Kirigami.Units.largeSpacing * 1.5
                 }
-                source: "../../io/zynthbox/ui/img/breadcrumb-separator.svg"
+                source: "../../io/zynthbox/imp/img/breadcrumb-separator.svg"
             }
             Text {
                 id: startHandleLabel

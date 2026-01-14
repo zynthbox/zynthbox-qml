@@ -29,12 +29,12 @@ import QtQuick.Controls 2.2 as QQC2
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.DialogQuestion {
+ZUI.DialogQuestion {
     id: component
     x: 0
     y: 0

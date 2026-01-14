@@ -30,12 +30,12 @@ import QtQuick.Controls 2.2 as QQC2
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.ScreenPage {
+ZUI.ScreenPage {
     id: component
     screenId: "playgrid"
     controlsVisible: false
@@ -185,7 +185,7 @@ don't want to have to dig too far...
             Layout.fillHeight: true
             Layout.margins: 8
 
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 id: settingsButton
                 // Let's put our friend here on top of the things underneath (which would usually be stacked above)
                 z: 1000
@@ -220,7 +220,7 @@ don't want to have to dig too far...
                     }
                     width: component.width - settingsPopup.width - settingsPopup.x - Kirigami.Units.largeSpacing * 4
                     visible: settingsPopup.visible && gridSettingsPopup.item !== null
-                    ZUI2.Card {
+                    ZUI.Card {
                         anchors.fill: parent
                     }
                     Loader {
@@ -232,7 +232,7 @@ don't want to have to dig too far...
                         sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.popup ? playGridStack.currentPlayGridItem.popup : null
                     }
                 }
-                ZUI2.Dialog {
+                ZUI.Dialog {
                     id: settingsDialog
                     visible: false
                     title: qsTr("%1 Settings").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ")
@@ -257,7 +257,7 @@ don't want to have to dig too far...
                             color: Kirigami.Theme.textColor
                         }
                     }
-                    footer: ZUI2.ActionBar {
+                    footer: ZUI.ActionBar {
                         Layout.fillWidth: true
                         currentPage: Item {
                             property QtObject backAction: Kirigami.Action {
@@ -287,7 +287,7 @@ don't want to have to dig too far...
                     }
                     height: controlsPanel.height / 2
                     width: component.width / 3
-                    ZUI2.Card {
+                    ZUI.Card {
                         anchors.fill: parent
                     }
                     onVisibleChanged: {
@@ -365,7 +365,7 @@ don't want to have to dig too far...
                         }
                         height: playGridSwitcherRepeater.count * settingsButton.width
                         width: component.width / 3
-                        ZUI2.Card {
+                        ZUI.Card {
                             anchors.fill: parent
                         }
                         ColumnLayout {
@@ -593,7 +593,7 @@ don't want to have to dig too far...
         ColumnLayout {
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 icon.name: "arrow-up"
                 enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
@@ -608,7 +608,7 @@ don't want to have to dig too far...
                 Layout.alignment: Qt.AlignHCenter
             }
 
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 icon.name: "arrow-down"
                 enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
@@ -620,7 +620,7 @@ don't want to have to dig too far...
 
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 text: "Mod\nulate"
                 MultiPointTouchArea {
                     anchors.fill: parent
@@ -643,7 +643,7 @@ don't want to have to dig too far...
 
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 icon.name: "arrow-up"
                 onPressed: {
                     Zynthbox.PlayGridManager.pitch = 8191;
@@ -656,7 +656,7 @@ don't want to have to dig too far...
                 text: "Pitch"
                 Layout.alignment: Qt.AlignHCenter
             }
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 icon.name: "arrow-down"
                 onPressed: {
                     Zynthbox.PlayGridManager.pitch = -8192;

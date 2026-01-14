@@ -31,9 +31,6 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
-
-import "private" as Private
 
 QQC2.Pane
 {
@@ -358,7 +355,7 @@ QQC2.Pane
             }
         }
 
-        ZUI2.Popup {
+        ZUI.Popup {
             id: popup
 
             property var cuiaCallback: function(cuia) {
@@ -453,9 +450,9 @@ QQC2.Pane
                 GridLayout {
                     anchors.fill: parent
                     columns: 3
-                    rowSpacing:  ZUI2.Theme.padding
-                    columnSpacing: ZUI2.Theme.padding
-                    ZUI2.Card {
+                    rowSpacing:  ZUI.Theme.padding
+                    columnSpacing: ZUI.Theme.padding
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -463,7 +460,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                ZUI2.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     id: volumeDial
                                     property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
 
@@ -485,14 +482,14 @@ QQC2.Pane
                             }
                         }
                     }
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         contentItem: ColumnLayout {
                             visible: false // Hide scale for now
-                            ZUI2.SketchpadMultiSwitch {
+                            ZUI.SketchpadMultiSwitch {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 controlObj: zynqtgui.sketchpad.song
@@ -508,7 +505,7 @@ QQC2.Pane
                             }
                         }
                     }
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -516,7 +513,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                ZUI2.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     Layout.margins: Kirigami.Units.gridUnit
@@ -562,7 +559,7 @@ QQC2.Pane
                         }
                     }
 
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -570,7 +567,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                ZUI2.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: true
                                     Layout.margins: Kirigami.Units.gridUnit
@@ -601,7 +598,7 @@ QQC2.Pane
                             }
                         }
                     }
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -634,7 +631,7 @@ QQC2.Pane
                             }
                         }
                     }
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -642,7 +639,7 @@ QQC2.Pane
                         contentItem: Item {
                             ColumnLayout {
                                 anchors.fill: parent
-                                ZUI2.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.margins: Kirigami.Units.gridUnit
@@ -674,7 +671,7 @@ QQC2.Pane
                         }
                     }
 
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: 1
@@ -728,7 +725,7 @@ QQC2.Pane
                         Item {
                             Layout.fillHeight: true
                             Layout.fillWidth: true
-                            ZUI2.CardBackground {
+                            ZUI.CardBackground {
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                     left: parent.left

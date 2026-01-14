@@ -1,4 +1,4 @@
-module io.zynthbox.ui
+module io.zynthbox.imp
 
 BasePlayGrid 1.0 BasePlayGrid.qml
 BluetoothConnections 1.0 BluetoothConnections.qml

@@ -28,10 +28,10 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI2.ScreenPage {
+import io.zynthbox.ui 1.0 as ZUI
+
+ZUI.ScreenPage {
     id: root
     property var cuiaCallback: function(cuia) {
         return false
@@ -47,7 +47,7 @@ ZUI2.ScreenPage {
             onTriggered: zynqtgui.show_modal("theme_downloader")
         }
     ]
-    contentItem: ZUI2.SelectorView {
+    contentItem: ZUI.SelectorView {
         id: view
         implicitHeight: 1
         screenId: root.screenId

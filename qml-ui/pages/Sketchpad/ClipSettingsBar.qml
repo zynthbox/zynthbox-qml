@@ -32,8 +32,8 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import io.zynthbox.components 1.0 as Zynthbox
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 // GridLayout so TabbedControlView knows how to navigate it
 ColumnLayout {
@@ -158,7 +158,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.maximumHeight: Kirigami.Units.gridUnit * 10
-        ZUI2.SketchpadDial {
+        ZUI.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)") + "\n"
             controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject.gainHandler : null
@@ -179,7 +179,7 @@ ColumnLayout {
             }
         }
 
-        ZUI2.SketchpadDial {
+        ZUI.SketchpadDial {
             id: panDial
             text: qsTr("Pan") + "\n"
             controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject : null
@@ -200,7 +200,7 @@ ColumnLayout {
             }
         }
 
-        ZUI2.SketchpadDial {
+        ZUI.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch") + "\n"
             controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject : null
@@ -221,7 +221,7 @@ ColumnLayout {
             }
         }
 
-        ZUI2.SketchpadDial {
+        ZUI.SketchpadDial {
             id: timeDial
             text: qsTr("Speed Ratio") + "\n"
             controlObj: root.clipAudioSource
@@ -271,7 +271,7 @@ ColumnLayout {
                         bpmGuessedDialog.open();
                         zynqtgui.stop_loading();
                     }
-                    ZUI2.DialogQuestion {
+                    ZUI.DialogQuestion {
                         id: bpmGuessedDialog
                         property double guessedBPM: 0
                         title: "Estimated BPM"
@@ -380,7 +380,7 @@ ColumnLayout {
                 onClicked: {
                     playbackStylePicker.open();
                 }
-                ZUI2.ActionPickerPopup {
+                ZUI.ActionPickerPopup {
                     id: playbackStylePicker
                     actions: [
                         Kirigami.Action {
@@ -458,7 +458,7 @@ ColumnLayout {
                 onClicked: {
                     timeStretchingPopup.open();
                 }
-                ZUI2.ActionPickerPopup {
+                ZUI.ActionPickerPopup {
                     id: timeStretchingPopup
                     actions: [
                         Kirigami.Action {

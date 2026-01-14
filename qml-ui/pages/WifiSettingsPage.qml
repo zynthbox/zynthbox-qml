@@ -27,12 +27,12 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import "Sketchpad" as Sketchpad
 
-ZUI2.ScreenPage {
+ZUI.ScreenPage {
     id: root
 
     signal openCaptivePortal(string url)
@@ -92,7 +92,7 @@ ZUI2.ScreenPage {
         }
     }
 
-    ZUI2.Dialog {
+    ZUI.Dialog {
         id: connectDialog
 
         property string ssid
@@ -223,7 +223,7 @@ ZUI2.ScreenPage {
                 text: qsTr("Country")
             }
 
-            ZUI2.ComboBox {
+            ZUI.ComboBox {
                 id: countryCodesCombo
                 Layout.fillWidth: false
                 Layout.fillHeight: false
@@ -261,10 +261,10 @@ ZUI2.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: availableNetworksListView
                 anchors.fill: parent
-                qmlSelector: ZUI2.SelectorWrapper {
+                qmlSelector: ZUI.SelectorWrapper {
                     selector_list: zynqtgui.wifi_settings.availableWifiNetworksModel
                     current_index: -1
                 }
@@ -332,10 +332,10 @@ ZUI2.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: savedNetworksListView
                 anchors.fill: parent
-                qmlSelector: ZUI2.SelectorWrapper {
+                qmlSelector: ZUI.SelectorWrapper {
                     selector_list: zynqtgui.wifi_settings.savedWifiNetworksModel
                     current_index: -1
                 }

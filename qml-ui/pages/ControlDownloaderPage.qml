@@ -26,10 +26,10 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import org.kde.newstuff 1.91 as NewStuff
 
-import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI2.NewStuffPage {
+import io.zynthbox.ui 1.0 as ZUI
+
+ZUI.NewStuffPage {
     id: component
     screenId: "control_downloader"
     title: qsTr("Edit Pages Downloader")

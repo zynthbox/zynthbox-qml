@@ -35,8 +35,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 import QtQuick.Controls.Styles 1.4
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -358,12 +358,12 @@ QQC2.Pane {
         // console.log(`TracksBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             returnValue = true;
             break;
 
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             returnValue = true;
             break;
 
@@ -765,7 +765,7 @@ QQC2.Pane {
 
     contentItem: Item {
         RowLayout {
-            spacing: ZUI2.Theme.spacing
+            spacing: ZUI.Theme.spacing
             anchors.fill: parent
 
             BottomStackTabs {
@@ -785,10 +785,10 @@ QQC2.Pane {
                 Layout.rightMargin: svgBg4.visible ? svgBg4.inset.right : 0
                 Layout.bottomMargin: svgBg4.visible ? svgBg4.inset.bottom : 0
 
-                topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI2.Theme.padding
-                bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI2.Theme.padding
-                leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI2.Theme.padding
-                rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI2.Theme.padding
+                topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
+                bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
+                leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
+                rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
 
                 background: Item {
                     PlasmaCore.FrameSvgItem {
@@ -875,7 +875,7 @@ QQC2.Pane {
                                         unusedStuffWarning.text = theText;
                                         unusedStuffWarning.open();
                                     }
-                                    ZUI2.DialogQuestion {
+                                    ZUI.DialogQuestion {
                                         id: unusedStuffWarning
                                         width: Kirigami.Units.gridUnit * 30
                                         height: Kirigami.Units.gridUnit * 18
@@ -1168,7 +1168,7 @@ QQC2.Pane {
                                             anchors.fill: parent
                                             border.width: 1
                                             border.color: "#ff999999"
-                                            radius: ZUI2.Theme.radius
+                                            radius: ZUI.Theme.radius
                                             color: "#222222"
                                         }
 
@@ -1192,7 +1192,7 @@ QQC2.Pane {
                                             {
                                                 width: waveItemContainer.width
                                                 height: waveItemContainer.height
-                                                radius: ZUI2.Theme.radius
+                                                radius: ZUI.Theme.radius
                                             }
                                         }
 
@@ -1454,7 +1454,7 @@ QQC2.Pane {
                                                 property real startPositionRelative: progressDots.cppClipObject
                                                                                      ? progressDots.cppClipObject.rootSlice.startPositionSamples / progressDots.cppClipObject.durationSamples
                                                                                      : 1
-                                                x: progressDots.cppClipObject != null ? ZUI2.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
+                                                x: progressDots.cppClipObject != null ? ZUI.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
                                             }
 
                                             // Loop line
@@ -1471,7 +1471,7 @@ QQC2.Pane {
                                                                                  ? progressDots.cppClipObject.rootSlice.loopDeltaSamples / progressDots.cppClipObject.durationSamples
                                                                                  : 0
                                                 x: progressDots.cppClipObject
-                                                   ? ZUI2.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                                                   ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
                                                    : 0
                                             }
 
@@ -1486,7 +1486,7 @@ QQC2.Pane {
                                                 opacity: 0.8
                                                 width: 1
                                                 x: progressDots.cppClipObject
-                                                   ? ZUI2.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.rootSlice.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                                                   ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.rootSlice.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
                                                    : 0
                                             }
 
@@ -1499,7 +1499,7 @@ QQC2.Pane {
                                                 visible: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
                                                 color: Kirigami.Theme.highlightColor
                                                 width: Kirigami.Units.smallSpacing
-                                                x: visible ? ZUI2.CommonUtils.fitInWindow(progressDots.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
+                                                x: visible ? ZUI.CommonUtils.fitInWindow(progressDots.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
                                             }
 
                                             // SamplerSynth progress dots
@@ -1541,7 +1541,7 @@ QQC2.Pane {
                                                         top: parent.verticalCenter
                                                         topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                                                     }
-                                                    x: visible ? Math.floor(ZUI2.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                                                    x: visible ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
                                                 }
                                             }
                                         }
@@ -1667,7 +1667,7 @@ QQC2.Pane {
                                             anchors.fill: parent
                                             border.width: 1
                                             border.color: "#ff999999"
-                                            radius: ZUI2.Theme.radius
+                                            radius: ZUI.Theme.radius
                                             color: "#222222"
                                         }
 
@@ -1694,7 +1694,7 @@ QQC2.Pane {
                                             {
                                                 width: patternVisualiserItem.width
                                                 height: patternVisualiserItem.height
-                                                radius: ZUI2.Theme.radius
+                                                radius: ZUI.Theme.radius
                                             }
                                         }
 

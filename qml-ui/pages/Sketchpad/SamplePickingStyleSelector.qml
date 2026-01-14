@@ -29,12 +29,12 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.DialogQuestion {
+ZUI.DialogQuestion {
     id: component
     function pickSamplePickingStyle(channel) {
         _private.selectedChannel = channel;
@@ -125,7 +125,7 @@ ZUI2.DialogQuestion {
                 onClicked: {
                     _private.newPickingStyle = "same";
                 }
-                ZUI2.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
+                ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
             }
             QQC2.Button {
                 id: styleButtonFirst
@@ -140,7 +140,7 @@ ZUI2.DialogQuestion {
                 onClicked: {
                     _private.newPickingStyle = "first";
                 }
-                ZUI2.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
+                ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
             }
             QQC2.Button {
                 id: styleButtonAll
@@ -155,7 +155,7 @@ ZUI2.DialogQuestion {
                 onClicked: {
                     _private.newPickingStyle = "all";
                 }
-                ZUI2.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
+                ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
             }
         }
         QQC2.Label {
@@ -192,7 +192,7 @@ ZUI2.DialogQuestion {
                 onClicked: {
                     _private.newTrustExternalDeviceChannels = false;
                 }
-                ZUI2.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
+                ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
             }
             QQC2.Button {
                 id: sameButtonTrust
@@ -207,7 +207,7 @@ ZUI2.DialogQuestion {
                 onClicked: {
                     _private.newTrustExternalDeviceChannels = true;
                 }
-                ZUI2.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
+                ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
             }
         }
     }

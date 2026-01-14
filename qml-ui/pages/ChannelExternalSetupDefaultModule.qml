@@ -30,9 +30,9 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
+import io.zynthbox.imp 1.0 as IMP
 
-ZUI.BaseExternalEditor {
+IMP.BaseExternalEditor {
     id: component
 
     cuiaCallback: function(cuia) {
@@ -326,7 +326,7 @@ ZUI.BaseExternalEditor {
                         }
                         height: Kirigami.Units.iconSizes.small
                         width: Kirigami.Units.iconSizes.small
-                        ZUI2.KnobIndicator {
+                        ZUI.KnobIndicator {
                             anchors.centerIn: parent
                             height: Kirigami.Units.iconSizes.small
                             width: Kirigami.Units.iconSizes.small
@@ -377,7 +377,7 @@ ZUI.BaseExternalEditor {
                         }
                         height: Kirigami.Units.iconSizes.medium
                         width: Kirigami.Units.iconSizes.medium
-                        ZUI2.KnobIndicator {
+                        ZUI.KnobIndicator {
                             anchors.centerIn: parent
                             height: Kirigami.Units.iconSizes.small
                             width: Kirigami.Units.iconSizes.small
@@ -484,7 +484,7 @@ ZUI.BaseExternalEditor {
                     }
                     height: Kirigami.Units.iconSizes.medium
                     width: Kirigami.Units.iconSizes.medium
-                    ZUI2.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors.centerIn: parent
                         height: Kirigami.Units.iconSizes.small
                         width: Kirigami.Units.iconSizes.small
@@ -632,7 +632,7 @@ ZUI.BaseExternalEditor {
                                 }
                                 height: Kirigami.Units.iconSizes.medium
                                 width: Kirigami.Units.iconSizes.medium
-                                ZUI2.KnobIndicator {
+                                ZUI.KnobIndicator {
                                     anchors.centerIn: parent
                                     height: Kirigami.Units.iconSizes.small
                                     width: Kirigami.Units.iconSizes.small
@@ -647,7 +647,7 @@ ZUI.BaseExternalEditor {
         }
     }
 
-    ZUI2.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: optionPickerPopup
         // Pick options for this element (specifically: which CC value should this be, and what midi channel)
         function pickOptions(theEntryIndex) {
@@ -680,7 +680,7 @@ ZUI.BaseExternalEditor {
             }
         ]
     }
-    ZUI2.ComboBox {
+    ZUI.ComboBox {
         id: midiChannelPicker
         visible: false;
         property int channelValue: -1

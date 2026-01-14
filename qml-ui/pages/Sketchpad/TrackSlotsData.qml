@@ -4,8 +4,8 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -272,7 +272,7 @@ GridLayout {
                     // If slot is a enabled clip or slot is selectedSlot, show highlighted border
                     border.color: backgroundItem.highlightBorder ? Kirigami.Theme.highlightColor : "#ff999999"
                     border.width: 2
-                    radius: ZUI2.Theme.radius
+                    radius: ZUI.Theme.radius
                 }
                 PlasmaCore.FrameSvgItem {
                     id: svgBg
@@ -389,7 +389,7 @@ GridLayout {
                     anchors {
                         fill: parent
                         // margins: Kirigami.Units.smallSpacing
-                        margins: ZUI2.Theme.padding
+                        margins: ZUI.Theme.padding
                     }
                     visible: control.dragEnabled
                     Rectangle {
@@ -399,7 +399,7 @@ GridLayout {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: ZUI2.Theme.radius
+                        radius: ZUI.Theme.radius
                         opacity: 0.8
                         visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
                         color: Kirigami.Theme.highlightColor
@@ -411,33 +411,33 @@ GridLayout {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: ZUI2.Theme.radius
+                        radius: ZUI.Theme.radius
                         opacity: 0.8
                         visible: slotDelegate.cppClipObject
                         color: Kirigami.Theme.highlightColor
                     }
                     Rectangle {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                        width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI2.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                         anchors {
                             left: parent.left
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: ZUI2.Theme.radius
+                        radius: ZUI.Theme.radius
                         opacity: 0.8
                         visible: control.slotType === "fx" && control.slotData[index] != null && control.slotData[index].length > 0
                         color: Kirigami.Theme.highlightColor
                     }
                     Rectangle {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                        width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI2.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                         anchors {
                             left: parent.left
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: ZUI2.Theme.radius
+                        radius: ZUI.Theme.radius
                         opacity: 0.8
                         visible: control.slotType === "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0
                         color: Kirigami.Theme.highlightColor
@@ -574,24 +574,24 @@ GridLayout {
                         if (control.dragEnabled) {
                             var newVal
                             if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI2.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
                                 synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
                             } else if (control.slotType == "sample-trig" && control.slotData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI2.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
                             } else if (control.slotType == "fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI2.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", ZUI2.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                                control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
                             } else if (control.slotType == "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI2.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                 delegateMouseArea.dragHappened = true;
                                 // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", ZUI2.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                                control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
                             }
                         }
                     }

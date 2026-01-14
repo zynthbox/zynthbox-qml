@@ -29,8 +29,8 @@ import QtQuick 2.10
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Layouts 1.4
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.4 as Kirigami
@@ -60,11 +60,11 @@ QQC2.Pane {
             returnVal = true;
             break;
         case "NAVIGATE_LEFT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;
         case "NAVIGATE_RIGHT":
-            zynqtgui.sketchpad.selectedTrackId = ZUI2.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;
         }
@@ -81,7 +81,7 @@ QQC2.Pane {
     }
 
     contentItem: Item {
-        ZUI2.ActionPickerPopup {
+        ZUI.ActionPickerPopup {
             id: clipSettingsPopup
 
             columns: 3
@@ -109,7 +109,7 @@ QQC2.Pane {
         }
 
         RowLayout {
-            spacing: ZUI2.Theme.spacing
+            spacing: ZUI.Theme.spacing
             anchors.fill: parent
 
             BottomStackTabs {
@@ -231,7 +231,7 @@ QQC2.Pane {
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                 Layout.alignment: Qt.AlignTop
-                padding: ZUI2.Theme.padding
+                padding: ZUI.Theme.padding
                 background: null
 
                 contentItem: Item {

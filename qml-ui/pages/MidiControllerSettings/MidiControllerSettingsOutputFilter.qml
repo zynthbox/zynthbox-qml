@@ -30,8 +30,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -196,7 +196,7 @@ QQC2.ScrollView {
                         component.filterObject.originTrack = newTrack;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -236,7 +236,7 @@ QQC2.ScrollView {
                         component.filterObject.originSlot = newSlot;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -285,7 +285,7 @@ QQC2.ScrollView {
                         component.filterObject.valueMinimum = newByte;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -309,7 +309,7 @@ QQC2.ScrollView {
                         component.filterObject.valueMaximum = newByte;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -439,7 +439,7 @@ QQC2.ScrollView {
                     onClicked: {
                         outputFilterRulesRepeaterDelegate.knob0down();
                     }
-                    ZUI2.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left

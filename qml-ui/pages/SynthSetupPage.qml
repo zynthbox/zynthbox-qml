@@ -31,11 +31,11 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.15
 
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
+import io.zynthbox.imp 1.0 as IMP
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.ScreenPage {
+ZUI.ScreenPage {
     id: root
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -337,13 +337,13 @@ ZUI2.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
-            ZUI2.LibraryPagePicker {
+            ZUI.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "synths"
                 selectedChannel: root.selectedChannel
             }
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -366,7 +366,7 @@ ZUI2.ScreenPage {
                 Component.onCompleted: {
                     layersView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: ZUI2.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: delegate
                     screenId: layersView.screenId
                     selector: layersView.selector
@@ -570,7 +570,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI2.SelectorView {
+                ZUI.SelectorView {
                     id: bankView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -585,7 +585,7 @@ ZUI2.ScreenPage {
                     Component.onCompleted: {
                         bankView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                     }
-                    delegate: ZUI2.SelectorDelegate {
+                    delegate: ZUI.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
@@ -629,7 +629,7 @@ ZUI2.ScreenPage {
                         onClicked: middleColumnStack.currentIndex = 0
                     }
                 }
-                ZUI2.Card {
+                ZUI.Card {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     contentItem: ColumnLayout {
@@ -709,7 +709,7 @@ ZUI2.ScreenPage {
                     }
                 }
             }
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: presetView
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 active: zynqtgui.isBootingComplete
@@ -731,7 +731,7 @@ ZUI2.ScreenPage {
                 Component.onCompleted: {
                     presetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
-                delegate: ZUI2.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     screenId: presetView.screenId
                     selector: presetView.selector
                     // Show highlight frame only if current preset name matches selected one
@@ -771,7 +771,7 @@ ZUI2.ScreenPage {
         onRequestCloseLayerSetupDialog: layerSetupDialog.reject()
     }
 
-    ZUI2.Dialog {
+    ZUI.Dialog {
         id: layerSetupDialog
         parent: applicationWindow().contentItem
         x: Math.round(parent.width/2 - width/2)
@@ -870,7 +870,7 @@ ZUI2.ScreenPage {
         }
     }
 
-//        ZUI.FilePickerDialog {
+//        IMP.FilePickerDialog {
 //            id: saveDialog
 //            property string mode: "sound"
 
@@ -950,7 +950,7 @@ ZUI2.ScreenPage {
 //            saveMode: true
 //        }
 
-//        ZUI.FilePickerDialog {
+//        IMP.FilePickerDialog {
 //            id: pickerDialog
 //            parent: root
 //            property string mode: "sound"
@@ -1037,7 +1037,7 @@ ZUI2.ScreenPage {
 //            }
 //        }
 
-//        ZUI.LayerReplaceDialog {
+//        IMP.LayerReplaceDialog {
 //            id: layerReplaceDialog
 //            parent: root.parent
 //            modal: true

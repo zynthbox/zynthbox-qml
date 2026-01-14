@@ -32,12 +32,12 @@ import org.kde.plasma.components 3.0 as PlasmaComponents
 import "../../../pages"
 
 import io.zynthbox.components 1.0 as Zynthbox
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import Helpers 1.0 as Helpers
 
-ZUI2.Dialog {
+ZUI.Dialog {
     id: component
 
     /**
@@ -210,7 +210,7 @@ ZUI2.Dialog {
                 } else {
                     // If we've not got a lead-in, just start playback immediately
                     console.log("No lead-in, just starting playback");
-                    ZUI2.CommonUtils.startMetronomeAndPlayback();
+                    ZUI.CommonUtils.startMetronomeAndPlayback();
                 }
                 _private.isRecording = true;
             }
@@ -225,7 +225,7 @@ ZUI2.Dialog {
                 _private.isRecording = false;
                 if (Zynthbox.PlayGridManager.metronomeActive) {
                     // Stop the playback, again, in case this was called by someone else (like the close button)
-                    ZUI2.CommonUtils.stopMetronomeAndPlayback();
+                    ZUI.CommonUtils.stopMetronomeAndPlayback();
                 }
                 // Save metadata into the newly created recordings
                 let recordingFilenames = Zynthbox.AudioLevels.recordingFilenames();
@@ -274,7 +274,7 @@ ZUI2.Dialog {
             interval: Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, _private.leadinDurationInTicks) * 1000
             onTriggered: {
                 console.log("Starting playback after", interval);
-                ZUI2.CommonUtils.startMetronomeAndPlayback();
+                ZUI.CommonUtils.startMetronomeAndPlayback();
             }
         }
         Timer {
@@ -296,7 +296,7 @@ ZUI2.Dialog {
                     _private.recordingProgress = _private.cumulativeBeats/_private.songDurationInTicks;
                 } else if (_private.songDurationInTicks === _private.cumulativeBeats) {
                     // Stop all the playback
-                    ZUI2.CommonUtils.stopMetronomeAndPlayback();
+                    ZUI.CommonUtils.stopMetronomeAndPlayback();
                     // Set progress back to 0, so we get a little spinny time while it fades out
                     _private.recordingProgress = 0;
                 } else {
@@ -353,7 +353,7 @@ ZUI2.Dialog {
                 color: Kirigami.Theme.textColor
                 opacity: 0.3
             }
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 Layout.fillWidth: true
                 text: qsTr("Song")
                 enabled: !_private.isRecording
@@ -362,7 +362,7 @@ ZUI2.Dialog {
             }
             Repeater {
                 model: _private.song ? 10 : 0
-                delegate: ZUI2.PlayGridButton {
+                delegate: ZUI.PlayGridButton {
                     Layout.fillWidth: true
                     text: "T" + (model.index + 1)
                     enabled: !_private.isRecording
@@ -514,7 +514,7 @@ ZUI2.Dialog {
         }
     }
     footer: RowLayout {
-        ZUI2.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
@@ -526,7 +526,7 @@ ZUI2.Dialog {
                 component.close();
             }
         }
-        ZUI2.PlayGridButton {
+        ZUI.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true

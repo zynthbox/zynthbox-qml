@@ -31,12 +31,12 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.15
 
 import Helpers 1.0 as Helpers
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.ScreenPage {
+ZUI.ScreenPage {
     id: component
 
     property bool isVisible: ["sample_library"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -230,7 +230,7 @@ ZUI2.ScreenPage {
             filePath: "/zynthian/zynthian-my-data"
         }
     }
-    ZUI2.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: sampleSlotAssigner
         objectName: ""
         rows: 5
@@ -330,13 +330,13 @@ ZUI2.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
-            ZUI2.LibraryPagePicker {
+            ZUI.LibraryPagePicker {
                 id: libraryPagePicker
                 Layout.fillWidth: true
                 libraryName: "samples"
                 selectedChannel: component.selectedChannel
             }
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: clipsListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -345,7 +345,7 @@ ZUI2.ScreenPage {
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 active: zynqtgui.isBootingComplete
                 autoActivateIndexOnChange: true
-                qmlSelector: ZUI2.SelectorWrapper {
+                qmlSelector: ZUI.SelectorWrapper {
                     selector_list: Zynthbox.Plugin.sketchpadSlotCount
                     current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? component.selectedChannel.selectedSlot.value : -1
                 }
@@ -373,7 +373,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                delegate: ZUI2.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: clipDelegate
                     height: clipsListView.view.height/5
                     enabled: true
@@ -464,7 +464,7 @@ ZUI2.ScreenPage {
                                             top: parent.verticalCenter
                                             topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                                         }
-                                        x: visible ? Math.floor(ZUI2.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                                        x: visible ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
                                     }
                                 }
                             }
@@ -502,7 +502,7 @@ ZUI2.ScreenPage {
                 }
                 // The header items want to be rowlayouts, so we can add buttons in later, should we want to
             }
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: folderListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -522,7 +522,7 @@ ZUI2.ScreenPage {
                     }
                     qmlSelector.current_index = index;
                 }
-                qmlSelector: ZUI2.SelectorWrapper {
+                qmlSelector: ZUI.SelectorWrapper {
                     selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
                         ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"])
                         : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"])
@@ -530,7 +530,7 @@ ZUI2.ScreenPage {
                         current_index = 0;
                     }
                 }
-                delegate: ZUI2.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: folderDelegate
                     width: ListView.view.width
                     height: Kirigami.Units.iconSizes.medium
@@ -580,7 +580,7 @@ ZUI2.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
             }
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: filesListView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -645,7 +645,7 @@ ZUI2.ScreenPage {
                     }
                     filesListView.mostRecentlyActivatedIndex = index;
                 }
-                qmlSelector: ZUI2.SelectorWrapper {
+                qmlSelector: ZUI.SelectorWrapper {
                     selector_list: Zynthbox.FolderListModel {
                         id: folderModel
                         caseSensitive: false
@@ -663,7 +663,7 @@ ZUI2.ScreenPage {
                         filesListView.itemActivated(screenId, index);
                     }
                 }
-                delegate: ZUI2.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: fileDelegate
                     width: ListView.view.width
                     height: Kirigami.Units.iconSizes.large

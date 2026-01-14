@@ -30,8 +30,8 @@ import QtQuick.Window 2.1
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.6 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 import "pages" as Pages
@@ -50,7 +50,7 @@ RowLayout {
             anchors.fill: parent
             spacing: Kirigami.Units.mediumSpacing
 
-            ZUI2.PlayGridButton {
+            ZUI.PlayGridButton {
                 id: settingsButton
                 Layout.preferredHeight: width
                 Layout.maximumHeight: width

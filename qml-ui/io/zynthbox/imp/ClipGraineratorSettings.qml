@@ -30,8 +30,8 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 Item {
     id: component
@@ -367,7 +367,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainScanSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -405,7 +405,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainIntervalSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -424,7 +424,7 @@ Item {
                     onGrainIntervalChanged: grainIntervalSlider.value = component.sliceObject.grainInterval
                 }
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainIntervalAdditionalSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -459,7 +459,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainSizeSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -478,7 +478,7 @@ Item {
                     onGrainSizeChanged: grainSizeSlider.value = component.sliceObject.grainSize
                 }
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainSizeAdditionalSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -537,7 +537,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPanMinimumSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -555,7 +555,7 @@ Item {
                     onGrainPanMinimumChanged: grainPanMinimumSlider.value = component.sliceObject.grainPanMinimum
                 }
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPanMaximumSlider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -589,7 +589,7 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMinimum1Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -607,7 +607,7 @@ Item {
                     onGrainPitchMinimum1Changed: grainPitchMinimum1Slider.value = component.sliceObject.grainPitchMinimum1
                 }
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMaximum1Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -661,7 +661,7 @@ Item {
                     color: _private.currentElement === 4 ? Kirigami.Theme.highlightedTextColor : "transparent"
                 }
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMinimum2Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -679,7 +679,7 @@ Item {
                     onGrainPitchMinimum2Changed: grainPitchMinimum2Slider.value = component.sliceObject.grainPitchMinimum2
                 }
             }
-            ZUI2.InfinitySlider {
+            ZUI.InfinitySlider {
                 id: grainPitchMaximum2Slider
                 Layout.fillHeight: true
                 Layout.fillWidth: true

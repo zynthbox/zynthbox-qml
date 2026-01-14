@@ -29,8 +29,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 Item {
     id: component
@@ -268,7 +268,7 @@ Item {
     RowLayout {
         anchors.fill: parent
         spacing: 0
-        ZUI2.InfinitySlider {
+        ZUI.InfinitySlider {
             id: subvoiceCountSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -298,7 +298,7 @@ Item {
                     }
                 }
             }
-            ZUI2.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     top: parent.bottom
                     horizontalCenter: parent.right
@@ -309,7 +309,7 @@ Item {
                 knobId: 3
             }
         }
-        ZUI2.InfinitySlider {
+        ZUI.InfinitySlider {
             id: editVoiceSlider
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -358,7 +358,7 @@ Item {
                 RowLayout {
                     spacing: 0
                     Layout.bottomMargin: 2 // To give even space for the selected indicator that sits two pixels below the thing
-                    ZUI2.SketchpadDial {
+                    ZUI.SketchpadDial {
                         id: panDial
                         text: qsTr("Pan")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
@@ -382,7 +382,7 @@ Item {
                         }
                     }
 
-                    ZUI2.SketchpadDial {
+                    ZUI.SketchpadDial {
                         id: pitchDial
                         text: qsTr("Pitch")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
@@ -406,7 +406,7 @@ Item {
                         }
                     }
 
-                    ZUI2.SketchpadDial {
+                    ZUI.SketchpadDial {
                         id: gainDial
                         text: qsTr("Gain (dB)")
                         controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
@@ -433,7 +433,7 @@ Item {
                     }
                 }
             }
-            ZUI2.KnobIndicator {
+            ZUI.KnobIndicator {
                 anchors {
                     top: parent.bottom
                     horizontalCenter: parent.horizontalCenter

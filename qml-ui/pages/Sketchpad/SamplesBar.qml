@@ -4,12 +4,12 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.Card {
+ZUI.Card {
     id: root
 
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
@@ -151,7 +151,7 @@ ZUI2.Card {
         }
     }
 
-    ZUI.FilePickerDialog {
+    IMP.FilePickerDialog {
         id: samplePickerDialog
         parent: zlScreen.parent
 

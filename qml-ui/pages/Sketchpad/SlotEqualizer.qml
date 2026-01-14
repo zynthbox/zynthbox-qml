@@ -30,12 +30,12 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.DialogQuestion {
+ZUI.DialogQuestion {
     id: component
     function showEqualizer(channel, slotType, slotIndex) {
         _private.slotIndex = slotIndex;
@@ -499,7 +499,7 @@ ZUI2.DialogQuestion {
                                         color: bandDelegate.filterSettings ? bandDelegate.filterSettings.color : "black"
                                     }
                                 }
-                                ZUI2.PlayGridButton {
+                                ZUI.PlayGridButton {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -508,7 +508,7 @@ ZUI2.DialogQuestion {
                                         filterTypeCombo.currentIndex = bandDelegate.filterSettings.filterType;
                                         filterTypeCombo.onClicked()
                                     }
-                                    ZUI2.ComboBox {
+                                    ZUI.ComboBox {
                                         id: filterTypeCombo
                                         visible: false;
                                         model: bandDelegate.filterSettings ? bandDelegate.filterSettings.filterTypeNames() : 0
@@ -564,7 +564,7 @@ ZUI2.DialogQuestion {
                                                         lastPressed = newTimestamp;
                                                     }
                                                 }
-                                                ZUI2.KnobIndicator {
+                                                ZUI.KnobIndicator {
                                                     visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
@@ -624,7 +624,7 @@ ZUI2.DialogQuestion {
                                                         lastPressed = newTimestamp;
                                                     }
                                                 }
-                                                ZUI2.KnobIndicator {
+                                                ZUI.KnobIndicator {
                                                     visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
@@ -683,7 +683,7 @@ ZUI2.DialogQuestion {
                                                     ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(1))
                                                     : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
                                             : ""
-                                            ZUI2.KnobIndicator {
+                                            ZUI.KnobIndicator {
                                                 visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
                                                 anchors {
                                                     top: parent.verticalCenter
@@ -700,7 +700,7 @@ ZUI2.DialogQuestion {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                         Layout.fillHeight: false
@@ -714,7 +714,7 @@ ZUI2.DialogQuestion {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 1
                                     }
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                         Layout.fillHeight: false
@@ -784,7 +784,7 @@ ZUI2.DialogQuestion {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit
                     }
-                    ZUI2.PlayGridButton {
+                    ZUI.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -797,7 +797,7 @@ ZUI2.DialogQuestion {
                             sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 0);
                         }
                     }
-                    ZUI2.PlayGridButton {
+                    ZUI.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -810,7 +810,7 @@ ZUI2.DialogQuestion {
                             sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 1);
                         }
                     }
-                    ZUI2.ComboBox {
+                    ZUI.ComboBox {
                         id: sideChainSourcePicker
                         visible: false;
                         model: Zynthbox.MidiRouter.model.audioInSources
@@ -891,7 +891,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI2.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -951,7 +951,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI2.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1015,7 +1015,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI2.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1075,7 +1075,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI2.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1139,7 +1139,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI2.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
                                         anchors.centerIn: parent
                                         height: parent.height / 2
@@ -1199,7 +1199,7 @@ ZUI2.DialogQuestion {
                                             lastPressed = newTimestamp;
                                         }
                                     }
-                                    ZUI2.KnobIndicator {
+                                    ZUI.KnobIndicator {
                                         visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
                                         anchors.centerIn: parent
                                         height: parent.height / 2

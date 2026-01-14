@@ -30,8 +30,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -170,7 +170,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.lowerMasterChannel = newChannel;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -192,7 +192,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.upperMasterChannel = newChannel;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -211,7 +211,7 @@ QQC2.ScrollView {
                 onClicked: {
                     _private.selectedDeviceObject.sendTimecode = !_private.selectedDeviceObject.sendTimecode;
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -269,7 +269,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.upperMasterChannel = 15;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -291,7 +291,7 @@ QQC2.ScrollView {
                         _private.selectedDeviceObject.lastLowerZoneMemberChannel = newChannel;
                     });
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -310,7 +310,7 @@ QQC2.ScrollView {
                 onClicked: {
                     _private.selectedDeviceObject.sendBeatClock = !_private.selectedDeviceObject.sendBeatClock;
                 }
-                ZUI2.KnobIndicator {
+                ZUI.KnobIndicator {
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
@@ -452,7 +452,7 @@ QQC2.ScrollView {
                         inputFiltersRepeater.currentlySelectedFilter = modelData;
                         inputFiltersRepeaterDelegate.knob0down();
                     }
-                    ZUI2.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left
@@ -715,7 +715,7 @@ QQC2.ScrollView {
                     onClicked: {
                         outputFiltersRepeaterDelegate.knob0down();
                     }
-                    ZUI2.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             verticalCenter: parent.verticalCenter
                             horizontalCenter: parent.left
@@ -812,7 +812,7 @@ QQC2.ScrollView {
                     onClicked: {
                         _private.selectedDeviceObject.setSendToChannels([model.index], !_private.selectedDeviceObject.channelsToSendTo[model.index]);
                     }
-                    ZUI2.KnobIndicator {
+                    ZUI.KnobIndicator {
                         anchors {
                             left: parent.left
                             bottom: parent.bottom
@@ -827,7 +827,7 @@ QQC2.ScrollView {
             }
         }
     }
-    ZUI2.ActionPickerPopup {
+    ZUI.ActionPickerPopup {
         id: deviceActionPicker
         actions: [
             Kirigami.Action {
@@ -850,7 +850,7 @@ QQC2.ScrollView {
             }
         ]
     }
-    ZUI.FilePickerDialog {
+    IMP.FilePickerDialog {
         id: deviceFilePickerDialog
 
         function pick(save) {

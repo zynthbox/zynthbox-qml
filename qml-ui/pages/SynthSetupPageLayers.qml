@@ -30,10 +30,10 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI2.ScreenPage {
+ZUI.ScreenPage {
     id: root
     backAction: Kirigami.Action {
         text: qsTr("Back")
@@ -253,7 +253,7 @@ ZUI2.ScreenPage {
                     }
                 }
             }
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -261,7 +261,7 @@ ZUI2.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                delegate: ZUI2.SelectorDelegate {
+                delegate: ZUI.SelectorDelegate {
                     id: delegate
                     screenId: layersView.screenId
                     selector: layersView.selector
@@ -426,7 +426,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI2.SelectorView {
+                ZUI.SelectorView {
                     id: bankView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -434,7 +434,7 @@ ZUI2.ScreenPage {
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                    delegate: ZUI2.SelectorDelegate {
+                    delegate: ZUI.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
@@ -462,7 +462,7 @@ ZUI2.ScreenPage {
                         onClicked: middleColumnStack.currentIndex = 0
                     }
                 }
-                ZUI2.Card {
+                ZUI.Card {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     contentItem: ColumnLayout {
@@ -544,7 +544,7 @@ ZUI2.ScreenPage {
                     }
                 }
             }
-            ZUI2.SelectorView {
+            ZUI.SelectorView {
                 id: presetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -587,7 +587,7 @@ ZUI2.ScreenPage {
             }
         }
 
-        ZUI2.Dialog {
+        ZUI.Dialog {
             id: layerSetupDialog
             parent: applicationWindow().contentItem
             x: Math.round(parent.width/2 - width/2)
@@ -630,7 +630,7 @@ ZUI2.ScreenPage {
             }
         }
 
-        ZUI.FilePickerDialog {
+        IMP.FilePickerDialog {
             id: saveDialog
             property string mode: "sound"
 
@@ -710,7 +710,7 @@ ZUI2.ScreenPage {
             saveMode: true
         }
 
-        ZUI.FilePickerDialog {
+        IMP.FilePickerDialog {
             id: pickerDialog
             parent: root
             property string mode: "sound"

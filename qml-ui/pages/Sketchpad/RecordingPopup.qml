@@ -32,10 +32,10 @@ import org.kde.kirigami 2.6 as Kirigami
 import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 import io.zynthbox.components 1.0 as Zynthbox
-import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI2.Popup {
+import io.zynthbox.ui 1.0 as ZUI
+
+ZUI.Popup {
     id: root
     property QtObject selectedChannel: null
     property string selectedSlotType: "synth"
@@ -102,11 +102,11 @@ ZUI2.Popup {
                     }
                     break;
                 case "KNOB1_UP":
-                    countIn.value = ZUI2.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
+                    countIn.value = ZUI.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
                     returnValue = true;
                     break;
                 case "KNOB1_DOWN":
-                    countIn.value = ZUI2.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
+                    countIn.value = ZUI.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
                     returnValue = true;
                     break;
                 case "KNOB2_UP":
@@ -219,7 +219,7 @@ ZUI2.Popup {
             if (startWithCountin && countIn.value > 0) {
                 Zynthbox.SyncTimer.startWithCountin(countIn.value);
             } else {
-                ZUI2.CommonUtils.startMetronomeAndPlayback();
+                ZUI.CommonUtils.startMetronomeAndPlayback();
             }
         }
     }
@@ -465,12 +465,12 @@ ZUI2.Popup {
                     Layout.minimumHeight: Layout.preferredHeight
                     enabled: zynqtgui.sketchpad.isRecording === false
 
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI2.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -501,12 +501,12 @@ ZUI2.Popup {
                             }
                         }
                     }
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI2.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -537,7 +537,7 @@ ZUI2.Popup {
                                         icon.name: "list-remove-symbolic"
                                         enabled: countIn.value > countIn.from
                                         onClicked: {
-                                            countIn.value = ZUI2.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
+                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
                                         }
                                     }
                                     Rectangle {
@@ -565,7 +565,7 @@ ZUI2.Popup {
                                         icon.name: "list-add-symbolic"
                                         enabled: countIn.value < countIn.to
                                         onClicked: {
-                                            countIn.value = ZUI2.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
+                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
                                         }
                                     }
                                 }
@@ -579,12 +579,12 @@ ZUI2.Popup {
                             }
                         }
                     }
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI2.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -603,7 +603,7 @@ ZUI2.Popup {
                                     verticalAlignment: Text.AlignVCenter
                                     text: qsTr("Master\nVolume")
                                 }
-                                ZUI2.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
                                     Layout.fillHeight: true
                                     controlObj: gainHandler
@@ -621,12 +621,12 @@ ZUI2.Popup {
                             }
                         }
                     }
-                    ZUI2.Card {
+                    ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         contentItem: Item {
-                            ZUI2.KnobIndicator {
+                            ZUI.KnobIndicator {
                                 anchors {
                                     right: parent.right
                                     bottom: parent.bottom
@@ -644,7 +644,7 @@ ZUI2.Popup {
                                     horizontalAlignment: Text.AlignRight
                                     text: qsTr("BPM")
                                 }
-                                ZUI2.SketchpadDial {
+                                ZUI.SketchpadDial {
                                     Layout.fillHeight: true
                                     controlObj: Zynthbox.SyncTimer
                                     controlProperty: "bpm"
@@ -712,7 +712,7 @@ ZUI2.Popup {
                                     Layout.alignment: Qt.AlignCenter
                                     text: qsTr("Audio Source:")
                                 }
-                                ZUI2.ComboBox {
+                                ZUI.ComboBox {
                                     id: sourceCombo
 
                                     Layout.fillWidth: true
@@ -740,7 +740,7 @@ ZUI2.Popup {
                                     Layout.alignment: Qt.AlignCenter
                                     text: qsTr("Recording Channel:")
                                 }
-                                ZUI2.ComboBox {
+                                ZUI.ComboBox {
                                     id: recordingChannelCombo
 
                                     Layout.fillWidth: true
@@ -769,7 +769,7 @@ ZUI2.Popup {
                                     enabled: parent.enabled
                                     text: qsTr("Source Track:")
                                 }
-                                ZUI2.ComboBox {
+                                ZUI.ComboBox {
                                     id: channelCombo
 
                                     Layout.fillWidth: true
@@ -831,7 +831,7 @@ ZUI2.Popup {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                                     text: qsTr("Midi Source:")
                                 }
-                                ZUI2.ComboBox {
+                                ZUI.ComboBox {
                                     id: midiSourceCombo
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
@@ -900,7 +900,7 @@ ZUI2.Popup {
                                 Layout.preferredHeight: _private.preferredRowHeight
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-remove-symbolic"
@@ -919,7 +919,7 @@ ZUI2.Popup {
                                         horizontalAlignment: Text.AlignHCenter
                                         text: _private.selectedPattern ? qsTr("Step Length: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.stepLength)) : ""
                                     }
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-add-symbolic"
@@ -939,7 +939,7 @@ ZUI2.Popup {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-remove-symbolic"
@@ -989,7 +989,7 @@ ZUI2.Popup {
                                             ]
                                         }
                                     }
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-add-symbolic"
@@ -1004,7 +1004,7 @@ ZUI2.Popup {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-remove-symbolic"
@@ -1055,7 +1055,7 @@ ZUI2.Popup {
                                         }
                                     }
 
-                                    ZUI2.PlayGridButton {
+                                    ZUI.PlayGridButton {
                                         Layout.fillWidth: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         icon.name: "list-add-symbolic"
@@ -1216,7 +1216,7 @@ ZUI2.Popup {
                                             return -100
                                         }
                                     }
-                                    Layout.preferredWidth: parent.width * ZUI2.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
                                     Layout.minimumWidth: Layout.preferredWidth
                                     Layout.maximumWidth: Layout.preferredWidth
                                     Layout.fillHeight: true
@@ -1237,7 +1237,7 @@ ZUI2.Popup {
                                             return -100
                                         }
                                     }
-                                    Layout.preferredWidth: parent.width * ZUI2.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
                                     Layout.minimumWidth: Layout.preferredWidth
                                     Layout.maximumWidth: Layout.preferredWidth
                                     Layout.fillHeight: true

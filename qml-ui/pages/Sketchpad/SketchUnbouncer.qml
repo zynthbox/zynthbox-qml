@@ -29,12 +29,12 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI2.DialogQuestion {
+ZUI.DialogQuestion {
     id: component
     width: Kirigami.Units.gridUnit * 40
     height: Kirigami.Units.gridUnit * 25
@@ -155,7 +155,7 @@ ZUI2.DialogQuestion {
             Layout.fillWidth: true
             Repeater {
                 model: 10
-                delegate: ZUI2.PlayGridButton {
+                delegate: ZUI.PlayGridButton {
                     Layout.preferredWidth: Kirigami.Units.gridUnit
                     text: "T" + (index + 1)
                     checked: _private.channel ? _private.channel.id == index : false
@@ -177,7 +177,7 @@ ZUI2.DialogQuestion {
             Layout.fillWidth: true
             Repeater {
                 model: 5
-                delegate: ZUI2.PlayGridButton {
+                delegate: ZUI.PlayGridButton {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                     text: "Pattern " + (index + 1)
                     checked: _private.slot == index

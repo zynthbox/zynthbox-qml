@@ -31,13 +31,13 @@ import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.15
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.6 as Kirigami
 
-ZUI2.ScreenPage {
+ZUI.ScreenPage {
     id: root
 
     property bool isVisible: ["midicontroller_settings"].indexOf(zynqtgui.current_screen_id) >= 0
@@ -210,7 +210,7 @@ ZUI2.ScreenPage {
 
                     }
 
-                    background: ZUI2.DelegateBackground {
+                    background: ZUI.DelegateBackground {
                         delegate: devicesListViewDelegate
                         visible: devicesListViewDelegate.highlighted
                     }
@@ -219,7 +219,7 @@ ZUI2.ScreenPage {
 
             }
 
-            background: ZUI2.SelectorViewBackground {
+            background: ZUI.SelectorViewBackground {
                 id: background
             }
 
@@ -235,7 +235,7 @@ ZUI2.ScreenPage {
 
     }
 
-    ZUI2.DialogQuestion {
+    ZUI.DialogQuestion {
         id: confirmer
 
         property var callbackFunction: null
@@ -254,7 +254,7 @@ ZUI2.ScreenPage {
         }
     }
 
-    ZUI2.ComboBox {
+    ZUI.ComboBox {
         id: trackPicker
 
         property int trackValue: -1
@@ -351,7 +351,7 @@ ZUI2.ScreenPage {
 
     }
 
-    ZUI2.ComboBox {
+    ZUI.ComboBox {
         id: slotPicker
 
         property int slotValue: -1
@@ -433,7 +433,7 @@ ZUI2.ScreenPage {
 
     }
 
-    ZUI2.ComboBox {
+    ZUI.ComboBox {
         id: midiChannelPicker
 
         property int channelValue: -1
@@ -545,7 +545,7 @@ ZUI2.ScreenPage {
 
     }
 
-    ZUI2.ComboBox {
+    ZUI.ComboBox {
         id: cuiaEventPicker
 
         property int cuiaEvent: -1
@@ -585,7 +585,7 @@ ZUI2.ScreenPage {
 
     }
 
-    ZUI2.ComboBox {
+    ZUI.ComboBox {
         id: valueSpecifierPicker
 
         property int valueSpecifier: -1
@@ -645,7 +645,7 @@ ZUI2.ScreenPage {
 
     }
 
-    ZUI2.DialogQuestion {
+    ZUI.DialogQuestion {
         id: midiEventListener
 
         property var selectedEvent: []

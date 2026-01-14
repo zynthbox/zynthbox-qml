@@ -30,12 +30,12 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import "./Sketchpad" as Sketchpad
 
-ZUI2.ScreenPage {
+ZUI.ScreenPage {
     id: component
     screenId: "channel_wave_editor"
     title: qsTr("Track Wave Editor")
@@ -567,7 +567,7 @@ ZUI2.ScreenPage {
                         testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 12);
                     }
                 }
-                ZUI2.NotePad {
+                ZUI.NotePad {
                     id: testNotePad
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -795,7 +795,7 @@ ZUI2.ScreenPage {
                                 : ""
                     showCopyPasteButtons: false
                 }
-                ZUI.ClipSlicesSettings {
+                IMP.ClipSlicesSettings {
                     id: clipSettingsSlices
                     objectName: "clipSettingsSlices"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -810,7 +810,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI.ClipVoicesSettings {
+                IMP.ClipVoicesSettings {
                     id: clipSettingsVoices
                     objectName: "clipSettingsVoices"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -825,7 +825,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI2.ADSRClipView {
+                ZUI.ADSRClipView {
                     id: clipSettingsADSR
                     objectName: "clipSettingsADSR"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -839,7 +839,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI.ClipGraineratorSettings {
+                IMP.ClipGraineratorSettings {
                     id: clipSettingsGrainerator
                     objectName: "clipSettingsGrainerator"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -853,7 +853,7 @@ ZUI2.ScreenPage {
                         }
                     }
                 }
-                ZUI.ClipInfoView {
+                IMP.ClipInfoView {
                     id: clipSettingsInfoView
                     objectName: "clipSettingsInfoView"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -919,7 +919,7 @@ ZUI2.ScreenPage {
                             visible: component.isVisible && component.selectedChannel.trackType === "sample-loop" && clipDelegate.cppClipObject && clipDelegate.cppClipObject.isPlaying
                             color: Kirigami.Theme.highlightColor
                             width: Kirigami.Units.smallSpacing
-                            x: visible ? ZUI2.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
+                            x: visible ? ZUI.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
                         }
 
                         // SamplerSynth progress dots
@@ -959,7 +959,7 @@ ZUI2.ScreenPage {
                                     top: parent.verticalCenter
                                     topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                                 }
-                                x: visible ? Math.floor(ZUI2.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                                x: visible ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
                             }
                         }
                     }

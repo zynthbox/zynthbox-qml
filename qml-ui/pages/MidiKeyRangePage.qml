@@ -29,10 +29,10 @@ import QtQuick.Window 2.10
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
-ZUI2.ScreenPage {
+import io.zynthbox.ui 1.0 as ZUI
+
+ZUI.ScreenPage {
     id: root
     title: zynqtgui.midi_key_range.select_path ? zynqtgui.midi_key_range.select_path : ""
 
@@ -46,7 +46,7 @@ ZUI2.ScreenPage {
         columns: 3
         rowSpacing: Kirigami.Units.gridUnit
 
-        ZUI2.MultiSwitchController {
+        ZUI.MultiSwitchController {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             Layout.preferredHeight: Layout.preferredWidth
@@ -62,7 +62,7 @@ ZUI2.ScreenPage {
             }
             //stepSize: 1
         }
-        ZUI2.Card {
+        ZUI.Card {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 15
             Layout.preferredHeight: Kirigami.Units.gridUnit * 10
@@ -126,7 +126,7 @@ ZUI2.ScreenPage {
                 }
             }
         }
-        ZUI2.MultiSwitchController {
+        ZUI.MultiSwitchController {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             Layout.preferredHeight: Layout.preferredWidth

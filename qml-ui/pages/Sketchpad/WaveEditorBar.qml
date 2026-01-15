@@ -31,6 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
+
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -566,7 +567,7 @@ GridLayout {
                     bottom: parent.bottom
                     margins: Kirigami.Units.largeSpacing * 1.5
                 }
-                source: "../../io/zynthbox/ui/img/breadcrumb-separator.svg"
+                source: "../../io/zynthbox/imp/img/breadcrumb-separator.svg"
             }
             Text {
                 id: startHandleLabel
@@ -603,7 +604,7 @@ GridLayout {
                     bottom: parent.bottom
                     margins: Kirigami.Units.largeSpacing * 1.5
                 }
-                source: "../../io/zynthbox/ui/img/breadcrumb-separator.svg"
+                source: "../../io/zynthbox/imp/img/breadcrumb-separator.svg"
             }
             Text {
                 id: loopHandleLabel
@@ -640,7 +641,7 @@ GridLayout {
                     margins: Kirigami.Units.largeSpacing * 1.5
                 }
                 mirror: true
-                source: "../../io/zynthbox/ui/img/breadcrumb-separator.svg"
+                source: "../../io/zynthbox/imp/img/breadcrumb-separator.svg"
             }
             Text {
                 id: endHandleLabel

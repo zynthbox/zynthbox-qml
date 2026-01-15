@@ -27,7 +27,7 @@ import QtQuick 2.10
 
 import io.zynthbox.ui 1.0 as ZUI
 
-ZUI.NewStuffPage {
+ZUI3.NewStuffPage {
     id: component
     screenId: "soundfont_downloader"
     title: qsTr("Soundfont Downloader")

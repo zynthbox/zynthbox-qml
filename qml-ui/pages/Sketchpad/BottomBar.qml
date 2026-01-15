@@ -31,6 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -140,7 +141,6 @@ Rectangle {
                     }
                 }
 
-
                 Item {
                     Layout.fillWidth: true
                     visible: !(zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern")
@@ -236,7 +236,6 @@ Rectangle {
                     }
                 }
             }
-
 
             ZUI.TabbedControlView {
                 id: tabbedView
@@ -425,7 +424,7 @@ Rectangle {
         }
     }
 
-    ZUI.FilePickerDialog {
+    IMP.FilePickerDialog {
         id: pickerDialog
         parent: zlScreen.parent
 

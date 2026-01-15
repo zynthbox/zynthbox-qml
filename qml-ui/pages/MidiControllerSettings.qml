@@ -30,7 +30,10 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.15
+
+
 import io.zynthbox.ui 1.0 as ZUI
+
 import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.6 as Kirigami
 
@@ -207,7 +210,7 @@ ZUI.ScreenPage {
 
                     }
 
-                    background: ZynthianPrivate.DelegateBackground {
+                    background: ZUI.DelegateBackground {
                         delegate: devicesListViewDelegate
                         visible: devicesListViewDelegate.highlighted
                     }
@@ -216,7 +219,7 @@ ZUI.ScreenPage {
 
             }
 
-            background: ZynthianPrivate.SelectorViewBackground {
+            background: ZUI.SelectorViewBackground {
                 id: background
             }
 

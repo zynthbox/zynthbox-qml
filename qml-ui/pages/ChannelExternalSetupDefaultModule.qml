@@ -30,8 +30,9 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.imp 1.0 as IMP
 
-ZUI.BaseExternalEditor {
+IMP.BaseExternalEditor {
     id: component
 
     cuiaCallback: function(cuia) {

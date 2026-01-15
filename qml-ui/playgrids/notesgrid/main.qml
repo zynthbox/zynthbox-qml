@@ -29,10 +29,11 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import io.zynthbox.ui 1.0 as ZUI
+
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.BasePlayGrid {
+IMP.BasePlayGrid {
     id: component
     grid: notesGrid
     miniGrid: notesMiniGrid

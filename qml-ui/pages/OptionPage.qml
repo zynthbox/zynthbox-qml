@@ -30,6 +30,6 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
 
-ZUI.SelectorPage {
+ZUI.SelectorPage2 {
     screenId: "option"
 }

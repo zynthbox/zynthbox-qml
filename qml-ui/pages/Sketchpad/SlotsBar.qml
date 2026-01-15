@@ -33,8 +33,8 @@ import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -298,7 +298,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: ZUI2.Theme.spacing
+                spacing: ZUI.Theme.spacing
 
                 ColumnLayout {
                     id: buttonsColumn
@@ -307,7 +307,7 @@ QQC2.Pane {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     // Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
-                    spacing: ZUI2.Theme.spacing
+                    spacing: ZUI.Theme.spacing
 
                     //// INVISIBLE BUTTONS
                     QQC2.Button {
@@ -628,7 +628,7 @@ QQC2.Pane {
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignTop
 
-                    padding: ZUI2.Theme.padding
+                    padding: ZUI.Theme.padding
                     background: null
 
                 contentItem: Item {
@@ -796,7 +796,7 @@ QQC2.Pane {
     }
 
 
-    ZUI.FilePickerDialog {
+    IMP.FilePickerDialog {
         id: samplePickerDialog
         parent: zlScreen.parent
 
@@ -857,7 +857,7 @@ QQC2.Pane {
         }
     }
 
-    ZUI.FilePickerDialog {
+    IMP.FilePickerDialog {
         id: loopPickerDialog
         parent: zlScreen.parent
 
@@ -1075,7 +1075,7 @@ QQC2.Pane {
         id: sketchUnbouncer
     }
 
-    ZUI.LayerSetupDialog {
+    IMP.LayerSetupDialog {
         id: layerSetupDialog
         onRequestSlotPicker: function(channel, slotType, slotIndex) {
             slotSwapperPopup.pickSlotToSwapWith(channel, slotType, slotIndex);

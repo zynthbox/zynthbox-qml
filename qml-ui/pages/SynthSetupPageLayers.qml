@@ -30,6 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
 
 ZUI.ScreenPage {
@@ -629,7 +630,7 @@ ZUI.ScreenPage {
             }
         }
 
-        ZUI.FilePickerDialog {
+        IMP.FilePickerDialog {
             id: saveDialog
             property string mode: "sound"
 
@@ -709,7 +710,7 @@ ZUI.ScreenPage {
             saveMode: true
         }
 
-        ZUI.FilePickerDialog {
+        IMP.FilePickerDialog {
             id: pickerDialog
             parent: root
             property string mode: "sound"

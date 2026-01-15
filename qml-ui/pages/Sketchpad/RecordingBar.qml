@@ -34,6 +34,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import io.zynthbox.components 1.0 as Zynthbox
+
 import io.zynthbox.ui 1.0 as ZUI
 
 // GridLayout so TabbedControlView knows how to navigate it

@@ -31,6 +31,7 @@ import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 import "pages" as Pages
@@ -1187,7 +1188,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
 
-            ZUI.StatusInfo {}
+            IMP.StatusInfo {}
         }
     }
 
@@ -1539,7 +1540,7 @@ Kirigami.AbstractApplicationWindow {
     }
 
     readonly property QtObject midiBytePicker: midiBytePicker
-    ZUI.MidiBytePickerPopup {
+    IMP.MidiBytePickerPopup {
         id: midiBytePicker
     }
 
@@ -1986,7 +1987,7 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    ZUI.OnScreenDisplay {
+    IMP.OnScreenDisplay {
         id: osd
     }
 

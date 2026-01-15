@@ -30,6 +30,7 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
 
 import "Sketchpad" as Sketchpad
@@ -194,10 +195,10 @@ ZUI.ScreenPage {
             }
         }
     ]
-    ZUI.MultichannelRecorderPopup {
+    IMP.MultichannelRecorderPopup {
         id: multichannelRecorderPopup
     }
-    ZUI.SegmentModelPicker {
+    IMP.SegmentModelPicker {
         id: segmentModelPicker
     }
 

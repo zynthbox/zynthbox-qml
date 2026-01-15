@@ -29,8 +29,8 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 ZUI.ScreenPage {
     screenId: "main"
@@ -104,7 +104,7 @@ ZUI.ScreenPage {
 
     contentItem: RowLayout {
         // spacing: Kirigami.Units.gridUnit
-        spacing: ZUI2.Theme.padding
+        spacing: ZUI.Theme.padding
 
         Item{
             Layout.fillWidth: false
@@ -114,7 +114,7 @@ ZUI.ScreenPage {
             ColumnLayout {
                 id: categoryButtons
                 anchors.fill: parent
-                spacing: ZUI2.Theme.spacing   
+                spacing: ZUI.Theme.spacing   
                 //Placeholders to replace the buttons
                 QQC2.Button {
                     Layout.fillHeight: true

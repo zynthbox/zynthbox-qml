@@ -28,7 +28,9 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import '../../io/zynthbox/ui' 1.0 as ZUI
+import io.zynthbox.imp 1.0 as IMP
+import io.zynthbox.ui 1.0 as ZUI
+
 import '../Sketchpad' as Sketchpad
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -267,7 +269,7 @@ ZUI.ScreenPage {
         }
     }
 
-    ZUI.SaveFileDialog {
+    IMP.SaveFileDialog {
         id: saveSoundDialog
         visible: false
         headerText: qsTr("Save Sound")

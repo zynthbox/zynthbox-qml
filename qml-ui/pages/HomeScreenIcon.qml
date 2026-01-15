@@ -5,8 +5,8 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 QQC2.Control {
     id: root
@@ -17,7 +17,7 @@ QQC2.Control {
 
     background: Rectangle {
         id: buttonId
-        radius: ZUI2.Theme.radius
+        radius: ZUI.Theme.radius
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
         color: root.highlighted ? Kirigami.Theme.highlightColor : "transparent"
     }

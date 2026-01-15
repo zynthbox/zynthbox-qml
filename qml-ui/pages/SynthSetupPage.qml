@@ -31,6 +31,8 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.15
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.imp 1.0 as IMP
+
 import io.zynthbox.components 1.0 as Zynthbox
 
 ZUI.ScreenPage {
@@ -868,7 +870,7 @@ ZUI.ScreenPage {
         }
     }
 
-//        ZUI.FilePickerDialog {
+//        IMP.FilePickerDialog {
 //            id: saveDialog
 //            property string mode: "sound"
 
@@ -948,7 +950,7 @@ ZUI.ScreenPage {
 //            saveMode: true
 //        }
 
-//        ZUI.FilePickerDialog {
+//        IMP.FilePickerDialog {
 //            id: pickerDialog
 //            parent: root
 //            property string mode: "sound"
@@ -1035,7 +1037,7 @@ ZUI.ScreenPage {
 //            }
 //        }
 
-//        ZUI.LayerReplaceDialog {
+//        IMP.LayerReplaceDialog {
 //            id: layerReplaceDialog
 //            parent: root.parent
 //            modal: true

@@ -27,10 +27,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
 
-import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
-import "../io/zynthbox/ui/private" as ZynthianPrivate
+import io.zynthbox.ui 1.0 as ZUI
 
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -139,9 +137,9 @@ ZUI.ScreenPage {
         highlighted: index === root.currentIndex
         width: parent.width
         implicitHeight: _layout.implicitHeight + topPadding + bottomPadding
-        padding: ZUI2.Theme.padding
+        padding: ZUI.Theme.padding
 
-        background: ZynthianPrivate.DelegateBackground {
+        background: ZUI.DelegateBackground {
             delegate: _delegate
             visible: delegate.highlighted
         }
@@ -149,7 +147,7 @@ ZUI.ScreenPage {
         contentItem: RowLayout {
             id: _layout
 
-            spacing: ZUI2.Theme.spacing
+            spacing: ZUI.Theme.spacing
 
             QQC2.Label {
                 Layout.fillWidth: true
@@ -175,7 +173,7 @@ ZUI.ScreenPage {
                     color: Kirigami.Theme.backgroundColor
                     border.color: "#ff999999"
                     border.width: 2
-                    radius: ZUI2.Theme.radius
+                    radius: ZUI.Theme.radius
                 }
 
             }
@@ -195,7 +193,7 @@ ZUI.ScreenPage {
         contentItem: Column {
             id: content
 
-            spacing: ZUI2.Theme.padding
+            spacing: ZUI.Theme.padding
 
             EntryDelegate {
                 text: qsTr("Double Click Threshold Amount")
@@ -349,7 +347,7 @@ ZUI.ScreenPage {
             }
         }
 
-        background: ZynthianPrivate.SelectorViewBackground {
+        background: ZUI.SelectorViewBackground {
             id: background
         }
 

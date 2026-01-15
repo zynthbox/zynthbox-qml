@@ -32,10 +32,12 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
+
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.BasePlayGrid {
+IMP.BasePlayGrid {
     id: component
     grid: drumsGrid
     settings: drumsGridSettings
@@ -699,7 +701,7 @@ ZUI.BasePlayGrid {
     property var noteListeningNotes: []
     property var noteListeningVelocities: []
 
-    // ZUI.SequenceLoader {
+    // IMP.SequenceLoader {
     //     id: sequenceLoader
     // }
 
@@ -1376,7 +1378,7 @@ ZUI.BasePlayGrid {
                             restoreMode: Binding.RestoreBinding
                         }
                         property QtObject sample: channel ? channel.getClipsModelById(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
-                        ZUI.SampleVisualiser {
+                        IMP.SampleVisualiser {
                             anchors.fill: parent
                             sample: parent.visible ? drumpadLoopVisualiser.sample : null
                             trackType: drumpadLoopVisualiser.channel === null ? "" : drumpadLoopVisualiser.channel.trackType

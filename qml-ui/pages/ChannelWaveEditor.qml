@@ -30,7 +30,9 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
+
 import "./Sketchpad" as Sketchpad
 
 ZUI.ScreenPage {
@@ -793,7 +795,7 @@ ZUI.ScreenPage {
                                 : ""
                     showCopyPasteButtons: false
                 }
-                ZUI.ClipSlicesSettings {
+                IMP.ClipSlicesSettings {
                     id: clipSettingsSlices
                     objectName: "clipSettingsSlices"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -808,7 +810,7 @@ ZUI.ScreenPage {
                         }
                     }
                 }
-                ZUI.ClipVoicesSettings {
+                IMP.ClipVoicesSettings {
                     id: clipSettingsVoices
                     objectName: "clipSettingsVoices"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -837,7 +839,7 @@ ZUI.ScreenPage {
                         }
                     }
                 }
-                ZUI.ClipGraineratorSettings {
+                IMP.ClipGraineratorSettings {
                     id: clipSettingsGrainerator
                     objectName: "clipSettingsGrainerator"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
@@ -851,7 +853,7 @@ ZUI.ScreenPage {
                         }
                     }
                 }
-                ZUI.ClipInfoView {
+                IMP.ClipInfoView {
                     id: clipSettingsInfoView
                     objectName: "clipSettingsInfoView"
                     visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName

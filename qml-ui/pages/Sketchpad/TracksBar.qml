@@ -35,8 +35,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 import QtQuick.Controls.Styles 1.4
 
+
 import io.zynthbox.ui 1.0 as ZUI
-import io.zynthbox.ui2 1.0 as ZUI2
 
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -765,7 +765,7 @@ QQC2.Pane {
 
     contentItem: Item {
         RowLayout {
-            spacing: ZUI2.Theme.spacing
+            spacing: ZUI.Theme.spacing
             anchors.fill: parent
 
             BottomStackTabs {
@@ -785,10 +785,10 @@ QQC2.Pane {
                 Layout.rightMargin: svgBg4.visible ? svgBg4.inset.right : 0
                 Layout.bottomMargin: svgBg4.visible ? svgBg4.inset.bottom : 0
 
-                topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI2.Theme.padding
-                bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI2.Theme.padding
-                leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI2.Theme.padding
-                rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI2.Theme.padding
+                topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
+                bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
+                leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
+                rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
 
                 background: Item {
                     PlasmaCore.FrameSvgItem {
@@ -1168,7 +1168,7 @@ QQC2.Pane {
                                             anchors.fill: parent
                                             border.width: 1
                                             border.color: "#ff999999"
-                                            radius: ZUI2.Theme.radius
+                                            radius: ZUI.Theme.radius
                                             color: "#222222"
                                         }
 
@@ -1192,7 +1192,7 @@ QQC2.Pane {
                                             {
                                                 width: waveItemContainer.width
                                                 height: waveItemContainer.height
-                                                radius: ZUI2.Theme.radius
+                                                radius: ZUI.Theme.radius
                                             }
                                         }
 
@@ -1667,7 +1667,7 @@ QQC2.Pane {
                                             anchors.fill: parent
                                             border.width: 1
                                             border.color: "#ff999999"
-                                            radius: ZUI2.Theme.radius
+                                            radius: ZUI.Theme.radius
                                             color: "#222222"
                                         }
 
@@ -1694,7 +1694,7 @@ QQC2.Pane {
                                             {
                                                 width: patternVisualiserItem.width
                                                 height: patternVisualiserItem.height
-                                                radius: ZUI2.Theme.radius
+                                                radius: ZUI.Theme.radius
                                             }
                                         }
 

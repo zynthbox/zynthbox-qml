@@ -1,0 +1,21 @@
+module io.zynthbox.imp
+
+BasePlayGrid 1.0 BasePlayGrid.qml
+BluetoothConnections 1.0 BluetoothConnections.qml
+Stack 1.0 Stack.qml
+StatusInfo 1.0 StatusInfo.qml
+FilePickerDialog 1.0 FilePickerDialog.qml
+SaveFileDialog 1.0 SaveFileDialog.qml
+LayerReplaceDialog 1.0 LayerReplaceDialog.qml
+SequenceLoader 1.0 SequenceLoader.qml
+LayerSetupDialog 1.0 LayerSetupDialog.qml
+MultichannelRecorderPopup 1.0 MultichannelRecorderPopup.qml
+OnScreenDisplay 1.0 OnScreenDisplay.qml
+SampleVisualiser 1.0 SampleVisualiser.qml
+SegmentModelPicker 1.0 SegmentModelPicker.qml
+ClipGraineratorSettings 1.0 ClipGraineratorSettings.qml
+ClipInfoView 1.0 ClipInfoView.qml
+ClipVoicesSettings 1.0 ClipVoicesSettings.qml
+ClipSlicesSettings 1.0 ClipSlicesSettings.qml
+BaseExternalEditor 1.0 BaseExternalEditor.qml
+MidiBytePickerPopup 1.0 MidiBytePickerPopup.qml

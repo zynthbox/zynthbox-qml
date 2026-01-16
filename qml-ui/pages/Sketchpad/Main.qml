@@ -1468,7 +1468,7 @@ ZUI.ScreenPage {
                                                     }
                                                 ]
 
-                                                TableHeader {
+                                                ZUI.TableHeader {
                                                     id: sceneHeader
                                                     anchors.fill: parent
                                                     text: String.fromCharCode(65+index).toUpperCase()

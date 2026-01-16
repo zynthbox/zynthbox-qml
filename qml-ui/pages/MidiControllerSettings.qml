@@ -23,14 +23,12 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import "../io/zynthbox/ui/private" as ZynthianPrivate
 import "MidiControllerSettings"
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.15
-
 
 import io.zynthbox.ui 1.0 as ZUI
 

@@ -249,7 +249,7 @@ ZUI.ScreenPage {
                 }
                 Repeater {
                     model: segmentsLayout.lastVisibleSegmentCellIndex + 1
-                    Sketchpad.TableHeader {
+                    ZUI.TableHeader {
                         id: segmentHeader
 
                         property bool startDrag: false

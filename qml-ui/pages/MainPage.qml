@@ -29,13 +29,11 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-
 import io.zynthbox.ui 1.0 as ZUI
 
 ZUI.ScreenPage {
     screenId: "main"
     backAction.visible: false
-
 
     background: Rectangle
     {
@@ -104,7 +102,7 @@ ZUI.ScreenPage {
 
     contentItem: RowLayout {
         // spacing: Kirigami.Units.gridUnit
-        spacing: ZUI.Theme.padding
+        spacing: ZUI.Theme.spacing
 
         Item{
             Layout.fillWidth: false
@@ -123,7 +121,7 @@ ZUI.ScreenPage {
                     checkable: true
                     checked: zynqtgui.main.visibleCategory === "modules"
                     text: qsTr("Modules")
-                    onClicked: zynqtgui.main.audio_settings = "modules"
+                    onClicked: zynqtgui.main.visibleCategory = "modules"
                 }
 
                 QQC2.Button {
@@ -201,15 +199,33 @@ ZUI.ScreenPage {
             }
         }
 
-        Item {
+        QQC2.Control {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
+            bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
+            leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
+            rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
 
-            MouseArea {
+            background: Item {
+                PlasmaCore.FrameSvgItem {
+                    id: svgBg4
+                    visible: fromCurrentTheme
+                    anchors.fill: parent
+
+                    readonly property real leftPadding: fixedMargins.left
+                    readonly property real rightPadding: fixedMargins.right
+                    readonly property real topPadding: fixedMargins.top
+                    readonly property real bottomPadding: fixedMargins.bottom
+
+                    imagePath: "widgets/background"
+                     colorGroup: PlasmaCore.Theme.ViewColorGroup
+                }
+            }
+
+           contentItem: MouseArea {
                 id: gridMouseArea
                 property bool blocked: false
-
-                anchors.fill: parent
                 drag.filterChildren: true
                 onClicked: {
                     if (!gridMouseArea.blocked) {

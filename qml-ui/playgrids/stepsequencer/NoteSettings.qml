@@ -511,7 +511,7 @@ ColumnLayout {
                 Layout.maximumHeight: 1
                 z: 9999 // Put the label on top of all the things
                 opacity: subnoteDelegate.thisDataIndex === 0 || model.index === 0 || subnoteDelegate.firstInStep ? 1 : 0
-                Rectangle {
+                Kirigami.Separator {
                     anchors {
                         bottomMargin: 2
                         bottom: parent.top
@@ -519,7 +519,6 @@ ColumnLayout {
                         right: parent.right
                     }
                     height: 1
-                    color: Kirigami.Theme.textColor
                 }
                 QQC2.Label {
                     anchors {

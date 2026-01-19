@@ -79,19 +79,11 @@ ColumnLayout {
                 break;
             case "NAVIGATE_LEFT":
                 // page down
-                if (component.currenParameterPageIndex > 0) {
-                    component.currenParameterPageIndex = component.currenParameterPageIndex - 1;
-                } else {
-                    component.currenParameterPageIndex = component.parameterPageCount - 1;
-                }
+                applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex - 1);
                 break;
             case "NAVIGATE_RIGHT":
                 // page up
-                if (component.currenParameterPageIndex + 1 < component.parameterPageCount) {
-                    component.currenParameterPageIndex = component.currenParameterPageIndex + 1;
-                } else {
-                    component.currenParameterPageIndex = 0;
-                }
+                applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex + 1);
                 break;
             case "KNOB0_UP":
                 result = false;
@@ -157,8 +149,7 @@ ColumnLayout {
         ? "%1 (default)".arg(component.patternModel.stepLengthName(component.patternModel.defaultNoteDuration))
         : ""
 
-    readonly property int parameterPageCount: 3
-    property int currenParameterPageIndex: 0
+    readonly property int currentParameterPageIndex: applicationWindow().globalSequencer.parameterPage
 
     onVisibleChanged: {
         if (!visible) {
@@ -300,27 +291,27 @@ ColumnLayout {
             Layout.fillWidth: false
             Layout.fillHeight: true
             text: qsTr("General")
-            checked: component.currenParameterPageIndex === 0
+            checked: component.currentParameterPageIndex === 0
             onClicked: {
-                component.currenParameterPageIndex = 0;
+                component.currentParameterPageIndex = 0;
             }
         }
         ZUI.PlayGridButton {
             Layout.fillWidth: false
             Layout.fillHeight: true
             text: qsTr("Probability")
-            checked: component.currenParameterPageIndex === 1
+            checked: component.currentParameterPageIndex === 1
             onClicked: {
-                component.currenParameterPageIndex = 1;
+                component.currentParameterPageIndex = 1;
             }
         }
         ZUI.PlayGridButton {
             Layout.fillWidth: false
             Layout.fillHeight: true
             text: qsTr("Ratchet")
-            checked: component.currenParameterPageIndex === 2
+            checked: component.currentParameterPageIndex === 2
             onClicked: {
-                component.currenParameterPageIndex = 2;
+                component.currentParameterPageIndex = 2;
             }
         }
     }
@@ -424,9 +415,9 @@ ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
-            text: component.currenParameterPageIndex === 0
+            text: component.currentParameterPageIndex === 0
                 ? "Velocity"
-                : component.currenParameterPageIndex === 1
+                : component.currentParameterPageIndex === 1
                     ? "Probability"
                     : "Ratchet Style"
             ZUI.KnobIndicator {
@@ -447,9 +438,9 @@ ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
-            text: component.currenParameterPageIndex === 0
+            text: component.currentParameterPageIndex === 0
                 ? "Length"
-                : component.currenParameterPageIndex === 1
+                : component.currentParameterPageIndex === 1
                     ? ""
                     : "Ratchet Count"
             ZUI.KnobIndicator {
@@ -470,9 +461,9 @@ ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
-            text: component.currenParameterPageIndex === 0
+            text: component.currentParameterPageIndex === 0
                 ? "Position"
-                : component.currenParameterPageIndex === 1
+                : component.currentParameterPageIndex === 1
                     ? "Next Step"
                     : "Ratchet Probability"
             ZUI.KnobIndicator {
@@ -649,7 +640,7 @@ ColumnLayout {
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 0
+                    visible: component.currentParameterPageIndex === 0
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "velocity"
@@ -670,7 +661,7 @@ ColumnLayout {
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 0
+                    visible: component.currentParameterPageIndex === 0
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "duration"
@@ -709,7 +700,7 @@ ColumnLayout {
                     id: delayParamDelegate
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 0
+                    visible: component.currentParameterPageIndex === 0
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "delay"
@@ -763,7 +754,7 @@ ColumnLayout {
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 1
+                    visible: component.currentParameterPageIndex === 1
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "probability"
@@ -828,12 +819,12 @@ ColumnLayout {
                 Item {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 1
+                    visible: component.currentParameterPageIndex === 1
                 }
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 1
+                    visible: component.currentParameterPageIndex === 1
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "next-step"
@@ -863,7 +854,7 @@ ColumnLayout {
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 2
+                    visible: component.currentParameterPageIndex === 2
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "ratchet-style"
@@ -886,7 +877,7 @@ ColumnLayout {
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 2
+                    visible: component.currentParameterPageIndex === 2
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "ratchet-count"
@@ -902,7 +893,7 @@ ColumnLayout {
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currenParameterPageIndex === 2
+                    visible: component.currentParameterPageIndex === 2
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "ratchet-probability"

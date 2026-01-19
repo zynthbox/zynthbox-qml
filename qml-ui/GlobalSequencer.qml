@@ -934,6 +934,13 @@ Item {
                 break;
 
             case "SWITCH_BACK_SHORT":
+                if (_private.temporaryLiveRecordPattern && zynqtgui.startRecordButtonPressed) {
+                    _private.temporaryLiveRecordPattern.recordLive = false;
+                    _private.temporaryLiveRecordPattern = null;
+                    zynqtgui.sketchpad.isRecording = false;
+                    zynqtgui.ignoreNextRecordButtonPress = true;
+                    returnValue = true;
+                }
                 component.ignoreHeldStepButtonsReleases();
                 break;
 
@@ -1622,6 +1629,9 @@ Item {
         property QtObject starNote: null
         property int starVelocity: pattern ? pattern.defaultVelocity : 64
 
+        property QtObject temporaryLiveRecordPattern: null
+        property int temporaryRecordedNotes: 0
+
         // Should probably do a thing where we show when notes are playing when in keys mode...
         property var stepKeyNotes: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
         property var stepKeyNotesActive: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
@@ -2028,6 +2038,11 @@ Item {
                 && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
                     let setOn = true;
+                    // If we're trying to record stuff live, count up notes (in case we're in style 2, and want to leave it live recording when we release the record button)
+                    if (_private.temporaryLiveRecordPattern) {
+                        zynqtgui.ui_settings.temporaryRecordedNotes = zynqtgui.ui_settings.temporaryRecordedNotes + 1;
+                        zynqtgui.ignoreNextRecordButtonPress = true;
+                    }
                     // By convention, an "off" note can be either a midi off message, or an on message with a velocity of 0
                     if (byte1 < 144 || byte3 === 0) {
                         setOn = false;
@@ -2137,6 +2152,38 @@ Item {
         onStep14_button_pressed_changed: { _private.heldStepButtons[13] = zynqtgui.step14ButtonPressed; }
         onStep15_button_pressed_changed: { _private.heldStepButtons[14] = zynqtgui.step15ButtonPressed; }
         onStep16_button_pressed_changed: { _private.heldStepButtons[15] = zynqtgui.step16ButtonPressed; }
+        onStartRecord_button_pressed_changed: {
+            // Temporary live recording style 1 is to live record when holding down the record button, and style 2 is to also leave live recording on when released if at least one note was recorded (so don't disable live recording in that case)
+            if (Zynthbox.SyncTimer.timerRunning) {
+                if (zynqtgui.startRecordButtonPressed) {
+                    // Temporary live recording style 1 is to live record when holding down the record button, and style 2 is to also leave live recording on when released if at least one note was recorded
+                    if (zynqtgui.ui_settings.temporaryLiveRecordStyle == 1 || zynqtgui.ui_settings.temporaryLiveRecordStyle == 2) {
+                        // Start live recording with the current settings
+                        if (_private.temporaryLiveRecordPattern) {
+                            // This should really never happen, but in case it does, let's just handle that real quick
+                            _private.temporaryLiveRecordPattern.recordLive = false;
+                            _private.temporaryLiveRecordPattern = null;
+                        }
+                        _private.temporaryLiveRecordPattern = _private.pattern;
+                        _private.temporaryRecordedNotes = 0;
+                        _private.temporaryLiveRecordPattern.liveRecordingSource = "";
+                        _private.temporaryLiveRecordPattern.recordLive = true;
+                        zynqtgui.sketchpad.recordingType = "midi";
+                        zynqtgui.sketchpad.isRecording = true;
+                    }
+                } else {
+                    // Temporary live recording style 1 is to live record when holding down the record button,
+                    // and style 2 is to also leave live recording on when released if at least one note was recorded (so don't disable live recording in that case)
+                    if (_private.temporaryLiveRecordPattern && (zynqtgui.ui_settings.temporaryLiveRecordStyle == 1 || zynqtgui.ui_settings.temporaryLiveRecordStyle == 2)) {
+                        if (zynqtgui.ui_settings.temporaryLiveRecordStyle == 1 || zynqtgui.ui_settings.temporaryRecordedNotes == 0) {
+                            _private.temporaryLiveRecordPattern.recordLive = false;
+                            zynqtgui.sketchpad.isRecording = false;
+                        }
+                        _private.temporaryLiveRecordPattern = null;
+                    }
+                }
+            }
+        }
     }
     Connections {
         target: Zynthbox.PlayGridManager

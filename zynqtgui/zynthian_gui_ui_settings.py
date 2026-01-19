@@ -41,6 +41,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "false") == "true" else False
         self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
+        self.__temporaryLiveRecordStyle = int(self.zynqtgui.global_settings.value("UI/temporaryLiveRecordStyle", 1))
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
         self.__showCursor = True if self.zynqtgui.global_settings.value("UI/showCursor", "false") == "true" else False
         self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
@@ -131,6 +132,24 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     hardwareSequencerEditInclusions = Property(int, get_hardwareSequencerEditInclusions, set_hardwareSequencerEditInclusions, notify=hardwareSequencerEditInclusionsChanged)
     ### END Property hardwareSequencerEditInclusions
+
+    ### BEGIN Property temporaryLiveRecordStyle
+    # 0 is no temporary live recording
+    # 1 is temporary live recording when record is held down
+    # 2 is sticky (live recording will remain active if at least one note was recorded)
+    def get_temporaryLiveRecordStyle(self):
+        return self.__temporaryLiveRecordStyle
+
+    def set_temporaryLiveRecordStyle(self, value):
+        if value != self.__temporaryLiveRecordStyle:
+            self.__temporaryLiveRecordStyle = value
+            self.zynqtgui.global_settings.setValue("UI/temporaryLiveRecordStyle", self.__temporaryLiveRecordStyle)
+            self.temporaryLiveRecordStyleChanged.emit()
+
+    temporaryLiveRecordStyleChanged = Signal()
+
+    temporaryLiveRecordStyle = Property(int, get_temporaryLiveRecordStyle, set_temporaryLiveRecordStyle, notify=temporaryLiveRecordStyleChanged)
+    ### END Property temporaryLiveRecordStyle
 
     ### BEGIN Property debugMode
     def get_debugMode(self):

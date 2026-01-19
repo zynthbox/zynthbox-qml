@@ -296,10 +296,37 @@ ZUI.ScreenPage {
             }
 
             EntryDelegate {
+                text: qsTr("Record Live When Holding Record")
+                infoText: zynqtgui.ui_settings.temporaryLiveRecordStyle === 0
+                    ? qsTr("Off")
+                    : zynqtgui.ui_settings.temporaryLiveRecordStyle === 1
+                        ? qsTr("When Held")
+                        : zynqtgui.ui_settings.temporaryLiveRecordStyle === 2
+                            ? qsTr("Sticky")
+                            : qsTr("Unknown")
+                index: 4
+                onIncrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.min(2, zynqtgui.ui_settings.temporaryLiveRecordStyle + 1)
+                onDecrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.max(0, zynqtgui.ui_settings.temporaryLiveRecordStyle - 1)
+
+                QQC2.Slider {
+                    width: Kirigami.Units.gridUnit * 20
+                    from: 0
+                    to: 2
+                    stepSize: 1
+                    value: zynqtgui.ui_settings.temporaryLiveRecordStyle
+                    onPressedChanged: {
+                        // Set the value on release to save the value only when needed
+                        if (!pressed)
+                            zynqtgui.ui_settings.temporaryLiveRecordStyle = value;
+                    }
+                }
+            }
+
+            EntryDelegate {
                 text: qsTr("Debug Mode")
                 infoText: zynqtgui.ui_settings.debugMode ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.debugMode = !zynqtgui.ui_settings.debugMode
-                index: 4
+                index: 5
                 onIncrementValue: zynqtgui.ui_settings.debugMode = true
                 onDecrementValue: zynqtgui.ui_settings.debugMode = false
 
@@ -316,7 +343,7 @@ ZUI.ScreenPage {
                 text: qsTr("Show Cursor")
                 infoText: zynqtgui.ui_settings.showCursor ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.showCursor = !zynqtgui.ui_settings.showCursor
-                index: 5
+                index: 6
                 onIncrementValue: zynqtgui.ui_settings.showCursor = true
                 onDecrementValue: zynqtgui.ui_settings.showCursor = false
 
@@ -334,7 +361,7 @@ ZUI.ScreenPage {
                 text: qsTr("VNC Server")
                 infoText: zynqtgui.ui_settings.vncserverEnabled ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.vncserverEnabled = !zynqtgui.ui_settings.vncserverEnabled
-                index: 5
+                index: 7
                 onIncrementValue: zynqtgui.ui_settings.vncserverEnabled = true
                 onDecrementValue: zynqtgui.ui_settings.vncserverEnabled = false
 

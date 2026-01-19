@@ -54,6 +54,10 @@ ZUI.ScreenPage {
 
             zynqtgui.admin.power_off()
             return true
+        case "SWITCH_SELECT_SHORT":
+            mainviewGridId.activateCurrent();
+            return true;
+            break;
         case "SELECT_UP":
             mainviewGridId.moveCurrentIndexUp();
             return true;
@@ -65,9 +69,11 @@ ZUI.ScreenPage {
             }
             return true;
         case "NAVIGATE_LEFT":
+        case "KNOB3_DOWN":
             mainviewGridId.moveCurrentIndexLeft();
             return true;
         case "NAVIGATE_RIGHT":
+        case "KNOB3_UP":
             mainviewGridId.moveCurrentIndexRight();
             return true;
 
@@ -245,6 +251,11 @@ ZUI.ScreenPage {
                     cellHeight:iconHeight
                     currentIndex: zynqtgui.main.current_index
                     model:zynqtgui.main.selector_list
+                    function activateCurrent() {
+                        if (mainviewGridId.currentItem) {
+                            mainviewGridId.currentItem.activate();
+                        }
+                    }
                     delegate: HomeScreenIcon {
                         width: mainviewGridId.iconWidth
                         height: mainviewGridId.iconHeight
@@ -262,6 +273,18 @@ ZUI.ScreenPage {
 
                         text: model.display ? model.display : ""
 
+                        function activate() {
+                            // activate_index will start the appimage process and open sketchpad after 5 seconds
+                            // to mimic closing of menu after opening an app like other modules in main page
+                            zynqtgui.main.activate_index(model.index);
+
+                            if (model.action_id === "appimage") {
+                                // FIXME : If currentTaskMessage is not cleared before calling start_loading, it displays a blank loading screen without any text
+                                zynqtgui.currentTaskMessage = ""
+                                zynqtgui.start_loading_with_message("Starting " + model.display);
+                                stopLoadingTimer.restart();
+                            }
+                        }
                         MouseArea {
                             id: _mouseArea
                             anchors.fill: parent
@@ -272,16 +295,7 @@ ZUI.ScreenPage {
                             onReleased: gridMouseArea.blocked = false
                             onCanceled: gridMouseArea.blocked = false
                             onClicked: {
-                                // activate_index will start the appimage process and open sketchpad after 5 seconds
-                                // to mimic closing of menu after opening an app like other modules in main page
-                                zynqtgui.main.activate_index(model.index);
-
-                                if (model.action_id === "appimage") {
-                                    // FIXME : If currentTaskMessage is not cleared before calling start_loading, it displays a blank loading screen without any text
-                                    zynqtgui.currentTaskMessage = ""
-                                    zynqtgui.start_loading_with_message("Starting " + model.display);
-                                    stopLoadingTimer.restart();
-                                }
+                                delegateIconButton.activate();
                             }
 
                             QQC2.Button {

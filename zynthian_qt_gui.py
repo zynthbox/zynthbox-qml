@@ -2576,6 +2576,8 @@ class zynthian_gui(QObject):
                         self.knob2Touched = True
                     elif i == 32: # KNOB_3 (big knob)
                         self.knob3Touched = True
+                    elif i == 33:
+                        self.knob3Pressed = True
 
                 if self.fake_key_event_for_zynswitch(i, True):
                     return
@@ -2734,6 +2736,8 @@ class zynthian_gui(QObject):
                         self.knob2Touched = False
                     elif i == 32: # KNOB_3 (big knob)
                         self.knob3Touched = False
+                    elif i == 33:
+                        self.knob3Pressed = False
 
                 if self.fake_key_event_for_zynswitch(i, False):
                     return

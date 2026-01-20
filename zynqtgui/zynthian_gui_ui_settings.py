@@ -38,7 +38,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_ui_settings, self).__init__(parent)
         self.__doubleClickThreshold = int(self.zynqtgui.global_settings.value("UI/doubleClickThreshhold", 200))
-        self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "false") == "true" else False
+        self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "true") == "true" else False
         self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
         self.__temporaryLiveRecordStyle = int(self.zynqtgui.global_settings.value("UI/temporaryLiveRecordStyle", 1))

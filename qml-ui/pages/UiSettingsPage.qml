@@ -356,12 +356,29 @@ ZUI.ScreenPage {
 
             }
 
+            EntryDelegate {
+                text: qsTr("Encoder Touch Response")
+                infoText: zynqtgui.ui_settings.touchEncoders ? qsTr("Enabled") : qsTr("Disabled")
+                onClicked: zynqtgui.ui_settings.touchEncoders = !zynqtgui.ui_settings.touchEncoders
+                index: 7
+                onIncrementValue: zynqtgui.ui_settings.touchEncoders = true
+                onDecrementValue: zynqtgui.ui_settings.touchEncoders = false
+
+                QQC2.Switch {
+                    checked: zynqtgui.ui_settings.touchEncoders
+                    onClicked: {
+                        zynqtgui.ui_settings.touchEncoders = checked;
+                    }
+                }
+
+            }
+
 
             EntryDelegate {
                 text: qsTr("VNC Server")
                 infoText: zynqtgui.ui_settings.vncserverEnabled ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.vncserverEnabled = !zynqtgui.ui_settings.vncserverEnabled
-                index: 7
+                index: 8
                 onIncrementValue: zynqtgui.ui_settings.vncserverEnabled = true
                 onDecrementValue: zynqtgui.ui_settings.vncserverEnabled = false
 

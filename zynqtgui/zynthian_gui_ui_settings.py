@@ -44,6 +44,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__temporaryLiveRecordStyle = int(self.zynqtgui.global_settings.value("UI/temporaryLiveRecordStyle", 1))
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
         self.__showCursor = True if self.zynqtgui.global_settings.value("UI/showCursor", "false") == "true" else False
+        self.__touchEncoders = True if self.zynqtgui.global_settings.value("UI/touchEncoders", "false") == "true" else False
         self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
 
@@ -179,7 +180,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
             else:
                 nullCursor = QPixmap(16, 16);
                 nullCursor.fill(Qt.transparent);
-                zynthian_gui_config.app.setOverrideCursor(QCursor(nullCursor));            
+                zynthian_gui_config.app.setOverrideCursor(QCursor(nullCursor));
             self.zynqtgui.global_settings.setValue("UI/showCursor", self.__showCursor)
             self.showCursorChanged.emit()
 
@@ -187,6 +188,21 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     showCursor = Property(bool, get_showCursor, set_showCursor, notify=showCursorChanged)
     ### END Property showCursor
+
+    ### BEGIN Property touchEncoders
+    def get_touchEncoders(self):
+        return self.__touchEncoders
+
+    def set_touchEncoders(self, value, force_set=False):
+        if value != self.__touchEncoders or force_set:
+            self.__touchEncoders = value
+            self.zynqtgui.global_settings.setValue("UI/touchEncoders", self.__touchEncoders)
+            self.touchEncodersChanged.emit()
+
+    touchEncodersChanged = Signal()
+
+    touchEncoders = Property(bool, get_touchEncoders, set_touchEncoders, notify=touchEncodersChanged)
+    ### END Property touchEncoders
 
     ### BEGIN Property vncserverEnabled
     def get_vncserverEnabled(self):

@@ -398,11 +398,11 @@ QQC2.Pane
                     result = false;
                     break;
                 case "KNOB0_UP":
-                    applicationWindow().updateSketchpadBpm(1);
+                    applicationWindow().updateMasterVolume(1);
                     result = true;
                     break;
                 case "KNOB0_DOWN":
-                    applicationWindow().updateSketchpadBpm(-1);
+                    applicationWindow().updateMasterVolume(-1);
                     result = true;
                     break;
                 case "KNOB1_UP":
@@ -425,7 +425,7 @@ QQC2.Pane
                     if (zynqtgui.altButtonPressed) {
                         zynqtgui.sketchpad.metronomeVolume = Math.min(1, zynqtgui.sketchpad.metronomeVolume + 0.01);
                     } else {
-                        applicationWindow().updateMasterVolume(1);
+                        applicationWindow().updateSketchpadBpm(1);
                     }
                     result = true;
                     break;
@@ -433,7 +433,7 @@ QQC2.Pane
                     if (zynqtgui.altButtonPressed) {
                         zynqtgui.sketchpad.metronomeVolume = Math.max(0, zynqtgui.sketchpad.metronomeVolume - 0.01);
                     } else {
-                        applicationWindow().updateMasterVolume(-1);
+                        applicationWindow().updateSketchpadBpm(-1);
                     }
                     result = true;
                     break;
@@ -472,7 +472,7 @@ QQC2.Pane
                                     controlObj: gainHandler
                                     controlProperty: "gainDb"
                                     valueString: qsTr("%1 dB").arg(dial.value.toFixed(2))
-                                    knobId: 3
+                                    knobId: 0
                                     onDoubleClicked: gainHandler.gainDb = zynqtgui.initialMasterVolume
                                     dial {
                                         stepSize: 0.5
@@ -522,7 +522,7 @@ QQC2.Pane
                                     text: qsTr("BPM")
                                     controlObj: Zynthbox.SyncTimer
                                     controlProperty: "bpm"
-                                    knobId: 0
+                                    knobId: 3
 
                                     dial {
                                         stepSize: 1

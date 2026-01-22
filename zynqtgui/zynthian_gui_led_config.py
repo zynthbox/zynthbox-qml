@@ -396,7 +396,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             # Do not continue if channel is not yet instantiated
             return
 
-        menu_page_active = self.zynqtgui.modal_screen is None and self.zynqtgui.active_screen == "main"
+        menu_page_active = self.zynqtgui.current_screen_id in ["main", "admin", "about", "audio_settings", "midicontroller_settings", "test_knobs", "synth_behaviour",  "network", "network_info", "wifi_settings", "hardware", "ui_settings", "led_config", "bluetooth_config", "theme_chooser", "theme_downloader", "apps_downloader"]
         sketchpad_page_active = self.zynqtgui.current_screen_id == "sketchpad"
         playgrid_page_active = self.zynqtgui.current_screen_id == "playgrid"
         song_manager_page_active = self.zynqtgui.current_screen_id == "song_manager"

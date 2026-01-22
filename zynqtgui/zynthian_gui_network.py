@@ -85,6 +85,12 @@ class zynthian_gui_network(zynthian_gui_selector):
         self.select_path_element = "Network"
         super().set_select_path()
 
+    def back_action(self):
+        if self.zynqtgui.current_screen_id == "network":
+            return "admin"
+        else:
+            return "network"
+
     def execute_commands(self):
         self.zynqtgui.start_loading()
 

@@ -1286,7 +1286,7 @@ class zynthian_gui(QObject):
             screen == "layer"
             or screen == "fixed_layers"
             or screen == "main_layers_view"
-            or screen ==  "layers_for_channel"
+            or screen == "layers_for_channel"
             or screen == "bank"
             or screen == "preset"
             or screen == "control"
@@ -1997,13 +1997,7 @@ class zynthian_gui(QObject):
             self.zynswitch_short(3)
 
         elif cuia == "SCREEN_MAIN_MENU":
-            if self.get_current_screen_id() == "main":
-                if self.modal_screen_back:
-                    self.show_modal(self.modal_screen_back)
-                elif self.screen_back:
-                    self.show_screen(self.screen_back)
-            else:
-                self.show_screen("main")
+            self.show_modal("main")
 
         # elif cuia == "SCREEN_EDIT_CONTEXTUAL":
             # Do not handle this here. Instead handle it from qml main
@@ -4139,7 +4133,6 @@ class zynthian_gui(QObject):
             self.__menu_button_pressed__ = pressed
             if pressed:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MENU_DOWN")
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SCREEN_MAIN_MENU")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MENU_RELEASED")
             self.menu_button_pressed_changed.emit()

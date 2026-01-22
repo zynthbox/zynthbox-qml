@@ -263,6 +263,13 @@ Kirigami.AbstractApplicationWindow {
                     result = true;
                 }
                 break;
+            case "SWITCH_MENU_RELEASED":
+                if (["main", "admin", "about", "audio_settings", "midicontroller_settings", "test_knobs", "synth_behaviour",  "network", "network_info", "wifi_settings", "hardware", "ui_settings", "led_config", "bluetooth_config", "theme_chooser", "theme_downloader", "apps_downloader"].includes(zynqtgui.current_screen_id) === true) {
+                    zynqtgui.callable_ui_action_simple("SWITCH_BACK_SHORT");
+                } else {
+                    zynqtgui.callable_ui_action_simple("SCREEN_MAIN_MENU");
+                }
+                break;
             case "SCREEN_LAYER":
             case "SCREEN_PRESET":
                 recordingPopup.close();

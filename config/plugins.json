@@ -645,7 +645,7 @@
       "currentVersion": "0000",
       "versions": {
         "0000": {
-          "visible": true,
+          "visible": false,
           "pluginName": "ALO",
           "format": "LV2",
           "path": "/usr/local/lib/lv2/alo.lv2/",

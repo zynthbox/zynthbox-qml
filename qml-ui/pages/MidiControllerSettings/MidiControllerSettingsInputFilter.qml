@@ -45,7 +45,7 @@ QQC2.ScrollView {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
                 contentStack.pop();
-                returnValue = true;
+                result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
                 if (component.currentRow.selectPressed) {
@@ -91,7 +91,7 @@ QQC2.ScrollView {
                     theParent = theParent.parent;
                 }
                 component.contentItem.contentY = (deviceComponentContent.height - component.height) * ((component.currentRow.height * (mappedY / deviceComponentContent.height)) + mappedY) / deviceComponentContent.height;
-                returnValue = true;
+                result = true;
                 break;
             }
             case "KNOB3_DOWN": {
@@ -103,7 +103,7 @@ QQC2.ScrollView {
                     theParent = theParent.parent;
                 }
                 component.contentItem.contentY = (deviceComponentContent.height - component.height) * ((component.currentRow.height * (mappedY / deviceComponentContent.height)) + mappedY) / deviceComponentContent.height;
-                returnValue = true;
+                result = true;
                 break;
             }
             default:

@@ -89,7 +89,7 @@ ZUI.ScreenPage {
                 switch (cuia) {
                 case "SWITCH_BACK_SHORT":
                     zynqtgui.current_screen_id = "admin";
-                    returnValue = true;
+                    result = true;
                     break;
                 case "SWITCH_SELECT_SHORT":
                     if (_private.selectedDeviceIndex > -1)
@@ -97,22 +97,21 @@ ZUI.ScreenPage {
                         "containingPage": root,
                         "_private": _private
                     });
-
-                    returnValue = true;
+                    result = true;
                     break;
                 case "KNOB3_UP":
                     if (_private.selectedDeviceIndex + 1 < devicesListView.count) {
                         _private.selectedDeviceIndex = _private.selectedDeviceIndex + 1;
                         _private.selectedDeviceObject = devicesListView.currentItem.midiRouterDevice;
                     }
-                    returnValue = true;
+                    result = true;
                     break;
                 case "KNOB3_DOWN":
                     if (_private.selectedDeviceIndex > 0) {
                         _private.selectedDeviceIndex = _private.selectedDeviceIndex - 1;
                         _private.selectedDeviceObject = devicesListView.currentItem.midiRouterDevice;
                     }
-                    returnValue = true;
+                    result = true;
                     break;
                 default:
                     break;

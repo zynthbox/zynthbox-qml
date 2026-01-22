@@ -44,7 +44,7 @@ ColumnLayout {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
                 contentStack.pop();
-                returnValue = true;
+                result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
                 if (component.currentRow.selectPressed) {
@@ -83,12 +83,12 @@ ColumnLayout {
                 break;
             case "KNOB3_UP": {
                 currentRow.goNext();
-                returnValue = true;
+                result = true;
                 break;
             }
             case "KNOB3_DOWN": {
                 currentRow.goPrevious();
-                returnValue = true;
+                result = true;
                 break;
             }
             default:

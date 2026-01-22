@@ -4981,7 +4981,7 @@ class zynthian_gui(QObject):
 
     def set_knob0touched(self, touched):
         # We never do touchey stuff if the touchEncoders option is false, and this is the most central place for that
-        touchedActual = touched if self.ui_settings.touchEncoders == True else false
+        touchedActual = touched if self.ui_settings.touchEncoders == True else False
         if self.__knob0touched__ != touchedActual:
             self.__knob0touched__ = touchedActual
             if touchedActual:
@@ -5001,7 +5001,7 @@ class zynthian_gui(QObject):
 
     def set_knob1touched(self, touched):
         # We never do touchey stuff if the touchEncoders option is false, and this is the most central place for that
-        touchedActual = touched if self.ui_settings.touchEncoders == True else false
+        touchedActual = touched if self.ui_settings.touchEncoders == True else False
         if self.__knob1touched__ != touchedActual:
             self.__knob1touched__ = touchedActual
             if touchedActual:
@@ -5021,7 +5021,7 @@ class zynthian_gui(QObject):
 
     def set_knob2touched(self, touched):
         # We never do touchey stuff if the touchEncoders option is false, and this is the most central place for that
-        touchedActual = touched if self.ui_settings.touchEncoders == True else false
+        touchedActual = touched if self.ui_settings.touchEncoders == True else False
         if self.__knob2touched__ != touchedActual:
             self.__knob2touched__ = touchedActual
             if touchedActual:
@@ -5041,7 +5041,7 @@ class zynthian_gui(QObject):
 
     def set_knob3touched(self, touched):
         # We never do touchey stuff if the touchEncoders option is false, and this is the most central place for that
-        touchedActual = touched if self.ui_settings.touchEncoders == True else false
+        touchedActual = touched if self.ui_settings.touchEncoders == True else False
         if self.__knob3touched__ != touchedActual:
             self.__knob3touched__ = touchedActual
             if touchedActual:

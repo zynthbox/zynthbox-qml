@@ -2068,6 +2068,7 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_GLOBAL_DOWN":
             self.globalButtonPressed = True
         elif cuia == "SWITCH_GLOBAL_RELEASED":
+            self.globalPopupOpened = True
             self.globalButtonPressed = False
 
         elif cuia == "TRACK_1":
@@ -4699,11 +4700,6 @@ class zynthian_gui(QObject):
         if self.__global_button_pressed__ != pressed:
             logging.debug(f"Global Button pressed : {pressed}")
             self.__global_button_pressed__ = pressed
-            if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_DOWN")
-                self.globalPopupOpened = not self.globalPopupOpened
-            else:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_RELEASED")
             self.global_button_pressed_changed.emit()
 
     global_button_pressed_changed = Signal()

@@ -378,6 +378,7 @@ QQC2.Pane
                     break;
                 case "SWITCH_SELECT_SHORT":
                 case "SWITCH_BACK_SHORT":
+                case "SWITCH_GLOBAL_RELEASED":
                     zynqtgui.globalPopupOpened = false;
                     result = true;
                     break;

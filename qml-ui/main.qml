@@ -88,7 +88,11 @@ Kirigami.AbstractApplicationWindow {
                 result = true;
                 break;
             case "KNOB0_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateMasterVolume(0);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelVolume(0, true)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -98,7 +102,10 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB0_RELEASED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
                     zynqtgui.ignoreNextMetronomeButtonPress = true
@@ -106,7 +113,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB0_UP":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateMasterVolume(1);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelVolume(1, true)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -116,7 +127,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB0_DOWN":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateMasterVolume(-1);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelVolume(-1, true)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -126,7 +141,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB1_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateGlobalDelayFXAmount(0);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelDelaySend(0)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -135,7 +154,10 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB1_RELEASED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
                     zynqtgui.ignoreNextMetronomeButtonPress = true
@@ -143,7 +165,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB1_UP":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateGlobalDelayFXAmount(1);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelDelaySend(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -153,7 +179,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB1_DOWN":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateGlobalDelayFXAmount(-1);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelDelaySend(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -163,7 +193,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB2_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateGlobalReverbFXAmount(0);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelReverbSend(0)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -172,7 +206,10 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB2_RELEASED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
                     zynqtgui.ignoreNextMetronomeButtonPress = true
@@ -180,7 +217,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB2_UP":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateGlobalReverbFXAmount(1);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelReverbSend(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -190,7 +231,11 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB2_DOWN":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    root.updateGlobalReverbFXAmount(-1);
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelReverbSend(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -200,10 +245,12 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB3_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     // Allows us to use alt+mode as a modifier in stepsequencer
                     if (zynqtgui.modeButtonPressed === false) {
-                        root.updateMasterVolume(0);
                         result = true;
                     }
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -213,7 +260,10 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB3_RELEASED":
-                if (zynqtgui.altButtonPressed) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    result = true;
+                } else if (zynqtgui.altButtonPressed) {
                     // Allows us to use alt+mode as a modifier in stepsequencer
                     if (zynqtgui.modeButtonPressed === false) {
                         result = true;
@@ -224,10 +274,12 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB3_UP":
-                if (zynqtgui.altButtonPressed && zynqtgui.globalPopupOpened === false) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    result = true;
+                } else if (zynqtgui.altButtonPressed && zynqtgui.globalPopupOpened === false) {
                     // Allows us to use alt+mode as a modifier in stepsequencer
                     if (zynqtgui.modeButtonPressed === false) {
-                        root.updateMasterVolume(1);
                         result = true;
                     }
                 } else if (zynqtgui.metronomeButtonPressed) {
@@ -237,10 +289,12 @@ Kirigami.AbstractApplicationWindow {
                 }
                 break;
             case "KNOB3_DOWN":
-                if (zynqtgui.altButtonPressed && zynqtgui.globalPopupOpened === false) {
+                if (zynqtgui.globalButtonPressed) {
+                    zynqtgui.ignoreNextGlobalButtonPress = true;
+                    result = true;
+                } else if (zynqtgui.altButtonPressed && zynqtgui.globalPopupOpened === false) {
                     // Allows us to use alt+mode as a modifier in stepsequencer
                     if (zynqtgui.modeButtonPressed === false) {
-                        root.updateMasterVolume(-1);
                         result = true;
                     }
                 } else if (zynqtgui.metronomeButtonPressed) {

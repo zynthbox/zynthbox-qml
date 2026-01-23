@@ -151,33 +151,41 @@ QQC2.AbstractButton {
 
     background: Item {
 
-        Rectangle {
+        // Rectangle {
+        //     anchors.fill: parent
+        //     visible: !svgBg.visible
+        //     color: root.backgroundColor
+
+        //     border.width: 1
+        //     border.color: root.highlightColor
+        //                   ? root.highlightColor
+        //                   : root.highlighted
+        //                     ? Kirigami.Theme.highlightColor
+        //                     : "transparent"
+        // }
+
+        // PlasmaCore.FrameSvgItem {
+        //     id: svgBg
+        //     visible: fromCurrentTheme && highlighted
+        //     anchors.fill: parent
+
+        //     property bool highlighted: root.highlighted
+        //     readonly property real leftPadding: fixedMargins.left
+        //     readonly property real rightPadding: fixedMargins.right
+        //     readonly property real topPadding: fixedMargins.top
+        //     readonly property real bottomPadding: fixedMargins.bottom
+
+        //     imagePath: "widgets/column-delegate-background"
+        //     prefix: highlighted ? ["focus", ""] : ""
+        //     colorGroup: PlasmaCore.Theme.ViewColorGroup
+        // }
+
+         Rectangle {
             anchors.fill: parent
-            visible: !svgBg.visible
-            color: root.backgroundColor
-
-            border.width: 1
-            border.color: root.highlightColor
-                          ? root.highlightColor
-                          : root.highlighted
-                            ? Kirigami.Theme.highlightColor
-                            : "transparent"
-        }
-
-        PlasmaCore.FrameSvgItem {
-            id: svgBg
-            visible: fromCurrentTheme && highlighted
-            anchors.fill: parent
-
-            property bool highlighted: root.highlighted
-            readonly property real leftPadding: fixedMargins.left
-            readonly property real rightPadding: fixedMargins.right
-            readonly property real topPadding: fixedMargins.top
-            readonly property real bottomPadding: fixedMargins.bottom
-
-            imagePath: "widgets/column-delegate-background"
-            prefix: highlighted ? ["focus", ""] : ""
-            colorGroup: PlasmaCore.Theme.ViewColorGroup
+            property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
+            opacity: highlighted ? 0.2 : 1
+            color: "#1f2022"
+            radius: 2
         }
 
         Rectangle {

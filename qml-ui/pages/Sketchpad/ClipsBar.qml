@@ -73,9 +73,12 @@ QQC2.Pane {
     }
 
     Layout.fillWidth: true
-    padding: 0
-    background: null //for now it is not themeable
-
+    // padding: 0
+    // background: null //for now it is not themeable
+    padding: 2
+    background: Rectangle {
+        color: "#292a2c"
+    }
     QQC2.ButtonGroup {
         buttons: buttonsColumn.children
     }
@@ -124,35 +127,41 @@ QQC2.Pane {
             QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.topMargin: svgBg.visible ? svgBg.inset.top : 0
-                Layout.leftMargin: svgBg.visible ? svgBg.inset.left : 0
-                Layout.rightMargin: svgBg.visible ? svgBg.inset.right : 0
-                Layout.bottomMargin: svgBg.visible ? svgBg.inset.bottom : 0
-                topPadding: svgBg.visible ? svgBg.topPadding : 0
-                bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
-                leftPadding: svgBg.visible ? svgBg.leftPadding : 0
-                rightPadding: svgBg.visible ? svgBg.rightPadding : 0
+                // Layout.topMargin: svgBg.visible ? svgBg.inset.top : 0
+                // Layout.leftMargin: svgBg.visible ? svgBg.inset.left : 0
+                // Layout.rightMargin: svgBg.visible ? svgBg.inset.right : 0
+                // Layout.bottomMargin: svgBg.visible ? svgBg.inset.bottom : 0
+                // topPadding: svgBg.visible ? svgBg.topPadding : 0
+                // bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
+                // leftPadding: svgBg.visible ? svgBg.leftPadding : 0
+                // rightPadding: svgBg.visible ? svgBg.rightPadding : 0
 
-                background: Item {
-                    PlasmaCore.FrameSvgItem {
-                        id: svgBg
+                // background: Item {
+                //     PlasmaCore.FrameSvgItem {
+                //         id: svgBg
 
-                        readonly property real leftPadding: fixedMargins.left
-                        readonly property real rightPadding: fixedMargins.right
-                        readonly property real topPadding: fixedMargins.top
-                        readonly property real bottomPadding: fixedMargins.bottom
+                //         readonly property real leftPadding: fixedMargins.left
+                //         readonly property real rightPadding: fixedMargins.right
+                //         readonly property real topPadding: fixedMargins.top
+                //         readonly property real bottomPadding: fixedMargins.bottom
 
-                        visible: fromCurrentTheme
-                        anchors.fill: parent
-                        imagePath: "widgets/tracks-background"
-                        colorGroup: PlasmaCore.Theme.ViewColorGroup
-                    }
+                //         visible: fromCurrentTheme
+                //         anchors.fill: parent
+                //         imagePath: "widgets/tracks-background"
+                //         colorGroup: PlasmaCore.Theme.ViewColorGroup
+                //     }
 
+                // }
+
+                padding: 2
+                background: Rectangle {
+                    color: "#040507"
+                    radius: 4
                 }
 
-                contentItem: Item {
+                contentItem: Rectangle {
                     id: clipsContainer
-
+                    color: "#2e3336"    
                     RowLayout {
                         id: contentColumn
 
@@ -231,8 +240,11 @@ QQC2.Pane {
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                 Layout.alignment: Qt.AlignTop
-                padding: ZUI.Theme.padding
-                background: null
+                padding: 2
+                background: Rectangle {
+                    color: "#040507"
+                    radius: 4
+                }
 
                 contentItem: Item {
                     ColumnLayout {
@@ -247,10 +259,12 @@ QQC2.Pane {
                         // }
 
                         anchors.fill: parent
+                        spacing: 2
 
                         QQC2.Label {
-                            // visible: text.length > 0
-
+                            visible: text.length > 0
+                            padding: 4
+                            horizontalAlignment: Qt.AlignHCenter
                             Layout.fillWidth: true
                             wrapMode: Text.WrapAnywhere
                             enabled: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
@@ -258,8 +272,9 @@ QQC2.Pane {
                         }
 
                         QQC2.Label {
-                            // visible: text.length > 0
-
+                            visible: text.length > 0
+                            padding: 4  
+                            horizontalAlignment: Qt.AlignHCenter
                             Layout.fillWidth: true
                             wrapMode: Text.WrapAnywhere
                             enabled: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
@@ -268,15 +283,26 @@ QQC2.Pane {
 
                         QQC2.Button {
                             Layout.fillWidth: true
+                            implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
+
                             enabled: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
                             text: qsTr("Swap with...")
                             onClicked: {
-                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.clipIndex);
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", root.selectedClipPattern.clipIndex);
+                            }
+
+                            background: Rectangle {
+                                opacity: parent.checked ? 0.5 : 1
+
+                                color: parent.checked ? "#181918" : "#1f2022"
+                                radius: 2
                             }
                         }
 
                         QQC2.Button {
                             Layout.fillWidth: true
+                            implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
+
                             text: qsTr("Clear Column")
                             onClicked: {
                                 applicationWindow().confirmer.confirmSomething(qsTr("Clear Column?"), qsTr("Are you sure that you want to clear entire column?"), function() {
@@ -285,6 +311,13 @@ QQC2.Pane {
                                         Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.selectedClipChannel.id, i).resetPattern(true);
                                     }
                                 });
+                            }
+
+                            background: Rectangle {
+                                opacity: parent.checked ? 0.5 : 1
+
+                                color: parent.checked ? "#181918" : "#1f2022"
+                                radius: 2
                             }
                         }
 

@@ -782,53 +782,28 @@ Kirigami.AbstractApplicationWindow {
     onWidthChanged: width = screen.width
     onHeightChanged: height = screen.height
     pageStack: pageManager
-    header: QQC2.Pane {
+    header: ZUI.SectionPanel {
 
-        topPadding: svgBg.topPadding
-        bottomPadding: svgBg.bottomPadding
-        // leftPadding: svgBg.leftPadding
-        leftPadding: 0
-        rightPadding: svgBg.rightPadding
-
-        background: Item
-        {
-            PlasmaCore.FrameSvgItem {
-                id: svgBg
-                anchors.fill: parent
-                // property bool highlighted
-
-                readonly property real leftPadding: fixedMargins.left
-                readonly property real rightPadding: fixedMargins.right
-                readonly property real topPadding: fixedMargins.top
-                readonly property real bottomPadding: fixedMargins.bottom
-
-                imagePath: "widgets/header-background"
-                //colorGroup: PlasmaCore.Theme.ViewColorGroup
-                enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
-                colorGroup: PlasmaCore.Theme.HeaderColorGroup
-            }
-        }
+        implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
 
         contentItem: RowLayout {
             spacing: Kirigami.Units.mediumSpacing
-            QQC2.Control
-            {
+
+            ZUI.SectionGroup {
                 Layout.fillHeight: true
 
-                padding: 0
-                clip: true
-                background: null
-                contentItem: RowLayout
-                {
-                    spacing: 0
-                    ZUI.BreadcrumbButton {
+                contentItem : RowLayout {
+                    spacing: ZUI.Theme.spacing
+                    
+                    ZUI.SectionButton {
                         id: menuButton
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
                         icon.width: 24
                         icon.height: 24
                         icon.name: "application-menu"
-                        icon.color: Kirigami.Theme.textColor
-                        padding: Kirigami.Units.largeSpacing*1.5
-                        rightPadding: Kirigami.Units.largeSpacing*1.5
+                        icon.color: checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                        
                         property string oldPage: "sketchpad"
                         property string oldModalPage: "sketchpad"
                         onClicked: {
@@ -849,15 +824,20 @@ Kirigami.AbstractApplicationWindow {
                                 zynqtgui.current_screen_id = 'main';
                             }
                         }
+                        checked: highlighted
                         highlighted: zynqtgui.current_screen_id === 'main'
                     }
-                    ZUI.BreadcrumbButton {
+
+                    ZUI.SectionButton {
                         id: homeButton
                         Layout.minimumWidth: Kirigami.Units.gridUnit * 6
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                        padding: Kirigami.Units.largeSpacing*1.5
-                        rightPadding: Kirigami.Units.largeSpacing*1.5
-                        font.pointSize: 11
+                        Layout.fillHeight: true
+                        padding: 4
+                        // rightPadding: Kirigami.Units.largeSpacing*1.5
+                        // font.pointSize: 11
+                        checked: highlighted
+                        highlighted: zynqtgui.current_modal_screen_id == "sketchpad"
                         onClicked: {
                             if (zynqtgui.current_modal_screen_id == "sketchpad") {
                                 root.showMessageDialog(zynqtgui.sketchpad.song.sketchpadFolder+zynqtgui.sketchpad.song.name+".sketchpad.json", 0)
@@ -865,19 +845,21 @@ Kirigami.AbstractApplicationWindow {
                                 zynqtgui.current_modal_screen_id = 'sketchpad'
                             }
                         }
-                        QQC2.Label {
-                            anchors.fill: parent
-                            anchors.margins: Kirigami.Units.largeSpacing
-                            horizontalAlignment: QQC2.Label.AlignHCenter
-                            verticalAlignment: QQC2.Label.AlignVCenter
-                            elide: Text.ElideMiddle
-                            wrapMode: QQC2.Label.WrapAnywhere
-                            font.pointSize: 10
-                            minimumPointSize: 5
-                            fontSizeMode: Text.Fit
-                            maximumLineCount: 3
-                            text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
-                        }
+                        text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
+
+                        // QQC2.Label {
+                        //     anchors.fill: parent
+                        //     // anchors.margins: Kirigami.Units.largeSpacing
+                        //     horizontalAlignment: QQC2.Label.AlignHCenter
+                        //     verticalAlignment: QQC2.Label.AlignVCenter
+                        //     elide: Text.ElideMiddle
+                        //     wrapMode: QQC2.Label.WrapAnywhere
+                        //     font.pointSize: 10
+                        //     minimumPointSize: 5
+                        //     fontSizeMode: Text.Fit
+                        //     maximumLineCount: 3
+                        //     text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
+                        // }
 
                         ZUI.Menu {
                             id: tracksMenu
@@ -899,14 +881,31 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    ZUI.BreadcrumbButton {
+                }
+            }
+
+            ZUI.SectionGroup {
+                Layout.fillHeight: true
+
+                contentItem: RowLayout
+                {
+                    spacing: ZUI.Theme.spacing
+                    
+                    ZUI.SectionButton {
                         id: sceneButton
-                        icon.color: Kirigami.Theme.textColor
-                        text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
+                        // icon.color: Kirigami.Theme.textColor
+                        text: qsTr("Scene %1").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
+                        Layout.fillHeight: true
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+
                         rightPadding: Kirigami.Units.largeSpacing*2
+                        leftPadding: rightPadding 
+
                         font.pointSize: 11
                         onClicked: scenesMenu.visible = true
+                        checked: highlighted
+                        highlighted: scenesMenu.visible
+                        showIndicator: true
 
                         Timer {
                             id: switchTimer
@@ -942,16 +941,24 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    ZUI.BreadcrumbButton {
+
+                    ZUI.SectionButton {
                         id: channelButton
                         icon.color: Kirigami.Theme.textColor
-                        text: qsTr("Track %1 ˬ")
-                        .arg(zynqtgui.sketchpad.selectedTrackId+1)
+                        text: qsTr("Track %1").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                        checked: highlighted
+                        highlighted: channelsMenu.visible
+                        showIndicator: true
 
+                        Layout.fillHeight: true
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+
                         rightPadding: Kirigami.Units.largeSpacing*2
+                        leftPadding: rightPadding 
+
                         font.pointSize: 11
                         onClicked: channelsMenu.visible = true
+
                         ZUI.Menu {
                             id: channelsMenu
                             y: parent.height
@@ -971,7 +978,8 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    ZUI.BreadcrumbButton {
+
+                    ZUI.SectionButton {
                         id: samplesButton
 
                         property QtObject selectedSample: null
@@ -995,8 +1003,10 @@ Kirigami.AbstractApplicationWindow {
                         text: qsTr("Sample %1 ˬ %2")
                         .arg(root.selectedChannel.selectedSlotRow + 1)
                         .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
+                        Layout.fillHeight: true
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 11
                         rightPadding: Kirigami.Units.largeSpacing*2
+                        leftPadding: rightPadding 
                         font.pointSize: 11
                         onClicked: samplesMenu.visible = true
                         visible: root.selectedChannel.trackType == "sample-trig"
@@ -1019,26 +1029,35 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    ZUI.BreadcrumbButton {
+                    ZUI.SectionButton {
                         id: sampleLoopButton
 
                         property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
                         icon.color: Kirigami.Theme.textColor
                         text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
+                        Layout.fillHeight: true
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 10
                         rightPadding: Kirigami.Units.largeSpacing*2
+                        leftPadding: rightPadding 
                         font.pointSize: 11
                         visible: root.selectedChannel.trackType === "sample-loop"
                     }
-                    ZUI.BreadcrumbButton {
+
+                    ZUI.SectionButton {
                         id: synthButton
                         icon.color: Kirigami.Theme.textColor
+                        Layout.fillHeight: true
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                         rightPadding: Kirigami.Units.largeSpacing*2
+                        leftPadding: rightPadding 
                         font.pointSize: 11
                         visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
                         Component.onCompleted: synthButton.updateSoundName();
+
+                        highlighted: zynqtgui.current_screen_id === "layer_midi_effect_chooser"
+                        checked: highlighted
+
                         // Open preset screen on clicking this synth button
                         onClicked: {
                             if (zynqtgui.curlayerIsFX) {
@@ -1065,13 +1084,20 @@ Kirigami.AbstractApplicationWindow {
                             synthButtonSoundNameThrottle.restart();
                         }
                     }
-                    ZUI.BreadcrumbButton {
+
+                    ZUI.SectionButton {
                         id: presetButton
                         icon.color: Kirigami.Theme.textColor
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                        Layout.fillHeight: true
+                        Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                         rightPadding: Kirigami.Units.largeSpacing*2
+                        leftPadding: rightPadding 
                         font.pointSize: 11
                         visible: root.selectedChannel.trackType === "synth" && synthButton.visible
+
+                        highlighted: zynqtgui.current_screen_id === "control"
+                        checked: highlighted
+
                         onClicked: {
                             // Open synth edit page whjen preset button is clicked
                             zynqtgui.current_screen_id = "control";
@@ -1095,7 +1121,8 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                    ZUI.BreadcrumbButton {
+                    
+                    ZUI.SectionButton {
                         icon.color: Kirigami.Theme.textColor
                         text: {
                             switch (effectScreen) {
@@ -1136,18 +1163,22 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                         onClicked: zynqtgui.current_screen_id = effectScreen
+                        Layout.fillHeight: true
                         Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                         rightPadding: Kirigami.Units.largeSpacing*2
+                        leftPadding: rightPadding 
                         font.pointSize: 11
                     }
-                    ZUI.BreadcrumbButton {
-                        icon.color: Kirigami.Theme.textColor
-                        text: "EDIT"
-                        visible: zynqtgui.current_screen_id === "control"
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 4
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        font.pointSize: 11
-                    }
+                    // ZUI.SectionButton {
+                    //     icon.color: Kirigami.Theme.textColor
+                    //     text: "EDIT"
+                    //     visible: zynqtgui.current_screen_id === "control"
+                    //     Layout.fillHeight: true
+                    //     Layout.maximumWidth: Kirigami.Units.gridUnit * 4
+                    //     rightPadding: Kirigami.Units.largeSpacing*2
+                    //     leftPadding: rightPadding 
+                    //     font.pointSize: 11
+                    // }
                 }
             }
 
@@ -1155,18 +1186,32 @@ Kirigami.AbstractApplicationWindow {
                 Layout.fillWidth: true
             }
 
-            QQC2.Control
-            {
-                Layout.preferredHeight: Kirigami.Units.gridUnit*2
+            ZUI.SectionGroup {
+                // Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                Layout.fillHeight: true
                 // topPadding: svgBg2.topPadding
                 // bottomPadding: svgBg2.bottomPadding
                 // leftPadding: svgBg2.leftPadding
                 // rightPadding: svgBg2.rightPadding
+                // background: PlasmaCore.FrameSvgItem {
+                //             id: svgBg2
+                //             visible: fromCurrentTheme
+                //             anchors.fill: parent
 
+                //             readonly property real leftPadding: margins.left
+                //             readonly property real rightPadding: margins.right
+                //             readonly property real topPadding: margins.top
+                //             readonly property real bottomPadding: margins.bottom
+
+                //             imagePath: "widgets/statusinfo_background"
+                //             //colorGroup: PlasmaCore.Theme.ViewColorGroup
+                //             prefix: root.highlighted ? ["focus", ""] : ""
+                //             colorGroup: PlasmaCore.Theme.ViewColorGroup
+                //         }
                 contentItem: Row {
-                    spacing: 0
+                    spacing: ZUI.Theme.spacing
 
-                    QQC2.Button {
+                    ZUI.SectionButton {
                         id: globalRecordButton
                         width: Kirigami.Units.gridUnit*4
                         height: parent.height
@@ -1189,29 +1234,12 @@ Kirigami.AbstractApplicationWindow {
                         icon.height: 24
                         icon.color:  globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive
                                      ? "#ff5cf436" // A green with the same values as the red audio record colour below
-                                     : zynqtgui.sketchpad.isRecording ? "#fff44336" : Kirigami.Theme.textColor
-
-                        background: Item
-                        {
-                            PlasmaCore.FrameSvgItem {
-                                id: recBtnBg
-                                anchors.fill: parent
-                                // property bool highlighted
-
-                                readonly property real leftPadding: fixedMargins.left
-                                readonly property real rightPadding: fixedMargins.right
-                                readonly property real topPadding: fixedMargins.top
-                                readonly property real bottomPadding: fixedMargins.bottom
-
-                                imagePath: "widgets/button"
-                                prefix: ["normal"]
-                                enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder | PlasmaCore.FrameSvgItem.TopBorder | PlasmaCore.FrameSvgItem.LeftBorder
-                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                            }
-                        }
+                                     : zynqtgui.sketchpad.isRecording ? "#fff44336" : "red"
+                        checked: highlighted
+                        highlighted: zynqtgui.sketchpad.isRecording 
                     }
 
-                    QQC2.Button {
+                    ZUI.SectionButton {
                         id: globalPlaybackButton
                         width: Kirigami.Units.gridUnit*4
                         height: parent.height
@@ -1222,29 +1250,12 @@ Kirigami.AbstractApplicationWindow {
                                 zynqtgui.callable_ui_action_simple("SWITCH_PLAY");
                             }
                         }
+                        checked: highlighted
+                        highlighted: zynqtgui.sketchpad.isMetronomeRunning 
                         icon.name: zynqtgui.sketchpad.isMetronomeRunning ? "media-playback-stop" : "media-playback-start"
                         icon.width: 24
                         icon.height: 24
-                        icon.color: pressed || highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
-
-                        background: Item
-                        {
-                            PlasmaCore.FrameSvgItem {
-                                id: playBtnBg
-                                anchors.fill: parent
-                                // property bool highlighted
-
-                                readonly property real leftPadding: fixedMargins.left
-                                readonly property real rightPadding: fixedMargins.right
-                                readonly property real topPadding: fixedMargins.top
-                                readonly property real bottomPadding: fixedMargins.bottom
-
-                                imagePath: "widgets/button"
-                                prefix: ["normal"]
-                                enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder | PlasmaCore.FrameSvgItem.TopBorder | PlasmaCore.FrameSvgItem.RightBorder
-                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                            }
-                        }
+                        icon.color: checked || pressed || highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                     }
                 }
             }
@@ -1257,12 +1268,13 @@ Kirigami.AbstractApplicationWindow {
         Kirigami.Theme.inherit: false
         // TODO: this should eventually go to Window and the panels to View
         Kirigami.Theme.colorSet: Kirigami.Theme.View
-        color: Kirigami.Theme.backgroundColor
+        // color: Kirigami.Theme.backgroundColor
+        color: "#010204"
 
         Image {
             id: wallpaper
             anchors.fill: parent
-            source: PlasmaCore.Theme.wallpaperPath
+            // source: PlasmaCore.Theme.wallpaperPath
             // visible: !PlasmaCore.Theme.contrastEnabled
         }
 

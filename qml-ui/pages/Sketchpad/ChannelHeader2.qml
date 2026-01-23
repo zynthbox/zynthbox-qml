@@ -52,8 +52,12 @@ QQC2.Control {
     property bool synthDetailsVisible: true
     property bool active: true
 
+    property alias columnContent: _columnContent.data
+
     signal clicked()
     signal doubleClicked()
+
+    padding: 1
 
     contentItem: Item {
         opacity: root.active ? 1 : 0.3
@@ -99,9 +103,10 @@ QQC2.Control {
         }
 
         ColumnLayout {
+            id: _columnContent
             anchors.fill: parent
-            anchors.margins: 2
-            spacing: 2
+            // anchors.margins: 2
+            spacing: ZUI.Theme.spacing
             // Reduce opacity when muted overlay is active to make muted overlay more prominent
             opacity: !root.channel.muted ? 1 : 0.3
 
@@ -113,22 +118,21 @@ QQC2.Control {
                 elide: Text.ElideRight
                 text: root.text
                 font.pointSize: 8
+                font.bold: true
             }
 
             QQC2.Label {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                // Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                 visible: subSubText.length > 0
 
                 horizontalAlignment: Text.AlignHCenter
                 elide: Text.ElideRight
-                font.pointSize: 8
+                font.pointSize: 6
+                font.capitalization: Font.AllUppercase
                 text: subSubText
-                padding: 0
-
-                // color: Kirigami.Theme.backgroundColor
-
+                padding: 1
                 background: Rectangle {
                     color: root.color
                     radius: ZUI.Theme.radius
@@ -138,6 +142,9 @@ QQC2.Control {
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                
+                Layout.leftMargin: Kirigami.Units.largeSpacing
+                Layout.rightMargin: Kirigami.Units.largeSpacing
 
                 QQC2.Label {
                     id: subContents
@@ -160,8 +167,6 @@ QQC2.Control {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
-                        Layout.leftMargin: Kirigami.Units.largeSpacing
-                        Layout.rightMargin: Kirigami.Units.largeSpacing
                         visible: root.channel.trackType == "synth"
 
                         Repeater {
@@ -184,8 +189,6 @@ QQC2.Control {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
-                        Layout.leftMargin: Kirigami.Units.largeSpacing
-                        Layout.rightMargin: Kirigami.Units.largeSpacing
                         visible: root.channel.trackType == "synth"
 
                         Repeater {
@@ -208,8 +211,6 @@ QQC2.Control {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
-                        Layout.leftMargin: Kirigami.Units.largeSpacing
-                        Layout.rightMargin: Kirigami.Units.largeSpacing
                         visible: root.channel.trackType == "synth"
 
                         Repeater {
@@ -232,8 +233,6 @@ QQC2.Control {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
-                        Layout.leftMargin: Kirigami.Units.largeSpacing
-                        Layout.rightMargin: Kirigami.Units.largeSpacing
                         visible: root.channel.trackType == "sample-loop"
 
                         Repeater {
@@ -256,8 +255,6 @@ QQC2.Control {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
-                        Layout.leftMargin: Kirigami.Units.largeSpacing
-                        Layout.rightMargin: Kirigami.Units.largeSpacing
                         visible: root.channel.trackType == "sample-loop"
 
                         Repeater {
@@ -334,55 +331,62 @@ QQC2.Control {
                 }
             }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 0.7
-                color: "#99888888"
+            // Rectangle {
+            //     Layout.fillWidth: true
+            //     Layout.fillHeight: false
+            //     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.7
+            //     color: "#99888888"
 
-                // QQC2.Label {
-                //     id: synthName
-                //     anchors.fill: parent
-                //     elide: Text.ElideRight
-                //     horizontalAlignment: Text.AlignHCenter
-                //     verticalAlignment: Text.AlignVCenter
-                //     font.pointSize: 8
-                //     visible: root.synthDetailsVisible &&
-                //              synthName.text &&
-                //              synthName.text.length > 0
-                //     // text: channel.connectedSoundName.split(" > ")[0]
-                //     text: root.channel.trackType === "synth"
-                //               ? root.channel.connectedSoundName.split(" > ")[0]
-                //               : ""
-                // }
-            }
+            //     // QQC2.Label {
+            //     //     id: synthName
+            //     //     anchors.fill: parent
+            //     //     elide: Text.ElideRight
+            //     //     horizontalAlignment: Text.AlignHCenter
+            //     //     verticalAlignment: Text.AlignVCenter
+            //     //     font.pointSize: 8
+            //     //     visible: root.synthDetailsVisible &&
+            //     //              synthName.text &&
+            //     //              synthName.text.length > 0
+            //     //     // text: channel.connectedSoundName.split(" > ")[0]
+            //     //     text: root.channel.trackType === "synth"
+            //     //               ? root.channel.connectedSoundName.split(" > ")[0]
+            //     //               : ""
+            //     // }
+            // }
         }
     }
 
-    background: Item {
-        Rectangle {
-            anchors.fill: parent
-            visible: !svgBg.visible
-            border.width: (root.highlightOnFocus && root.activeFocus) || root.highlighted ? 1 : 0
-            border.color: root.highlightColor
+    // background: Item {
+    //     Rectangle {
+    //         anchors.fill: parent
+    //         visible: !svgBg.visible
+    //         border.width: (root.highlightOnFocus && root.activeFocus) || root.highlighted ? 1 : 0
+    //         border.color: root.highlightColor
 
-            color: Kirigami.Theme.backgroundColor
-        }
+    //         color: Kirigami.Theme.backgroundColor
+    //     }
 
-        PlasmaCore.FrameSvgItem {
-            id: svgBg
-            visible: fromCurrentTheme && highlighted
-            anchors.fill: parent
+    //     PlasmaCore.FrameSvgItem {
+    //         id: svgBg
+    //         visible: fromCurrentTheme && highlighted
+    //         anchors.fill: parent
 
-            property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
-            readonly property real leftPadding: fixedMargins.left
-            readonly property real rightPadding: fixedMargins.right
-            readonly property real topPadding: fixedMargins.top
-            readonly property real bottomPadding: fixedMargins.bottom
+    //         property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
+    //         readonly property real leftPadding: fixedMargins.left
+    //         readonly property real rightPadding: fixedMargins.right
+    //         readonly property real topPadding: fixedMargins.top
+    //         readonly property real bottomPadding: fixedMargins.bottom
 
-            imagePath: "widgets/column-delegate-background"
-            prefix: highlighted ? ["focus", ""] : ""
-            colorGroup: PlasmaCore.Theme.ViewColorGroup
-        }
+    //         imagePath: "widgets/column-delegate-background"
+    //         prefix: highlighted ? ["focus", ""] : ""
+    //         colorGroup: PlasmaCore.Theme.ViewColorGroup
+    //     }
+    // }
+
+    background: Rectangle {
+        property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
+        opacity: highlighted ? 0.2 : 1
+        color: "#1f2022"
+        radius: 2
     }
 }

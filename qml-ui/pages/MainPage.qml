@@ -35,11 +35,9 @@ ZUI.ScreenPage {
     screenId: "main"
     backAction.visible: false
 
-    background: Rectangle
-    {
-        Kirigami.Theme.colorSet: Kirigami.Theme.Window
-        Kirigami.Theme.inherit: false
-        color: Kirigami.Theme.backgroundColor
+    // padding: 2
+    background: Rectangle {
+        color: "#2e3336"
     }
 
     cuiaCallback: function(cuia) {
@@ -110,124 +108,162 @@ ZUI.ScreenPage {
         // spacing: Kirigami.Units.gridUnit
         spacing: ZUI.Theme.spacing
 
-        Item{
+        QQC2.Pane {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+            padding: 2
+            background: Rectangle {
+                color: "#040507"
+                radius: 4
+            }
+            contentItem: Item{                
 
-            ColumnLayout {
-                id: categoryButtons
-                anchors.fill: parent
-                spacing: ZUI.Theme.spacing   
-                //Placeholders to replace the buttons
-                QQC2.Button {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    implicitHeight: 0
-                    checkable: true
-                    checked: zynqtgui.main.visibleCategory === "modules"
-                    text: qsTr("Modules")
-                    onClicked: zynqtgui.main.visibleCategory = "modules"
-                }
+                ColumnLayout {
+                    id: categoryButtons
+                    anchors.fill: parent
+                    spacing: ZUI.Theme.spacing   
+                    //Placeholders to replace the buttons
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        implicitHeight: 0
+                        checkable: true
+                        checked: highlighted
+                        highlighted: zynqtgui.main.visibleCategory === "modules"
+                        text: qsTr("Modules")
+                        onClicked: zynqtgui.main.visibleCategory = "modules"
+                        background: Rectangle {
+                            opacity: parent.highlighted ? 0.5 : 1
+                            color: parent.highlighted ? "#181918" : "#1f2022"
+                            radius: 2
+                        }
+                    }
 
-                QQC2.Button {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    implicitHeight: 0
-                    checkable: true
-                    checked: zynqtgui.main.visibleCategory === "appimages"
-                    text: qsTr("Apps")
-                    onClicked: zynqtgui.main.visibleCategory = "appimages"
-                }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        implicitHeight: 0
+                        checkable: true
+                        checked: highlighted
+                        highlighted: zynqtgui.main.visibleCategory === "appimages"
+                        text: qsTr("Apps")
+                        onClicked: zynqtgui.main.visibleCategory = "appimages"
+                        background: Rectangle {
+                            opacity: parent.highlighted ? 0.5 : 1
+                            color: parent.highlighted ? "#181918" : "#1f2022"
+                            radius: 2
+                        }
+                    }
 
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: 0
-                    checkable: true
-                    checked: zynqtgui.main.visibleCategory === "sessions" ||
-                             zynqtgui.main.visibleCategory === "sessions-versions"
-                    text: qsTr("Sketchpads")
-                    onClicked: zynqtgui.main.visibleCategory = "sessions"
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: 0
-                    checkable: true
-                    checked: zynqtgui.main.visibleCategory === "services"
-                    text: qsTr("Services")
-                    onClicked: zynqtgui.main.visibleCategory = "services"
-                }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitHeight: 0
+                        checkable: true
+                        checked: highlighted
+                        highlighted: zynqtgui.main.visibleCategory === "sessions" ||
+                                zynqtgui.main.visibleCategory === "sessions-versions"
+                        text: qsTr("Sketchpads")
+                        onClicked: zynqtgui.main.visibleCategory = "sessions"
+                        background: Rectangle {
+                            opacity: parent.highlighted ? 0.5 : 1
+                            color: parent.highlighted ? "#181918" : "#1f2022"
+                            radius: 2
+                        }
+                    }
 
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: 0
-                    checkable: true
-                    checked: zynqtgui.main.visibleCategory === "?"
-                    text: qsTr("")
-                    onClicked: zynqtgui.main.visibleCategory = "?"
-                }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitHeight: 0
+                        checkable: true
+                        checked: highlighted
+                        highlighted: zynqtgui.main.visibleCategory === "services"
+                        text: qsTr("Services")
+                        onClicked: zynqtgui.main.visibleCategory = "services"
+                        background: Rectangle {
+                            opacity: parent.highlighted ? 0.5 : 1
+                            color: parent.highlighted ? "#181918" : "#1f2022"
+                            radius: 2
+                        }
+                    }
 
-                // Disabled these below buttons for now
-                // QQC2.Button {
-                //     Layout.fillWidth: true
-                //     Layout.fillHeight: true
-                //     opacity: 0
-                //     enabled: false
-                //     checkable: true
-                //     checked: zynqtgui.main.visibleCategory === "sessions" ||
-                //              zynqtgui.main.visibleCategory === "sessions-versions"
-                //     text: qsTr("Sessions")
-                //     onClicked: zynqtgui.main.visibleCategory = "sessions"
-                // }
-                // QQC2.Button {
-                //     Layout.fillWidth: true
-                //     Layout.fillHeight: true
-                //     opacity: 0
-                //     enabled: false
-                //     checkable: true
-                //     checked: zynqtgui.main.visibleCategory === "templates"
-                //     text: qsTr("Templates")
-                //     onClicked: zynqtgui.main.visibleCategory = "templates"
-                // }
-                // QQC2.Button {
-                //     Layout.fillWidth: true
-                //     Layout.fillHeight: true
-                //     opacity: 0
-                //     enabled: false
-                //     checkable: true
-                //     checked: zynqtgui.main.visibleCategory === "discover"
-                //     text: qsTr("Discover")
-                //     onClicked: zynqtgui.main.visibleCategory = "discover"
-                // }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitHeight: 0
+                        checkable: true
+                        checked: highlighted
+                        highlighted: zynqtgui.main.visibleCategory === "?"
+                        text: qsTr("")
+                        onClicked: zynqtgui.main.visibleCategory = "?"
+                        background: Rectangle {
+                            opacity: parent.highlighted ? 0.5 : 1
+                            color: parent.highlighted ? "#181918" : "#1f2022"
+                            radius: 2
+                        }
+                    }
+
+                    // Disabled these below buttons for now
+                    // QQC2.Button {
+                    //     Layout.fillWidth: true
+                    //     Layout.fillHeight: true
+                    //     opacity: 0
+                    //     enabled: false
+                    //     checkable: true
+                    //     checked: zynqtgui.main.visibleCategory === "sessions" ||
+                    //              zynqtgui.main.visibleCategory === "sessions-versions"
+                    //     text: qsTr("Sessions")
+                    //     onClicked: zynqtgui.main.visibleCategory = "sessions"
+                    // }
+                    // QQC2.Button {
+                    //     Layout.fillWidth: true
+                    //     Layout.fillHeight: true
+                    //     opacity: 0
+                    //     enabled: false
+                    //     checkable: true
+                    //     checked: zynqtgui.main.visibleCategory === "templates"
+                    //     text: qsTr("Templates")
+                    //     onClicked: zynqtgui.main.visibleCategory = "templates"
+                    // }
+                    // QQC2.Button {
+                    //     Layout.fillWidth: true
+                    //     Layout.fillHeight: true
+                    //     opacity: 0
+                    //     enabled: false
+                    //     checkable: true
+                    //     checked: zynqtgui.main.visibleCategory === "discover"
+                    //     text: qsTr("Discover")
+                    //     onClicked: zynqtgui.main.visibleCategory = "discover"
+                    // }
+                }
             }
         }
 
         QQC2.Control {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
-            bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
-            leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
-            rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
+            // topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
+            // bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
+            // leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
+            // rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
 
-            background: Item {
-                PlasmaCore.FrameSvgItem {
-                    id: svgBg4
-                    visible: fromCurrentTheme
-                    anchors.fill: parent
+            // background: Item {
+            //     PlasmaCore.FrameSvgItem {
+            //         id: svgBg4
+            //         visible: fromCurrentTheme
+            //         anchors.fill: parent
 
-                    readonly property real leftPadding: fixedMargins.left
-                    readonly property real rightPadding: fixedMargins.right
-                    readonly property real topPadding: fixedMargins.top
-                    readonly property real bottomPadding: fixedMargins.bottom
+            //         readonly property real leftPadding: fixedMargins.left
+            //         readonly property real rightPadding: fixedMargins.right
+            //         readonly property real topPadding: fixedMargins.top
+            //         readonly property real bottomPadding: fixedMargins.bottom
 
-                    imagePath: "widgets/background"
-                     colorGroup: PlasmaCore.Theme.ViewColorGroup
-                }
-            }
+            //         imagePath: "widgets/background"
+            //          colorGroup: PlasmaCore.Theme.ViewColorGroup
+            //     }
+            // }
 
            contentItem: MouseArea {
                 id: gridMouseArea

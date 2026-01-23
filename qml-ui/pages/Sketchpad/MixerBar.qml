@@ -43,8 +43,13 @@ QQC2.Pane {
     readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
 
     Layout.fillWidth: true
-    padding: 0
-    background: null //for now it is not themeable
+    // padding: 0
+    // background: null //for now it is not themeable
+
+    padding: 2
+    background: Rectangle {
+        color: "#292a2c"
+    }
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -156,42 +161,49 @@ QQC2.Pane {
                     id: mixerContainer
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.topMargin: svgBg.visible ? svgBg.inset.top : 0
-                    Layout.leftMargin: svgBg.visible ? svgBg.inset.left : 0
-                    Layout.rightMargin: svgBg.visible ? svgBg.inset.right : 0
-                    Layout.bottomMargin: svgBg.visible ? svgBg.inset.bottom : 0
+                    // Layout.topMargin: svgBg.visible ? svgBg.inset.top : 0
+                    // Layout.leftMargin: svgBg.visible ? svgBg.inset.left : 0
+                    // Layout.rightMargin: svgBg.visible ? svgBg.inset.right : 0
+                    // Layout.bottomMargin: svgBg.visible ? svgBg.inset.bottom : 0
 
-                    topPadding: svgBg.visible ? svgBg.topPadding : 0
-                    bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
-                    leftPadding: svgBg.visible ? svgBg.leftPadding : 0
-                    rightPadding: svgBg.visible ? svgBg.rightPadding : 0
+                    // topPadding: svgBg.visible ? svgBg.topPadding : 0
+                    // bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
+                    // leftPadding: svgBg.visible ? svgBg.leftPadding : 0
+                    // rightPadding: svgBg.visible ? svgBg.rightPadding : 0
 
-                    background: Item {
+                    // background: Item {
                         
-                        Rectangle {
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                            Kirigami.Theme.inherit: false
-                             visible: !svgBg.visible
-                            anchors.fill: parent
-                            color: Kirigami.Theme.backgroundColor
-                        }
+                    //     Rectangle {
+                    //         Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                    //         Kirigami.Theme.inherit: false
+                    //          visible: !svgBg.visible
+                    //         anchors.fill: parent
+                    //         color: Kirigami.Theme.backgroundColor
+                    //     }
                         
-                        PlasmaCore.FrameSvgItem {
-                            id: svgBg
-                            visible: fromCurrentTheme
-                            anchors.fill: parent
+                    //     PlasmaCore.FrameSvgItem {
+                    //         id: svgBg
+                    //         visible: fromCurrentTheme
+                    //         anchors.fill: parent
 
-                            readonly property real leftPadding: fixedMargins.left
-                            readonly property real rightPadding: fixedMargins.right
-                            readonly property real topPadding: fixedMargins.top
-                            readonly property real bottomPadding: fixedMargins.bottom
+                    //         readonly property real leftPadding: fixedMargins.left
+                    //         readonly property real rightPadding: fixedMargins.right
+                    //         readonly property real topPadding: fixedMargins.top
+                    //         readonly property real bottomPadding: fixedMargins.bottom
 
-                            imagePath: "widgets/tracks-background"
-                            colorGroup: PlasmaCore.Theme.ViewColorGroup
-                        }
+                    //         imagePath: "widgets/tracks-background"
+                    //         colorGroup: PlasmaCore.Theme.ViewColorGroup
+                    //     }
+                    // }
+
+                    padding: 2
+                    background: Rectangle {
+                        color: "#040507"
+                        radius: 4
                     }
 
                     contentItem: Item {
+                        // color: "#2e3336"  
                         RowLayout {
                             id: channelsVolumeRow
 
@@ -216,38 +228,44 @@ QQC2.Pane {
                                     Layout.fillHeight: true
                                     // Layout.bottomMargin: 6
 
-                                    background: Item {
-                                        // Kirigami.Separator {
-                                        //     height: parent.height
-                                        //     anchors.left: parent.left
-                                        //     visible: index !== 0
-                                        //     width: 1
-                                        //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
-                                        // }
-                                        Rectangle  {
-                                            Kirigami.Theme.colorSet: Kirigami.Theme.View
-                                            Kirigami.Theme.inherit: false
-                                            visible: !svgBg2.visible
-                                            anchors.fill: parent
-                                            color: Kirigami.Theme.backgroundColor
-                                            border.width: 1
-                                            border.color: mixerColumnDelegate.highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                                        }
+                                    // background: Item {
+                                    //     // Kirigami.Separator {
+                                    //     //     height: parent.height
+                                    //     //     anchors.left: parent.left
+                                    //     //     visible: index !== 0
+                                    //     //     width: 1
+                                    //     //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                                    //     // }
+                                    //     Rectangle  {
+                                    //         Kirigami.Theme.colorSet: Kirigami.Theme.View
+                                    //         Kirigami.Theme.inherit: false
+                                    //         visible: !svgBg2.visible
+                                    //         anchors.fill: parent
+                                    //         color: Kirigami.Theme.backgroundColor
+                                    //         border.width: 1
+                                    //         border.color: mixerColumnDelegate.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                    //     }
 
-                                        PlasmaCore.FrameSvgItem {
-                                            id: svgBg2
-                                            visible: fromCurrentTheme /*&& mixerColumnDelegate.highlighted*/
-                                            anchors.fill: parent
+                                    //     PlasmaCore.FrameSvgItem {
+                                    //         id: svgBg2
+                                    //         visible: fromCurrentTheme /*&& mixerColumnDelegate.highlighted*/
+                                    //         anchors.fill: parent
 
-                                            readonly property real leftPadding: fixedMargins.left
-                                            readonly property real rightPadding: fixedMargins.right
-                                            readonly property real topPadding: fixedMargins.top
-                                            readonly property real bottomPadding: fixedMargins.bottom
+                                    //         readonly property real leftPadding: fixedMargins.left
+                                    //         readonly property real rightPadding: fixedMargins.right
+                                    //         readonly property real topPadding: fixedMargins.top
+                                    //         readonly property real bottomPadding: fixedMargins.bottom
 
-                                            imagePath: "widgets/column-delegate-background"
-                                            prefix: mixerColumnDelegate.highlighted ? ["focus", ""] : ""
-                                            colorGroup: PlasmaCore.Theme.ViewColorGroup
-                                        }
+                                    //         imagePath: "widgets/column-delegate-background"
+                                    //         prefix: mixerColumnDelegate.highlighted ? ["focus", ""] : ""
+                                    //         colorGroup: PlasmaCore.Theme.ViewColorGroup
+                                    //     }
+                                    // }
+                                    background: Rectangle {
+                                        opacity: parent.highlighted ? 0.5 : 1
+
+                                        color: parent.highlighted ? "#040507" : "#1f2022"
+                                        radius: 2
                                     }
 
                                     contentItem: Item {
@@ -454,61 +472,86 @@ QQC2.Pane {
                                                 }
                                             }
 
-                                            RowLayout {
+                                            QQC2.Pane {
+
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: false
                                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                                                Layout.margins: 4
-                                                spacing: 2
+                                                Layout.margins: 2
 
-                                                QQC2.RoundButton {
-                                                    Layout.fillWidth: true
-                                                    Layout.fillHeight: true
-                                                    Layout.preferredWidth: (parent.width-parent.spacing)/2
-                                                    radius: 2
-                                                    font.pointSize: 8
-                                                    checked: root.song.playChannelSolo === model.channel.id
-                                                    text: qsTr("S")
-                                                    contentItem: QQC2.Label {
-                                                        text: parent.text
-                                                        font: parent.font
-                                                        horizontalAlignment: Text.AlignHCenter
-                                                    }
-                                                    background: Rectangle {
-                                                        radius: parent.radius
-                                                        border.width: 1
-                                                        border.color: Qt.rgba(50, 50, 50, 0.1)
-                                                        color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
-                                                    }
-                                                    onClicked: {
-                                                        if (root.song.playChannelSolo == model.channel.id) {
-                                                            root.song.playChannelSolo = -1
-                                                        } else {
-                                                            root.song.playChannelSolo = model.channel.id
+                                                padding: 2
+                                                background: Rectangle {
+                                                    color: "#040507"
+                                                    radius: 4
+                                                }
+
+                                                contentItem : RowLayout {
+                                                   
+                                                    spacing: 2
+
+                                                    QQC2.RoundButton {
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        // Layout.preferredWidth: (parent.width-parent.spacing)/2
+                                                        radius: 2
+                                                        font.pointSize: 8
+                                                        checked: root.song.playChannelSolo === model.channel.id
+                                                        text: qsTr("S")
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+
+                                                        background: Rectangle {
+                                                            opacity: parent.checked ? 0.5 : 1
+
+                                                            color: parent.checked ? Kirigami.Theme.positiveBackgroundColor  : "#1f2022"
+                                                            radius: 2
+                                                        }
+
+                                                        // background: Rectangle {
+                                                        //     radius: parent.radius
+                                                        //     border.width: 1
+                                                        //     border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                        //     color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        // }
+                                                        onClicked: {
+                                                            if (root.song.playChannelSolo == model.channel.id) {
+                                                                root.song.playChannelSolo = -1
+                                                            } else {
+                                                                root.song.playChannelSolo = model.channel.id
+                                                            }
                                                         }
                                                     }
-                                                }
-                                                QQC2.RoundButton {
-                                                    Layout.fillWidth: true
-                                                    Layout.fillHeight: true
-                                                    Layout.preferredWidth: (parent.width-parent.spacing)/2
-                                                    radius: 2
-                                                    font.pointSize: 8
-                                                    checked: model.channel.muted
-                                                    text: qsTr("M")
-                                                    contentItem: QQC2.Label {
-                                                        text: parent.text
-                                                        font: parent.font
-                                                        horizontalAlignment: Text.AlignHCenter
-                                                    }
-                                                    background: Rectangle {
-                                                        radius: parent.radius
-                                                        border.width: 1
-                                                        border.color: Qt.rgba(50, 50, 50, 0.1)
-                                                        color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
-                                                    }
-                                                    onClicked: {
-                                                        model.channel.muted = !model.channel.muted
+                                                    QQC2.RoundButton {
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        // Layout.preferredWidth: (parent.width-parent.spacing)/2
+                                                        radius: 2
+                                                        font.pointSize: 8
+                                                        checked: model.channel.muted
+                                                        text: qsTr("M")
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        // background: Rectangle {
+                                                        //     radius: parent.radius
+                                                        //     border.width: 1
+                                                        //     border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                        //     color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        // }
+                                                        background: Rectangle {
+                                                            opacity: parent.checked ? 0.5 : 1
+
+                                                            color: parent.checked ? Kirigami.Theme.negativeBackgroundColor  : "#1f2022"
+                                                            radius: 2
+                                                        }
+                                                        onClicked: {
+                                                            model.channel.muted = !model.channel.muted
+                                                        }
                                                     }
                                                 }
                                             }
@@ -531,165 +574,179 @@ QQC2.Pane {
                     // Layout.bottomMargin: masterSvgBg.inset.bottom
                     // topPadding: masterSvgBg.topPadding
                     // bottomPadding:  masterSvgBg.visible ? masterSvgBg.bottomPadding : 0
-                    leftPadding: 6
-                    rightPadding: 6
+                    // leftPadding: 6
+                    // rightPadding: 6
                     property bool highlighted : false
-                    background: Item {
-                        // Kirigami.Separator {
-                        //     visible: !masterSvgBg.visible
-                        //     height: parent.height
-                        //     anchors.left: parent.left
-                        //     width: 1
-                        //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
-                        // }
+                    // background: Item {
+                    //     // Kirigami.Separator {
+                    //     //     visible: !masterSvgBg.visible
+                    //     //     height: parent.height
+                    //     //     anchors.left: parent.left
+                    //     //     width: 1
+                    //     //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                    //     // }
                         
-                        Rectangle  {
-                                              Kirigami.Theme.colorSet: Kirigami.Theme.View
-                            Kirigami.Theme.inherit: false
-                                            visible: !masterSvgBg.visible
-                                            anchors.fill: parent
-                                            color: Kirigami.Theme.backgroundColor
-                                            border.width: 1
-                                            border.color: masterControl.highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                                        }
+                    //     Rectangle  {
+                    //                           Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    //         Kirigami.Theme.inherit: false
+                    //                         visible: !masterSvgBg.visible
+                    //                         anchors.fill: parent
+                    //                         color: Kirigami.Theme.backgroundColor
+                    //                         border.width: 1
+                    //                         border.color: masterControl.highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                    //                     }
                                         
-                        PlasmaCore.FrameSvgItem {
-                            id: masterSvgBg
-                            visible: fromCurrentTheme
-                            anchors.fill: parent
+                    //     PlasmaCore.FrameSvgItem {
+                    //         id: masterSvgBg
+                    //         visible: fromCurrentTheme
+                    //         anchors.fill: parent
 
-                            readonly property real leftPadding: fixedMargins.left
-                            readonly property real rightPadding: fixedMargins.right
-                            readonly property real topPadding: fixedMargins.top
-                            readonly property real bottomPadding: fixedMargins.bottom
+                    //         readonly property real leftPadding: fixedMargins.left
+                    //         readonly property real rightPadding: fixedMargins.right
+                    //         readonly property real topPadding: fixedMargins.top
+                    //         readonly property real bottomPadding: fixedMargins.bottom
 
-                             imagePath: "widgets/column-delegate-background"
-                                            prefix: masterControl.highlighted ? ["focus", ""] : ""
-                                            colorGroup: PlasmaCore.Theme.ViewColorGroup
-                        }
+                    //          imagePath: "widgets/column-delegate-background"
+                    //                         prefix: masterControl.highlighted ? ["focus", ""] : ""
+                    //                         colorGroup: PlasmaCore.Theme.ViewColorGroup
+                    //     }
+                    // }
+
+                    padding: 2
+                    background: Rectangle {
+                        color: "#040507"
+                        radius: 4
                     }
 
-                    contentItem: Item {
-                        MouseArea {
-                            anchors.fill: parent
-                            onPressed: masterVolume.mouseArea.handlePressed(mouse)
-                            onReleased: masterVolume.mouseArea.released(mouse)
-                            onPressAndHold: masterVolume.mouseArea.pressAndHold(mouse)
-                            onClicked: masterVolume.mouseArea.clicked(mouse)
-                            onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
-                            onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
+                    contentItem: QQC2.Pane {
+
+                        background: Rectangle {
+                            color:"#1f2022"
+                            radius: 2
                         }
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: Kirigami.Units.smallSpacing
 
-                            VolumeControl {
-                                id: masterVolume
-                                property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
-
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
-                                inputAudioLevelVisible: true
-                                enabled: !gainHandler.muted
-
-                                Binding {
-                                    target: masterVolume.slider
-                                    property: "value"
-                                    value: masterVolume.gainHandler.gainDb
-                                }
-
-                                slider {
-                                    value: masterVolume.gainHandler.gainDb
-                                    from: masterVolume.gainHandler.minimumDecibel
-                                    to: masterVolume.gainHandler.maximumDecibel
-                                }
-                                onValueChanged: {
-                                    masterVolume.gainHandler.gainDb = masterVolume.slider.value;
-                                    zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
-                                }
-                                onClicked: {
-                                    zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
-                                }
-                                onDoubleClicked: {
-                                    masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
-                                }
+                        contentItem: Item {
+                            MouseArea {
+                                anchors.fill: parent
+                                onPressed: masterVolume.mouseArea.handlePressed(mouse)
+                                onReleased: masterVolume.mouseArea.released(mouse)
+                                onPressAndHold: masterVolume.mouseArea.pressAndHold(mouse)
+                                onClicked: masterVolume.mouseArea.clicked(mouse)
+                                onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
+                                onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
                             }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: Kirigami.Units.smallSpacing
 
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit
-                                Layout.leftMargin: Kirigami.Units.smallSpacing
-                                Layout.rightMargin: Kirigami.Units.smallSpacing
-                                // color: "pink"
-                                PanSlider {
-                                    anchors.fill: parent
-                                    orientation: Qt.Horizontal
-                                    from: -1.0
-                                    to: 1.0
-                                    controlObj: Zynthbox.Plugin.globalPlaybackClient
-                                    controlProp: "panAmount"
-                                    initialValue: 0
-                                }
-                            }
+                                VolumeControl {
+                                    id: masterVolume
+                                    property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
 
-                            QQC2.Label {
-                                Layout.alignment: Qt.AlignCenter
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.margins: 4
-                                horizontalAlignment: Text.AlignHCenter
-                                elide: Text.ElideRight
-                                text: "Master"
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
+                                    inputAudioLevelVisible: true
+                                    enabled: !gainHandler.muted
 
-                                MouseArea {
-                                    anchors.fill: parent
+                                    Binding {
+                                        target: masterVolume.slider
+                                        property: "value"
+                                        value: masterVolume.gainHandler.gainDb
+                                    }
+
+                                    slider {
+                                        value: masterVolume.gainHandler.gainDb
+                                        from: masterVolume.gainHandler.minimumDecibel
+                                        to: masterVolume.gainHandler.maximumDecibel
+                                    }
+                                    onValueChanged: {
+                                        masterVolume.gainHandler.gainDb = masterVolume.slider.value;
+                                        zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
+                                    }
                                     onClicked: {
                                         zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
                                     }
-                                }
-                            }
-
-                            QQC2.Label {
-                                Layout.alignment: Qt.AlignCenter
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                horizontalAlignment: Text.AlignHCenter
-                                elide: Text.ElideRight
-                                text: qsTr("%1 dB").arg(masterVolume.gainHandler.gainDb.toFixed(2))
-                                font.pointSize: 9
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
+                                    onDoubleClicked: {
+                                        masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
                                     }
                                 }
-                            }
 
-                            QQC2.RoundButton {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                                Layout.margins: 4
-                                radius: 2
-                                font.pointSize: 8
-                                checked: masterVolume.gainHandler.muted
-                                text: qsTr("M")
-                                contentItem: QQC2.Label {
-                                    text: parent.text
-                                    font: parent.font
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                                    Layout.leftMargin: Kirigami.Units.smallSpacing
+                                    Layout.rightMargin: Kirigami.Units.smallSpacing
+                                    // color: "pink"
+                                    PanSlider {
+                                        anchors.fill: parent
+                                        orientation: Qt.Horizontal
+                                        from: -1.0
+                                        to: 1.0
+                                        controlObj: Zynthbox.Plugin.globalPlaybackClient
+                                        controlProp: "panAmount"
+                                        initialValue: 0
+                                    }
+                                }
+
+                                QQC2.Label {
+                                    Layout.alignment: Qt.AlignCenter
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.margins: 4
                                     horizontalAlignment: Text.AlignHCenter
+                                    elide: Text.ElideRight
+                                    text: "Master"
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
+                                        }
+                                    }
                                 }
-                                background: Rectangle {
-                                    radius: parent.radius
-                                    border.width: 1
-                                    border.color: Qt.rgba(50, 50, 50, 0.1)
-                                    color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+
+                                QQC2.Label {
+                                    Layout.alignment: Qt.AlignCenter
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    horizontalAlignment: Text.AlignHCenter
+                                    elide: Text.ElideRight
+                                    text: qsTr("%1 dB").arg(masterVolume.gainHandler.gainDb.toFixed(2))
+                                    font.pointSize: 9
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
+                                        }
+                                    }
                                 }
-                                onClicked: {
-                                    masterVolume.gainHandler.muted = !masterVolume.gainHandler.muted
+
+                                QQC2.RoundButton {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                    Layout.margins: 2
+                                    radius: 2
+                                    font.pointSize: 8
+                                    checked: masterVolume.gainHandler.muted
+                                    text: qsTr("M")
+                                    contentItem: QQC2.Label {
+                                        text: parent.text
+                                        font: parent.font
+                                        horizontalAlignment: Text.AlignHCenter
+                                    }
+                                    background: Rectangle {
+                                        radius: parent.radius
+                                        border.width: 1
+                                        border.color: Qt.rgba(50, 50, 50, 0.1)
+                                        color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                    }
+                                    onClicked: {
+                                        masterVolume.gainHandler.muted = !masterVolume.gainHandler.muted
+                                    }
                                 }
                             }
                         }

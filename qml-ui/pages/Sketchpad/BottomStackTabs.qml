@@ -22,76 +22,83 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.10
-import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Layouts 1.4
+import io.zynthbox.ui 1.0 as ZUI
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
-import io.zynthbox.ui 1.0 as ZUI
 
-ColumnLayout {
+ZUI.SectionGroup {
     id: root
 
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
-    spacing: ZUI.Theme.spacing
+
     // Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
+ 
+    contentItem: ColumnLayout {
+        spacing: ZUI.Theme.spacing
 
-    QQC2.Button {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        checkable: true
-        checked: bottomStack.slotsBar ? bottomStack.slotsBar.channelButton.checked : false
-        enabled: !root.displaySceneButtons
-        text: qsTr("Track")
-        onClicked: {
-            bottomStack.slotsBar.channelButton.checked = true
+        ZUI.SectionButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            checked: highlighted
+            highlighted: bottomStack.slotsBar ? bottomStack.slotsBar.channelButton.checked : false
+            enabled: !root.displaySceneButtons
+            text: qsTr("Track")
+            onClicked: {
+                bottomStack.slotsBar.channelButton.checked = true;
+            }
         }
+
+        ZUI.SectionButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            checkable: true
+            checked: highlighted
+            highlighted: bottomStack.slotsBar ? bottomStack.slotsBar.clipsButton.checked : false
+            enabled: !root.displaySceneButtons
+            text: qsTr("Clips")
+            onClicked: {
+                bottomStack.slotsBar.clipsButton.checked = true;
+            }  
+        }
+
+        ZUI.SectionButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            checkable: true
+            checked: bottomStack.slotsBar ? bottomStack.slotsBar.synthsButton.checked : false
+            enabled: !root.displaySceneButtons
+            text: qsTr("Synths")
+            onClicked: {
+                bottomStack.slotsBar.synthsButton.checked = true;
+            }
+        }
+
+        ZUI.SectionButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            checkable: true
+            checked: bottomStack.slotsBar ? bottomStack.slotsBar.samplesButton.checked : false
+            enabled: !root.displaySceneButtons
+            text: qsTr("Samples")
+            onClicked: {
+                bottomStack.slotsBar.samplesButton.checked = true;
+            }
+        }
+
+        ZUI.SectionButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            checkable: true
+            checked: bottomStack.slotsBar ? bottomStack.slotsBar.fxButton.checked : false
+            enabled: !root.displaySceneButtons
+            text: qsTr("FX")
+            onClicked: {
+                bottomStack.slotsBar.fxButton.checked = true;
+            }
+        }
+
     }
 
-    QQC2.Button {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        checkable: true
-        checked: bottomStack.slotsBar ? bottomStack.slotsBar.clipsButton.checked : false
-        enabled: !root.displaySceneButtons
-        text: qsTr("Clips")
-        onClicked: {
-            bottomStack.slotsBar.clipsButton.checked = true
-        }
-    }
-
-    QQC2.Button {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        checkable: true
-        checked: bottomStack.slotsBar ? bottomStack.slotsBar.synthsButton.checked : false
-        enabled: !root.displaySceneButtons
-        text: qsTr("Synths")
-        onClicked: {
-            bottomStack.slotsBar.synthsButton.checked = true
-        }
-    }
-
-    QQC2.Button {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        checkable: true
-        checked: bottomStack.slotsBar ? bottomStack.slotsBar.samplesButton.checked : false
-        enabled: !root.displaySceneButtons
-        text: qsTr("Samples")
-        onClicked: {
-            bottomStack.slotsBar.samplesButton.checked = true
-        }
-    }
-
-    QQC2.Button {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        checkable: true
-        checked: bottomStack.slotsBar ? bottomStack.slotsBar.fxButton.checked : false
-        enabled: !root.displaySceneButtons
-        text: qsTr("FX")
-        onClicked: {
-            bottomStack.slotsBar.fxButton.checked = true
-        }
-    }
 }

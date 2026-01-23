@@ -32,7 +32,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.ui 1.0 as ZUI
 
-QQC2.Pane
+ZUI.SectionGroup 
 {
     id: root
 
@@ -43,40 +43,47 @@ QQC2.Pane
 
     Layout.fillHeight: true
 
-    topPadding: svgBg.visible ? svgBg.topPadding : Kirigami.Units.smallSpacing
-    bottomPadding: svgBg.visible ? svgBg.bottomPadding : Kirigami.Units.smallSpacing
-    leftPadding: svgBg.visible ? svgBg.leftPadding : Kirigami.Units.smallSpacing
-    rightPadding: svgBg.visible ? svgBg.rightPadding : Kirigami.Units.smallSpacing
+    // topPadding: svgBg.visible ? svgBg.topPadding : Kirigami.Units.smallSpacing
+    // bottomPadding: svgBg.visible ? svgBg.bottomPadding : Kirigami.Units.smallSpacing
+    // leftPadding: svgBg.visible ? svgBg.leftPadding : Kirigami.Units.smallSpacing
+    // rightPadding: svgBg.visible ? svgBg.rightPadding : Kirigami.Units.smallSpacing
 
-    background: Item
-    {
-        PlasmaCore.FrameSvgItem {
-            id: svgBg
-            visible: fromCurrentTheme
-            anchors.fill: parent
+    // background: Item
+    // {
+    //     PlasmaCore.FrameSvgItem {
+    //         id: svgBg
+    //         visible: fromCurrentTheme
+    //         anchors.fill: parent
 
-            readonly property real leftPadding: margins.left
-            readonly property real rightPadding: margins.right
-            readonly property real topPadding: margins.top
-            readonly property real bottomPadding: margins.bottom
+    //         readonly property real leftPadding: margins.left
+    //         readonly property real rightPadding: margins.right
+    //         readonly property real topPadding: margins.top
+    //         readonly property real bottomPadding: margins.bottom
 
-            imagePath: "widgets/statusinfo_background"
-            //colorGroup: PlasmaCore.Theme.ViewColorGroup
-            prefix: root.highlighted ? ["focus", ""] : ""
-            colorGroup: PlasmaCore.Theme.ViewColorGroup
-        }
-    }
-
+    //         imagePath: "widgets/statusinfo_background"
+    //         //colorGroup: PlasmaCore.Theme.ViewColorGroup
+    //         prefix: root.highlighted ? ["focus", ""] : ""
+    //         colorGroup: PlasmaCore.Theme.ViewColorGroup
+    //     }
+    // }
     contentItem: MouseArea {
 
         onClicked: zynqtgui.globalPopupOpened = true
 
+        Rectangle {
+            anchors.fill: parent
+            color: "#1a1b1d"
+            radius: 2
+        }
+
         RowLayout {
             anchors.fill: parent
+            anchors.margins: 2
             spacing: Kirigami.Units.mediumSpacing
 
             ColumnLayout {
                 Layout.fillWidth: true
+                spacing: 1
 
                 Item {
                     id: bar1
@@ -86,12 +93,18 @@ QQC2.Pane
                     clip: true
 
                     Rectangle {
+                        color: "#040507"
+                        anchors.fill: parent  
+                        radius: ZUI.Theme.radius
+                    }
+
+                    Rectangle {
                         id: holdSignalARect
                         anchors {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: 3
+                       radius: ZUI.Theme.radius
                         x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackAHold / zynqtgui.status_information.rangedB), 1) * bar1.width)
                         opacity: x === 0 ? 0 : 1
                         implicitWidth: Kirigami.Units.smallSpacing
@@ -116,7 +129,7 @@ QQC2.Pane
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        radius: 3
+                        radius: ZUI.Theme.radius
                         color: Kirigami.Theme.negativeTextColor
                         width: highSignalARect.peakSignalA * bar1.width
                         property double peakSignalA: Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackA / zynqtgui.status_information.rangedB), 1)
@@ -128,7 +141,7 @@ QQC2.Pane
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        radius: 3
+                        radius: ZUI.Theme.radius
                         color: Kirigami.Theme.neutralTextColor
                         width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.over) * bar1.width
                     }
@@ -139,7 +152,7 @@ QQC2.Pane
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        radius: 3
+                        radius: ZUI.Theme.radius
                         color: Kirigami.Theme.positiveTextColor
                         width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.high) * bar1.width
                     }
@@ -153,12 +166,18 @@ QQC2.Pane
                     clip: true
 
                     Rectangle {
+                        color: "#040507"
+                        anchors.fill: parent  
+                        radius: ZUI.Theme.radius
+                    }
+
+                    Rectangle {
                         id: holdSignalBRect
                         anchors {
                             top: parent.top
                             bottom: parent.bottom
                         }
-                        radius: 3
+                        radius: ZUI.Theme.radius
                         x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackBHold / zynqtgui.status_information.rangedB), 1) * bar2.width)
                         opacity: x === 0 ? 0 : 1
                         implicitWidth: Kirigami.Units.smallSpacing
@@ -183,7 +202,7 @@ QQC2.Pane
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        radius: 3
+                        radius: ZUI.Theme.radius
                         color: Kirigami.Theme.negativeTextColor
                         width: Math.min(highSignalBRect.peakSignalB, 1) * bar2.width
                         property double peakSignalB: Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackB / zynqtgui.status_information.rangedB), 1)
@@ -195,7 +214,7 @@ QQC2.Pane
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        radius: 3
+                        radius: ZUI.Theme.radius
                         color: Kirigami.Theme.neutralTextColor
                         width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.over) * bar2.width
                     }
@@ -206,7 +225,7 @@ QQC2.Pane
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        radius: 3
+                        radius: ZUI.Theme.radius
                         color: Kirigami.Theme.positiveTextColor
                         width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.high) * bar2.width
                     }
@@ -215,6 +234,7 @@ QQC2.Pane
                 RowLayout {
                     id: statusIconsLayout
                     Layout.fillWidth: true
+                    spacing: 2
 
                     QQC2.Label {
                         color: Kirigami.Theme.textColor
@@ -228,7 +248,7 @@ QQC2.Pane
                                 width: 1
                                 color: Kirigami.Theme.textColor
                             }
-                            radius: 3
+                            radius: ZUI.Theme.radius
                         }
                     }
                     Kirigami.Icon {
@@ -336,6 +356,7 @@ QQC2.Pane
 
             ColumnLayout {
                Layout.fillHeight: true
+               spacing: 1
                 QQC2.Label {
                     id: bpmLabel
                     Layout.alignment: Qt.AlignTop

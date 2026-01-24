@@ -43,31 +43,8 @@ ZUI.SectionGroup
 
     Layout.fillHeight: true
 
-    // topPadding: svgBg.visible ? svgBg.topPadding : Kirigami.Units.smallSpacing
-    // bottomPadding: svgBg.visible ? svgBg.bottomPadding : Kirigami.Units.smallSpacing
-    // leftPadding: svgBg.visible ? svgBg.leftPadding : Kirigami.Units.smallSpacing
-    // rightPadding: svgBg.visible ? svgBg.rightPadding : Kirigami.Units.smallSpacing
-
-    // background: Item
-    // {
-    //     PlasmaCore.FrameSvgItem {
-    //         id: svgBg
-    //         visible: fromCurrentTheme
-    //         anchors.fill: parent
-
-    //         readonly property real leftPadding: margins.left
-    //         readonly property real rightPadding: margins.right
-    //         readonly property real topPadding: margins.top
-    //         readonly property real bottomPadding: margins.bottom
-
-    //         imagePath: "widgets/statusinfo_background"
-    //         //colorGroup: PlasmaCore.Theme.ViewColorGroup
-    //         prefix: root.highlighted ? ["focus", ""] : ""
-    //         colorGroup: PlasmaCore.Theme.ViewColorGroup
-    //     }
-    // }
-    contentItem: MouseArea {
-
+    MouseArea {
+        anchors.fill: parent    
         onClicked: zynqtgui.globalPopupOpened = true
 
         // Rectangle {
@@ -79,7 +56,7 @@ ZUI.SectionGroup
         RowLayout {
             anchors.fill: parent
             anchors.margins: 2
-            spacing: Kirigami.Units.mediumSpacing
+            spacing: ZUI.Theme.spacing
 
             ColumnLayout {
                 Layout.fillWidth: true

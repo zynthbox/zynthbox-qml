@@ -35,7 +35,8 @@ ZUI.SectionGroup {
 
     // Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
  
-    contentItem: ColumnLayout {
+    ColumnLayout {
+        anchors.fill: parent
         spacing: ZUI.Theme.spacing
 
         ZUI.SectionButton {

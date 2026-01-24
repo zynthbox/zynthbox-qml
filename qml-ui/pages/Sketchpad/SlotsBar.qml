@@ -519,8 +519,8 @@ QQC2.Pane {
                                         //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
                                         // }
                                         Rectangle {
-                                             Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                                            Kirigami.Theme.inherit: false
                                             visible: !svgBg2.visible
                                             anchors.fill: parent
                                             color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
@@ -631,164 +631,163 @@ QQC2.Pane {
                     padding: ZUI.Theme.padding
                     background: null
 
-                contentItem: Item {
-                    
-                    
-                    ColumnLayout {
-                    anchors.fill: parent
-                    spacing: Kirigami.Units.mediumSpacing
+                    contentItem: Item {                   
+                        
+                        ColumnLayout {
+                        anchors.fill: parent
+                        spacing: Kirigami.Units.mediumSpacing
 
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        // Layout.alignment: Qt.AlignHCenter
-                        // font.pointSize: 14
-                        text: qsTr("Ch%1-Slot%2")
-                        .arg(zynqtgui.sketchpad.selectedTrackId + 1)
-                        .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        // Layout.alignment: Qt.AlignHCenter
-                        visible: synthsButton.checked
-                        font.pointSize: 10
-                        text: qsTr("Synth")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: 10
-                        visible: fxButton.checked
-                        text: qsTr("Fx")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: 10
-                        visible: samplesButton.checked
-                        text: qsTr("Sample")
-                    }
-
-                    QQC2.Control {
-                        clip: true
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: detailsText.height + 20
-                        Layout.alignment: Qt.AlignHCenter
-
-                        background: Item {
-
-                            Rectangle {
-                                visible: !svgBg3.visible
-                                anchors.fill: parent
-                                Kirigami.Theme.inherit: false
-                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                color: Kirigami.Theme.backgroundColor
-
-                                border.color: "#ff999999"
-                                border.width: 1
-                                radius: 4
-                            }
-
-                            PlasmaCore.FrameSvgItem {
-                                id: svgBg3
-                                anchors.fill: parent
-                                visible: fromCurrentTheme
-                                readonly property bool highlighted: false
-                                readonly property real leftPadding: margins.left
-                                readonly property real rightPadding: margins.right
-                                readonly property real topPadding: margins.top
-                                readonly property real bottomPadding: margins.bottom
-
-                                imagePath: "widgets/slots-delegate-background"
-                                prefix: svgBg3.highlighted ? ["focus", ""] : ""
-                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                            }
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            // Layout.alignment: Qt.AlignHCenter
+                            // font.pointSize: 14
+                            text: qsTr("Ch%1-Slot%2")
+                            .arg(zynqtgui.sketchpad.selectedTrackId + 1)
+                            .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            // Layout.alignment: Qt.AlignHCenter
+                            visible: synthsButton.checked
+                            font.pointSize: 10
+                            text: qsTr("Synth")
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignHCenter
+                            font.pointSize: 10
+                            visible: fxButton.checked
+                            text: qsTr("Fx")
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignHCenter
+                            font.pointSize: 10
+                            visible: samplesButton.checked
+                            text: qsTr("Sample")
                         }
 
-                        contentItem: MouseArea {
-                            QQC2.Label {
-                                id: detailsText
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    left: parent.left
-                                    leftMargin: 10
-                                    right: parent.right
-                                    rightMargin: 10
+                        QQC2.Control {
+                            clip: true
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.preferredHeight: detailsText.height + 20
+                            Layout.alignment: Qt.AlignHCenter
+
+                            background: Item {
+
+                                Rectangle {
+                                    visible: !svgBg3.visible
+                                    anchors.fill: parent
+                                    Kirigami.Theme.inherit: false
+                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                    color: Kirigami.Theme.backgroundColor
+
+                                    border.color: "#ff999999"
+                                    border.width: 1
+                                    radius: 4
                                 }
-                                wrapMode: Text.WrapAnywhere
-                                font.pointSize: 8
-                                text: {
-                                    if (synthsButton.checked) {
-                                        return root.selectedChannel.synthSlotsData[root.selectedChannel.selectedSlot.value]
-                                    } else if (samplesButton.checked) {
-                                        return root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].filename
-                                    } else if (fxButton.checked) {
-                                        return root.selectedChannel.fxSlotsData[root.selectedChannel.selectedSlot.value]
-                                    } else {
-                                        return ""
+
+                                PlasmaCore.FrameSvgItem {
+                                    id: svgBg3
+                                    anchors.fill: parent
+                                    visible: fromCurrentTheme
+                                    readonly property bool highlighted: false
+                                    readonly property real leftPadding: margins.left
+                                    readonly property real rightPadding: margins.right
+                                    readonly property real topPadding: margins.top
+                                    readonly property real bottomPadding: margins.bottom
+
+                                    imagePath: "widgets/slots-delegate-background"
+                                    prefix: svgBg3.highlighted ? ["focus", ""] : ""
+                                    colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                                }
+                            }
+
+                            contentItem: MouseArea {
+                                QQC2.Label {
+                                    id: detailsText
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        left: parent.left
+                                        leftMargin: 10
+                                        right: parent.right
+                                        rightMargin: 10
+                                    }
+                                    wrapMode: Text.WrapAnywhere
+                                    font.pointSize: 8
+                                    text: {
+                                        if (synthsButton.checked) {
+                                            return root.selectedChannel.synthSlotsData[root.selectedChannel.selectedSlot.value]
+                                        } else if (samplesButton.checked) {
+                                            return root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].filename
+                                        } else if (fxButton.checked) {
+                                            return root.selectedChannel.fxSlotsData[root.selectedChannel.selectedSlot.value]
+                                        } else {
+                                            return ""
+                                        }
                                     }
                                 }
-                            }
 
+                                onClicked: {
+                                    handleItemClick()
+                                }
+                            }
+                        }
+
+                        QQC2.Slider {
+                            id: volumeSlider
+
+                            property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
+                            property QtObject synthPassthroughClient: chainedSound > -1 ? Zynthbox.Plugin.synthPassthroughClients[chainedSound] : null
+
+                            orientation: Qt.Horizontal
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+
+                            visible: synthsButton.checked
+                            enabled: volumeSlider.synthPassthroughClient != null && chainedSound >= 0 && (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
+                            value: volumeSlider.synthPassthroughClient ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
+                            stepSize: 0.01
+                            from: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.minimumDecibel : 0
+                            to: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.maximumDecibel : 0
+                            onMoved: {
+                                volumeSlider.synthPassthroughClient.dryGainHandler.gainDb = volumeSlider.value;
+                            }
+                            Binding {
+                                target: volumeSlider
+                                property: "value"
+                                value: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
+                            }
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            text: qsTr("Swap with...")
                             onClicked: {
-                                handleItemClick()
+                                let swapType = "unknown";
+                                if (synthsButton.checked) {
+                                    swapType = "synth";
+                                } else if (fxButton.checked) {
+                                    swapType = "fx";
+                                } else if (samplesButton.checked) {
+                                    swapType = "sample";
+                                }
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedSlotRowItem.channel, swapType, root.selectedSlotRowItem.channel.selectedSlotRow);
                             }
                         }
-                    }
 
-                    QQC2.Slider {
-                        id: volumeSlider
-
-                        property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
-                        property QtObject synthPassthroughClient: chainedSound > -1 ? Zynthbox.Plugin.synthPassthroughClients[chainedSound] : null
-
-                        orientation: Qt.Horizontal
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-
-                        visible: synthsButton.checked
-                        enabled: volumeSlider.synthPassthroughClient != null && chainedSound >= 0 && (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
-                        value: volumeSlider.synthPassthroughClient ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
-                        stepSize: 0.01
-                        from: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.minimumDecibel : 0
-                        to: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.maximumDecibel : 0
-                        onMoved: {
-                            volumeSlider.synthPassthroughClient.dryGainHandler.gainDb = volumeSlider.value;
-                        }
-                        Binding {
-                            target: volumeSlider
-                            property: "value"
-                            value: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
+                        Item{
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                         }
                     }
-
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        text: qsTr("Swap with...")
-                        onClicked: {
-                            let swapType = "unknown";
-                            if (synthsButton.checked) {
-                                swapType = "synth";
-                            } else if (fxButton.checked) {
-                                swapType = "fx";
-                            } else if (samplesButton.checked) {
-                                swapType = "sample";
-                            }
-                            bottomStack.slotsBar.pickSlotToSwapWith(root.selectedSlotRowItem.channel, swapType, root.selectedSlotRowItem.channel.selectedSlotRow);
-                        }
-                    }
-
-                    Item{
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                    }
-                }
                 }
             }
             }

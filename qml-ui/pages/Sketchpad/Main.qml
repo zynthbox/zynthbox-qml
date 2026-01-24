@@ -1218,14 +1218,15 @@ ZUI.ScreenPage {
                 contentItem: Item {
                     RowLayout {
                         anchors.fill: parent
-                        spacing: Kirigami.Units.mediumSpacing
+                        spacing: ZUI.Theme.sectionSpacing
 
                         ZUI.SectionGroup {
                             Layout.fillWidth: false
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
-                            contentItem: Item {
+                            Item {
+                                anchors.fill: parent
                                 ColumnLayout {
                                     id: sketchpadSketchHeadersColumn
 
@@ -1372,606 +1373,597 @@ ZUI.ScreenPage {
                                 Kirigami.Theme.colorSet: Kirigami.Theme.View
                                 color: Kirigami.Theme.backgroundColor
                                 opacity: 0.1
-                            }                        
+                            }   
 
-                            contentItem: Item {
+                            ColumnLayout {
+                                id: sketchpadClipsColumn
 
-                                ColumnLayout {
-                                    id: sketchpadClipsColumn
+                                // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
+                                property bool shouldShowSegmentArrows: root.song.arrangementsModel.selectedArrangement.segmentsModel.count > 10
+                                // Segment offset will determine what is the first segment to display when arrow keys are displayed
+                                property int segmentOffset: 0
+                                // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
+                                property int maximumSegmentOffset: root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2
 
-                                    // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
-                                    property bool shouldShowSegmentArrows: root.song.arrangementsModel.selectedArrangement.segmentsModel.count > 10
-                                    // Segment offset will determine what is the first segment to display when arrow keys are displayed
-                                    property int segmentOffset: 0
-                                    // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
-                                    property int maximumSegmentOffset: root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2
+                                anchors.fill: parent
+                                spacing: 2 //TOTHEME
 
-                                    anchors.fill: parent
-                                    spacing: 2
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    spacing: 2 //TOTHEME
 
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        spacing: 2
+                                    // Display 10 header buttons which will show channel header buttons
+                                    Repeater {
+                                        id: channelsHeaderRepeater
 
-                                        // Display 10 header buttons which will show channel header buttons
-                                        Repeater {
-                                            id: channelsHeaderRepeater
+                                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                        model: zynqtgui.isBootingComplete ? 10 : 0
 
-                                            // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                            model: zynqtgui.isBootingComplete ? 10 : 0
+                                        delegate: Item {
+                                            id: headerDelegate
 
-                                            delegate: Item {
-                                                id: headerDelegate
+                                            property QtObject channel: root.song.channelsModel.getChannel(index)
+                                            property bool showVolume: state == "ChannelMode"
 
-                                                property QtObject channel: root.song.channelsModel.getChannel(index)
+                                            function switchToThisChannel() {
+                                                // If song mode is not active, clicking on cells should activate that channel
+                                                zynqtgui.sketchpad.lastSelectedObj.setTo(channelHeaderDelegate.channel.className, channelHeaderDelegate.channel, channelHeaderDelegate, channelHeaderDelegate.channel);
+                                                zynqtgui.sketchpad.selectedTrackId = index;
+                                                Qt.callLater(function() {
+                                                    // Open TracksBar and switch to channel
+                                                    // bottomStack.slotsBar.channelButton.checked = true
+                                                    root.resetBottomBar(false);
+                                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                                    zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
+                                                });
+                                            }
 
-                                                function switchToThisChannel() {
-                                                    // If song mode is not active, clicking on cells should activate that channel
-                                                    zynqtgui.sketchpad.lastSelectedObj.setTo(channelHeaderDelegate.channel.className, channelHeaderDelegate.channel, channelHeaderDelegate, channelHeaderDelegate.channel);
-                                                    zynqtgui.sketchpad.selectedTrackId = index;
-                                                    Qt.callLater(function() {
-                                                        // Open TracksBar and switch to channel
-                                                        // bottomStack.slotsBar.channelButton.checked = true
-                                                        root.resetBottomBar(false);
-                                                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                                        zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
-                                                    });
-                                                }
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            // Layout.topMargin: 1 // Without this magic number, the top of header row doesn't match with left side scenes button or right side copy button
+                                            state: root.displaySceneButtons ? "SceneMode" : "ChannelMode"
+                                            states: [
+                                                State {
+                                                    name: "SceneMode"
 
-                                                Layout.fillWidth: true
-                                                Layout.fillHeight: true
-                                                // Layout.topMargin: 1 // Without this magic number, the top of header row doesn't match with left side scenes button or right side copy button
-                                                state: root.displaySceneButtons ? "SceneMode" : "ChannelMode"
-                                                states: [
-                                                    State {
-                                                        name: "SceneMode"
-
-                                                        PropertyChanges {
-                                                            target: sceneHeader
-                                                            visible: true
-                                                        }
-
-                                                        PropertyChanges {
-                                                            target: channelHeaderDelegate
-                                                            visible: false
-                                                        }
-
-                                                        PropertyChanges {
-                                                            target: volumeGauge
-                                                            visible: false
-                                                        }
-
-                                                    },
-                                                    State {
-                                                        name: "ChannelMode"
-
-                                                        PropertyChanges {
-                                                            target: sceneHeader
-                                                            visible: false
-                                                        }
-
-                                                        PropertyChanges {
-                                                            target: channelHeaderDelegate
-                                                            visible: true
-                                                        }
-
-                                                        PropertyChanges {
-                                                            target: volumeGauge
-                                                            visible: true
-                                                        }
-
-                                                    }
-                                                ]
-
-                                                ZUI.TableHeader {
-                                                    id: sceneHeader
-
-                                                    anchors.fill: parent
-                                                    text: String.fromCharCode(65 + index).toUpperCase()
-                                                    highlighted: index === root.song.scenesModel.selectedSceneIndex
-                                                    highlightOnFocus: false
-                                                    onPressed: {
-                                                        ZUI.CommonUtils.switchToScene(index);
-                                                    }
-                                                }
-
-                                                ChannelHeader2 {
-                                                    id: channelHeaderDelegate
-
-                                                    anchors.fill: parent
-                                                    channel: headerDelegate.channel
-                                                    text: channelHeaderDelegate.channel.name
-                                                    subText: null
-                                                    subSubText: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected")
-                                                    subSubTextSize: 7
-                                                    highlightOnFocus: false
-                                                    highlighted: index === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
-                                                    onClicked: {
-                                                        headerDelegate.switchToThisChannel();
-                                                    }
-                                                    onDoubleClicked: {
-                                                        channelHeaderDelegate.channel.muted = !channelHeaderDelegate.channel.muted;
+                                                    PropertyChanges {
+                                                        target: sceneHeader
+                                                        visible: true
                                                     }
 
-                                                    Binding {
+                                                    PropertyChanges {
                                                         target: channelHeaderDelegate
-                                                        property: "color"
-                                                        when: root.visible
-                                                        delayed: true
-                                                        value: {
-                                                            if (zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.value === model.channel)
-                                                                return "#ff2196f3";
-                                                            else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0 || channelHeaderDelegate.channel.occupiedSampleSlotsCount > 0)
-                                                                return channelHeaderDelegate.channel.color;
-                                                            return "#66888888";
-                                                        }
+                                                        visible: false
+                                                    }
+                                                },
+                                                State {
+                                                    name: "ChannelMode"
+
+                                                    PropertyChanges {
+                                                        target: sceneHeader
+                                                        visible: false
                                                     }
 
-                                                    columnContent: Rectangle {
-                                                        id: volumeGauge
-                                                        color: Kirigami.Theme.textColor
-                                                        implicitWidth: parent.width * ((channelHeaderDelegate.channel.volume-(-40))/(20-(-40)) )
-                                                        implicitHeight: 6
-                                                        anchors.bottom: parent.bottom
-                                                        opacity: 0.7
-                                                        radius: ZUI.Theme.radius
+                                                    PropertyChanges {
+                                                        target: channelHeaderDelegate
+                                                        visible: true
                                                     }
-
                                                 }
+                                            ]
 
-                                                // Extras.Gauge {
-                                                //     id: volumeGauge
+                                            ZUI.TableHeader {
+                                                id: sceneHeader
 
-                                                //     visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id
-                                                //     minimumValue: -40
-                                                //     maximumValue: 20
-                                                //     value: channelHeaderDelegate.channel.volume
-                                                //     font.pointSize: 8
-                                                //     opacity: 0.7
-
-                                                //     anchors {
-                                                //         top: parent.top
-                                                //         bottom: parent.bottom
-                                                //         right: parent.right
-                                                //         rightMargin: 2
-                                                //         topMargin: -4
-                                                //         bottomMargin: -4
-                                                //     }
-
-                                                //     style: GaugeStyle {
-                                                //         minorTickmark: null
-                                                //         tickmark: null
-                                                //         tickmarkLabel: null
-
-                                                //         valueBar: Rectangle {
-                                                //             // color: Kirigami.Theme.highlightColor
-                                                //             color: Kirigami.Theme.textColor
-                                                //             implicitWidth: 6
-                                                //         }
-
-                                                //     }
-
-                                                // }
-
+                                                anchors.fill: parent
+                                                text: String.fromCharCode(65 + index).toUpperCase()
+                                                highlighted: index === root.song.scenesModel.selectedSceneIndex
+                                                highlightOnFocus: false
+                                                onPressed: {
+                                                    ZUI.CommonUtils.switchToScene(index);
+                                                }
                                             }
 
-                                        }
+                                            ChannelHeader2 {
+                                                id: channelHeaderDelegate
 
-                                    }
+                                                anchors.fill: parent
+                                                channel: headerDelegate.channel
+                                                text: channelHeaderDelegate.channel.name
+                                                subText: null
+                                                subSubText: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected")
+                                                subSubTextSize: 7
+                                                highlightOnFocus: false
+                                                highlighted: index === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
+                                                onClicked: {
+                                                    headerDelegate.switchToThisChannel();
+                                                }
+                                                onDoubleClicked: {
+                                                    channelHeaderDelegate.channel.muted = !channelHeaderDelegate.channel.muted;
+                                                }
 
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        spacing: 2
-
-                                        Repeater {
-                                            id: clipsRepeater
-
-                                            // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                            model: zynqtgui.isBootingComplete ? root.song.channelsModel : 0
-
-                                            delegate: Item {
-                                                id: clipsDelegate
-
-                                                function switchToThisClip(allowToggle) {
-                                                    if (zynqtgui.sketchpad.lastSelectedObj != null && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview" && zynqtgui.sketchpad.lastSelectedObj.value === index && zynqtgui.sketchpad.lastSelectedObj.component != null && zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
-                                                        // Clip overview is already selected. Toggle between track/clips view
-                                                        root.resetBottomBar(allowToggle);
-                                                    } else {
-                                                        // Clip overview is not selected. Open clips grid view
-                                                        bottomStack.slotsBar.clipsButton.checked = true;
-                                                        zynqtgui.sketchpad.lastSelectedObj.setTo("sketchpad_clipoverview", index, clipCell, clipCell.channel);
-                                                        zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id;
+                                                Binding {
+                                                    target: channelHeaderDelegate
+                                                    property: "color"
+                                                    when: root.visible
+                                                    delayed: true
+                                                    value: {
+                                                        if (zynqtgui.sketchpad.copySourceObj && zynqtgui.sketchpad.copySourceObj.value === model.channel)
+                                                            return "#ff2196f3";
+                                                        else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0 || channelHeaderDelegate.channel.occupiedSampleSlotsCount > 0)
+                                                            return channelHeaderDelegate.channel.color;
+                                                        return "#66888888";
                                                     }
                                                 }
 
-                                                Layout.fillWidth: true
-                                                Layout.fillHeight: true
-                                                // Layout.bottomMargin: 1 // Without this magic number, the bottom of clips row doesn't match with left side scenes button or right side copy button
-                                                state: bottomStack.slotsBar.mixerButton.checked ? "MixerMode" : "ClipsMode"
-                                                states: [
-                                                    State {
-                                                        name: "ClipsMode"
-
-                                                        PropertyChanges {
-                                                            target: clipCell
-                                                            visible: true
-                                                        }
-
-                                                        PropertyChanges {
-                                                            target: mixerCell
-                                                            visible: false
-                                                        }
-
-                                                    },
-                                                    State {
-                                                        name: "MixerMode"
-
-                                                        PropertyChanges {
-                                                            target: clipCell
-                                                            visible: false
-                                                        }
-
-                                                        PropertyChanges {
-                                                            target: mixerCell
-                                                            visible: true
-                                                        }
-
-                                                    }
-                                                ]
-
-                                                ClipCell {
-                                                    id: clipCell
-
-                                                    anchors.fill: parent
-                                                    channel: model.channel
-                                                    backgroundColor: "#000000"
-                                                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                                    sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-                                                    pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByClipId(channel.id, channel.selectedClip) : null
-                                                    onPressed: {
-                                                        clipsDelegate.switchToThisClip(true);
-                                                    }
-
-                                                    Connections {
-                                                        target: channel.sceneClip
-                                                        onInCurrentSceneChanged: colorTimer.restart()
-                                                        onPathChanged: colorTimer.restart()
-                                                        onIsPlayingChanged: colorTimer.restart()
-                                                    }
-
-                                                    Connections {
-                                                        target: channel
-                                                        onConnectedPatternChanged: colorTimer.restart()
-                                                        onTrackTypeChanged: colorTimer.restart()
-                                                        onClipsModelChanged: colorTimer.restart()
-                                                    }
-
-                                                    Connections {
-                                                        target: clipCell.pattern
-                                                        onLastModifiedChanged: colorTimer.restart()
-                                                        onEnabledChanged: colorTimer.restart()
-                                                    }
-
-                                                    Connections {
-                                                        target: clipCell.sequence
-                                                        onIsPlayingChanged: colorTimer.restart()
-                                                    }
-
-                                                    Connections {
-                                                        target: zynqtgui.sketchpad
-                                                        onIsMetronomeRunningChanged: colorTimer.restart()
-                                                    }
-
-                                                    Connections {
-                                                        target: root.song.scenesModel
-                                                        onSelectedSketchpadSongIndexChanged: colorTimer.restart()
-                                                    }
-
-                                                    Timer {
-                                                        id: colorTimer
-
-                                                        interval: 10
-                                                        onTriggered: {
-                                                            // update isPlaying
-                                                            if (channel.connectedPattern < 0) {
-                                                                clipCell.isPlaying = channel.sceneClip.isPlaying;
-                                                            } else {
-                                                                var patternIsPlaying = false;
-                                                                if (clipCell.sequence && clipCell.sequence.isPlaying) {
-                                                                    if (clipCell.sequence.soloPattern > -1)
-                                                                        patternIsPlaying = (clipCell.sequence.soloPattern == channel.connectedPattern);
-                                                                    else if (clipCell.pattern)
-                                                                        patternIsPlaying = clipCell.pattern.enabled;
-                                                                }
-                                                                clipCell.isPlaying = patternIsPlaying && root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col) && zynqtgui.sketchpad.isMetronomeRunning;
-                                                            }
+                                                columnContent: Loader {
+                                                    active: ZUI.Theme.altVolume
+                                                    visible: active && headerDelegate.showVolume
+                                                    Layout.fillWidth: true
+                                                    sourceComponent: Item {                                                        
+                                                        height: 6
+                                                        Rectangle {
+                                                            color: Kirigami.Theme.textColor
+                                                            width: parent.width * ((channelHeaderDelegate.channel.volume-(-40))/(20-(-40)) )
+                                                            height: 6
+                                                            opacity: 0.7
+                                                            radius: ZUI.Theme.radius                                                    
                                                         }
                                                     }
-
-                                                }
-
-                                                ZUI.SectionGroup {
-                                                    id: mixerCell
-                                                    padding: 0
-
-                                                    anchors.fill: parent
-                                                    // color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
-                                                    // color: Kirigami.Theme.backgroundColor
-
-                                                    contentItem : Item {
-
-                                                        
-                                                        Item {
-                                                            anchors.fill: parent
-                                                            visible: root.showMixerEqualiser === true
-
-
-                                                            // Layout.leftMargin: Kirigami.Units.smallSpacing
-                                                            // Layout.rightMargin: Kirigami.Units.smallSpacing
-                                                            MultiPointTouchArea {
-                                                                id: graphTouchArea
-
-                                                                readonly property int thisTrackIndex: index
-
-                                                                anchors.fill: parent
-                                                                touchPoints: [
-                                                                    TouchPoint {
-                                                                        id: slidePoint
-
-                                                                        property QtObject selectedBand: null
-                                                                        property var pressedTime: undefined
-                                                                        readonly property QtObject
-                                                                        eqDoublePressedTimer: Timer {
-                                                                            interval: zynqtgui.ui_settings.doubleClickThreshold
-                                                                            running: false
-                                                                            repeat: false
-                                                                            onTriggered: {
-                                                                                // If we have not been stopped, this will be our single-click action
-                                                                                if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
-                                                                                    // If we're already on this track (and also the eq is enabled), cycle to the next band
-
-                                                                                    if (equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled)
-                                                                                        slidePoint.ensureSelectedBand(1);
-
-                                                                                } else {
-                                                                                    // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
-                                                                                    zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
-                                                                                }
-                                                                            }
-                                                                        }
-
-                                                                        property point startingPoint
-                                                                        property double startingGain
-                                                                        property double startingFrequency
-
-                                                                        // Set the startOffset to 1 to move forward, and 0 to try the current one first
-                                                                        function ensureSelectedBand(startOffset) {
-                                                                            // If there are more than one active bands, cycle to the next one in the list
-                                                                            // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
-                                                                            let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
-                                                                            let currentBandIndex = equaliserSettings.indexOf(slidePoint.selectedBand);
-                                                                            for (let testOffset = startOffset; testOffset < equaliserSettings.length; testOffset++) {
-                                                                                let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
-                                                                                if (testBand.active) {
-                                                                                    // This is the next active band in the settings list, select that and bail out
-                                                                                    testBand.selected = true;
-                                                                                    slidePoint.selectedBand = testBand;
-                                                                                    break;
-                                                                                }
-                                                                            }
-                                                                            // Also make sure to de-select the compressor, in case that one's selected
-                                                                            passthroughVisualiserItem.source.compressorSettings.selected = false;
-                                                                        }
-
-                                                                        onPressedChanged: {
-                                                                            if (pressed) {
-                                                                                pressedTime = Date.now();
-                                                                                selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
-                                                                                slidePoint.ensureSelectedBand(0);
-                                                                                slidePoint.startingGain = selectedBand.gainAbsolute;
-                                                                                slidePoint.startingFrequency = selectedBand.frequencyAbsolute;
-                                                                                slidePoint.startingPoint.x = slidePoint.x;
-                                                                                slidePoint.startingPoint.y = slidePoint.y;
-                                                                            } else {
-                                                                                // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
-                                                                                if ((Date.now() - pressedTime) < 300) {
-                                                                                    if (eqDoublePressedTimer.running) {
-                                                                                        // If we clicked again this quickly, it was a double-click
-                                                                                        eqDoublePressedTimer.stop();
-                                                                                        passthroughVisualiserItem.source.equaliserEnabled = !passthroughVisualiserItem.source.equaliserEnabled;
-                                                                                    } else {
-                                                                                        eqDoublePressedTimer.restart();
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        onYChanged: {
-                                                                            if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
-                                                                                // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
-                                                                                if (selectedBand.active === true) {
-                                                                                    let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
-                                                                                    selectedBand.gainAbsolute = Math.min(Math.max(slidePoint.startingGain - newGain, 0), 1);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        onXChanged: {
-                                                                            if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
-                                                                                // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
-                                                                                if (selectedBand.active === true) {
-                                                                                    let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2.5);
-                                                                                    selectedBand.frequencyAbsolute = slidePoint.startingFrequency + newFrequency;
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                ]
-
-                                                                Zynthbox.JackPassthroughVisualiserItem {
-                                                                    id: passthroughVisualiserItem
-
-                                                                    function getCurrentSelectedBand() {
-                                                                        // Just in case there's nothing active, just pick the first thing in the list
-
-                                                                        let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
-                                                                        let currentObject = null;
-                                                                        for (let slotIndex = 0; slotIndex < equaliserSettings.length; ++slotIndex) {
-                                                                            if (passthroughVisualiserItem.source.compressorSettings.selected || equaliserSettings[slotIndex].selected) {
-                                                                                currentObject = equaliserSettings[slotIndex];
-                                                                                break;
-                                                                            }
-                                                                        }
-                                                                        if (currentObject === null)
-                                                                            currentObject = equaliserSettings[0];
-
-                                                                        return currentObject;
-                                                                    }
-
-                                                                    anchors.fill: parent
-                                                                    analyseAudio: false
-                                                                    drawDisabledBands: false
-                                                                    eqCurveThickness: 2
-                                                                    source: root.showMixerEqualiser ? Zynthbox.AudioLevels.tracks[index] : null
-
-                                                                    // An overlay for the equaliser disabled state
-                                                                    Rectangle {
-                                                                        id: equaliserEnabledVisualiser
-
-                                                                        readonly property QtObject audioLevelsTrack: Zynthbox.AudioLevels.tracks[index]
-
-                                                                        anchors.fill: parent
-                                                                        color: Kirigami.Theme.negativeBackgroundColor
-                                                                        opacity: root.showMixerEqualiser === false ? 0.1 : (audioLevelsTrack.equaliserEnabled ? 0 : 0.5)
-
-                                                                        QQC2.Label {
-                                                                            anchors.centerIn: parent
-                                                                            horizontalAlignment: Text.AlignHCenter
-                                                                            font.bold: true
-                                                                            font.pointSize: 14
-                                                                            text: qsTr("EQ\nOff")
-                                                                        }
-
-                                                                    }
-
-                                                                }
-
-                                                            }
-
-                                                        }
-                                                        
-                                                        ColumnLayout {                                                            
-                                                            visible: root.showMixerEqualiser === false
-                                                            anchors.fill: parent
-                                                            spacing: 2
-
-                                                            Item {
-                                                                 Layout.fillWidth: true
-                                                                Layout.fillHeight: true
-                                                            QQC2.Pane {
-                                                               anchors.fill: parent
-                                                                padding: 2
-
-                                                                background: Rectangle {
-                                                                    color: "#1f2022"
-                                                                    radius: 2
-                                                                }
-
-                                                                contentItem: Item {
-                                                                    RowLayout {
-                                                                        anchors.fill: parent
-                                                                        QQC2.Dial {         
-                                                                            // Layout.fillWidth: true
-                                                                            implicitWidth: height
-                                                                            Layout.fillHeight: true                                                      
-                                                                            inputMode: QQC2.Dial.Vertical
-                                                                            handle: null
-                                                                            value: applicationWindow().channels[index].wetFx1Amount
-                                                                            stepSize: 1
-                                                                            from: 0
-                                                                            to: 100
-                                                                            onValueChanged: {
-                                                                                applicationWindow().channels[index].wetFx1Amount = value;
-                                                                            }
-                                                                        }
-
-                                                                        QQC2.Label {
-                                                                            Layout.fillWidth: true
-                                                                            Layout.fillHeight: true 
-                                                                            horizontalAlignment: Text.AlignHCenter
-                                                                            verticalAlignment: Text.AlignVCenter
-                                                                            fontSizeMode: Text.Fit
-                                                                            minimumPointSize: 6
-                                                                            font.pointSize: 9
-                                                                            text: qsTr("%1\%").arg(applicationWindow().channels[index].wetFx1Amount)
-                                                                        }
-                                                                    }
-
-                                                                }
-                                                            }
-                                                            }
-
-                                                           Item { 
-                                                             Layout.fillWidth: true
-                                                                Layout.fillHeight: true
-                                                            QQC2.Pane {
-                                                               anchors.fill: parent
-                                                                padding: 2
-
-                                                                background: Rectangle {
-                                                                    color: "#1f2022"
-                                                                    radius: 2
-                                                                }
-
-                                                                contentItem: Item {
-                                                                    RowLayout { 
-                                                                        anchors.fill: parent                                                                        
-
-                                                                        QQC2.Label {
-                                                                            Layout.fillWidth: true
-                                                                            Layout.fillHeight: true
-                                                                            horizontalAlignment: Text.AlignHCenter
-                                                                            verticalAlignment: Text.AlignVCenter
-                                                                            fontSizeMode: Text.Fit
-                                                                            minimumPointSize: 6
-                                                                            font.pointSize: 9
-                                                                            text: qsTr("%1\%").arg(applicationWindow().channels[index].wetFx2Amount)
-
-                                                                        }
-
-                                                                        QQC2.Dial {
-                                                                            // Layout.fillWidth: true
-                                                                            implicitWidth: height
-                                                                            Layout.fillHeight: true
-                                                                            inputMode: QQC2.Dial.Vertical
-                                                                            handle: null
-                                                                            value: applicationWindow().channels[index].wetFx2Amount
-                                                                            stepSize: 1
-                                                                            from: 0
-                                                                            to: 100
-                                                                            onValueChanged: {
-                                                                                applicationWindow().channels[index].wetFx2Amount = value;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                           }
-
-                                                        }
-                                                    }
-
+                                                
                                                 }
 
                                             }
 
+                                            Loader {
+                                                active: !ZUI.Theme.altVolume
+                                                visible: active && headerDelegate.showVolume
+                                                // visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id
+
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                    right: parent.right
+                                                    rightMargin: 2
+                                                    topMargin: -4
+                                                    bottomMargin: -4
+                                                }
+
+                                                sourceComponent: Extras.Gauge {
+
+                                                    minimumValue: -40
+                                                    maximumValue: 20
+                                                    value: channelHeaderDelegate.channel.volume
+                                                    font.pointSize: 8
+                                                    opacity: 0.7
+                                                    style: GaugeStyle {
+                                                        minorTickmark: null
+                                                        tickmark: null
+                                                        tickmarkLabel: null
+
+                                                        valueBar: Rectangle {
+                                                            color: Kirigami.Theme.highlightColor
+                                                            implicitWidth: 6
+                                                        }
+
+                                                    }
+
+                                                }
+                                            }
+
                                         }
+
                                     }
 
                                 }
 
-                            }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    spacing: 2
 
+                                    Repeater {
+                                        id: clipsRepeater
+
+                                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                        model: zynqtgui.isBootingComplete ? root.song.channelsModel : 0
+
+                                        delegate: Item {
+                                            id: clipsDelegate
+
+                                            function switchToThisClip(allowToggle) {
+                                                if (zynqtgui.sketchpad.lastSelectedObj != null && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview" && zynqtgui.sketchpad.lastSelectedObj.value === index && zynqtgui.sketchpad.lastSelectedObj.component != null && zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
+                                                    // Clip overview is already selected. Toggle between track/clips view
+                                                    root.resetBottomBar(allowToggle);
+                                                } else {
+                                                    // Clip overview is not selected. Open clips grid view
+                                                    bottomStack.slotsBar.clipsButton.checked = true;
+                                                    zynqtgui.sketchpad.lastSelectedObj.setTo("sketchpad_clipoverview", index, clipCell, clipCell.channel);
+                                                    zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id;
+                                                }
+                                            }
+
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            // Layout.bottomMargin: 1 // Without this magic number, the bottom of clips row doesn't match with left side scenes button or right side copy button
+                                            state: bottomStack.slotsBar.mixerButton.checked ? "MixerMode" : "ClipsMode"
+                                            states: [
+                                                State {
+                                                    name: "ClipsMode"
+
+                                                    PropertyChanges {
+                                                        target: clipCell
+                                                        visible: true
+                                                    }
+
+                                                    PropertyChanges {
+                                                        target: mixerCell
+                                                        visible: false
+                                                    }
+
+                                                },
+                                                State {
+                                                    name: "MixerMode"
+
+                                                    PropertyChanges {
+                                                        target: clipCell
+                                                        visible: false
+                                                    }
+
+                                                    PropertyChanges {
+                                                        target: mixerCell
+                                                        visible: true
+                                                    }
+
+                                                }
+                                            ]
+
+                                            ClipCell {
+                                                id: clipCell
+
+                                                anchors.fill: parent
+                                                channel: model.channel
+                                                backgroundColor: "#000000"
+                                                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                                sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
+                                                pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByClipId(channel.id, channel.selectedClip) : null
+                                                onPressed: {
+                                                    clipsDelegate.switchToThisClip(true);
+                                                }
+
+                                                Connections {
+                                                    target: channel.sceneClip
+                                                    onInCurrentSceneChanged: colorTimer.restart()
+                                                    onPathChanged: colorTimer.restart()
+                                                    onIsPlayingChanged: colorTimer.restart()
+                                                }
+
+                                                Connections {
+                                                    target: channel
+                                                    onConnectedPatternChanged: colorTimer.restart()
+                                                    onTrackTypeChanged: colorTimer.restart()
+                                                    onClipsModelChanged: colorTimer.restart()
+                                                }
+
+                                                Connections {
+                                                    target: clipCell.pattern
+                                                    onLastModifiedChanged: colorTimer.restart()
+                                                    onEnabledChanged: colorTimer.restart()
+                                                }
+
+                                                Connections {
+                                                    target: clipCell.sequence
+                                                    onIsPlayingChanged: colorTimer.restart()
+                                                }
+
+                                                Connections {
+                                                    target: zynqtgui.sketchpad
+                                                    onIsMetronomeRunningChanged: colorTimer.restart()
+                                                }
+
+                                                Connections {
+                                                    target: root.song.scenesModel
+                                                    onSelectedSketchpadSongIndexChanged: colorTimer.restart()
+                                                }
+
+                                                Timer {
+                                                    id: colorTimer
+
+                                                    interval: 10
+                                                    onTriggered: {
+                                                        // update isPlaying
+                                                        if (channel.connectedPattern < 0) {
+                                                            clipCell.isPlaying = channel.sceneClip.isPlaying;
+                                                        } else {
+                                                            var patternIsPlaying = false;
+                                                            if (clipCell.sequence && clipCell.sequence.isPlaying) {
+                                                                if (clipCell.sequence.soloPattern > -1)
+                                                                    patternIsPlaying = (clipCell.sequence.soloPattern == channel.connectedPattern);
+                                                                else if (clipCell.pattern)
+                                                                    patternIsPlaying = clipCell.pattern.enabled;
+                                                            }
+                                                            clipCell.isPlaying = patternIsPlaying && root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col) && zynqtgui.sketchpad.isMetronomeRunning;
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+
+                                            ZUI.SectionGroup {
+                                                id: mixerCell
+                                                padding: 0
+
+                                                anchors.fill: parent
+                                                Item {
+                                                    
+                                                    anchors.fill: parent
+
+                                                    Item {
+                                                        anchors.fill: parent
+                                                        visible: root.showMixerEqualiser === true
+
+
+                                                        // Layout.leftMargin: Kirigami.Units.smallSpacing
+                                                        // Layout.rightMargin: Kirigami.Units.smallSpacing
+                                                        MultiPointTouchArea {
+                                                            id: graphTouchArea
+
+                                                            readonly property int thisTrackIndex: index
+
+                                                            anchors.fill: parent
+                                                            touchPoints: [
+                                                                TouchPoint {
+                                                                    id: slidePoint
+
+                                                                    property QtObject selectedBand: null
+                                                                    property var pressedTime: undefined
+                                                                    readonly property QtObject
+                                                                    eqDoublePressedTimer: Timer {
+                                                                        interval: zynqtgui.ui_settings.doubleClickThreshold
+                                                                        running: false
+                                                                        repeat: false
+                                                                        onTriggered: {
+                                                                            // If we have not been stopped, this will be our single-click action
+                                                                            if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
+                                                                                // If we're already on this track (and also the eq is enabled), cycle to the next band
+
+                                                                                if (equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled)
+                                                                                    slidePoint.ensureSelectedBand(1);
+
+                                                                            } else {
+                                                                                // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
+                                                                                zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    property point startingPoint
+                                                                    property double startingGain
+                                                                    property double startingFrequency
+
+                                                                    // Set the startOffset to 1 to move forward, and 0 to try the current one first
+                                                                    function ensureSelectedBand(startOffset) {
+                                                                        // If there are more than one active bands, cycle to the next one in the list
+                                                                        // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
+                                                                        let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
+                                                                        let currentBandIndex = equaliserSettings.indexOf(slidePoint.selectedBand);
+                                                                        for (let testOffset = startOffset; testOffset < equaliserSettings.length; testOffset++) {
+                                                                            let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
+                                                                            if (testBand.active) {
+                                                                                // This is the next active band in the settings list, select that and bail out
+                                                                                testBand.selected = true;
+                                                                                slidePoint.selectedBand = testBand;
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                        // Also make sure to de-select the compressor, in case that one's selected
+                                                                        passthroughVisualiserItem.source.compressorSettings.selected = false;
+                                                                    }
+
+                                                                    onPressedChanged: {
+                                                                        if (pressed) {
+                                                                            pressedTime = Date.now();
+                                                                            selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
+                                                                            slidePoint.ensureSelectedBand(0);
+                                                                            slidePoint.startingGain = selectedBand.gainAbsolute;
+                                                                            slidePoint.startingFrequency = selectedBand.frequencyAbsolute;
+                                                                            slidePoint.startingPoint.x = slidePoint.x;
+                                                                            slidePoint.startingPoint.y = slidePoint.y;
+                                                                        } else {
+                                                                            // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                                                            if ((Date.now() - pressedTime) < 300) {
+                                                                                if (eqDoublePressedTimer.running) {
+                                                                                    // If we clicked again this quickly, it was a double-click
+                                                                                    eqDoublePressedTimer.stop();
+                                                                                    passthroughVisualiserItem.source.equaliserEnabled = !passthroughVisualiserItem.source.equaliserEnabled;
+                                                                                } else {
+                                                                                    eqDoublePressedTimer.restart();
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    onYChanged: {
+                                                                        if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
+                                                                            // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
+                                                                            if (selectedBand.active === true) {
+                                                                                let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
+                                                                                selectedBand.gainAbsolute = Math.min(Math.max(slidePoint.startingGain - newGain, 0), 1);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    onXChanged: {
+                                                                        if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
+                                                                            // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
+                                                                            if (selectedBand.active === true) {
+                                                                                let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2.5);
+                                                                                selectedBand.frequencyAbsolute = slidePoint.startingFrequency + newFrequency;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+
+                                                            Zynthbox.JackPassthroughVisualiserItem {
+                                                                id: passthroughVisualiserItem
+
+                                                                function getCurrentSelectedBand() {
+                                                                    // Just in case there's nothing active, just pick the first thing in the list
+
+                                                                    let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
+                                                                    let currentObject = null;
+                                                                    for (let slotIndex = 0; slotIndex < equaliserSettings.length; ++slotIndex) {
+                                                                        if (passthroughVisualiserItem.source.compressorSettings.selected || equaliserSettings[slotIndex].selected) {
+                                                                            currentObject = equaliserSettings[slotIndex];
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                    if (currentObject === null)
+                                                                        currentObject = equaliserSettings[0];
+
+                                                                    return currentObject;
+                                                                }
+
+                                                                anchors.fill: parent
+                                                                analyseAudio: false
+                                                                drawDisabledBands: false
+                                                                eqCurveThickness: 2
+                                                                source: root.showMixerEqualiser ? Zynthbox.AudioLevels.tracks[index] : null
+
+                                                                // An overlay for the equaliser disabled state
+                                                                Rectangle {
+                                                                    id: equaliserEnabledVisualiser
+
+                                                                    readonly property QtObject audioLevelsTrack: Zynthbox.AudioLevels.tracks[index]
+
+                                                                    anchors.fill: parent
+                                                                    color: Kirigami.Theme.negativeBackgroundColor
+                                                                    opacity: root.showMixerEqualiser === false ? 0.1 : (audioLevelsTrack.equaliserEnabled ? 0 : 0.5)
+
+                                                                    QQC2.Label {
+                                                                        anchors.centerIn: parent
+                                                                        horizontalAlignment: Text.AlignHCenter
+                                                                        font.bold: true
+                                                                        font.pointSize: 14
+                                                                        text: qsTr("EQ\nOff")
+                                                                    }
+
+                                                                }
+
+                                                            }
+
+                                                        }
+
+                                                    }
+                                                    
+                                                    ColumnLayout {                                                            
+                                                        visible: root.showMixerEqualiser === false
+                                                        anchors.fill: parent
+                                                        spacing: 2
+
+                                                        Item {
+                                                                Layout.fillWidth: true
+                                                            Layout.fillHeight: true
+                                                        QQC2.Pane {
+                                                            anchors.fill: parent
+                                                            padding: 2
+
+                                                            background: Rectangle {
+                                                                color: "#1f2022"
+                                                                radius: 2
+                                                            }
+
+                                                            contentItem: Item {
+                                                                RowLayout {
+                                                                    anchors.fill: parent
+                                                                    QQC2.Dial {         
+                                                                        // Layout.fillWidth: true
+                                                                        implicitWidth: height
+                                                                        Layout.fillHeight: true                                                      
+                                                                        inputMode: QQC2.Dial.Vertical
+                                                                        handle: null
+                                                                        value: applicationWindow().channels[index].wetFx1Amount
+                                                                        stepSize: 1
+                                                                        from: 0
+                                                                        to: 100
+                                                                        onValueChanged: {
+                                                                            applicationWindow().channels[index].wetFx1Amount = value;
+                                                                        }
+                                                                    }
+
+                                                                    QQC2.Label {
+                                                                        Layout.fillWidth: true
+                                                                        Layout.fillHeight: true 
+                                                                        horizontalAlignment: Text.AlignHCenter
+                                                                        verticalAlignment: Text.AlignVCenter
+                                                                        fontSizeMode: Text.Fit
+                                                                        minimumPointSize: 6
+                                                                        font.pointSize: 9
+                                                                        text: qsTr("%1\%").arg(applicationWindow().channels[index].wetFx1Amount)
+                                                                    }
+                                                                }
+
+                                                            }
+                                                        }
+                                                        }
+
+                                                        Item { 
+                                                            Layout.fillWidth: true
+                                                            Layout.fillHeight: true
+                                                        QQC2.Pane {
+                                                            anchors.fill: parent
+                                                            padding: 2
+
+                                                            background: Rectangle {
+                                                                color: "#1f2022"
+                                                                radius: 2
+                                                            }
+
+                                                            contentItem: Item {
+                                                                RowLayout { 
+                                                                    anchors.fill: parent                                                                        
+
+                                                                    QQC2.Label {
+                                                                        Layout.fillWidth: true
+                                                                        Layout.fillHeight: true
+                                                                        horizontalAlignment: Text.AlignHCenter
+                                                                        verticalAlignment: Text.AlignVCenter
+                                                                        fontSizeMode: Text.Fit
+                                                                        minimumPointSize: 6
+                                                                        font.pointSize: 9
+                                                                        text: qsTr("%1\%").arg(applicationWindow().channels[index].wetFx2Amount)
+
+                                                                    }
+
+                                                                    QQC2.Dial {
+                                                                        // Layout.fillWidth: true
+                                                                        implicitWidth: height
+                                                                        Layout.fillHeight: true
+                                                                        inputMode: QQC2.Dial.Vertical
+                                                                        handle: null
+                                                                        value: applicationWindow().channels[index].wetFx2Amount
+                                                                        stepSize: 1
+                                                                        from: 0
+                                                                        to: 100
+                                                                        onValueChanged: {
+                                                                            applicationWindow().channels[index].wetFx2Amount = value;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        }
+
+                                                    }
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                            }
                         }
 
                         ZUI.SectionGroup {
@@ -1979,9 +1971,9 @@ ZUI.ScreenPage {
                             Layout.fillHeight: true
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
-                            contentItem: ColumnLayout {
+                            ColumnLayout {
                                 id: sketchpadCopyPasteButtonsColumn
-
+                                anchors.fill: parent
                                 spacing: ZUI.Theme.spacing
 
                                 // Common copy button to set the object to copy

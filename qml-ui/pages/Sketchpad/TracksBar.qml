@@ -765,7 +765,7 @@ ZUI.SectionPanel {
 
     contentItem: Item {
         RowLayout {
-            spacing: Kirigami.Units.mediumSpacing
+            spacing: ZUI.Theme.sectionSpacing
             anchors.fill: parent
 
             BottomStackTabs {
@@ -817,7 +817,7 @@ ZUI.SectionPanel {
 
                         RowLayout {
                             id: tabButtons
-                            spacing: Kirigami.Units.mediumSpacing 
+                            spacing: ZUI.Theme.sectionSpacing
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -826,7 +826,8 @@ ZUI.SectionPanel {
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
 
-                                contentItem : Kirigami.Heading { 
+                                Kirigami.Heading { 
+                                    anchors.fill: parent
                                     padding: 2                                  
                                     wrapMode: Text.NoWrap
                                     elide: Text.ElideRight
@@ -841,7 +842,8 @@ ZUI.SectionPanel {
                             ZUI.SectionGroup {
                                 Layout.fillHeight: true
 
-                                contentItem : RowLayout {
+                                RowLayout {
+                                    anchors.fill: parent
                                     spacing: ZUI.Theme.spacing
 
                                     ZUI.SectionButton {
@@ -949,8 +951,8 @@ ZUI.SectionPanel {
                                 Layout.fillHeight: true
                                 visible: root.selectedChannel != null && root.selectedChannel.trackType == "synth"
 
-                                contentItem: RowLayout {
-
+                                RowLayout {
+                                    anchors.fill: parent
                                     spacing: ZUI.Theme.spacing
 
                                     QQC2.Switch {
@@ -1063,11 +1065,7 @@ ZUI.SectionPanel {
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter
-                            // Layout.fillHeight: true
-                            // Layout.topMargin: Kirigami.Units.smallSpacing
-                            // Layout.bottomMargin: Kirigami.Units.smallSpacing
-                            spacing: Kirigami.Units.mediumSpacing
-                            
+                            spacing: ZUI.Theme.sectionSpacing                            
 
                             Item {
                                 Layout.fillWidth: true
@@ -1148,7 +1146,7 @@ ZUI.SectionPanel {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 4
-                            spacing: Kirigami.Units.mediumSpacing
+                            spacing: ZUI.Theme.sectionSpacing
 
                             Timer {
                                 id: waveformThrottle
@@ -1212,7 +1210,8 @@ ZUI.SectionPanel {
                                     ZUI.SectionGroup {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        
+                                        mask: true
+                                        fallbackPadding: ZUI.Theme.padding
                                         fallbackBackground:  Rectangle {                                             
                                             border.width: 1
                                             border.color: "#ff999999"
@@ -1220,20 +1219,9 @@ ZUI.SectionPanel {
                                             color: "#222222"
                                         }
 
-                                        contentItem: Item {
+                                        Item {
                                             id: waveItemContainer
-
-                                            layer.enabled: true
-                                            layer.effect: OpacityMask
-                                            {
-                                                maskSource: Rectangle
-                                                {
-                                                    width: waveItemContainer.width
-                                                    height: waveItemContainer.height
-                                                    // radius: ZUI.Theme.radius
-                                                    radius: 4
-                                                }
-                                            }
+                                            anchors.fill: parent
 
                                             MouseArea {
                                                 property var lastMouseX
@@ -1712,7 +1700,8 @@ ZUI.SectionPanel {
                                     ZUI.SectionGroup {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        // mask: true
+                                        mask: true
+                                        fallbackPadding: ZUI.Theme.padding
                                         fallbackBackground:  Rectangle {
                                             border.width: 1
                                             border.color: "#ff999999"
@@ -1720,9 +1709,9 @@ ZUI.SectionPanel {
                                             color: "#222222"
                                         }
 
-                                        contentItem: Item {
+                                        Item {
                                             id: patternVisualiserItem
-
+                                            anchors.fill: parent
                                             clip: true
 
                                             visible: root.pattern != null

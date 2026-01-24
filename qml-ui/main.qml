@@ -782,404 +782,746 @@ Kirigami.AbstractApplicationWindow {
     onWidthChanged: width = screen.width
     onHeightChanged: height = screen.height
     pageStack: pageManager
-    header: ZUI.SectionPanel {
 
-        implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
 
-        contentItem: RowLayout {
-            spacing: Kirigami.Units.mediumSpacing
+    Component {
+        id: _breadCrumbSectionComponent
+        QQC2.Control {
+            Layout.fillHeight: true
 
-            ZUI.SectionGroup {
-                Layout.fillHeight: true
-
-                contentItem : RowLayout {
-                    spacing: ZUI.Theme.spacing
-                    
-                    ZUI.SectionButton {
-                        id: menuButton
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                        icon.width: 24
-                        icon.height: 24
-                        icon.name: "application-menu"
-                        icon.color: checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
-                        
-                        property string oldPage: "sketchpad"
-                        property string oldModalPage: "sketchpad"
-                        onClicked: {
-                            if (zynqtgui.current_screen_id === 'main') {
-                                if (oldModalPage !== "") {
-                                    zynqtgui.current_modal_screen_id = oldModalPage;
-                                } else if (oldPage !== "") {
-                                    zynqtgui.current_screen_id = oldPage;
-                                }
-                            } else {
-                                if (zynqtgui.current_screen_id === "control") {
-                                    oldModalPage = "";
-                                    oldPage = "preset"
-                                } else {
-                                    oldModalPage = zynqtgui.current_modal_screen_id;
-                                    oldPage = zynqtgui.current_screen_id;
-                                }
-                                zynqtgui.current_screen_id = 'main';
+            padding: 0
+            clip: true
+            background: null
+            contentItem: RowLayout
+            {
+                spacing: 0
+                ZUI.BreadcrumbButton {
+                    id: menuButton
+                    icon.width: 24
+                    icon.height: 24
+                    icon.name: "application-menu"
+                    icon.color: Kirigami.Theme.textColor
+                    padding: Kirigami.Units.largeSpacing*1.5
+                    rightPadding: Kirigami.Units.largeSpacing*1.5
+                    property string oldPage: "sketchpad"
+                    property string oldModalPage: "sketchpad"
+                    onClicked: {
+                        if (zynqtgui.current_screen_id === 'main') {
+                            if (oldModalPage !== "") {
+                                zynqtgui.current_modal_screen_id = oldModalPage;
+                            } else if (oldPage !== "") {
+                                zynqtgui.current_screen_id = oldPage;
                             }
+                        } else {
+                            if (zynqtgui.current_screen_id === "control") {
+                                oldModalPage = "";
+                                oldPage = "preset"
+                            } else {
+                                oldModalPage = zynqtgui.current_modal_screen_id;
+                                oldPage = zynqtgui.current_screen_id;
+                            }
+                            zynqtgui.current_screen_id = 'main';
                         }
-                        checked: highlighted
-                        highlighted: zynqtgui.current_screen_id === 'main'
+                    }
+                    highlighted: zynqtgui.current_screen_id === 'main'
+                }
+                ZUI.BreadcrumbButton {
+                    id: homeButton
+                    Layout.minimumWidth: Kirigami.Units.gridUnit * 6
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    padding: Kirigami.Units.largeSpacing*1.5
+                    rightPadding: Kirigami.Units.largeSpacing*1.5
+                    font.pointSize: 11
+                    onClicked: {
+                        if (zynqtgui.current_modal_screen_id == "sketchpad") {
+                            root.showMessageDialog(zynqtgui.sketchpad.song.sketchpadFolder+zynqtgui.sketchpad.song.name+".sketchpad.json", 0)
+                        } else {
+                            zynqtgui.current_modal_screen_id = 'sketchpad'
+                        }
+                    }
+                    QQC2.Label {
+                        anchors.fill: parent
+                        anchors.margins: Kirigami.Units.largeSpacing
+                        horizontalAlignment: QQC2.Label.AlignHCenter
+                        verticalAlignment: QQC2.Label.AlignVCenter
+                        elide: Text.ElideMiddle
+                        wrapMode: QQC2.Label.WrapAnywhere
+                        font.pointSize: 10
+                        minimumPointSize: 5
+                        fontSizeMode: Text.Fit
+                        maximumLineCount: 3
+                        text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
                     }
 
-                    ZUI.SectionButton {
-                        id: homeButton
-                        Layout.minimumWidth: Kirigami.Units.gridUnit * 6
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                        Layout.fillHeight: true
-                        padding: 4
-                        // rightPadding: Kirigami.Units.largeSpacing*1.5
-                        // font.pointSize: 11
-                        checked: highlighted
-                        highlighted: zynqtgui.current_modal_screen_id == "sketchpad"
-                        onClicked: {
-                            if (zynqtgui.current_modal_screen_id == "sketchpad") {
-                                root.showMessageDialog(zynqtgui.sketchpad.song.sketchpadFolder+zynqtgui.sketchpad.song.name+".sketchpad.json", 0)
-                            } else {
-                                zynqtgui.current_modal_screen_id = 'sketchpad'
+                    ZUI.Menu {
+                        id: tracksMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: 10
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Track T%1").arg(index+1)
+                                width: parent.width
+                                font.pointSize: 11
+                                onClicked: {
+                                    tracksMenu.close();
+                                    zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = index;
+                                }
+                                highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex === index
                             }
                         }
-                        text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
+                    }
+                }
+                ZUI.BreadcrumbButton {
+                    id: sceneButton
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                    onClicked: scenesMenu.visible = true
 
-                        // QQC2.Label {
-                        //     anchors.fill: parent
-                        //     // anchors.margins: Kirigami.Units.largeSpacing
-                        //     horizontalAlignment: QQC2.Label.AlignHCenter
-                        //     verticalAlignment: QQC2.Label.AlignVCenter
-                        //     elide: Text.ElideMiddle
-                        //     wrapMode: QQC2.Label.WrapAnywhere
-                        //     font.pointSize: 10
-                        //     minimumPointSize: 5
-                        //     fontSizeMode: Text.Fit
-                        //     maximumLineCount: 3
-                        //     text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
-                        // }
+                    Timer {
+                        id: switchTimer
 
-                        ZUI.Menu {
-                            id: tracksMenu
-                            y: parent.height
-                            modal: true
-                            dim: false
-                            Repeater {
-                                model: 10
-                                delegate: QQC2.MenuItem {
-                                    text: qsTr("Track T%1").arg(index+1)
-                                    width: parent.width
-                                    font.pointSize: 11
-                                    onClicked: {
-                                        tracksMenu.close();
-                                        zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = index;
-                                    }
-                                    highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex === index
+                        property int index
+
+                        interval: 100
+                        repeat: false
+                        onTriggered: {
+                            ZUI.CommonUtils.switchToScene(index)
+                        }
+                    }
+
+                    ZUI.Menu {
+                        id: scenesMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: 10
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
+                                width: parent.width
+                                font.pointSize: 11
+                                onClicked: {
+                                    scenesMenu.close();
+                                    switchTimer.index = index;
+                                    switchTimer.restart();
                                 }
+                                highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSceneIndex === index
+                                //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
+                            }
+                        }
+                    }
+                }
+                ZUI.BreadcrumbButton {
+                    id: channelButton
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("Track %1 ˬ")
+                    .arg(zynqtgui.sketchpad.selectedTrackId+1)
+
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                    onClicked: channelsMenu.visible = true
+                    ZUI.Menu {
+                        id: channelsMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Component.onCompleted: zynqtgui.fixed_layers.layers_count = 15;
+                        Repeater {
+                            model: zynqtgui.sketchpad.song.channelsModel
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Track %1").arg(index + 1)
+                                width: parent.width
+                                onClicked: {
+                                    zynqtgui.sketchpad.selectedTrackId = index;
+                                }
+                                highlighted: zynqtgui.sketchpad.selectedTrackId === index
+                            }
+                        }
+                    }
+                }
+                ZUI.BreadcrumbButton {
+                    id: samplesButton
+
+                    property QtObject selectedSample: null
+                    Timer {
+                        id: samplesButtonThrottle
+                        interval: 1; running: false; repeat: false;
+                        onTriggered: {
+                            root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                        }
+                    }
+                    Connections {
+                        target: root.selectedChannel
+                        onSamples_changed: samplesButtonThrottle.restart()
+                        onSelectedSlotRowChanged: samplesButtonThrottle.restart()
+                    }
+                    Component.onCompleted: {
+                        samplesButtonThrottle.restart();
+                    }
+
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("Sample %1 ˬ %2")
+                    .arg(root.selectedChannel.selectedSlotRow + 1)
+                    .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 11
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                    onClicked: samplesMenu.visible = true
+                    visible: root.selectedChannel.trackType == "sample-trig"
+
+                    ZUI.Menu {
+                        id: samplesMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: 5
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Sample %1").arg(index + 1)
+                                width: parent.width
+                                onClicked: {
+                                    root.selectedChannel.selectedSlotRow = index
+                                }
+                                highlighted: root.selectedChannel.selectedSlotRow === index
+                            }
+                        }
+                    }
+                }
+                ZUI.BreadcrumbButton {
+                    id: sampleLoopButton
+
+                    property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                    visible: root.selectedChannel.trackType === "sample-loop"
+                }
+                ZUI.BreadcrumbButton {
+                    id: synthButton
+                    icon.color: Kirigami.Theme.textColor
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                    visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
+                    Component.onCompleted: synthButton.updateSoundName();
+                    // Open preset screen on clicking this synth button
+                    onClicked: {
+                        if (zynqtgui.curlayerIsFX) {
+                            zynqtgui.show_screen("effect_preset")
+                        } else {
+                            zynqtgui.show_screen("preset")
+                        }
+                    }
+
+                    Connections {
+                        target: zynqtgui.fixed_layers
+                        onList_updated: {
+                            synthButton.updateSoundName();
+                        }
+                    }
+                    Timer {
+                        id: synthButtonSoundNameThrottle
+                        interval: 0; repeat: false; running: false;
+                        onTriggered: {
+                            synthButton.text = zynqtgui.curlayerEngineName.length > 0 ? zynqtgui.curlayerEngineName : "";
+                        }
+                    }
+                    function updateSoundName() {
+                        synthButtonSoundNameThrottle.restart();
+                    }
+                }
+                ZUI.BreadcrumbButton {
+                    id: presetButton
+                    icon.color: Kirigami.Theme.textColor
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                    visible: root.selectedChannel.trackType === "synth" && synthButton.visible
+                    onClicked: {
+                        // Open synth edit page whjen preset button is clicked
+                        zynqtgui.current_screen_id = "control";
+                        zynqtgui.forced_screen_back = "sketchpad"
+                    }
+
+                    Connections {
+                        target: zynqtgui.fixed_layers
+                        onList_updated: presetButton.updateSoundName()
+                    }
+                    Component.onCompleted: presetButton.updateSoundName()
+
+                    function updateSoundName() {
+                        presetButtonTextThrottle.restart()
+                    }
+                    Timer {
+                        id: presetButtonTextThrottle
+                        interval: 0; running: false; repeat: false;
+                        onTriggered: {
+                            presetButton.text = zynqtgui.curlayerPresetName.length > 0 ? zynqtgui.curlayerPresetName : qsTr("Presets");
+                        }
+                    }
+                }
+                ZUI.BreadcrumbButton {
+                    icon.color: Kirigami.Theme.textColor
+                    text: {
+                        switch (effectScreen) {
+                        case "layer_midi_effects":
+                        case "midi_effect_types":
+                        case "layer_midi_effect_chooser":
+                            return "MIDI FX";
+                        default:
+                            "Audio FX";
+                        }
+                    }
+                    visible: {
+                        switch (zynqtgui.current_screen_id) {
+                        case "layer_effects":
+                        case "effect_types":
+                        case "layer_effect_chooser":
+                        case "layer_midi_effects":
+                        case "midi_effect_types":
+                        case "layer_midi_effect_chooser":
+                            return true;
+                        default:
+                            return false //screensLayer.depth > 2
+                        }
+                    }
+                    property string effectScreen: ""
+                    readonly property string screenId: zynqtgui.current_screen_id
+                    onScreenIdChanged: {
+                        switch (zynqtgui.current_screen_id) {
+                        case "layer_effects":
+                        case "effect_types":
+                        case "layer_effect_chooser":
+                        case "layer_midi_effects":
+                        case "midi_effect_types":
+                        case "layer_midi_effect_chooser":
+                            effectScreen = zynqtgui.current_screen_id;
+                        default:
+                            break;
+                        }
+                    }
+                    onClicked: zynqtgui.current_screen_id = effectScreen
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                }
+                ZUI.BreadcrumbButton {
+                    icon.color: Kirigami.Theme.textColor
+                    text: "EDIT"
+                    visible: zynqtgui.current_screen_id === "control"
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 4
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    font.pointSize: 11
+                }
+            }
+        }
+    }     
+
+    Component {
+        id: _groupSectionComponent1
+        ZUI.SectionGroup {
+
+            RowLayout {
+                anchors.fill: parent
+                spacing: ZUI.Theme.spacing
+                
+                ZUI.SectionButton {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                    icon.width: 24
+                    icon.height: 24
+                    icon.name: "application-menu"
+                    icon.color: checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                    
+                    property string oldPage: "sketchpad"
+                    property string oldModalPage: "sketchpad"
+                    onClicked: {
+                        if (zynqtgui.current_screen_id === 'main') {
+                            if (oldModalPage !== "") {
+                                zynqtgui.current_modal_screen_id = oldModalPage;
+                            } else if (oldPage !== "") {
+                                zynqtgui.current_screen_id = oldPage;
+                            }
+                        } else {
+                            if (zynqtgui.current_screen_id === "control") {
+                                oldModalPage = "";
+                                oldPage = "preset"
+                            } else {
+                                oldModalPage = zynqtgui.current_modal_screen_id;
+                                oldPage = zynqtgui.current_screen_id;
+                            }
+                            zynqtgui.current_screen_id = 'main';
+                        }
+                    }
+                    checked: highlighted
+                    highlighted: zynqtgui.current_screen_id === 'main'
+                }
+
+                ZUI.SectionButton {
+                    Layout.minimumWidth: Kirigami.Units.gridUnit * 6
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    Layout.fillHeight: true
+                    padding: 4
+                    checked: highlighted
+                    highlighted: zynqtgui.current_modal_screen_id == "sketchpad"
+                    onClicked: {
+                        if (zynqtgui.current_modal_screen_id == "sketchpad") {
+                            root.showMessageDialog(zynqtgui.sketchpad.song.sketchpadFolder+zynqtgui.sketchpad.song.name+".sketchpad.json", 0)
+                        } else {
+                            zynqtgui.current_modal_screen_id = 'sketchpad'
+                        }
+                    }
+                    text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
+
+                    ZUI.Menu {
+                        id: tracksMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: 10
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Track T%1").arg(index+1)
+                                width: parent.width
+                                font.pointSize: 11
+                                onClicked: {
+                                    tracksMenu.close();
+                                    zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = index;
+                                }
+                                highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex === index
                             }
                         }
                     }
                 }
             }
+        }
+    }
 
-            ZUI.SectionGroup {
-                Layout.fillHeight: true
+    Component {
+        id: _groupSectionComponent2
+        ZUI.SectionGroup {
+            RowLayout
+            {
+                spacing: ZUI.Theme.spacing
+                anchors.fill: parent
+                
+                ZUI.SectionButton {
+                    // icon.color: Kirigami.Theme.textColor
+                    text: qsTr("Scene %1").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
 
-                contentItem: RowLayout
-                {
-                    spacing: ZUI.Theme.spacing
-                    
-                    ZUI.SectionButton {
-                        id: sceneButton
-                        // icon.color: Kirigami.Theme.textColor
-                        text: qsTr("Scene %1").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
-                        Layout.fillHeight: true
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
 
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        leftPadding: rightPadding 
+                    font.pointSize: 11
+                    onClicked: scenesMenu.visible = true
+                    checked: highlighted
+                    highlighted: scenesMenu.visible
+                    showIndicator: true
 
-                        font.pointSize: 11
-                        onClicked: scenesMenu.visible = true
-                        checked: highlighted
-                        highlighted: scenesMenu.visible
-                        showIndicator: true
+                    Timer {
+                        id: switchTimer
 
-                        Timer {
-                            id: switchTimer
+                        property int index
 
-                            property int index
-
-                            interval: 100
-                            repeat: false
-                            onTriggered: {
-                                ZUI.CommonUtils.switchToScene(index)
-                            }
+                        interval: 100
+                        repeat: false
+                        onTriggered: {
+                            ZUI.CommonUtils.switchToScene(index)
                         }
+                    }
 
-                        ZUI.Menu {
-                            id: scenesMenu
-                            y: parent.height
-                            modal: true
-                            dim: false
-                            Repeater {
-                                model: 10
-                                delegate: QQC2.MenuItem {
-                                    text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
-                                    width: parent.width
-                                    font.pointSize: 11
-                                    onClicked: {
-                                        scenesMenu.close();
-                                        switchTimer.index = index;
-                                        switchTimer.restart();
-                                    }
-                                    highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSceneIndex === index
-                                    //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
+                    ZUI.Menu {
+                        id: scenesMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: 10
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
+                                width: parent.width
+                                font.pointSize: 11
+                                onClicked: {
+                                    scenesMenu.close();
+                                    switchTimer.index = index;
+                                    switchTimer.restart();
                                 }
+                                highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSceneIndex === index
+                                //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                             }
                         }
                     }
-
-                    ZUI.SectionButton {
-                        id: channelButton
-                        icon.color: Kirigami.Theme.textColor
-                        text: qsTr("Track %1").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                        checked: highlighted
-                        highlighted: channelsMenu.visible
-                        showIndicator: true
-
-                        Layout.fillHeight: true
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        leftPadding: rightPadding 
-
-                        font.pointSize: 11
-                        onClicked: channelsMenu.visible = true
-
-                        ZUI.Menu {
-                            id: channelsMenu
-                            y: parent.height
-                            modal: true
-                            dim: false
-                            Component.onCompleted: zynqtgui.fixed_layers.layers_count = 15;
-                            Repeater {
-                                model: zynqtgui.sketchpad.song.channelsModel
-                                delegate: QQC2.MenuItem {
-                                    text: qsTr("Track %1").arg(index + 1)
-                                    width: parent.width
-                                    onClicked: {
-                                        zynqtgui.sketchpad.selectedTrackId = index;
-                                    }
-                                    highlighted: zynqtgui.sketchpad.selectedTrackId === index
-                                }
-                            }
-                        }
-                    }
-
-                    ZUI.SectionButton {
-                        id: samplesButton
-
-                        property QtObject selectedSample: null
-                        Timer {
-                            id: samplesButtonThrottle
-                            interval: 1; running: false; repeat: false;
-                            onTriggered: {
-                                root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
-                            }
-                        }
-                        Connections {
-                            target: root.selectedChannel
-                            onSamples_changed: samplesButtonThrottle.restart()
-                            onSelectedSlotRowChanged: samplesButtonThrottle.restart()
-                        }
-                        Component.onCompleted: {
-                            samplesButtonThrottle.restart();
-                        }
-
-                        icon.color: Kirigami.Theme.textColor
-                        text: qsTr("Sample %1 ˬ %2")
-                        .arg(root.selectedChannel.selectedSlotRow + 1)
-                        .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
-                        Layout.fillHeight: true
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 11
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        leftPadding: rightPadding 
-                        font.pointSize: 11
-                        onClicked: samplesMenu.visible = true
-                        visible: root.selectedChannel.trackType == "sample-trig"
-
-                        ZUI.Menu {
-                            id: samplesMenu
-                            y: parent.height
-                            modal: true
-                            dim: false
-                            Repeater {
-                                model: 5
-                                delegate: QQC2.MenuItem {
-                                    text: qsTr("Sample %1").arg(index + 1)
-                                    width: parent.width
-                                    onClicked: {
-                                        root.selectedChannel.selectedSlotRow = index
-                                    }
-                                    highlighted: root.selectedChannel.selectedSlotRow === index
-                                }
-                            }
-                        }
-                    }
-                    ZUI.SectionButton {
-                        id: sampleLoopButton
-
-                        property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-
-                        icon.color: Kirigami.Theme.textColor
-                        text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
-                        Layout.fillHeight: true
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 10
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        leftPadding: rightPadding 
-                        font.pointSize: 11
-                        visible: root.selectedChannel.trackType === "sample-loop"
-                    }
-
-                    ZUI.SectionButton {
-                        id: synthButton
-                        icon.color: Kirigami.Theme.textColor
-                        Layout.fillHeight: true
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        leftPadding: rightPadding 
-                        font.pointSize: 11
-                        visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
-                        Component.onCompleted: synthButton.updateSoundName();
-
-                        highlighted: zynqtgui.current_screen_id === "layer_midi_effect_chooser"
-                        checked: highlighted
-
-                        // Open preset screen on clicking this synth button
-                        onClicked: {
-                            if (zynqtgui.curlayerIsFX) {
-                                zynqtgui.show_screen("effect_preset")
-                            } else {
-                                zynqtgui.show_screen("preset")
-                            }
-                        }
-
-                        Connections {
-                            target: zynqtgui.fixed_layers
-                            onList_updated: {
-                                synthButton.updateSoundName();
-                            }
-                        }
-                        Timer {
-                            id: synthButtonSoundNameThrottle
-                            interval: 0; repeat: false; running: false;
-                            onTriggered: {
-                                synthButton.text = zynqtgui.curlayerEngineName.length > 0 ? zynqtgui.curlayerEngineName : "";
-                            }
-                        }
-                        function updateSoundName() {
-                            synthButtonSoundNameThrottle.restart();
-                        }
-                    }
-
-                    ZUI.SectionButton {
-                        id: presetButton
-                        icon.color: Kirigami.Theme.textColor
-                        Layout.fillHeight: true
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        leftPadding: rightPadding 
-                        font.pointSize: 11
-                        visible: root.selectedChannel.trackType === "synth" && synthButton.visible
-
-                        highlighted: zynqtgui.current_screen_id === "control"
-                        checked: highlighted
-
-                        onClicked: {
-                            // Open synth edit page whjen preset button is clicked
-                            zynqtgui.current_screen_id = "control";
-                            zynqtgui.forced_screen_back = "sketchpad"
-                        }
-
-                        Connections {
-                            target: zynqtgui.fixed_layers
-                            onList_updated: presetButton.updateSoundName()
-                        }
-                        Component.onCompleted: presetButton.updateSoundName()
-
-                        function updateSoundName() {
-                            presetButtonTextThrottle.restart()
-                        }
-                        Timer {
-                            id: presetButtonTextThrottle
-                            interval: 0; running: false; repeat: false;
-                            onTriggered: {
-                                presetButton.text = zynqtgui.curlayerPresetName.length > 0 ? zynqtgui.curlayerPresetName : qsTr("Presets");
-                            }
-                        }
-                    }
-                    
-                    ZUI.SectionButton {
-                        icon.color: Kirigami.Theme.textColor
-                        text: {
-                            switch (effectScreen) {
-                            case "layer_midi_effects":
-                            case "midi_effect_types":
-                            case "layer_midi_effect_chooser":
-                                return "MIDI FX";
-                            default:
-                                "Audio FX";
-                            }
-                        }
-                        visible: {
-                            switch (zynqtgui.current_screen_id) {
-                            case "layer_effects":
-                            case "effect_types":
-                            case "layer_effect_chooser":
-                            case "layer_midi_effects":
-                            case "midi_effect_types":
-                            case "layer_midi_effect_chooser":
-                                return true;
-                            default:
-                                return false //screensLayer.depth > 2
-                            }
-                        }
-                        property string effectScreen: ""
-                        readonly property string screenId: zynqtgui.current_screen_id
-                        onScreenIdChanged: {
-                            switch (zynqtgui.current_screen_id) {
-                            case "layer_effects":
-                            case "effect_types":
-                            case "layer_effect_chooser":
-                            case "layer_midi_effects":
-                            case "midi_effect_types":
-                            case "layer_midi_effect_chooser":
-                                effectScreen = zynqtgui.current_screen_id;
-                            default:
-                                break;
-                            }
-                        }
-                        onClicked: zynqtgui.current_screen_id = effectScreen
-                        Layout.fillHeight: true
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                        rightPadding: Kirigami.Units.largeSpacing*2
-                        leftPadding: rightPadding 
-                        font.pointSize: 11
-                    }
-                    // ZUI.SectionButton {
-                    //     icon.color: Kirigami.Theme.textColor
-                    //     text: "EDIT"
-                    //     visible: zynqtgui.current_screen_id === "control"
-                    //     Layout.fillHeight: true
-                    //     Layout.maximumWidth: Kirigami.Units.gridUnit * 4
-                    //     rightPadding: Kirigami.Units.largeSpacing*2
-                    //     leftPadding: rightPadding 
-                    //     font.pointSize: 11
-                    // }
                 }
+
+                ZUI.SectionButton {
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("Track %1").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                    checked: highlighted
+                    highlighted: channelsMenu.visible
+                    showIndicator: true
+
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+
+                    font.pointSize: 11
+                    onClicked: channelsMenu.visible = true
+
+                    ZUI.Menu {
+                        id: channelsMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Component.onCompleted: zynqtgui.fixed_layers.layers_count = 15;
+                        Repeater {
+                            model: zynqtgui.sketchpad.song.channelsModel
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Track %1").arg(index + 1)
+                                width: parent.width
+                                onClicked: {
+                                    zynqtgui.sketchpad.selectedTrackId = index;
+                                }
+                                highlighted: zynqtgui.sketchpad.selectedTrackId === index
+                            }
+                        }
+                    }
+                }
+
+                ZUI.SectionButton {
+                    property QtObject selectedSample: null
+                    Timer {
+                        id: samplesButtonThrottle
+                        interval: 1; running: false; repeat: false;
+                        onTriggered: {
+                            root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                        }
+                    }
+                    Connections {
+                        target: root.selectedChannel
+                        onSamples_changed: samplesButtonThrottle.restart()
+                        onSelectedSlotRowChanged: samplesButtonThrottle.restart()
+                    }
+                    Component.onCompleted: {
+                        samplesButtonThrottle.restart();
+                    }
+
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("Sample %1 ˬ %2")
+                    .arg(root.selectedChannel.selectedSlotRow + 1)
+                    .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 11
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+                    font.pointSize: 11
+                    onClicked: samplesMenu.visible = true
+                    visible: root.selectedChannel.trackType == "sample-trig"
+
+                    ZUI.Menu {
+                        id: samplesMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: 5
+                            delegate: QQC2.MenuItem {
+                                text: qsTr("Sample %1").arg(index + 1)
+                                width: parent.width
+                                onClicked: {
+                                    root.selectedChannel.selectedSlotRow = index
+                                }
+                                highlighted: root.selectedChannel.selectedSlotRow === index
+                            }
+                        }
+                    }
+                }
+
+                ZUI.SectionButton {
+
+                    property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+                    font.pointSize: 11
+                    visible: root.selectedChannel.trackType === "sample-loop"
+                }
+
+                ZUI.SectionButton {
+                    id: synthButton
+                    icon.color: Kirigami.Theme.textColor
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+                    font.pointSize: 11
+                    visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
+                    Component.onCompleted: synthButton.updateSoundName();
+
+                    highlighted: zynqtgui.current_screen_id === "layer_midi_effect_chooser"
+                    checked: highlighted
+
+                    // Open preset screen on clicking this synth button
+                    onClicked: {
+                        if (zynqtgui.curlayerIsFX) {
+                            zynqtgui.show_screen("effect_preset")
+                        } else {
+                            zynqtgui.show_screen("preset")
+                        }
+                    }
+
+                    Connections {
+                        target: zynqtgui.fixed_layers
+                        onList_updated: {
+                            synthButton.updateSoundName();
+                        }
+                    }
+                    Timer {
+                        id: synthButtonSoundNameThrottle
+                        interval: 0; repeat: false; running: false;
+                        onTriggered: {
+                            synthButton.text = zynqtgui.curlayerEngineName.length > 0 ? zynqtgui.curlayerEngineName : "";
+                        }
+                    }
+                    function updateSoundName() {
+                        synthButtonSoundNameThrottle.restart();
+                    }
+                }
+
+                ZUI.SectionButton {
+                    id: presetButton
+                    icon.color: Kirigami.Theme.textColor
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+                    font.pointSize: 11
+                    visible: root.selectedChannel.trackType === "synth" && synthButton.visible
+
+                    highlighted: zynqtgui.current_screen_id === "control"
+                    checked: highlighted
+
+                    onClicked: {
+                        // Open synth edit page whjen preset button is clicked
+                        zynqtgui.current_screen_id = "control";
+                        zynqtgui.forced_screen_back = "sketchpad"
+                    }
+
+                    Connections {
+                        target: zynqtgui.fixed_layers
+                        onList_updated: presetButton.updateSoundName()
+                    }
+                    Component.onCompleted: presetButton.updateSoundName()
+
+                    function updateSoundName() {
+                        presetButtonTextThrottle.restart()
+                    }
+                    Timer {
+                        id: presetButtonTextThrottle
+                        interval: 0; running: false; repeat: false;
+                        onTriggered: {
+                            presetButton.text = zynqtgui.curlayerPresetName.length > 0 ? zynqtgui.curlayerPresetName : qsTr("Presets");
+                        }
+                    }
+                }
+                
+                ZUI.SectionButton {
+                    icon.color: Kirigami.Theme.textColor
+                    text: {
+                        switch (effectScreen) {
+                        case "layer_midi_effects":
+                        case "midi_effect_types":
+                        case "layer_midi_effect_chooser":
+                            return "MIDI FX";
+                        default:
+                            "Audio FX";
+                        }
+                    }
+                    visible: {
+                        switch (zynqtgui.current_screen_id) {
+                        case "layer_effects":
+                        case "effect_types":
+                        case "layer_effect_chooser":
+                        case "layer_midi_effects":
+                        case "midi_effect_types":
+                        case "layer_midi_effect_chooser":
+                            return true;
+                        default:
+                            return false //screensLayer.depth > 2
+                        }
+                    }
+                    property string effectScreen: ""
+                    readonly property string screenId: zynqtgui.current_screen_id
+                    onScreenIdChanged: {
+                        switch (zynqtgui.current_screen_id) {
+                        case "layer_effects":
+                        case "effect_types":
+                        case "layer_effect_chooser":
+                        case "layer_midi_effects":
+                        case "midi_effect_types":
+                        case "layer_midi_effect_chooser":
+                            effectScreen = zynqtgui.current_screen_id;
+                        default:
+                            break;
+                        }
+                    }
+                    onClicked: zynqtgui.current_screen_id = effectScreen
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+                    font.pointSize: 11
+                }
+            }
+        }
+    }
+
+    header: ZUI.SectionPanel {
+
+        implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
+        leftPadding: ZUI.Theme.useBreadcrumb ? 0 : rightPadding
+
+        contentItem: RowLayout {
+            spacing: ZUI.Theme.sectionSpacing
+
+            Loader {
+                active: ZUI.Theme.useBreadcrumb
+                visible: active
+                sourceComponent: _breadCrumbSectionComponent
+                Layout.fillHeight: true
+                Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
+            }
+
+            Loader {
+                active: !ZUI.Theme.useBreadcrumb
+                visible: active
+                sourceComponent: _groupSectionComponent1
+                Layout.fillHeight: true
+                Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
+            }
+
+            Loader {
+                active: !ZUI.Theme.useBreadcrumb
+                visible: active
+                sourceComponent: _groupSectionComponent2
+                Layout.fillHeight: true
+                Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
             }
 
             Item {
@@ -1187,28 +1529,10 @@ Kirigami.AbstractApplicationWindow {
             }
 
             ZUI.SectionGroup {
-                // Layout.preferredHeight: Kirigami.Units.gridUnit*2
                 Layout.fillHeight: true
-                // topPadding: svgBg2.topPadding
-                // bottomPadding: svgBg2.bottomPadding
-                // leftPadding: svgBg2.leftPadding
-                // rightPadding: svgBg2.rightPadding
-                // background: PlasmaCore.FrameSvgItem {
-                //             id: svgBg2
-                //             visible: fromCurrentTheme
-                //             anchors.fill: parent
 
-                //             readonly property real leftPadding: margins.left
-                //             readonly property real rightPadding: margins.right
-                //             readonly property real topPadding: margins.top
-                //             readonly property real bottomPadding: margins.bottom
-
-                //             imagePath: "widgets/statusinfo_background"
-                //             //colorGroup: PlasmaCore.Theme.ViewColorGroup
-                //             prefix: root.highlighted ? ["focus", ""] : ""
-                //             colorGroup: PlasmaCore.Theme.ViewColorGroup
-                //         }
-                contentItem: Row {
+                Row {
+                    anchors.fill: parent
                     spacing: ZUI.Theme.spacing
 
                     ZUI.SectionButton {

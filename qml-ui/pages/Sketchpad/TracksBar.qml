@@ -1213,26 +1213,12 @@ ZUI.SectionPanel {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         
-                                        // background: Item {
-
-                                        //     Rectangle {
-                                        //         visible: !svgBg.fromCurrentTheme
-                                        //         anchors.fill: parent
-                                        //         border.width: 1
-                                        //         border.color: "#ff999999"
-                                        //         radius: ZUI.Theme.radius
-                                        //         color: "#222222"
-                                        //     }
-
-                                        //     PlasmaCore.FrameSvgItem {
-                                        //         id: svgBg
-                                        //         anchors.fill: parent
-                                        //         readonly property bool highlighted: false
-                                        //         imagePath: "widgets/tracks_view_background"
-                                        //         colorGroup: PlasmaCore.Theme.ViewColorGroup
-                                        //         prefix: svgBg.highlighted ? ["focus", ""] : ""
-                                        //     }
-                                        // }
+                                        fallbackBackground:  Rectangle {                                             
+                                            border.width: 1
+                                            border.color: "#ff999999"
+                                            radius: ZUI.Theme.radius
+                                            color: "#222222"
+                                        }
 
                                         contentItem: Item {
                                             id: waveItemContainer
@@ -1726,31 +1712,13 @@ ZUI.SectionPanel {
                                     ZUI.SectionGroup {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        mask: true
-                                        // Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                        // padding: 1
-
-                                        // background: Item {
-
-                                        //     Rectangle {
-                                        //         visible: !svgBg2.fromCurrentTheme
-                                        //         anchors.fill: parent
-                                        //         border.width: 1
-                                        //         border.color: "#ff999999"
-                                        //         radius: ZUI.Theme.radius
-                                        //         color: "#222222"
-                                        //     }
-
-                                        //     PlasmaCore.FrameSvgItem {
-                                        //         id: svgBg2
-                                        //         anchors.fill: parent
-                                        //         readonly property bool highlighted: false
-
-                                        //         imagePath: "widgets/tracks_view_background"
-                                        //         colorGroup: PlasmaCore.Theme.ViewColorGroup
-                                        //         prefix: svgBg2.highlighted ? ["focus", ""] : ""
-                                        //     }
-                                        // }
+                                        // mask: true
+                                        fallbackBackground:  Rectangle {
+                                            border.width: 1
+                                            border.color: "#ff999999"
+                                            radius: ZUI.Theme.radius
+                                            color: "#222222"
+                                        }
 
                                         contentItem: Item {
                                             id: patternVisualiserItem

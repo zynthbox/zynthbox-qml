@@ -70,11 +70,11 @@ ZUI.SectionGroup
 
         onClicked: zynqtgui.globalPopupOpened = true
 
-        Rectangle {
-            anchors.fill: parent
-            color: "#1a1b1d"
-            radius: 2
-        }
+        // Rectangle {
+        //     anchors.fill: parent
+        //     color: "#1a1b1d"
+        //     radius: 2
+        // }
 
         RowLayout {
             anchors.fill: parent

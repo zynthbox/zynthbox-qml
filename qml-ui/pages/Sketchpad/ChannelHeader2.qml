@@ -30,15 +30,14 @@ import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-
 import io.zynthbox.ui 1.0 as ZUI
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-QQC2.Control {
+ZUI.CellControl {
     id: root
 
-    property string text
+    // property string text
     property var subText
     property var subSubText
     property QtObject channel
@@ -46,18 +45,17 @@ QQC2.Control {
     property var subTextSize
     property var subSubTextSize
     property color color: Kirigami.Theme.backgroundColor
-    property bool highlighted: false
     property bool highlightOnFocus: true
-    property color highlightColor: Kirigami.Theme.highlightColor
-    property bool synthDetailsVisible: true
+     property bool synthDetailsVisible: true
     property bool active: true
+
+    highlightColor: Kirigami.Theme.highlightColor
+    highlighted: (root.highlightOnFocus && root.activeFocus)   
 
     property alias columnContent: _columnContent.data
 
-    signal clicked()
-    signal doubleClicked()
-
-    padding: 1
+    // signal clicked()
+    // signal doubleClicked()    
 
     contentItem: Item {
         opacity: root.active ? 1 : 0.3
@@ -354,39 +352,5 @@ QQC2.Control {
             //     // }
             // }
         }
-    }
-
-    // background: Item {
-    //     Rectangle {
-    //         anchors.fill: parent
-    //         visible: !svgBg.visible
-    //         border.width: (root.highlightOnFocus && root.activeFocus) || root.highlighted ? 1 : 0
-    //         border.color: root.highlightColor
-
-    //         color: Kirigami.Theme.backgroundColor
-    //     }
-
-    //     PlasmaCore.FrameSvgItem {
-    //         id: svgBg
-    //         visible: fromCurrentTheme && highlighted
-    //         anchors.fill: parent
-
-    //         property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
-    //         readonly property real leftPadding: fixedMargins.left
-    //         readonly property real rightPadding: fixedMargins.right
-    //         readonly property real topPadding: fixedMargins.top
-    //         readonly property real bottomPadding: fixedMargins.bottom
-
-    //         imagePath: "widgets/column-delegate-background"
-    //         prefix: highlighted ? ["focus", ""] : ""
-    //         colorGroup: PlasmaCore.Theme.ViewColorGroup
-    //     }
-    // }
-
-    background: Rectangle {
-        property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
-        opacity: highlighted ? 0.2 : 1
-        color: "#1f2022"
-        radius: 2
-    }
+    }    
 }

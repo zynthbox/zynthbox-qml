@@ -29,23 +29,24 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
+import io.zynthbox.ui 1.0 as ZUI
 
 import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
 
 
-QQC2.AbstractButton {
+ZUI.CellControl {
     id: root
 
     readonly property QtObject song: zynqtgui.sketchpad.song
     readonly property int colIndex: index
     property bool isPlaying
-    property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
+    backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-    property bool highlighted: false
-    property color highlightColor: highlighted
-                                       ? Kirigami.Theme.highlightColor
-                                       : "transparent"
+    highlightColor: highlighted 
+                        ? Kirigami.Theme.highlightColor
+                        : "transparent"
+                        
     property bool isInScene: channel.selectedClipNames
                                 ? channel.selectedClipNames.join("").length > 0
                                 : false
@@ -148,72 +149,33 @@ QQC2.AbstractButton {
             }
         }
     }
+  
+    Rectangle {
+        id: progressRect
+        parent: root.background
+        anchors.bottom: parent.bottom
+        visible: root.isInScene &&
+                    channel.sceneClip.isPlaying &&
+                    channel.trackType === "sample-loop" &&
+                    !channel.sceneClip.isEmpty
 
-    background: Item {
-
-        // Rectangle {
-        //     anchors.fill: parent
-        //     visible: !svgBg.visible
-        //     color: root.backgroundColor
-
-        //     border.width: 1
-        //     border.color: root.highlightColor
-        //                   ? root.highlightColor
-        //                   : root.highlighted
-        //                     ? Kirigami.Theme.highlightColor
-        //                     : "transparent"
-        // }
-
-        // PlasmaCore.FrameSvgItem {
-        //     id: svgBg
-        //     visible: fromCurrentTheme && highlighted
-        //     anchors.fill: parent
-
-        //     property bool highlighted: root.highlighted
-        //     readonly property real leftPadding: fixedMargins.left
-        //     readonly property real rightPadding: fixedMargins.right
-        //     readonly property real topPadding: fixedMargins.top
-        //     readonly property real bottomPadding: fixedMargins.bottom
-
-        //     imagePath: "widgets/column-delegate-background"
-        //     prefix: highlighted ? ["focus", ""] : ""
-        //     colorGroup: PlasmaCore.Theme.ViewColorGroup
-        // }
-
-         Rectangle {
-            anchors.fill: parent
-            property bool highlighted: ((root.highlightOnFocus && root.activeFocus) || root.highlighted)
-            opacity: highlighted ? 0.2 : 1
-            color: "#1f2022"
-            radius: 2
-        }
-
-        Rectangle {
-            id: progressRect
-            anchors.bottom: parent.bottom
-            visible: root.isInScene &&
-                     channel.sceneClip.isPlaying &&
-                     channel.trackType === "sample-loop" &&
-                     !channel.sceneClip.isEmpty
-
-            color: Kirigami.Theme.textColor
-            height: Kirigami.Units.smallSpacing
-            width: visible ? (channel.sceneClip.progress - channel.sceneClip.metadata.startPosition)/adjustment : 0
-            property double adjustment: visible ? (((60/Zynthbox.SyncTimer.bpm) * channel.sceneClip.metadata.length) / parent.width) : 1
-        }
-        Rectangle {
-            id: patternProgressRect
-
-            anchors.bottom: parent.bottom
-            visible: root.isInScene &&
-                     channel.trackType !== "sample-loop" &&
-                     sequence.isPlaying &&
-                     root.pattern.hasNotes
-            color: Kirigami.Theme.textColor
-            height: Kirigami.Units.smallSpacing
-            width: pattern ? (parent.width/(16*pattern.availableBars))*pattern.bankPlaybackPosition : 0
-        }
+        color: Kirigami.Theme.textColor
+        height: Kirigami.Units.smallSpacing
+        width: visible ? (channel.sceneClip.progress - channel.sceneClip.metadata.startPosition)/adjustment : 0
+        property double adjustment: visible ? (((60/Zynthbox.SyncTimer.bpm) * channel.sceneClip.metadata.length) / parent.width) : 1
     }
+    Rectangle {
+        id: patternProgressRect
+        parent: root.background
+        anchors.bottom: parent.bottom
+        visible: root.isInScene &&
+                    channel.trackType !== "sample-loop" &&
+                    sequence.isPlaying &&
+                    root.pattern.hasNotes
+        color: Kirigami.Theme.textColor
+        height: Kirigami.Units.smallSpacing
+        width: pattern ? (parent.width/(16*pattern.availableBars))*pattern.bankPlaybackPosition : 0
+    }   
 
     onActiveFocusChanged: {
         console.log("Item with active Focus :", activeFocus)

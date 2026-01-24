@@ -1208,38 +1208,12 @@ ZUI.ScreenPage {
 
         ColumnLayout {
             anchors.fill: parent
-            // anchors.bottomMargin: Kirigami.Units.largeSpacing
             spacing: ZUI.Theme.spacing
 
             ZUI.SectionPanel {
-                // Layout.margins: svgBg.inset.top
-
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 9
-                // topPadding: svgBg.topPadding
-                // bottomPadding: svgBg.bottomPadding
-                // leftPadding: svgBg.leftPadding
-                // rightPadding: svgBg.rightPadding
-
-                // background: Item {
-                //     PlasmaCore.FrameSvgItem {
-                //         // enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
-
-                //         id: svgBg
-
-                //         readonly property real leftPadding: fixedMargins.left
-                //         readonly property real rightPadding: fixedMargins.right
-                //         readonly property real topPadding: fixedMargins.top
-                //         readonly property real bottomPadding: fixedMargins.bottom
-
-                //         visible: fromCurrentTheme
-                //         anchors.fill: parent
-                //         imagePath: "widgets/tracks_overview_background"
-                //         colorGroup: PlasmaCore.Theme.ViewColorGroup
-                //     }
-
-                // }
 
                 contentItem: Item {
                     RowLayout {
@@ -1390,39 +1364,18 @@ ZUI.ScreenPage {
                         }
 
                         ZUI.SectionGroup {
-                            // id: sketchpadClipContent
                             Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            // Layout.topMargin: svgBg2.visible ? svgBg2.inset.top : 0
-                            // Layout.leftMargin: svgBg2.visible ? svgBg2.inset.left : 0
-                            // Layout.rightMargin: svgBg2.visible ? svgBg2.inset.right : 0
-                            // Layout.bottomMargin: svgBg2.visible ? svgBg2.inset.bottom : 0
-                            // topPadding: svgBg2.visible ? svgBg2.topPadding : 0
-                            // bottomPadding: svgBg2.visible ? svgBg2.bottomPadding : 0
-                            // leftPadding: svgBg2.visible ? svgBg2.leftPadding : 0
-                            // rightPadding: svgBg2.visible ? svgBg2.rightPadding : 0
-
-                            // background: Item {
-                            //     PlasmaCore.FrameSvgItem {
-                            //         // property bool highlighted
-                            //         // enabledBorders: PlasmaCore.FrameSvgItem.BottomBorder
-
-                            //         id: svgBg2
-
-                            //         readonly property real leftPadding: fixedMargins.left
-                            //         readonly property real rightPadding: fixedMargins.right
-                            //         readonly property real topPadding: fixedMargins.top
-                            //         readonly property real bottomPadding: fixedMargins.bottom
-
-                            //         anchors.fill: parent
-                            //         visible: fromCurrentTheme
-                            //         imagePath: "widgets/tracks-background"
-                            //         colorGroup: PlasmaCore.Theme.NormalColorGroup
-                            //     }
-                            // }
+                            Layout.fillHeight: true   
+                            
+                            fallbackBackground: Rectangle {
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.View
+                                color: Kirigami.Theme.backgroundColor
+                                opacity: 0.1
+                            }                        
 
                             contentItem: Item {
-                                // color: "#2e3336"
+
                                 ColumnLayout {
                                     id: sketchpadClipsColumn
 
@@ -2080,8 +2033,6 @@ ZUI.ScreenPage {
                                         }
                                     }
                                     text: qsTr("Paste")
-                                    // opacity: enabled ? 1 : 0.6
-                                    flat: !checked
                                     onClicked: {
                                         applicationWindow().confirmer.confirmSomething(qsTr("Confirm Paste"), qsTr("Are you sure that you want to paste %1 to %2? This action is irreversible and will clear all existing contents of %2.").arg(zynqtgui.sketchpad.copySourceObj.humanReadableObjName).arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
                                             zynqtgui.sketchpad.lastSelectedObj.copyFrom(zynqtgui.sketchpad.copySourceObj);
@@ -2097,7 +2048,6 @@ ZUI.ScreenPage {
                                     // Button is enabled when a copy action is not running and selected slot can be copy-pasted
                                     enabled: copyButton.visible && copyButton.enabled && zynqtgui.sketchpad.lastSelectedObj.isCopyable
                                     text: qsTr("Clear")
-                                    // opacity: enabled ? 1 : 0.6
                                     onClicked: {
                                         applicationWindow().confirmer.confirmSomething(qsTr("Confirm Clear"), qsTr("Are you sure that you want to clear %1? This action is irreversible and will clear all existing contents of %1.").arg(zynqtgui.sketchpad.lastSelectedObj.humanReadableObjName), function() {
                                             zynqtgui.sketchpad.lastSelectedObj.clear();
@@ -2106,13 +2056,9 @@ ZUI.ScreenPage {
                                 }
 
                             }
-
                         }
-
                     }
-
                 }
-
             }
 
             QQC2.Control {

@@ -1274,7 +1274,7 @@ Kirigami.AbstractApplicationWindow {
         Image {
             id: wallpaper
             anchors.fill: parent
-            // source: PlasmaCore.Theme.wallpaperPath
+            source: PlasmaCore.Theme.wallpaperPath
             // visible: !PlasmaCore.Theme.contrastEnabled
         }
 

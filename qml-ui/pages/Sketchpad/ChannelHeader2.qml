@@ -36,6 +36,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 
 ZUI.CellControl {
     id: root
+    Kirigami.Theme.colorSet: Kirigami.Theme.View
 
     // property string text
     property var subText

@@ -78,14 +78,14 @@ GridLayout {
         if (control.orientation == Qt.Horizontal) {
             return 1
         } else if (control.orientation == Qt.Vertical) {
-            return Zynthbox.Plugin.sketchpadSlotCount + (control.showSlotTypeLabel ? 1 : 0) // +1 row for label if label is visible
+            return Zynthbox.Plugin.sketchpadSlotCount*2 + (control.showSlotTypeLabel ? 1 : 0) // +1 row for label if label is visible
         } else {
             return 1 // Fallback to horizontal
         }
     }
     columns: {
         if (control.orientation == Qt.Horizontal) {
-            return Zynthbox.Plugin.sketchpadSlotCount + (control.showSlotTypeLabel ? 1 : 0) // +1 col for label if label is visible
+            return Zynthbox.Plugin.sketchpadSlotCount*2 + (control.showSlotTypeLabel ? 1 : 0) // +1 col for label if label is visible
         } else if (control.orientation == Qt.Vertical) {
             return 1
         } else {
@@ -103,7 +103,8 @@ GridLayout {
     }
     layoutDirection: Qt.LeftToRight
 
-    rowSpacing: ZUI.Theme.sectionSpacing
+    rowSpacing: 0
+    columnSpacing : 0
 
     /**
      * \brief Emitted whenever the user clicks on the slot
@@ -196,599 +197,581 @@ GridLayout {
 
     Repeater {
         id: slotRepeater
+        
 
-        model: Zynthbox.Plugin.sketchpadSlotCount
-        delegate: QQC2.Control {
-            id: slotDelegate
-            property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null &&
-                                       zynqtgui.sketchpad.lastSelectedObj.track == control.channel &&
-                                       zynqtgui.sketchpad.lastSelectedObj.className == _private.className &&
-                                       zynqtgui.sketchpad.lastSelectedObj.value === index &&
-                                       zynqtgui.sketchpad.lastSelectedObj.component == slotDelegate
-            property int slotIndex: index
-            property bool isSketchpadClip: control.slotData && control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
-            property QtObject clip: isSketchpadClip ? control.slotData[index] : null
-            property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[index].cppObjId) : null
-            // A property to determine if slot is a sample-loop and is enabled
-            property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled
-            property int midiChannel: control.channel != null ? control.channel.chainedSounds[index] : -1
-            property QtObject synthPassthroughClient: control.channel != null && Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
-            property QtObject fxPassthroughClient: control.channel != null && Zynthbox.Plugin.fxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.channel.id][index] : null
-            property QtObject sketchFxPassthroughClient: control.channel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id][index] : null
-            property QtObject zynthianLayer: {
-                let layer = null;
-                if (control.channel != null) {
-                    switch (_private.className) {
-                    case "TracksBar_synthslot":
-                        let midiChannel = control.channel.chainedSounds[index];
-                        if (midiChannel >= 0 && control.channel.checkIfLayerExists(midiChannel)) {
-                            layer = zynqtgui.layer.get_layer_by_midi_channel(midiChannel)
-                        }
-                        break;
-                    case "TracksBar_fxslot":
-                        layer = control.channel.chainedFx[index];
-                        break;
-                    case "TracksBar_sketchfxslot":
-                        layer = control.channel.chainedSketchFx[index];
-                        break;
-                    }
-                    if (layer == undefined) {
-                        layer = null;
-                    }
-                }
-                return layer;
-            }
-            // This property will be used to determine if a slot makes sound
-            // For synth slots, this will be true if not muted
-            // For fx slots, this will be true if not bypassed
-            property bool slotMakesSound: {
-                if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_synthslot" && slotDelegate.synthPassthroughClient != null) {
-                    return !slotDelegate.synthPassthroughClient.muted
-                } else if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_fxslot" && slotDelegate.fxPassthroughClient != null) {
-                    return !slotDelegate.fxPassthroughClient.bypass
-                } else if (_private.className == "TracksBar_sampleslot" && slotDelegate.cppClipObject != null) {
-                    return !slotDelegate.cppClipObject.rootSlice.gainHandler.muted
-                } else {
-                    // For all other cases, default value is true
-                    return true
-                }
+        model: Zynthbox.Plugin.sketchpadSlotCount * 2
+        delegate: Item {
+            visible : index < (Zynthbox.Plugin.sketchpadSlotCount * 2)-1
+            Layout.fillWidth: visible ? (control.orientation == Qt.Horizontal ? isEven(index) : true) : false
+            implicitWidth: visible ? (control.orientation == Qt.Horizontal ? (isEven(index) ? 0 : ZUI.Theme.slotSpacing[(index-1)/2]) : 0) : 0
+            // implicitHeight:  control.orientation == Qt.Horizontal ? 0  : (isEven(index) ? 0 : ZUI.Theme.slotSpacing[(index-1)/2])
+            implicitHeight:  visible ? (control.orientation == Qt.Horizontal ? 0  : (isEven(index) ? Kirigami.Units.gridUnit * 2 : 4)) : 0
+            Layout.minimumWidth: implicitWidth    
+            Layout.minimumHeight: implicitHeight
+            Layout.fillHeight: visible ? (control.orientation == Qt.Horizontal ? true : false) : false
+
+            // color: isEven(index) ? "blue" : "red"
+            // radius: 10
+
+            // Layout.fillWidth: true
+            // Layout.fillHeight: true
+           
+            function isEven(n) {
+                return n % 2 === 0;
             }
 
-            Layout.fillWidth: true
-            Layout.fillHeight: false
-            // Layout.margins: svgBg.visible ? 0 : Kirigami.Units.smallSpacing
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-            opacity: slotMakesSound ? 1 : 0.3
-            // padding: svgBg.visible ? svgBg.leftPadding : 0
-            padding: 2
-            background: Item {
-                id: backgroundItem
-                property bool highlightBorder: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === index)
-                
-                Rectangle {
-                    id: butterfly
-                    visible: !delegate.isEmpty
-                    anchors.fill: parent
-                    color: "#040507"
-                    border.color: backgroundItem.highlightBorder && !delegate.isEmpty  ? Kirigami.Theme.highlightColor : "transparent"
-                    radius: 4
-                    opacity: delegate.isEmpty ? 0.5 : 1
-                }
-
-                Rectangle {
-                    id: bevelRect 
-                    anchors.fill: parent
-                    visible: false
-                    border.color:"#040507" 
-                    color: "#2e3336"
-                    opacity: 0.5
-                    radius: 4
-                }
-
-
-                    // InnerShadow {
-                    //     id: _shadow1
-                    //     visible: delegate.isEmpty 
-
-                    //     anchors.fill: bevelRect
-                    //     source: bevelRect
-                    //     color: "black" // Dark bottom-right
-                    //     radius: 5; horizontalOffset: 2; verticalOffset: 2
-                    // }
-                    // InnerShadow {
-                    //     anchors.fill: _shadow1
-                    //     visible: delegate.isEmpty 
-
-                    //     source: _shadow1
-                    //     color: "white" // Light top-left
-                    //     radius: 5; horizontalOffset: -2; verticalOffset: -2
-                    // }
-
-                InnerShadow {
-                    id: _shadow
-                    visible: delegate.isEmpty 
-                    anchors.fill: bevelRect
-                    radius: 4.0
-                    // samples: 16
-                    horizontalOffset: 2
-                    verticalOffset: 2
-                    color: "black"
-                    source: bevelRect
-                    // opacity: 0.4
-                    spread: 0.5
-                }
-
-                InnerShadow {
-                    anchors.fill: _shadow
-                    visible: delegate.isEmpty 
-                    radius: 4.0
-                    // samples: 16
-                    horizontalOffset: -2
-                    verticalOffset: -2
-                    color: "white"
-                    source: _shadow
-                    // opacity: 0.1
-                    spread: 0.3
-                }
-
-                 Rectangle {
-                    anchors.fill: parent
-                    visible: delegate.isEmpty 
-                    border.color: backgroundItem.highlightBorder ? Kirigami.Theme.highlightColor : "#040507" 
-                    color: "transparent"
-                    radius: 4
-                }
-                
-                // Show highlighted color on slot border when slot is a sample-loop and is enabled
-                // Rectangle {
-                //     visible: !svgBg.visible
-                //     anchors.fill: parent
-                //     Kirigami.Theme.inherit: false
-                //     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                //     color: Kirigami.Theme.backgroundColor
-                //     // If slot is a enabled clip or slot is selectedSlot, show highlighted border
-                //     border.color: backgroundItem.highlightBorder ? Kirigami.Theme.highlightColor : "#ff999999"
-                //     border.width: 2
-                //     radius: ZUI.Theme.radius
-                // }
-                // PlasmaCore.FrameSvgItem {
-                //     id: svgBg
-                //     anchors.fill: parent
-                //     visible: fromCurrentTheme
-
-                //     readonly property real leftPadding: margins.left
-                //     readonly property real rightPadding: margins.right
-                //     readonly property real topPadding: margins.top
-                //     readonly property real bottomPadding: margins.bottom
-
-                //     imagePath: "widgets/slots-delegate-background"
-                //     prefix: backgroundItem.highlightBorder ? ["focus", ""] : (delegate.isEmpty ? "inactive" : "")
-                //     colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                // }
+            Loader {
+                anchors.fill: parent
+                active: isEven(index)
+                visible: active
+                sourceComponent: _realComp 
             }
 
-            function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
-                if (control.performSlotInteractions) {
-                    if (!control.singleClickEnabled) {
-                        // If single click is disable, set onlyFocus to true so that clicks are not passed to slotsBar to handle popups
-                        onlyFocus = true;
-                    }
+            Component{
+                id: _realComp   
+                QQC2.Control {
+                    id: slotDelegate
+                    anchors.fill: parent
+                    property int realIndex : index/2
 
-                    let wasAlreadySelected = slotDelegate.highlighted
-                    control.channel.selectedSlot.setTo(_private.className, index, slotDelegate, control.channel);
-                    if (onlySelectSlot == false) {
-                        if (wasAlreadySelected == false || onlyFocus) {
-                            let className = "TracksBar_synthslot"
-                            switch (control.slotType) {
-                            case "synth":
-                                className = "TracksBar_synthslot";
+                    property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null &&
+                                            zynqtgui.sketchpad.lastSelectedObj.track == control.channel &&
+                                            zynqtgui.sketchpad.lastSelectedObj.className == _private.className &&
+                                            zynqtgui.sketchpad.lastSelectedObj.value === realIndex &&
+                                            zynqtgui.sketchpad.lastSelectedObj.component == slotDelegate
+                    property int slotIndex: realIndex
+                    property bool isSketchpadClip: control.slotData && control.slotData[realIndex] != null && control.slotData[realIndex].hasOwnProperty("className") && control.slotData[realIndex].className == "sketchpad_clip"
+                    property QtObject clip: isSketchpadClip ? control.slotData[realIndex] : null
+                    property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[realIndex].cppObjId) : null
+                    // A property to determine if slot is a sample-loop and is enabled
+                    property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[realIndex] && control.slotData[realIndex].enabled
+                    property int midiChannel: control.channel != null ? control.channel.chainedSounds[realIndex] : -1
+                    property QtObject synthPassthroughClient: control.channel != null && Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
+                    property QtObject fxPassthroughClient: control.channel != null && Zynthbox.Plugin.fxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.channel.id][realIndex] : null
+                    property QtObject sketchFxPassthroughClient: control.channel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id][realIndex] : null
+                    property QtObject zynthianLayer: {
+                        let layer = null;
+                        if (control.channel != null) {
+                            switch (_private.className) {
+                            case "TracksBar_synthslot":
+                                let midiChannel = control.channel.chainedSounds[realIndex];
+                                if (midiChannel >= 0 && control.channel.checkIfLayerExists(midiChannel)) {
+                                    layer = zynqtgui.layer.get_layer_by_midi_channel(midiChannel)
+                                }
                                 break;
-                            case "sample-trig":
-                                className = "TracksBar_sampleslot";
+                            case "TracksBar_fxslot":
+                                layer = control.channel.chainedFx[realIndex];
                                 break;
-                            case "sample-loop":
-                                className = "TracksBar_sketchslot";
-                                break;
-                            case "external":
-                                className = "TracksBar_externalslot";
-                                break;
-                            case "fx":
-                                className = "TracksBar_fxslot";
-                                break;
-                            case "sketch-fx":
-                                className = "TracksBar_sketchfxslot";
-                                break;
-                            case "text":
-                                // Do nothing for text slots
-                                break;
-                            default:
-                                console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
-                                control.channel.displayFx = false;
+                            case "TracksBar_sketchfxslot":
+                                layer = control.channel.chainedSketchFx[realIndex];
                                 break;
                             }
-                            zynqtgui.sketchpad.lastSelectedObj.setTo(className, index, slotDelegate, control.channel);
-                            control.channel.selectedSlotRow = index;
+                            if (layer == undefined) {
+                                layer = null;
+                            }
+                        }
+                        return layer;
+                    }
+                    // This property will be used to determine if a slot makes sound
+                    // For synth slots, this will be true if not muted
+                    // For fx slots, this will be true if not bypassed
+                    property bool slotMakesSound: {
+                        if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_synthslot" && slotDelegate.synthPassthroughClient != null) {
+                            return !slotDelegate.synthPassthroughClient.muted
+                        } else if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_fxslot" && slotDelegate.fxPassthroughClient != null) {
+                            return !slotDelegate.fxPassthroughClient.bypass
+                        } else if (_private.className == "TracksBar_sampleslot" && slotDelegate.cppClipObject != null) {
+                            return !slotDelegate.cppClipObject.rootSlice.gainHandler.muted
                         } else {
-                            if (control.slotType === "external") {
-                                // If channel type is external, then it has 2 slots visible
-                                // and the respective selectedSlotRow is already selected. Hence directly handle item click
-                                if (!onlyFocus) {
-                                    pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
-                                }
-                            } else {
-                                // Handle item click only if not dragged
-                                if (!delegateMouseArea.dragHappened && !onlyFocus) {
-                                    pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
-                                }
-                            }
-                        }
-                        // FIXME This needs refactoring away... everything should be using the selectedSlot logic instead
-                        control.channel.selectedSlotRow = index;
-                        control.channel.selectedFxSlotRow = index;
-                        // When trackStyle is set to one-to-one, make sure to update selectedClip so that selected column is updated and playing notes on keyboard makes correct sound
-                        if (control.channel.trackStyle === "one-to-one") {
-                            control.channel.selectedClip = index;
-                        }
-
-                        if (control.slotType == "synth") {
-                            control.channel.setCurlayerByType("synth")
-                        } else if (control.slotType == "sample-trig") {
-                            control.channel.setCurlayerByType("sample")
-                        } else if (control.slotType == "sample-loop") {
-                            control.channel.setCurlayerByType("loop")
-                        } else if (control.slotType == "external") {
-                            control.channel.setCurlayerByType("external")
-                        } else if (control.slotType == "fx") {
-                            control.channel.setCurlayerByType("fx")
-                        } else if (control.slotType == "sketch-fx") {
-                            control.channel.setCurlayerByType("sketch-fx")
-                        } else if (control.slotType == "text") {
-                            // Do nothing for text slots
-                        } else {
-                            control.channel.setCurlayerByType("")
+                            // For all other cases, default value is true
+                            return true
                         }
                     }
-                }
-                control.slotClicked(slotDelegate.slotIndex);
-            }
 
-            contentItem: Item {
-                id: delegate
-
-                // For external mode the first three slots are visible
-                // For other modes all slots are visible
-                enabled: (control.slotType !== "external") || (control.slotType === "external" && (index === 0 || index === 1 || index === 2))
-                opacity: enabled ? 1 : 0
-                visible: enabled
-                readonly property bool isEmpty : synthNameLabel.text.trim().length == 0
-                readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
-                
-                Loader { 
-                    anchors {
-                        fill: parent
-                        // margins: Kirigami.Units.smallSpacing
-                        margins: ZUI.Theme.padding
-                    }
-                    active: !ZUI.Theme.altVolume
-                    visible: control.dragEnabled && active
-                    sourceComponent: Item {
-                        id: slotDelegateVisualsContainer
-                       
-                        Rectangle {
-                            width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
-                            anchors {
-                                left: parent.left
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-                            radius: ZUI.Theme.radius
-                            opacity: 0.8
-                            visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
-                            color: Kirigami.Theme.highlightColor
-                        }
-                        Rectangle {
-                            width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
-                            anchors {
-                                left: parent.left
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-                            radius: ZUI.Theme.radius
-                            opacity: 0.8
-                            visible: slotDelegate.cppClipObject
-                            color: Kirigami.Theme.highlightColor
-                        }
-                        Rectangle {
-                            // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                            width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                            anchors {
-                                left: parent.left
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-                            radius: ZUI.Theme.radius
-                            opacity: 0.8
-                            visible: control.slotType === "fx" && control.slotData[index] != null && control.slotData[index].length > 0
-                            color: Kirigami.Theme.highlightColor
-                        }
-                        Rectangle {
-                            // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                            width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                            anchors {
-                                left: parent.left
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-                            radius: ZUI.Theme.radius
-                            opacity: 0.8
-                            visible: control.slotType === "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0
-                            color: Kirigami.Theme.highlightColor
-                        }
-
-                        property int availableWidth: width - 6
-                        Rectangle {
-                            anchors {
-                                top: parent.top
-                                left: parent.left
-                                leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                            }
-                            height: 1
-                            color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
-                            opacity: width > 1 ? 0.8 : 0
-                            width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
-                        }
-                        Rectangle {
-                            anchors {
-                                left: parent.left
-                                bottom: parent.bottom
-                                bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
-                                leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                            }
-                            height: 1
-                            color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
-                            opacity: width > 1 ? 0.8 : 0
-                            width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
-                        }
-                    }
-                }
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    spacing: ZUI.Theme.spacing
-                    QQC2.Label {
-                        id: synthNameLabel
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        padding: 2
-                        background: Rectangle {
-                            opacity: delegate.isEmpty || backgroundItem.highlightBorder  ? 0 : 1
-
-                            color: delegate.isEmpty  ? "#181918" : "#1f2022"
-                            radius: 2
-                        }
-
-                        horizontalAlignment: Text.AlignLeft
-                        text: {
-                            if (control.slotData && control.slotData[index] != null) {
-                                if (control.slotType === "synth") {
-                                    return control.slotData[index]
-                                } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop")) {
-                                    if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false) {
-                                        return "Missing: %1".arg(control.slotData[index].title ? control.slotData[index].title : "");
-                                    } else {
-                                        return control.slotData[index].title ? control.slotData[index].title : ""
-                                    }
-                                } else if (control.slotType === "external") {
-                                    return index < 3 ? control.slotData[index] : ""
-                                } else if (control.slotType === "fx") {
-                                    return control.slotData[index]
-                                } else if (control.slotType === "sketch-fx") {
-                                    return control.slotData[index]
-                                } else if (control.slotType === "text") {
-                                    if (typeof control.slotData[index] === "string") {
-                                        return control.slotData[index]
-                                    } else {
-                                        return control.slotData[index].toString();
-                                    }
-                                } else {
-                                    return ""
-                                }
-                            } else {
-                                return ""
-                            }
-                        }
-                        elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
-                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
-                    }
                     
-                    Loader { 
-                        Layout.fillWidth: true
-                        active: ZUI.Theme.altVolume
-                        visible: control.dragEnabled && active
-                        sourceComponent: Item {
-                            id: slotDelegateVisualsContainer
-                            height: 6                            
-                            Rectangle {
-                                width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
-                                height: 6
-                                anchors {
-                                    left: parent.left
-                                    bottom: parent.bottom
-                                }
-                                radius: ZUI.Theme.radius
-                                opacity: 0.8
-                                visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
-                                // color: Kirigami.Theme.highlightColor
-                                color: Kirigami.Theme.textColor
-                            }
-                            Rectangle {
-                                width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
-                                anchors {
-                                    left: parent.left
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                }
-                                radius: ZUI.Theme.radius
-                                opacity: 0.8
-                                visible: slotDelegate.cppClipObject
-                                color: Kirigami.Theme.textColor
-                            }
-                            Rectangle {
-                                // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                height: 6
-                                anchors {
-                                    left: parent.left
-                                    bottom: parent.bottom
-                                }
-                                radius: ZUI.Theme.radius
-                                opacity: 0.8
-                                visible: control.slotType === "fx" && control.slotData[index] != null && control.slotData[index].length > 0
-                                color: Kirigami.Theme.textColor
-                            }
-                            Rectangle {
-                                // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                anchors {
-                                    left: parent.left
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                }
-                                radius: ZUI.Theme.radius
-                                opacity: 0.8
-                                visible: control.slotType === "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0
-                                color: Kirigami.Theme.textColor
-                            }
+                    opacity: slotMakesSound ? 1 : 0.3
+                    // padding: svgBg.visible ? svgBg.leftPadding : 0
+                    padding: 2
 
-                            property int availableWidth: width - 6
-                            Rectangle {
-                                anchors {
-                                    top: parent.top
-                                    left: parent.left
-                                    leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                }
-                                height: 1
-                                color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
-                                opacity: width > 1 ? 0.8 : 0
-                                width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
-                            }
-                            Rectangle {
-                                anchors {
-                                    left: parent.left
-                                    bottom: parent.bottom
-                                    bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
-                                    leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                }
-                                height: 1
-                                color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
-                                opacity: width > 1 ? 0.8 : 0
-                                width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
-                            }
+
+                    background: Item {
+                        id: backgroundItem
+                        property bool highlightBorder: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === realIndex)
+                        
+                        // Rectangle {
+                        //     id: butterfly
+                        //     visible: !delegate.isEmpty
+                        //     anchors.fill: parent
+                        //     color: "#040507"
+                        //     border.color: backgroundItem.highlightBorder && !delegate.isEmpty  ? Kirigami.Theme.highlightColor : "transparent"
+                        //     radius: 4
+                        //     opacity: delegate.isEmpty ? 0.5 : 1
+                        // }
+                        // Show highlighted color on slot border when slot is a sample-loop and is enabled
+                        Rectangle {
+                            visible: !svgBg.visible
+                            anchors.fill: parent
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                            color: Kirigami.Theme.backgroundColor
+                            // If slot is a enabled clip or slot is selectedSlot, show highlighted border
+                            border.color: backgroundItem.highlightBorder ? Kirigami.Theme.highlightColor : "#ff999999"
+                            border.width: 2
+                            radius: ZUI.Theme.radius
+                        }
+                        PlasmaCore.FrameSvgItem {
+                            id: svgBg
+                            anchors.fill: parent
+                            visible: fromCurrentTheme
+
+                            readonly property real leftPadding: margins.left
+                            readonly property real rightPadding: margins.right
+                            readonly property real topPadding: margins.top
+                            readonly property real bottomPadding: margins.bottom
+
+                            imagePath: "widgets/slots-delegate-background"
+                            prefix: backgroundItem.highlightBorder ? ["focus", ""] : (delegate.isEmpty ? "inactive" : "")
+                            colorGroup: PlasmaCore.Theme.ButtonColorGroup
                         }
                     }
-                }
 
-                // Implement a double tap gesture
-                // On released event, start the double tap timer if it is not already running
-                // On pressed event, if the timer is already running then it means the 2nd tap was done within given time and hence a double tap event should be emitted
-                // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
-                Timer {
-                    id: doublePressedTimer
-                    interval: zynqtgui.ui_settings.doubleClickThreshold
-                    repeat: false
-                    onTriggered: {
-                        if (!delegateMouseArea.dragHappened) {
-                            slotDelegate.switchToThisSlot();
-                        }
-                    }
-                }
+                    function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
+                        if (control.performSlotInteractions) {
+                            if (!control.singleClickEnabled) {
+                                // If single click is disable, set onlyFocus to true so that clicks are not passed to slotsBar to handle popups
+                                onlyFocus = true;
+                            }
 
-                MouseArea {
-                    id: delegateMouseArea
-                    property real initialMouseX
-                    property bool dragHappened: false
-
-                    anchors.fill: parent
-                    onPressed: {
-                        if (control.dragEnabled) {
-                            delegateMouseArea.initialMouseX = mouse.x
-                        }
-                    }
-                    onReleased: {
-                        if (control.dragEnabled) {
-                            dragHappenedResetTimer.restart();
-                        }
-                        if (control.doubleClickEnabled) {
-                            if (doublePressedTimer.running) {
-                                doublePressedTimer.stop();
-                                // Double press has happened. Toggle mute/bypass state the slot
-                                switch (control.slotType) {
+                            let wasAlreadySelected = slotDelegate.highlighted
+                            control.channel.selectedSlot.setTo(_private.className, realIndex, slotDelegate, control.channel);
+                            if (onlySelectSlot == false) {
+                                if (wasAlreadySelected == false || onlyFocus) {
+                                    let className = "TracksBar_synthslot"
+                                    switch (control.slotType) {
                                     case "synth":
-                                        if (slotDelegate.synthPassthroughClient) {
-                                            slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
-                                        }
+                                        className = "TracksBar_synthslot";
                                         break;
                                     case "sample-trig":
-                                        if (slotDelegate.cppClipObject) {
-                                            slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
-                                        }
+                                        className = "TracksBar_sampleslot";
+                                        break;
+                                    case "sample-loop":
+                                        className = "TracksBar_sketchslot";
+                                        break;
+                                    case "external":
+                                        className = "TracksBar_externalslot";
                                         break;
                                     case "fx":
-                                        if (slotDelegate.fxPassthroughClient) {
-                                            slotDelegate.fxPassthroughClient.bypass = !slotDelegate.fxPassthroughClient.bypass;
-                                        }
+                                        className = "TracksBar_fxslot";
                                         break;
+                                    case "sketch-fx":
+                                        className = "TracksBar_sketchfxslot";
+                                        break;
+                                    case "text":
+                                        // Do nothing for text slots
+                                        break;
+                                    default:
+                                        console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
+                                        control.channel.displayFx = false;
+                                        break;
+                                    }
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo(className, realIndex, slotDelegate, control.channel);
+                                    control.channel.selectedSlotRow = realIndex;
+                                } else {
+                                    if (control.slotType === "external") {
+                                        // If channel type is external, then it has 2 slots visible
+                                        // and the respective selectedSlotRow is already selected. Hence directly handle item click
+                                        if (!onlyFocus) {
+                                            pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
+                                        }
+                                    } else {
+                                        // Handle item click only if not dragged
+                                        if (!delegateMouseArea.dragHappened && !onlyFocus) {
+                                            pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
+                                        }
+                                    }
                                 }
-                            } else {
-                                doublePressedTimer.restart();
-                            }
-                        } else {
-                            slotDelegate.switchToThisSlot();
-                        }
-                    }
-                    onMouseXChanged: {
-                        if (control.dragEnabled) {
-                            var newVal
-                            if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                delegateMouseArea.dragHappened = true;
-                                let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
-                                synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
-                            } else if (control.slotType == "sample-trig" && control.slotData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                delegateMouseArea.dragHappened = true;
-                                slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
-                            } else if (control.slotType == "fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                delegateMouseArea.dragHappened = true;
-                                // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                control.channel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
-                            } else if (control.slotType == "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                delegateMouseArea.dragHappened = true;
-                                // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                control.channel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                                // FIXME This needs refactoring away... everything should be using the selectedSlot logic instead
+                                control.channel.selectedSlotRow = realIndex;
+                                control.channel.selectedFxSlotRow = realIndex;
+                                // When trackStyle is set to one-to-one, make sure to update selectedClip so that selected column is updated and playing notes on keyboard makes correct sound
+                                if (control.channel.trackStyle === "one-to-one") {
+                                    control.channel.selectedClip = realIndex;
+                                }
+
+                                if (control.slotType == "synth") {
+                                    control.channel.setCurlayerByType("synth")
+                                } else if (control.slotType == "sample-trig") {
+                                    control.channel.setCurlayerByType("sample")
+                                } else if (control.slotType == "sample-loop") {
+                                    control.channel.setCurlayerByType("loop")
+                                } else if (control.slotType == "external") {
+                                    control.channel.setCurlayerByType("external")
+                                } else if (control.slotType == "fx") {
+                                    control.channel.setCurlayerByType("fx")
+                                } else if (control.slotType == "sketch-fx") {
+                                    control.channel.setCurlayerByType("sketch-fx")
+                                } else if (control.slotType == "text") {
+                                    // Do nothing for text slots
+                                } else {
+                                    control.channel.setCurlayerByType("")
+                                }
                             }
                         }
+                        control.slotClicked(slotDelegate.slotIndex);
                     }
-                    onPressAndHold: {
-                        if (control.clickAndHoldEnabled && slotDelegate.highlighted && !delegateMouseArea.dragHappened) {
-                            if (!control.channel.selectedSlot.isEmpty()) {
-                                zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+
+                    contentItem: Item {
+                        id: delegate
+
+                        // For external mode the first three slots are visible
+                        // For other modes all slots are visible
+                        enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || realIndex === 2))
+                        opacity: enabled ? 1 : 0
+                        visible: enabled
+                        readonly property bool isEmpty : synthNameLabel.text.trim().length == 0
+                        readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
+                        
+                        Loader { 
+                            anchors {
+                                fill: parent
+                                // margins: Kirigami.Units.smallSpacing
+                                margins: ZUI.Theme.padding
+                            }
+                            active: !ZUI.Theme.altVolume
+                            visible: control.dragEnabled && active
+                            sourceComponent: Item {
+                                id: slotDelegateVisualsContainer
+                            
+                                Rectangle {
+                                    width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
+                                    anchors {
+                                        left: parent.left
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                    }
+                                    radius: ZUI.Theme.radius
+                                    opacity: 0.8
+                                    visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
+                                    color: Kirigami.Theme.highlightColor
+                                }
+                                Rectangle {
+                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
+                                    anchors {
+                                        left: parent.left
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                    }
+                                    radius: ZUI.Theme.radius
+                                    opacity: 0.8
+                                    visible: slotDelegate.cppClipObject
+                                    color: Kirigami.Theme.highlightColor
+                                }
+                                Rectangle {
+                                    // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                                    width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                                    anchors {
+                                        left: parent.left
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                    }
+                                    radius: ZUI.Theme.radius
+                                    opacity: 0.8
+                                    visible: control.slotType === "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
+                                    color: Kirigami.Theme.highlightColor
+                                }
+                                Rectangle {
+                                    // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                                    width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                                    anchors {
+                                        left: parent.left
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                    }
+                                    radius: ZUI.Theme.radius
+                                    opacity: 0.8
+                                    visible: control.slotType === "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
+                                    color: Kirigami.Theme.highlightColor
+                                }
+
+                                property int availableWidth: width - 6
+                                Rectangle {
+                                    anchors {
+                                        top: parent.top
+                                        left: parent.left
+                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
+                                    }
+                                    height: 1
+                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
+                                    opacity: width > 1 ? 0.8 : 0
+                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
+                                }
+                                Rectangle {
+                                    anchors {
+                                        left: parent.left
+                                        bottom: parent.bottom
+                                        bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
+                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
+                                    }
+                                    height: 1
+                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
+                                    opacity: width > 1 ? 0.8 : 0
+                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
+                                }
                             }
                         }
-                    }
-                    Timer {
-                        id: dragHappenedResetTimer
-                        interval: 300
-                        repeat: false
-                        onTriggered: {
-                            delegateMouseArea.dragHappened = false
+
+                        ColumnLayout {
+                            anchors.fill: parent
+                            spacing: ZUI.Theme.spacing
+                            QQC2.Label {
+                                id: synthNameLabel
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                padding: 2
+                                background: Rectangle {
+                                    opacity: delegate.isEmpty || backgroundItem.highlightBorder  ? 0 : 1
+
+                                    color: delegate.isEmpty  ? "#181918" : "#1f2022"
+                                    radius: 2
+                                }
+
+                                horizontalAlignment: Text.AlignLeft
+                                text: {
+                                    if (control.slotData && control.slotData[realIndex] != null) {
+                                        if (control.slotType === "synth") {
+                                            return control.slotData[realIndex]
+                                        } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop")) {
+                                            if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false) {
+                                                return "Missing: %1".arg(control.slotData[realIndex].title ? control.slotData[realIndex].title : "");
+                                            } else {
+                                                return control.slotData[realIndex].title ? control.slotData[realIndex].title : ""
+                                            }
+                                        } else if (control.slotType === "external") {
+                                            return realIndex < 3 ? control.slotData[realIndex] : ""
+                                        } else if (control.slotType === "fx") {
+                                            return control.slotData[realIndex]
+                                        } else if (control.slotType === "sketch-fx") {
+                                            return control.slotData[realIndex]
+                                        } else if (control.slotType === "text") {
+                                            if (typeof control.slotData[realIndex] === "string") {
+                                                return control.slotData[realIndex]
+                                            } else {
+                                                return control.slotData[realIndex].toString();
+                                            }
+                                        } else {
+                                            return ""
+                                        }
+                                    } else {
+                                        return ""
+                                    }
+                                }
+                                elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
+                                color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
+                            }
+                            
+                            Loader { 
+                                Layout.fillWidth: true
+                                active: ZUI.Theme.altVolume
+                                visible: control.dragEnabled && active
+                                sourceComponent: Item {
+                                    id: slotDelegateVisualsContainer
+                                    implicitHeight: 6                            
+                                    Rectangle {
+                                        width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
+                                        height: 6
+                                        anchors {
+                                            left: parent.left
+                                            bottom: parent.bottom
+                                        }
+                                        radius: ZUI.Theme.radius
+                                        opacity: 0.8
+                                        visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
+                                        // color: Kirigami.Theme.highlightColor
+                                        color: Kirigami.Theme.textColor
+                                    }
+                                    Rectangle {
+                                        width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
+                                        anchors {
+                                            left: parent.left
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        radius: ZUI.Theme.radius
+                                        opacity: 0.8
+                                        visible: slotDelegate.cppClipObject
+                                        color: Kirigami.Theme.textColor
+                                    }
+                                    Rectangle {
+                                        // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                                        width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                                        height: 6
+                                        anchors {
+                                            left: parent.left
+                                            bottom: parent.bottom
+                                        }
+                                        radius: ZUI.Theme.radius
+                                        opacity: 0.8
+                                        visible: control.slotType === "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
+                                        color: Kirigami.Theme.textColor
+                                    }
+                                    Rectangle {
+                                        // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                                        width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                                        anchors {
+                                            left: parent.left
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        radius: ZUI.Theme.radius
+                                        opacity: 0.8
+                                        visible: control.slotType === "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
+                                        color: Kirigami.Theme.textColor
+                                    }
+
+                                    property int availableWidth: width - 6
+                                    Rectangle {
+                                        anchors {
+                                            top: parent.top
+                                            left: parent.left
+                                            leftMargin: 3 // because of the radius of the rectangles we're "inside"
+                                        }
+                                        height: 1
+                                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
+                                        opacity: width > 1 ? 0.8 : 0
+                                        width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
+                                    }
+                                    Rectangle {
+                                        anchors {
+                                            left: parent.left
+                                            bottom: parent.bottom
+                                            bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
+                                            leftMargin: 3 // because of the radius of the rectangles we're "inside"
+                                        }
+                                        height: 1
+                                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
+                                        opacity: width > 1 ? 0.8 : 0
+                                        width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
+                                    }
+                                }
+                            }
+                        }
+
+                        // Implement a double tap gesture
+                        // On released event, start the double tap timer if it is not already running
+                        // On pressed event, if the timer is already running then it means the 2nd tap was done within given time and hence a double tap event should be emitted
+                        // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
+                        Timer {
+                            id: doublePressedTimer
+                            interval: zynqtgui.ui_settings.doubleClickThreshold
+                            repeat: false
+                            onTriggered: {
+                                if (!delegateMouseArea.dragHappened) {
+                                    slotDelegate.switchToThisSlot();
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: delegateMouseArea
+                            property real initialMouseX
+                            property bool dragHappened: false
+
+                            anchors.fill: parent
+                            onPressed: {
+                                if (control.dragEnabled) {
+                                    delegateMouseArea.initialMouseX = mouse.x
+                                }
+                            }
+                            onReleased: {
+                                if (control.dragEnabled) {
+                                    dragHappenedResetTimer.restart();
+                                }
+                                if (control.doubleClickEnabled) {
+                                    if (doublePressedTimer.running) {
+                                        doublePressedTimer.stop();
+                                        // Double press has happened. Toggle mute/bypass state the slot
+                                        switch (control.slotType) {
+                                            case "synth":
+                                                if (slotDelegate.synthPassthroughClient) {
+                                                    slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
+                                                }
+                                                break;
+                                            case "sample-trig":
+                                                if (slotDelegate.cppClipObject) {
+                                                    slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
+                                                }
+                                                break;
+                                            case "fx":
+                                                if (slotDelegate.fxPassthroughClient) {
+                                                    slotDelegate.fxPassthroughClient.bypass = !slotDelegate.fxPassthroughClient.bypass;
+                                                }
+                                                break;
+                                        }
+                                    } else {
+                                        doublePressedTimer.restart();
+                                    }
+                                } else {
+                                    slotDelegate.switchToThisSlot();
+                                }
+                            }
+                            onMouseXChanged: {
+                                if (control.dragEnabled) {
+                                    var newVal
+                                    if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                        delegateMouseArea.dragHappened = true;
+                                        let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
+                                        synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
+                                    } else if (control.slotType == "sample-trig" && control.slotData[realIndex] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                        delegateMouseArea.dragHappened = true;
+                                        slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
+                                    } else if (control.slotType == "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                        delegateMouseArea.dragHappened = true;
+                                        // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
+                                        control.channel.set_passthroughValue("fxPassthrough", realIndex, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                                    } else if (control.slotType == "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                        delegateMouseArea.dragHappened = true;
+                                        // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
+                                        control.channel.set_passthroughValue("sketchFxPassthrough", realIndex, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                                    }
+                                }
+                            }
+                            onPressAndHold: {
+                                if (control.clickAndHoldEnabled && slotDelegate.highlighted && !delegateMouseArea.dragHappened) {
+                                    if (!control.channel.selectedSlot.isEmpty()) {
+                                        zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                                    }
+                                }
+                            }
+                            Timer {
+                                id: dragHappenedResetTimer
+                                interval: 300
+                                repeat: false
+                                onTriggered: {
+                                    delegateMouseArea.dragHappened = false
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+       
+
+       
+
+        // Component {
+        //     id: _fakeComp
+        //     Rectangle  {
+        //         Layout.fillWidth: true
+        //         Layout.fillHeight: true
+        //         color: "yellow"
+        //     }
+
+        // }
     }
+
 }

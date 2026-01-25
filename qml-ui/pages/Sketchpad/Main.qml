@@ -629,10 +629,10 @@ ZUI.ScreenPage {
 
     title: qsTr("Sketchpad")
     screenId: "sketchpad"
-    topPadding: 2
+    topPadding: ZUI.Theme.sectionPadding
     leftPadding: 0
     rightPadding: 0
-    bottomPadding: 2
+    bottomPadding: ZUI.Theme.sectionPadding + 1
     backAction.visible: false
     background: null
     cuiaCallback: function(cuia) {
@@ -1386,12 +1386,12 @@ ZUI.ScreenPage {
                                 property int maximumSegmentOffset: root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2
 
                                 anchors.fill: parent
-                                spacing: 2 //TOTHEME
+                                spacing: ZUI.Theme.cellSpacing
 
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    spacing: 2 //TOTHEME
+                                    spacing: ZUI.Theme.cellSpacing
 
                                     // Display 10 header buttons which will show channel header buttons
                                     Repeater {
@@ -1560,7 +1560,7 @@ ZUI.ScreenPage {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    spacing: 2
+                                    spacing: ZUI.Theme.cellSpacing
 
                                     Repeater {
                                         id: clipsRepeater

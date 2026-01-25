@@ -783,12 +783,9 @@ Kirigami.AbstractApplicationWindow {
     onHeightChanged: height = screen.height
     pageStack: pageManager
 
-
     Component {
         id: _breadCrumbSectionComponent
         QQC2.Control {
-            Layout.fillHeight: true
-
             padding: 0
             clip: true
             background: null
@@ -801,7 +798,7 @@ Kirigami.AbstractApplicationWindow {
                     icon.height: 24
                     icon.name: "application-menu"
                     icon.color: Kirigami.Theme.textColor
-                    padding: Kirigami.Units.largeSpacing*1.5
+                    // padding: Kirigami.Units.largeSpacing*1.5
                     rightPadding: Kirigami.Units.largeSpacing*1.5
                     property string oldPage: "sketchpad"
                     property string oldModalPage: "sketchpad"
@@ -829,7 +826,7 @@ Kirigami.AbstractApplicationWindow {
                     id: homeButton
                     Layout.minimumWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                    padding: Kirigami.Units.largeSpacing*1.5
+                    // padding: Kirigami.Units.largeSpacing*1.5
                     rightPadding: Kirigami.Units.largeSpacing*1.5
                     font.pointSize: 11
                     onClicked: {

@@ -28,13 +28,13 @@ ColumnLayout {
         clipsRepeater.itemAt(index).handleItemClick()
     }
 
-    spacing: 1
+    spacing: ZUI.Theme.cellSpacing
 
     readonly property QtObject repeater: clipsRepeater
     Repeater {
         id: clipsRepeater
         model: root.channel && root.sequence ? 5 : 0
-        delegate: QQC2.Control {
+        delegate: ZUI.CellControl {
             id: clipDelegate
             property int clipIndex: index
             property QtObject pattern: root.sequence.getByClipId(root.channel.id, model.index)
@@ -77,48 +77,16 @@ ColumnLayout {
                 ? clipDelegate.cppClipObject ? clipDelegate.cppClipObject.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
                 : clipDelegate.pattern ? clipDelegate.pattern.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
             // nextBarState is updated from the container (i.e. ClipsBar and slotSelectionDrawer in the main window - SongMode doesn't update this state, as it handles the playfield state explicitly during playback)
-            property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
-
-            background: Item {
-                Rectangle {
-                    anchors.fill: parent
-                    visible: !svgBg.visible
-                    color: "#000000"
-                    border{
-                        color: root.songMode
-                               ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.clips.indexOf(clipDelegate.clip) >= 0
-                                 ? Kirigami.Theme.highlightColor
-                                 : "#000000"
-                        : clipDelegate.clip && clipDelegate.clip.inCurrentScene
-                        ? Kirigami.Theme.highlightColor
-                        : "#000000"
-                        width: 1
-                    }
-                }
-
-                PlasmaCore.FrameSvgItem {
-                    id: svgBg
-                    visible: fromCurrentTheme && highlighted
-                    anchors.fill: parent
-
-                    property bool highlighted: root.songMode
-                                               ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.clips.indexOf(clipDelegate.clip) >= 0
-                                                 ? true
-                                                 : false
-                                        : clipDelegate.clip && clipDelegate.clip.inCurrentScene
+            property int nextBarState: Zynthbox.PlayfieldManager.StoppedState            
+            
+            backgroundColor: "#000000"
+            highlighted: root.songMode
+                                    ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.clips.indexOf(clipDelegate.clip) >= 0
                                         ? true
                                         : false
-
-                    readonly property real leftPadding: fixedMargins.left
-                    readonly property real rightPadding: fixedMargins.right
-                    readonly property real topPadding: fixedMargins.top
-                    readonly property real bottomPadding: fixedMargins.bottom
-
-                    imagePath: "widgets/column-delegate-background"
-                    prefix: highlighted ? ["focus", ""] : ""
-                    colorGroup: PlasmaCore.Theme.ViewColorGroup
-                }
-            }
+                            : clipDelegate.clip && clipDelegate.clip.inCurrentScene
+                            ? true
+                            : false            
 
             Layout.fillWidth: true
             Layout.fillHeight: true

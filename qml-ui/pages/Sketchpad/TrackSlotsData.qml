@@ -163,41 +163,48 @@ GridLayout {
         }
     }
 
-    QQC2.Label {
+    RowLayout {
+        visible: control.showSlotTypeLabel
+
         Layout.fillWidth: false
         Layout.fillHeight: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-        horizontalAlignment: Qt.AlignRight
-        verticalAlignment: Qt.AlignVCenter
-        visible: control.showSlotTypeLabel
-        wrapMode: Text.NoWrap
-        text: {
-            if (control.slotTypeLabel == "") {
-                switch (control.slotType) {
-                    case "synth":
-                        return qsTr("Synths :")
-                    case "sample-trig":
-                        return qsTr("Samples :")
-                    case "sample-loop":
-                        return qsTr("Sketches :")
-                    case "external":
-                        return qsTr("Settings :")
-                    case "fx":
-                        return qsTr("FX :")
-                    case "sketch-fx":
-                        return qsTr("FX :")
-                    case "text":
-                        return qsTr("")
+
+        Layout.rightMargin: 10
+
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            horizontalAlignment: Qt.AlignRight
+            verticalAlignment: Qt.AlignVCenter
+            wrapMode: Text.NoWrap
+            text: {
+                if (control.slotTypeLabel == "") {
+                    switch (control.slotType) {
+                        case "synth":
+                            return qsTr("Synths :")
+                        case "sample-trig":
+                            return qsTr("Samples :")
+                        case "sample-loop":
+                            return qsTr("Sketches :")
+                        case "external":
+                            return qsTr("Settings :")
+                        case "fx":
+                            return qsTr("FX :")
+                        case "sketch-fx":
+                            return qsTr("FX :")
+                        case "text":
+                            return qsTr("")
+                    }
+                } else {
+                    return control.slotTypeLabel
                 }
-            } else {
-                return control.slotTypeLabel
             }
         }
     }
 
     Repeater {
         id: slotRepeater
-        
 
         model: Zynthbox.Plugin.sketchpadSlotCount * 2
         delegate: Item {

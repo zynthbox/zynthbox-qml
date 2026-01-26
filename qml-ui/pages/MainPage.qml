@@ -36,9 +36,9 @@ ZUI.ScreenPage {
     backAction.visible: false
 
     // padding: 2
-    background: Rectangle {
-        color: "#2e3336"
-    }
+    // background: Rectangle {
+    //     color: "#2e3336"
+    // }
 
     cuiaCallback: function(cuia) {
         switch (cuia) {
@@ -106,25 +106,22 @@ ZUI.ScreenPage {
 
     contentItem: RowLayout {
         // spacing: Kirigami.Units.gridUnit
-        spacing: ZUI.Theme.spacing
+        spacing: ZUI.Theme.sectionSpacing
 
-        QQC2.Pane {
+        ZUI.SectionGroup {
             Layout.fillWidth: false
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-            padding: 2
-            background: Rectangle {
-                color: "#040507"
-                radius: 4
-            }
-            contentItem: Item{                
+            
+            Item{    
+                anchors.fill: parent            
 
                 ColumnLayout {
                     id: categoryButtons
                     anchors.fill: parent
                     spacing: ZUI.Theme.spacing   
                     //Placeholders to replace the buttons
-                    QQC2.Button {
+                    ZUI.SectionButton {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         implicitHeight: 0
@@ -133,14 +130,9 @@ ZUI.ScreenPage {
                         highlighted: zynqtgui.main.visibleCategory === "modules"
                         text: qsTr("Modules")
                         onClicked: zynqtgui.main.visibleCategory = "modules"
-                        background: Rectangle {
-                            opacity: parent.highlighted ? 0.5 : 1
-                            color: parent.highlighted ? "#181918" : "#1f2022"
-                            radius: 2
-                        }
                     }
 
-                    QQC2.Button {
+                    ZUI.SectionButton {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         implicitHeight: 0
@@ -149,14 +141,9 @@ ZUI.ScreenPage {
                         highlighted: zynqtgui.main.visibleCategory === "appimages"
                         text: qsTr("Apps")
                         onClicked: zynqtgui.main.visibleCategory = "appimages"
-                        background: Rectangle {
-                            opacity: parent.highlighted ? 0.5 : 1
-                            color: parent.highlighted ? "#181918" : "#1f2022"
-                            radius: 2
-                        }
                     }
 
-                    QQC2.Button {
+                    ZUI.SectionButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         implicitHeight: 0
@@ -166,14 +153,9 @@ ZUI.ScreenPage {
                                 zynqtgui.main.visibleCategory === "sessions-versions"
                         text: qsTr("Sketchpads")
                         onClicked: zynqtgui.main.visibleCategory = "sessions"
-                        background: Rectangle {
-                            opacity: parent.highlighted ? 0.5 : 1
-                            color: parent.highlighted ? "#181918" : "#1f2022"
-                            radius: 2
-                        }
                     }
 
-                    QQC2.Button {
+                    ZUI.SectionButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         implicitHeight: 0
@@ -182,14 +164,9 @@ ZUI.ScreenPage {
                         highlighted: zynqtgui.main.visibleCategory === "services"
                         text: qsTr("Services")
                         onClicked: zynqtgui.main.visibleCategory = "services"
-                        background: Rectangle {
-                            opacity: parent.highlighted ? 0.5 : 1
-                            color: parent.highlighted ? "#181918" : "#1f2022"
-                            radius: 2
-                        }
                     }
 
-                    QQC2.Button {
+                    ZUI.SectionButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         implicitHeight: 0
@@ -198,11 +175,6 @@ ZUI.ScreenPage {
                         highlighted: zynqtgui.main.visibleCategory === "?"
                         text: qsTr("")
                         onClicked: zynqtgui.main.visibleCategory = "?"
-                        background: Rectangle {
-                            opacity: parent.highlighted ? 0.5 : 1
-                            color: parent.highlighted ? "#181918" : "#1f2022"
-                            radius: 2
-                        }
                     }
 
                     // Disabled these below buttons for now

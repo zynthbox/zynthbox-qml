@@ -86,12 +86,6 @@ ZUI.SectionPanel {
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
 
     Layout.fillWidth: true
-    // background: Rectangle
-    // {
-    //     color: Kirigami.Theme.backgroundColor
-    //     // border.color: "red"
-    //     opacity: 0.2
-    // }
 
     function pickNextSlot(onlySelectSlot=false) {
         switch (root.selectedChannel.selectedSlot.className) {
@@ -832,7 +826,8 @@ ZUI.SectionPanel {
                                     wrapMode: Text.NoWrap
                                     elide: Text.ElideRight
                                     verticalAlignment: Text.AlignVCenter
-                                    horizontalAlignment: Text.AlignHCenter
+                                    // horizontalAlignment: Text.AlignHCenter
+                                    horizontalAlignment: Text.AlignLeft
                                     level: 3
                                     font.bold: true
                                     text: qsTr("Track: %1").arg(root.selectedChannel ? root.selectedChannel.name : "")

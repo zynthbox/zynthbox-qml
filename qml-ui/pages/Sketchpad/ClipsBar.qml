@@ -29,7 +29,6 @@ import QtQuick 2.10
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Layouts 1.4
 
-
 import io.zynthbox.ui 1.0 as ZUI
 
 import io.zynthbox.components 1.0 as Zynthbox
@@ -37,7 +36,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 // GridLayout so TabbedControlView knows how to navigate it
-QQC2.Pane {
+ZUI.SectionPanel {
     id: root
 
     property QtObject bottomBar: null
@@ -73,12 +72,7 @@ QQC2.Pane {
     }
 
     Layout.fillWidth: true
-    // padding: 0
-    // background: null //for now it is not themeable
-    padding: 2
-    background: Rectangle {
-        color: "#292a2c"
-    }
+    
     QQC2.ButtonGroup {
         buttons: buttonsColumn.children
     }
@@ -112,7 +106,7 @@ QQC2.Pane {
         }
 
         RowLayout {
-            spacing: ZUI.Theme.spacing
+            spacing: ZUI.Theme.sectionSpacing
             anchors.fill: parent
 
             BottomStackTabs {
@@ -124,49 +118,25 @@ QQC2.Pane {
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             }
 
-            QQC2.Pane {
+            ZUI.SectionGroup {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                // Layout.topMargin: svgBg.visible ? svgBg.inset.top : 0
-                // Layout.leftMargin: svgBg.visible ? svgBg.inset.left : 0
-                // Layout.rightMargin: svgBg.visible ? svgBg.inset.right : 0
-                // Layout.bottomMargin: svgBg.visible ? svgBg.inset.bottom : 0
-                // topPadding: svgBg.visible ? svgBg.topPadding : 0
-                // bottomPadding: svgBg.visible ? svgBg.bottomPadding : 0
-                // leftPadding: svgBg.visible ? svgBg.leftPadding : 0
-                // rightPadding: svgBg.visible ? svgBg.rightPadding : 0
 
-                // background: Item {
-                //     PlasmaCore.FrameSvgItem {
-                //         id: svgBg
+                fallbackBackground: Rectangle {
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    color: Kirigami.Theme.backgroundColor
+                    opacity: 0.1
+                }  
 
-                //         readonly property real leftPadding: fixedMargins.left
-                //         readonly property real rightPadding: fixedMargins.right
-                //         readonly property real topPadding: fixedMargins.top
-                //         readonly property real bottomPadding: fixedMargins.bottom
-
-                //         visible: fromCurrentTheme
-                //         anchors.fill: parent
-                //         imagePath: "widgets/tracks-background"
-                //         colorGroup: PlasmaCore.Theme.ViewColorGroup
-                //     }
-
-                // }
-
-                padding: 2
-                background: Rectangle {
-                    color: "#040507"
-                    radius: 4
-                }
-
-                contentItem: Rectangle {
+                Item {
                     id: clipsContainer
-                    color: "#2e3336"    
+                    anchors.fill: parent 
                     RowLayout {
                         id: contentColumn
 
                         anchors.fill: parent
-                        spacing: 1
+                        spacing: ZUI.Theme.cellSpacing
 
                         Connections {
                             function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
@@ -235,18 +205,14 @@ QQC2.Pane {
             }
 
             // Clip details colume, visible when not in song mode
-            QQC2.Pane {
+            ZUI.SectionGroup {
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                 Layout.alignment: Qt.AlignTop
-                padding: 2
-                background: Rectangle {
-                    color: "#040507"
-                    radius: 4
-                }
 
-                contentItem: Item {
+                Item {
+                    anchors.fill: parent
                     ColumnLayout {
                         // TODO : 1.1 Enable this back when loop mode gets enabled again
                         // QQC2.Button {
@@ -281,7 +247,7 @@ QQC2.Pane {
                             text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.clipName) : ""
                         }
 
-                        QQC2.Button {
+                        ZUI.SectionButton {
                             Layout.fillWidth: true
                             implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
 
@@ -290,16 +256,9 @@ QQC2.Pane {
                             onClicked: {
                                 bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", root.selectedClipPattern.clipIndex);
                             }
-
-                            background: Rectangle {
-                                opacity: parent.checked ? 0.5 : 1
-
-                                color: parent.checked ? "#181918" : "#1f2022"
-                                radius: 2
-                            }
                         }
 
-                        QQC2.Button {
+                        ZUI.SectionButton {
                             Layout.fillWidth: true
                             implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
 
@@ -311,13 +270,6 @@ QQC2.Pane {
                                         Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.selectedClipChannel.id, i).resetPattern(true);
                                     }
                                 });
-                            }
-
-                            background: Rectangle {
-                                opacity: parent.checked ? 0.5 : 1
-
-                                color: parent.checked ? "#181918" : "#1f2022"
-                                radius: 2
                             }
                         }
 

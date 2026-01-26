@@ -1585,7 +1585,7 @@ ZUI.ScreenPage {
 
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
-                                            // Layout.bottomMargin: 1 // Without this magic number, the bottom of clips row doesn't match with left side scenes button or right side copy button
+
                                             state: bottomStack.slotsBar.mixerButton.checked ? "MixerMode" : "ClipsMode"
                                             states: [
                                                 State {
@@ -1687,166 +1687,159 @@ ZUI.ScreenPage {
                                                     }
                                                 }
 
-                                            }
+                                            }   
 
-                                            ZUI.SectionGroup {
+                                            Item {
                                                 id: mixerCell
-                                                padding: 0
-
                                                 anchors.fill: parent
+
                                                 Item {
-                                                    
                                                     anchors.fill: parent
+                                                    visible: root.showMixerEqualiser === true
 
-                                                    Item {
+
+                                                    // Layout.leftMargin: Kirigami.Units.smallSpacing
+                                                    // Layout.rightMargin: Kirigami.Units.smallSpacing
+                                                    MultiPointTouchArea {
+                                                        id: graphTouchArea
+
+                                                        readonly property int thisTrackIndex: index
+
                                                         anchors.fill: parent
-                                                        visible: root.showMixerEqualiser === true
+                                                        touchPoints: [
+                                                            TouchPoint {
+                                                                id: slidePoint
 
+                                                                property QtObject selectedBand: null
+                                                                property var pressedTime: undefined
+                                                                readonly property QtObject
+                                                                eqDoublePressedTimer: Timer {
+                                                                    interval: zynqtgui.ui_settings.doubleClickThreshold
+                                                                    running: false
+                                                                    repeat: false
+                                                                    onTriggered: {
+                                                                        // If we have not been stopped, this will be our single-click action
+                                                                        if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
+                                                                            // If we're already on this track (and also the eq is enabled), cycle to the next band
 
-                                                        // Layout.leftMargin: Kirigami.Units.smallSpacing
-                                                        // Layout.rightMargin: Kirigami.Units.smallSpacing
-                                                        MultiPointTouchArea {
-                                                            id: graphTouchArea
+                                                                            if (equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled)
+                                                                                slidePoint.ensureSelectedBand(1);
 
-                                                            readonly property int thisTrackIndex: index
-
-                                                            anchors.fill: parent
-                                                            touchPoints: [
-                                                                TouchPoint {
-                                                                    id: slidePoint
-
-                                                                    property QtObject selectedBand: null
-                                                                    property var pressedTime: undefined
-                                                                    readonly property QtObject
-                                                                    eqDoublePressedTimer: Timer {
-                                                                        interval: zynqtgui.ui_settings.doubleClickThreshold
-                                                                        running: false
-                                                                        repeat: false
-                                                                        onTriggered: {
-                                                                            // If we have not been stopped, this will be our single-click action
-                                                                            if (zynqtgui.sketchpad.selectedTrackId === graphTouchArea.thisTrackIndex) {
-                                                                                // If we're already on this track (and also the eq is enabled), cycle to the next band
-
-                                                                                if (equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled)
-                                                                                    slidePoint.ensureSelectedBand(1);
-
-                                                                            } else {
-                                                                                // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
-                                                                                zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
-                                                                            }
-                                                                        }
-                                                                    }
-
-                                                                    property point startingPoint
-                                                                    property double startingGain
-                                                                    property double startingFrequency
-
-                                                                    // Set the startOffset to 1 to move forward, and 0 to try the current one first
-                                                                    function ensureSelectedBand(startOffset) {
-                                                                        // If there are more than one active bands, cycle to the next one in the list
-                                                                        // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
-                                                                        let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
-                                                                        let currentBandIndex = equaliserSettings.indexOf(slidePoint.selectedBand);
-                                                                        for (let testOffset = startOffset; testOffset < equaliserSettings.length; testOffset++) {
-                                                                            let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
-                                                                            if (testBand.active) {
-                                                                                // This is the next active band in the settings list, select that and bail out
-                                                                                testBand.selected = true;
-                                                                                slidePoint.selectedBand = testBand;
-                                                                                break;
-                                                                            }
-                                                                        }
-                                                                        // Also make sure to de-select the compressor, in case that one's selected
-                                                                        passthroughVisualiserItem.source.compressorSettings.selected = false;
-                                                                    }
-
-                                                                    onPressedChanged: {
-                                                                        if (pressed) {
-                                                                            pressedTime = Date.now();
-                                                                            selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
-                                                                            slidePoint.ensureSelectedBand(0);
-                                                                            slidePoint.startingGain = selectedBand.gainAbsolute;
-                                                                            slidePoint.startingFrequency = selectedBand.frequencyAbsolute;
-                                                                            slidePoint.startingPoint.x = slidePoint.x;
-                                                                            slidePoint.startingPoint.y = slidePoint.y;
                                                                         } else {
-                                                                            // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
-                                                                            if ((Date.now() - pressedTime) < 300) {
-                                                                                if (eqDoublePressedTimer.running) {
-                                                                                    // If we clicked again this quickly, it was a double-click
-                                                                                    eqDoublePressedTimer.stop();
-                                                                                    passthroughVisualiserItem.source.equaliserEnabled = !passthroughVisualiserItem.source.equaliserEnabled;
-                                                                                } else {
-                                                                                    eqDoublePressedTimer.restart();
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    onYChanged: {
-                                                                        if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
-                                                                            // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
-                                                                            if (selectedBand.active === true) {
-                                                                                let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
-                                                                                selectedBand.gainAbsolute = Math.min(Math.max(slidePoint.startingGain - newGain, 0), 1);
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    onXChanged: {
-                                                                        if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
-                                                                            // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
-                                                                            if (selectedBand.active === true) {
-                                                                                let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2.5);
-                                                                                selectedBand.frequencyAbsolute = slidePoint.startingFrequency + newFrequency;
-                                                                            }
+                                                                            // If the track is not currently active, activate the track on the first tap (to ensure things work as expected in various other ways)
+                                                                            zynqtgui.sketchpad.selectedTrackId = graphTouchArea.thisTrackIndex;
                                                                         }
                                                                     }
                                                                 }
-                                                            ]
 
-                                                            Zynthbox.JackPassthroughVisualiserItem {
-                                                                id: passthroughVisualiserItem
+                                                                property point startingPoint
+                                                                property double startingGain
+                                                                property double startingFrequency
 
-                                                                function getCurrentSelectedBand() {
-                                                                    // Just in case there's nothing active, just pick the first thing in the list
-
+                                                                // Set the startOffset to 1 to move forward, and 0 to try the current one first
+                                                                function ensureSelectedBand(startOffset) {
+                                                                    // If there are more than one active bands, cycle to the next one in the list
+                                                                    // That is, cycle through until we are either back where we were (to avoid infinity), or we have another active band
                                                                     let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
-                                                                    let currentObject = null;
-                                                                    for (let slotIndex = 0; slotIndex < equaliserSettings.length; ++slotIndex) {
-                                                                        if (passthroughVisualiserItem.source.compressorSettings.selected || equaliserSettings[slotIndex].selected) {
-                                                                            currentObject = equaliserSettings[slotIndex];
+                                                                    let currentBandIndex = equaliserSettings.indexOf(slidePoint.selectedBand);
+                                                                    for (let testOffset = startOffset; testOffset < equaliserSettings.length; testOffset++) {
+                                                                        let testBand = equaliserSettings[(currentBandIndex + testOffset) % equaliserSettings.length];
+                                                                        if (testBand.active) {
+                                                                            // This is the next active band in the settings list, select that and bail out
+                                                                            testBand.selected = true;
+                                                                            slidePoint.selectedBand = testBand;
                                                                             break;
                                                                         }
                                                                     }
-                                                                    if (currentObject === null)
-                                                                        currentObject = equaliserSettings[0];
-
-                                                                    return currentObject;
+                                                                    // Also make sure to de-select the compressor, in case that one's selected
+                                                                    passthroughVisualiserItem.source.compressorSettings.selected = false;
                                                                 }
 
-                                                                anchors.fill: parent
-                                                                analyseAudio: false
-                                                                drawDisabledBands: false
-                                                                eqCurveThickness: 2
-                                                                source: root.showMixerEqualiser ? Zynthbox.AudioLevels.tracks[index] : null
-
-                                                                // An overlay for the equaliser disabled state
-                                                                Rectangle {
-                                                                    id: equaliserEnabledVisualiser
-
-                                                                    readonly property QtObject audioLevelsTrack: Zynthbox.AudioLevels.tracks[index]
-
-                                                                    anchors.fill: parent
-                                                                    color: Kirigami.Theme.negativeBackgroundColor
-                                                                    opacity: root.showMixerEqualiser === false ? 0.1 : (audioLevelsTrack.equaliserEnabled ? 0 : 0.5)
-
-                                                                    QQC2.Label {
-                                                                        anchors.centerIn: parent
-                                                                        horizontalAlignment: Text.AlignHCenter
-                                                                        font.bold: true
-                                                                        font.pointSize: 14
-                                                                        text: qsTr("EQ\nOff")
+                                                                onPressedChanged: {
+                                                                    if (pressed) {
+                                                                        pressedTime = Date.now();
+                                                                        selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
+                                                                        slidePoint.ensureSelectedBand(0);
+                                                                        slidePoint.startingGain = selectedBand.gainAbsolute;
+                                                                        slidePoint.startingFrequency = selectedBand.frequencyAbsolute;
+                                                                        slidePoint.startingPoint.x = slidePoint.x;
+                                                                        slidePoint.startingPoint.y = slidePoint.y;
+                                                                    } else {
+                                                                        // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                                                        if ((Date.now() - pressedTime) < 300) {
+                                                                            if (eqDoublePressedTimer.running) {
+                                                                                // If we clicked again this quickly, it was a double-click
+                                                                                eqDoublePressedTimer.stop();
+                                                                                passthroughVisualiserItem.source.equaliserEnabled = !passthroughVisualiserItem.source.equaliserEnabled;
+                                                                            } else {
+                                                                                eqDoublePressedTimer.restart();
+                                                                            }
+                                                                        }
                                                                     }
+                                                                }
+                                                                onYChanged: {
+                                                                    if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
+                                                                        // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
+                                                                        if (selectedBand.active === true) {
+                                                                            let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
+                                                                            selectedBand.gainAbsolute = Math.min(Math.max(slidePoint.startingGain - newGain, 0), 1);
+                                                                        }
+                                                                    }
+                                                                }
+                                                                onXChanged: {
+                                                                    if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
+                                                                        // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
+                                                                        if (selectedBand.active === true) {
+                                                                            let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2.5);
+                                                                            selectedBand.frequencyAbsolute = slidePoint.startingFrequency + newFrequency;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
 
+                                                        Zynthbox.JackPassthroughVisualiserItem {
+                                                            id: passthroughVisualiserItem
+
+                                                            function getCurrentSelectedBand() {
+                                                                // Just in case there's nothing active, just pick the first thing in the list
+
+                                                                let equaliserSettings = passthroughVisualiserItem.source.equaliserSettings;
+                                                                let currentObject = null;
+                                                                for (let slotIndex = 0; slotIndex < equaliserSettings.length; ++slotIndex) {
+                                                                    if (passthroughVisualiserItem.source.compressorSettings.selected || equaliserSettings[slotIndex].selected) {
+                                                                        currentObject = equaliserSettings[slotIndex];
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                if (currentObject === null)
+                                                                    currentObject = equaliserSettings[0];
+
+                                                                return currentObject;
+                                                            }
+
+                                                            anchors.fill: parent
+                                                            analyseAudio: false
+                                                            drawDisabledBands: false
+                                                            eqCurveThickness: 2
+                                                            source: root.showMixerEqualiser ? Zynthbox.AudioLevels.tracks[index] : null
+
+                                                            // An overlay for the equaliser disabled state
+                                                            Rectangle {
+                                                                id: equaliserEnabledVisualiser
+
+                                                                readonly property QtObject audioLevelsTrack: Zynthbox.AudioLevels.tracks[index]
+
+                                                                anchors.fill: parent
+                                                                color: Kirigami.Theme.negativeBackgroundColor
+                                                                opacity: root.showMixerEqualiser === false ? 0.1 : (audioLevelsTrack.equaliserEnabled ? 0 : 0.5)
+
+                                                                QQC2.Label {
+                                                                    anchors.centerIn: parent
+                                                                    horizontalAlignment: Text.AlignHCenter
+                                                                    font.bold: true
+                                                                    font.pointSize: 14
+                                                                    text: qsTr("EQ\nOff")
                                                                 }
 
                                                             }
@@ -1854,31 +1847,27 @@ ZUI.ScreenPage {
                                                         }
 
                                                     }
-                                                    
-                                                    ColumnLayout {                                                            
-                                                        visible: root.showMixerEqualiser === false
-                                                        anchors.fill: parent
-                                                        spacing: 2
 
-                                                        Item {
-                                                                Layout.fillWidth: true
-                                                            Layout.fillHeight: true
-                                                        QQC2.Pane {
+                                                }
+                                                
+                                                ColumnLayout {                                                            
+                                                    visible: root.showMixerEqualiser === false
+                                                    anchors.fill: parent
+                                                    spacing: ZUI.Theme.cellSpacing
+
+                                                    Item {
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        ZUI.CellControl{
                                                             anchors.fill: parent
-                                                            padding: 2
-
-                                                            background: Rectangle {
-                                                                color: "#1f2022"
-                                                                radius: 2
-                                                            }
-
                                                             contentItem: Item {
                                                                 RowLayout {
                                                                     anchors.fill: parent
                                                                     QQC2.Dial {         
                                                                         // Layout.fillWidth: true
                                                                         implicitWidth: height
-                                                                        Layout.fillHeight: true                                                      
+                                                                        Layout.fillHeight: true 
+                                                                        Layout.margins: 2                                                     
                                                                         inputMode: QQC2.Dial.Vertical
                                                                         handle: null
                                                                         value: applicationWindow().channels[index].wetFx1Amount
@@ -1904,20 +1893,14 @@ ZUI.ScreenPage {
 
                                                             }
                                                         }
-                                                        }
+                                                    }
 
-                                                        Item { 
-                                                            Layout.fillWidth: true
-                                                            Layout.fillHeight: true
-                                                        QQC2.Pane {
+                                                    Item { 
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        ZUI.CellControl {
                                                             anchors.fill: parent
-                                                            padding: 2
-
-                                                            background: Rectangle {
-                                                                color: "#1f2022"
-                                                                radius: 2
-                                                            }
-
+                                                            
                                                             contentItem: Item {
                                                                 RowLayout { 
                                                                     anchors.fill: parent                                                                        
@@ -1938,6 +1921,7 @@ ZUI.ScreenPage {
                                                                         // Layout.fillWidth: true
                                                                         implicitWidth: height
                                                                         Layout.fillHeight: true
+                                                                        Layout.margins: 2    
                                                                         inputMode: QQC2.Dial.Vertical
                                                                         handle: null
                                                                         value: applicationWindow().channels[index].wetFx2Amount
@@ -1951,13 +1935,11 @@ ZUI.ScreenPage {
                                                                 }
                                                             }
                                                         }
-                                                        }
-
                                                     }
+
                                                 }
-
                                             }
-
+                                            
                                         }
 
                                     }

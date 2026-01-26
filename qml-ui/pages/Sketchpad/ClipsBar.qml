@@ -225,7 +225,7 @@ ZUI.SectionPanel {
                         // }
 
                         anchors.fill: parent
-                        spacing: 2
+                        spacing: ZUI.Theme.spacing
 
                         QQC2.Label {
                             visible: text.length > 0

@@ -38,7 +38,7 @@ import io.zynthbox.ui 1.0 as ZUI
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-QQC2.Pane {
+ZUI.SectionPanel {
     id: root
 
     property alias bottomBarButton: bottomBarButton
@@ -59,9 +59,7 @@ QQC2.Pane {
     property QtObject selectedSlotRowItem
 
     Layout.fillWidth: true
-    padding: 0
-    background: null //for now it is no themeable
-
+    
     function cuiaCallback(cuia) {
         var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
 
@@ -298,7 +296,7 @@ QQC2.Pane {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: ZUI.Theme.spacing
+                spacing: ZUI.Theme.sectionSpacing
 
                 ColumnLayout {
                     id: buttonsColumn
@@ -437,57 +435,22 @@ QQC2.Pane {
                     }
                 }
 
-                QQC2.Pane {
+                ZUI.SectionGroup {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.topMargin: svgBg.visible ?svgBg.inset.top : 0
-                    Layout.leftMargin: svgBg.visible ?svgBg.inset.left : 0
-                    Layout.rightMargin: svgBg.visible ?svgBg.inset.right : 0
-                    Layout.bottomMargin: svgBg.visible ?svgBg.inset.bottom : 0
+                    // mask: true
+                    
+                    fallbackBackground: Rectangle {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        color: Kirigami.Theme.backgroundColor
+                        opacity: 0.1
+                    } 
 
-                    topPadding: svgBg.visible ?svgBg.topPadding : 0
-                    bottomPadding: svgBg.visible ?svgBg.bottomPadding : 0
-                    leftPadding: svgBg.visible ?svgBg.leftPadding : 0
-                    rightPadding: svgBg.visible ?svgBg.rightPadding : 0
-
-                    background: Item {
-                        Rectangle {
-                            Kirigami.Theme.colorSet: Kirigami.Theme.View
-                            Kirigami.Theme.inherit: false
-                             visible: !svgBg.visible
-                            anchors.fill: parent
-                            color: Kirigami.Theme.backgroundColor
-                        }                                        
-                                        
-                        PlasmaCore.FrameSvgItem {
-                            id: svgBg
-                            visible: fromCurrentTheme
-                            anchors.fill: parent
-
-                            readonly property real leftPadding: fixedMargins.left
-                            readonly property real rightPadding: fixedMargins.right
-                            readonly property real topPadding: fixedMargins.top
-                            readonly property real bottomPadding: fixedMargins.bottom
-
-                            imagePath: "widgets/tracks-background"
-                            colorGroup: PlasmaCore.Theme.ViewColorGroup
-                        }
-                    }
-
-                    contentItem: Item {
+                    Item {
                         id: slotsContainer
-
-                        // layer.enabled: true
-                        // layer.effect: OpacityMask
-                        // {
-                        //     maskSource: Rectangle
-                        //     {
-                        //         width: slotsContainer.width
-                        //         height: slotsContainer.height
-                        //         radius: 6
-                        //     }
-                        // }
+                        anchors.fill: parent
 
                         RowLayout {
                             id: channelsSlotsRow
@@ -620,22 +583,17 @@ QQC2.Pane {
                     }
                 }
 
-                QQC2.Pane {
+                ZUI.SectionGroup {
 
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignTop
-
-                    padding: ZUI.Theme.padding
-                    background: null
-
-                    contentItem: Item {                   
-                        
-                        ColumnLayout {
+                    
+                    ColumnLayout {
                         anchors.fill: parent
-                        spacing: Kirigami.Units.mediumSpacing
+                        spacing: ZUI.Theme.spacing
 
                         QQC2.Label {
                             Layout.fillWidth: true
@@ -767,7 +725,7 @@ QQC2.Pane {
                             }
                         }
 
-                        QQC2.Button {
+                        ZUI.SectionButton {
                             Layout.fillWidth: true
                             text: qsTr("Swap with...")
                             onClicked: {
@@ -787,9 +745,8 @@ QQC2.Pane {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                         }
-                    }
+                    }                    
                 }
-            }
             }
         }
     }

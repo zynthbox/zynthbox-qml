@@ -116,7 +116,8 @@ GridLayout {
       */
     function switchToSlot(index, onlyFocus=false, onlySelectSlot=false) {
         // This function may conceivably (and does, or this wouldn't be here) be called during incubation, so let's just... not cause errors
-        let slotItem = slotRepeater.itemAt(index);
+
+        let slotItem = slotRepeater.itemAt((index)*2);
         if (slotItem) {
             slotItem.switchToThisSlot(onlyFocus, onlySelectSlot);
         }
@@ -227,7 +228,12 @@ GridLayout {
                 return n % 2 === 0;
             }
 
+            function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
+                _loader.item.switchToThisSlot(onlyFocus, onlySelectSlot)
+            }
+
             Loader {
+                id: _loader
                 anchors.fill: parent
                 active: isEven(index)
                 visible: active

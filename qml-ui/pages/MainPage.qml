@@ -35,10 +35,7 @@ ZUI.ScreenPage {
     screenId: "main"
     backAction.visible: false
 
-    // padding: 2
-    // background: Rectangle {
-    //     color: "#2e3336"
-    // }
+    padding : 0
 
     cuiaCallback: function(cuia) {
         switch (cuia) {
@@ -104,226 +101,227 @@ ZUI.ScreenPage {
         buttons: categoryButtons.children
     }
 
-    contentItem: RowLayout {
-        // spacing: Kirigami.Units.gridUnit
-        spacing: ZUI.Theme.sectionSpacing
+    contentItem: ZUI.SectionPanel {
+        contentItem: RowLayout {
+            spacing: ZUI.Theme.sectionSpacing
 
-        ZUI.SectionGroup {
-            Layout.fillWidth: false
-            Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-            
-            Item{    
-                anchors.fill: parent            
+            ZUI.SectionGroup {
+                Layout.fillWidth: false
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                
+                Item{    
+                    anchors.fill: parent            
 
-                ColumnLayout {
-                    id: categoryButtons
-                    anchors.fill: parent
-                    spacing: ZUI.Theme.spacing   
-                    //Placeholders to replace the buttons
-                    ZUI.SectionButton {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
-                        implicitHeight: 0
-                        checkable: true
-                        checked: highlighted
-                        highlighted: zynqtgui.main.visibleCategory === "modules"
-                        text: qsTr("Modules")
-                        onClicked: zynqtgui.main.visibleCategory = "modules"
+                    ColumnLayout {
+                        id: categoryButtons
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.spacing   
+                        //Placeholders to replace the buttons
+                        ZUI.SectionButton {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            implicitHeight: 0
+                            checkable: true
+                            checked: highlighted
+                            highlighted: zynqtgui.main.visibleCategory === "modules"
+                            text: qsTr("Modules")
+                            onClicked: zynqtgui.main.visibleCategory = "modules"
+                        }
+
+                        ZUI.SectionButton {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            implicitHeight: 0
+                            checkable: true
+                            checked: highlighted
+                            highlighted: zynqtgui.main.visibleCategory === "appimages"
+                            text: qsTr("Apps")
+                            onClicked: zynqtgui.main.visibleCategory = "appimages"
+                        }
+
+                        ZUI.SectionButton {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            implicitHeight: 0
+                            checkable: true
+                            checked: highlighted
+                            highlighted: zynqtgui.main.visibleCategory === "sessions" ||
+                                    zynqtgui.main.visibleCategory === "sessions-versions"
+                            text: qsTr("Sketchpads")
+                            onClicked: zynqtgui.main.visibleCategory = "sessions"
+                        }
+
+                        ZUI.SectionButton {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            implicitHeight: 0
+                            checkable: true
+                            checked: highlighted
+                            highlighted: zynqtgui.main.visibleCategory === "services"
+                            text: qsTr("Services")
+                            onClicked: zynqtgui.main.visibleCategory = "services"
+                        }
+
+                        ZUI.SectionButton {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            implicitHeight: 0
+                            checkable: true
+                            checked: highlighted
+                            highlighted: zynqtgui.main.visibleCategory === "?"
+                            text: qsTr("")
+                            onClicked: zynqtgui.main.visibleCategory = "?"
+                        }
+
+                        // Disabled these below buttons for now
+                        // QQC2.Button {
+                        //     Layout.fillWidth: true
+                        //     Layout.fillHeight: true
+                        //     opacity: 0
+                        //     enabled: false
+                        //     checkable: true
+                        //     checked: zynqtgui.main.visibleCategory === "sessions" ||
+                        //              zynqtgui.main.visibleCategory === "sessions-versions"
+                        //     text: qsTr("Sessions")
+                        //     onClicked: zynqtgui.main.visibleCategory = "sessions"
+                        // }
+                        // QQC2.Button {
+                        //     Layout.fillWidth: true
+                        //     Layout.fillHeight: true
+                        //     opacity: 0
+                        //     enabled: false
+                        //     checkable: true
+                        //     checked: zynqtgui.main.visibleCategory === "templates"
+                        //     text: qsTr("Templates")
+                        //     onClicked: zynqtgui.main.visibleCategory = "templates"
+                        // }
+                        // QQC2.Button {
+                        //     Layout.fillWidth: true
+                        //     Layout.fillHeight: true
+                        //     opacity: 0
+                        //     enabled: false
+                        //     checkable: true
+                        //     checked: zynqtgui.main.visibleCategory === "discover"
+                        //     text: qsTr("Discover")
+                        //     onClicked: zynqtgui.main.visibleCategory = "discover"
+                        // }
                     }
-
-                    ZUI.SectionButton {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
-                        implicitHeight: 0
-                        checkable: true
-                        checked: highlighted
-                        highlighted: zynqtgui.main.visibleCategory === "appimages"
-                        text: qsTr("Apps")
-                        onClicked: zynqtgui.main.visibleCategory = "appimages"
-                    }
-
-                    ZUI.SectionButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        implicitHeight: 0
-                        checkable: true
-                        checked: highlighted
-                        highlighted: zynqtgui.main.visibleCategory === "sessions" ||
-                                zynqtgui.main.visibleCategory === "sessions-versions"
-                        text: qsTr("Sketchpads")
-                        onClicked: zynqtgui.main.visibleCategory = "sessions"
-                    }
-
-                    ZUI.SectionButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        implicitHeight: 0
-                        checkable: true
-                        checked: highlighted
-                        highlighted: zynqtgui.main.visibleCategory === "services"
-                        text: qsTr("Services")
-                        onClicked: zynqtgui.main.visibleCategory = "services"
-                    }
-
-                    ZUI.SectionButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        implicitHeight: 0
-                        checkable: true
-                        checked: highlighted
-                        highlighted: zynqtgui.main.visibleCategory === "?"
-                        text: qsTr("")
-                        onClicked: zynqtgui.main.visibleCategory = "?"
-                    }
-
-                    // Disabled these below buttons for now
-                    // QQC2.Button {
-                    //     Layout.fillWidth: true
-                    //     Layout.fillHeight: true
-                    //     opacity: 0
-                    //     enabled: false
-                    //     checkable: true
-                    //     checked: zynqtgui.main.visibleCategory === "sessions" ||
-                    //              zynqtgui.main.visibleCategory === "sessions-versions"
-                    //     text: qsTr("Sessions")
-                    //     onClicked: zynqtgui.main.visibleCategory = "sessions"
-                    // }
-                    // QQC2.Button {
-                    //     Layout.fillWidth: true
-                    //     Layout.fillHeight: true
-                    //     opacity: 0
-                    //     enabled: false
-                    //     checkable: true
-                    //     checked: zynqtgui.main.visibleCategory === "templates"
-                    //     text: qsTr("Templates")
-                    //     onClicked: zynqtgui.main.visibleCategory = "templates"
-                    // }
-                    // QQC2.Button {
-                    //     Layout.fillWidth: true
-                    //     Layout.fillHeight: true
-                    //     opacity: 0
-                    //     enabled: false
-                    //     checkable: true
-                    //     checked: zynqtgui.main.visibleCategory === "discover"
-                    //     text: qsTr("Discover")
-                    //     onClicked: zynqtgui.main.visibleCategory = "discover"
-                    // }
                 }
             }
-        }
 
-        QQC2.Control {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            // topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
-            // bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
-            // leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
-            // rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
+            QQC2.Control {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                // topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
+                // bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
+                // leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
+                // rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
 
-            // background: Item {
-            //     PlasmaCore.FrameSvgItem {
-            //         id: svgBg4
-            //         visible: fromCurrentTheme
-            //         anchors.fill: parent
+                // background: Item {
+                //     PlasmaCore.FrameSvgItem {
+                //         id: svgBg4
+                //         visible: fromCurrentTheme
+                //         anchors.fill: parent
 
-            //         readonly property real leftPadding: fixedMargins.left
-            //         readonly property real rightPadding: fixedMargins.right
-            //         readonly property real topPadding: fixedMargins.top
-            //         readonly property real bottomPadding: fixedMargins.bottom
+                //         readonly property real leftPadding: fixedMargins.left
+                //         readonly property real rightPadding: fixedMargins.right
+                //         readonly property real topPadding: fixedMargins.top
+                //         readonly property real bottomPadding: fixedMargins.bottom
 
-            //         imagePath: "widgets/background"
-            //          colorGroup: PlasmaCore.Theme.ViewColorGroup
-            //     }
-            // }
+                //         imagePath: "widgets/background"
+                //          colorGroup: PlasmaCore.Theme.ViewColorGroup
+                //     }
+                // }
 
-           contentItem: MouseArea {
-                id: gridMouseArea
-                property bool blocked: false
-                drag.filterChildren: true
-                onClicked: {
-                    if (!gridMouseArea.blocked) {
-                        zynqtgui.show_modal("sketchpad")
-                    }
-                }
-
-                GridView {
-                    id: mainviewGridId
-
-                    property int iconWidth: (parent.width / 5)
-                    property int iconHeight:  (parent.height / 2.1)
-
-                    clip: true
-                    anchors.fill: parent
-                    cellWidth:iconWidth
-                    cellHeight:iconHeight
-                    currentIndex: zynqtgui.main.current_index
-                    model:zynqtgui.main.selector_list
-                    function activateCurrent() {
-                        if (mainviewGridId.currentItem) {
-                            mainviewGridId.currentItem.activate();
+            contentItem: MouseArea {
+                    id: gridMouseArea
+                    property bool blocked: false
+                    drag.filterChildren: true
+                    onClicked: {
+                        if (!gridMouseArea.blocked) {
+                            zynqtgui.show_modal("sketchpad")
                         }
                     }
-                    delegate: HomeScreenIcon {
-                        width: mainviewGridId.iconWidth
-                        height: mainviewGridId.iconHeight
 
-                        id: delegateIconButton
-                        readonly property bool isCurrent: mainviewGridId.currentIndex === index
+                    GridView {
+                        id: mainviewGridId
 
-                        imgSrc: model.icon
-                        highlighted: isCurrent || _mouseArea.containsPress
-                        onIsCurrentChanged: {
-                            if (isCurrent) {
-                                zynqtgui.main.current_index = index;
+                        property int iconWidth: (parent.width / 5)
+                        property int iconHeight:  (parent.height / 2.1)
+
+                        clip: true
+                        anchors.fill: parent
+                        cellWidth:iconWidth
+                        cellHeight:iconHeight
+                        currentIndex: zynqtgui.main.current_index
+                        model:zynqtgui.main.selector_list
+                        function activateCurrent() {
+                            if (mainviewGridId.currentItem) {
+                                mainviewGridId.currentItem.activate();
                             }
                         }
+                        delegate: HomeScreenIcon {
+                            width: mainviewGridId.iconWidth
+                            height: mainviewGridId.iconHeight
 
-                        text: model.display ? model.display : ""
+                            id: delegateIconButton
+                            readonly property bool isCurrent: mainviewGridId.currentIndex === index
 
-                        function activate() {
-                            // activate_index will start the appimage process and open sketchpad after 5 seconds
-                            // to mimic closing of menu after opening an app like other modules in main page
-                            zynqtgui.main.activate_index(model.index);
-
-                            if (model.action_id === "appimage") {
-                                // FIXME : If currentTaskMessage is not cleared before calling start_loading, it displays a blank loading screen without any text
-                                zynqtgui.currentTaskMessage = ""
-                                zynqtgui.start_loading_with_message("Starting " + model.display);
-                                stopLoadingTimer.restart();
-                            }
-                        }
-                        MouseArea {
-                            id: _mouseArea
-                            anchors.fill: parent
-                            onPressed: {
-                                gridMouseArea.blocked = true
-                                mainviewGridId.currentIndex = index
-                            }
-                            onReleased: gridMouseArea.blocked = false
-                            onCanceled: gridMouseArea.blocked = false
-                            onClicked: {
-                                delegateIconButton.activate();
-                            }
-
-                            QQC2.Button {
-                                anchors {
-                                    top: parent.top
-                                    right: parent.right
-                                    margins: Kirigami.Units.gridUnit
+                            imgSrc: model.icon
+                            highlighted: isCurrent || _mouseArea.containsPress
+                            onIsCurrentChanged: {
+                                if (isCurrent) {
+                                    zynqtgui.main.current_index = index;
                                 }
-                                width: Kirigami.Units.gridUnit * 2
-                                height: Kirigami.Units.gridUnit * 2
-                                icon.name: "delete-symbolic"
-                                // FIXME : Temporarily disable delete button. Figure out how to notify newstuffModel about app removal otherwise newstuff doesnt know that app got removed
-                                visible: false //model.action_id === "appimage" && model.metadata.path.length > 0
+                            }
+
+                            text: model.display ? model.display : ""
+
+                            function activate() {
+                                // activate_index will start the appimage process and open sketchpad after 5 seconds
+                                // to mimic closing of menu after opening an app like other modules in main page
+                                zynqtgui.main.activate_index(model.index);
+
+                                if (model.action_id === "appimage") {
+                                    // FIXME : If currentTaskMessage is not cleared before calling start_loading, it displays a blank loading screen without any text
+                                    zynqtgui.currentTaskMessage = ""
+                                    zynqtgui.start_loading_with_message("Starting " + model.display);
+                                    stopLoadingTimer.restart();
+                                }
+                            }
+                            MouseArea {
+                                id: _mouseArea
+                                anchors.fill: parent
                                 onPressed: {
                                     gridMouseArea.blocked = true
                                     mainviewGridId.currentIndex = index
                                 }
                                 onReleased: gridMouseArea.blocked = false
                                 onCanceled: gridMouseArea.blocked = false
-                                onClicked: zynqtgui.main.unregisterAppImage(model.metadata.path)
+                                onClicked: {
+                                    delegateIconButton.activate();
+                                }
+
+                                QQC2.Button {
+                                    anchors {
+                                        top: parent.top
+                                        right: parent.right
+                                        margins: Kirigami.Units.gridUnit
+                                    }
+                                    width: Kirigami.Units.gridUnit * 2
+                                    height: Kirigami.Units.gridUnit * 2
+                                    icon.name: "delete-symbolic"
+                                    // FIXME : Temporarily disable delete button. Figure out how to notify newstuffModel about app removal otherwise newstuff doesnt know that app got removed
+                                    visible: false //model.action_id === "appimage" && model.metadata.path.length > 0
+                                    onPressed: {
+                                        gridMouseArea.blocked = true
+                                        mainviewGridId.currentIndex = index
+                                    }
+                                    onReleased: gridMouseArea.blocked = false
+                                    onCanceled: gridMouseArea.blocked = false
+                                    onClicked: zynqtgui.main.unregisterAppImage(model.metadata.path)
+                                }
                             }
                         }
                     }

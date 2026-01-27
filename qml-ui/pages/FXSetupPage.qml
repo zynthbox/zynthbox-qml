@@ -35,6 +35,13 @@ import io.zynthbox.components 1.0 as Zynthbox
 
 ZUI.ScreenPage {
     id: root
+
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
+
     property var screenIds: ["effects_for_channel", "effect_preset"]
     property QtObject selectedChannel: null
     Timer {
@@ -155,177 +162,188 @@ ZUI.ScreenPage {
             }
         }
     }
-    contentItem: RowLayout {
-        id: layout
-        // FIXME : Find a way to correctly expand the columns equally with filLWidth property instead of using manually calculated width value
-        property real columnWidth: width / children.length - spacing/2
-        spacing: Kirigami.Units.gridUnit
+    contentItem: Item {
+        RowLayout {
+            id: layout
+            anchors.fill: parent
+            spacing: Kirigami.Units.gridUnit
 
-        ColumnLayout {
-            Layout.fillWidth: false
-            Layout.fillHeight: true
-            Layout.preferredWidth: layout.columnWidth
-
-            ZUI.LibraryPagePicker {
-                id: libraryPagePicker
-                Layout.fillWidth: true
-                libraryName: "fx"
-                selectedChannel: root.selectedChannel
-            }
-
-            ZUI.SelectorView {
-                id: fixedEffectsView
+            Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: root.screenIds[0]
-                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                onItemActivated: {
-                    if (root.selectedChannel.selectedSlot.value === index) {
-                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("fx", index);
-                    } else {
-                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
+                ColumnLayout {
+                    anchors.fill: parent
+
+                    ZUI.LibraryPagePicker {
+                        id: libraryPagePicker
+                        Layout.fillWidth: true
+                        libraryName: "fx"
+                        selectedChannel: root.selectedChannel
                     }
-                    if (zynqtgui.current_screen_id != "effects_for_channel") {
-                        zynqtgui.current_screen_id = "effects_for_channel";
-                    }
-                    root.itemActivated(screenId, index)
-                }
-                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                autoActivateIndexOnChange: true
-                onIconClicked: {
-                    if (fixedEffectsView.selector.current_index != index) {
-                        fixedEffectsView.selector.current_index = index;
-                        fixedEffectsView.selector.activate_index(index);
-                    }
-                    zynqtgui.current_screen_id = "effects_for_channel";
-                }
-                Component.onCompleted: {
-                    fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
-                }
-                delegate: ZUI.SelectorDelegate {
-                    id: delegate
-                    screenId: fixedEffectsView.screenId
-                    selector: fixedEffectsView.selector
-                    highlighted: zynqtgui.current_screen_id === fixedEffectsView.screenId
-                    onCurrentScreenIdRequested: fixedEffectsView.currentScreenIdRequested(screenId)
-                    onItemActivated: fixedEffectsView.itemActivated(screenId, index)
-                    onItemActivatedSecondary: fixedEffectsView.itemActivatedSecondary(screenId, index)
-                    height: fixedEffectsView.view.height/5
-                    onClicked: {
-                        if (!zynqtgui.effects_for_channel.current_index_valid) {
-                            delegate.selector.activate_index(index);
+
+                    ZUI.SelectorView {
+                        id: fixedEffectsView
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        screenId: root.screenIds[0]
+                        onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                        onItemActivated: {
+                            if (root.selectedChannel.selectedSlot.value === index) {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("fx", index);
+                            } else {
+                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
+                            }
+                            if (zynqtgui.current_screen_id != "effects_for_channel") {
+                                zynqtgui.current_screen_id = "effects_for_channel";
+                            }
+                            root.itemActivated(screenId, index)
                         }
-                    }
-                    contentItem: ColumnLayout {
-                        RowLayout {
-                            QQC2.Label {
-                                id: mainLabel
-                                Layout.fillWidth: true
-                                Binding { // Optimization
-                                    target: mainLabel
-                                    property: "text"
-                                    delayed: true
-                                    value: mainLabel.visible
-                                        ? model.display
-                                        : ""
+                        onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                        autoActivateIndexOnChange: true
+                        onIconClicked: {
+                            if (fixedEffectsView.selector.current_index != index) {
+                                fixedEffectsView.selector.current_index = index;
+                                fixedEffectsView.selector.activate_index(index);
+                            }
+                            zynqtgui.current_screen_id = "effects_for_channel";
+                        }
+                        Component.onCompleted: {
+                            fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                        }
+                        delegate: ZUI.SelectorDelegate {
+                            id: delegate
+                            screenId: fixedEffectsView.screenId
+                            selector: fixedEffectsView.selector
+                            highlighted: zynqtgui.current_screen_id === fixedEffectsView.screenId
+                            onCurrentScreenIdRequested: fixedEffectsView.currentScreenIdRequested(screenId)
+                            onItemActivated: fixedEffectsView.itemActivated(screenId, index)
+                            onItemActivatedSecondary: fixedEffectsView.itemActivatedSecondary(screenId, index)
+                            height: fixedEffectsView.view.height/5
+                            onClicked: {
+                                if (!zynqtgui.effects_for_channel.current_index_valid) {
+                                    delegate.selector.activate_index(index);
                                 }
-                                elide: Text.ElideRight
+                            }
+                            contentItem: ColumnLayout {
+                                RowLayout {
+                                    QQC2.Label {
+                                        id: mainLabel
+                                        Layout.fillWidth: true
+                                        Binding { // Optimization
+                                            target: mainLabel
+                                            property: "text"
+                                            delayed: true
+                                            value: mainLabel.visible
+                                                ? model.display
+                                                : ""
+                                        }
+                                        elide: Text.ElideRight
+                                    }
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                }
+                                Rectangle {
+                                    property QtObject fxPassthroughClient: root.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
+                                    Layout.preferredWidth: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                                    visible: fxPassthroughClient != null && root.selectedChannel != null && root.selectedChannel.chainedFx[index] != null
+                                    color: Kirigami.Theme.highlightColor
+                                    opacity: 0.7
+                                }
                             }
                         }
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                        }
-                        Rectangle {
-                            property QtObject fxPassthroughClient: root.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
-                            Layout.preferredWidth: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                            visible: fxPassthroughClient != null && root.selectedChannel != null && root.selectedChannel.chainedFx[index] != null
-                            color: Kirigami.Theme.highlightColor
-                            opacity: 0.7
-                        }
                     }
                 }
             }
-        }
 
-        ColumnLayout {
-            Layout.fillWidth: false
-            Layout.fillHeight: true
-            Layout.preferredWidth: layout.columnWidth
-
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.minimumHeight: libraryPagePicker.height
-                Layout.maximumHeight: libraryPagePicker.height
-                Kirigami.Heading {
-                    level: 2
-                    text: ""
-                    Kirigami.Theme.inherit: false
-                    // TODO: this should eventually go to Window and the panels to View
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                }
-            }
-
-            ZUI.SelectorView {
+            Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                model: []
-            }
-        }
+                ColumnLayout {
+                    anchors.fill: parent
 
-        ColumnLayout {
-            Layout.fillWidth: false
-            Layout.fillHeight: true
-            Layout.preferredWidth: layout.columnWidth
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: libraryPagePicker.height
+                        Layout.maximumHeight: libraryPagePicker.height
+                        Kirigami.Heading {
+                            level: 2
+                            text: ""
+                            Kirigami.Theme.inherit: false
+                            // TODO: this should eventually go to Window and the panels to View
+                            Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        }
+                    }
 
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.minimumHeight: libraryPagePicker.height
-                Layout.maximumHeight: libraryPagePicker.height
-                Kirigami.Heading {
-                    level: 2
-                    text: qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)
-                    Kirigami.Theme.inherit: false
-                    // TODO: this should eventually go to Window and the panels to View
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                }
-                Item {
-                    Layout.fillWidth: true
-                }
-                QQC2.Button {
-                    id: favToggleButton
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-                    text: zynqtgui.preset.show_only_favorites ? qsTr("Show All") : qsTr("Show Favorites")
-                    onClicked: {
-                        zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
+                    ZUI.SelectorView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        model: []
                     }
                 }
             }
-            ZUI.SelectorView {
-                id: effectPresetView
+
+            Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: root.screenIds[1]
-                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                onItemActivated: {
-                    if (zynqtgui.current_screen_id != "effect_preset") {
-                        zynqtgui.current_screen_id = "effect_preset";
+                ColumnLayout {
+                    anchors.fill: parent
+                    ZUI.SectionGroup {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: libraryPagePicker.height
+                        Layout.maximumHeight: libraryPagePicker.height
+
+                        RowLayout {
+                           anchors.fill: parent
+                            Kirigami.Heading {
+                                level: 2
+                                text: qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)
+                                Kirigami.Theme.inherit: false
+                                // TODO: this should eventually go to Window and the panels to View
+                                Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                            }
+                            ZUI.SectionButton {
+                                id: favToggleButton
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                                text: zynqtgui.preset.show_only_favorites ? qsTr("Show All") : qsTr("Show Favorites")
+                                onClicked: {
+                                    zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
+                                }
+                            }
+                        }
                     }
-                    root.itemActivated(screenId, index)
-                }
-                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                autoActivateIndexOnChange: true
-                onIconClicked: {
-                    if (effectPresetView.selector.current_index != index) {
-                        effectPresetView.selector.current_index = index;
-                        effectPresetView.selector.activate_index(index);
+                    
+                    ZUI.SelectorView {
+                        id: effectPresetView
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        screenId: root.screenIds[1]
+                        onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                        onItemActivated: {
+                            if (zynqtgui.current_screen_id != "effect_preset") {
+                                zynqtgui.current_screen_id = "effect_preset";
+                            }
+                            root.itemActivated(screenId, index)
+                        }
+                        onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                        autoActivateIndexOnChange: true
+                        onIconClicked: {
+                            if (effectPresetView.selector.current_index != index) {
+                                effectPresetView.selector.current_index = index;
+                                effectPresetView.selector.activate_index(index);
+                            }
+                            zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
+                            zynqtgui.current_screen_id = "effect_preset";
+                        }
+                        Component.onCompleted: {
+                            effectPresetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                        }
                     }
-                    zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
-                    zynqtgui.current_screen_id = "effect_preset";
-                }
-                Component.onCompleted: {
-                    effectPresetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }
             }
         }

@@ -787,6 +787,7 @@ Kirigami.AbstractApplicationWindow {
         id: _breadCrumbSectionComponent
         QQC2.Control {
             padding: 0
+            bottomPadding: 0
             clip: true
             background: null
             contentItem: RowLayout

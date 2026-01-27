@@ -62,6 +62,12 @@ ZUI.ScreenPage {
         }
     ]
 
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
+
     QtObject {
         id: _private
 

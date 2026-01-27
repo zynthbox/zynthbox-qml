@@ -306,7 +306,6 @@ GridLayout {
                     // padding: svgBg.visible ? svgBg.leftPadding : 0
                     padding: 2
 
-
                     background: Item {
                         id: backgroundItem
                         property bool highlightBorder: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === realIndex)
@@ -447,7 +446,6 @@ GridLayout {
                         Loader { 
                             anchors {
                                 fill: parent
-                                // margins: Kirigami.Units.smallSpacing
                                 margins: ZUI.Theme.padding
                             }
                             active: !ZUI.Theme.altVolume
@@ -542,6 +540,7 @@ GridLayout {
                                 Layout.fillHeight: true
                                 padding: 2
                                 background: Rectangle {
+                                    visible: ZUI.Theme.altVolume
                                     opacity: delegate.isEmpty || backgroundItem.highlightBorder  ? 0 : 1
 
                                     color: delegate.isEmpty  ? "#181918" : "#1f2022"

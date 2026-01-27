@@ -37,10 +37,13 @@ ZUI.ScreenPage {
     title: qsTr("Audio Settings")
     screenId: "audio_settings"
 
-    Rectangle {
-        anchors.fill: parent
+    background: Rectangle 
+    {
         color: Kirigami.Theme.backgroundColor
-        radius: 2
+        opacity: 0.4
+    }
+
+    contentItem: ZUI.SectionGroup {        
 
         ColumnLayout {
             anchors.fill: parent

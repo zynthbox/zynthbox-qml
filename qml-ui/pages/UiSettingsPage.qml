@@ -34,43 +34,6 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 ZUI.ScreenPage {
-    //     Layout.fillWidth: true
-    //     Layout.fillHeight: false
-    //     QQC2.Label {
-    //         Layout.fillWidth: false
-    //         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-    //         text: qsTr("Font Size")
-    //     }
-    //     QQC2.Slider {
-    //         id: fontSizeSlider
-    //         Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-    //         from: 1
-    //         to: 100
-    //         stepSize: 1
-    //         value: zynqtgui.ui_settings.fontSize == null ? zynqtgui.theme_chooser.calculate_font_size() : zynqtgui.ui_settings.fontSize
-    //         onPressedChanged: {
-    //             // Set the value on release to save the value only when needed
-    //             if (!pressed) {
-    //                 zynqtgui.ui_settings.fontSize = value
-    //             }
-    //         }
-    //     }
-    //     Rectangle {
-    //         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-    //         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-    //         Kirigami.Theme.inherit: false
-    //         Kirigami.Theme.colorSet: Kirigami.Theme.Button
-    //         color: Kirigami.Theme.backgroundColor
-    //         border.color: "#ff999999"
-    //         border.width: 2
-    //         radius: 4
-    //highlighted: view.activeFocus || zynqtgui.current_screen_id === root.screenId || (zynqtgui.current_screen_id === "layer" && root.screenId === "fixed_layers")
-    //         QQC2.Label {
-    //             anchors.centerIn: parent
-    //             text: qsTr("%1 pt").arg(fontSizeSlider.value)
-    //         }
-    //     }
-    // }
 
     id: root
 
@@ -122,6 +85,12 @@ ZUI.ScreenPage {
     title: qsTr("UI Settings")
     screenId: "ui_settings"
     contextualActions: []
+
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
 
     component EntryDelegate: QQC2.ItemDelegate {
         id: _delegate

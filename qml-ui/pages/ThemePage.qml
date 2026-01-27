@@ -36,11 +36,17 @@ ZUI.ScreenPage {
     property var cuiaCallback: function(cuia) {
         return false
     }
+    
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
 
     screenId: "theme_chooser"
     visible: true
     title: "Themes"
-    bottomPadding: Kirigami.Units.gridUnit
+
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Get New Themes")

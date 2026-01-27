@@ -37,6 +37,12 @@ ZUI.ScreenPage {
     id: root
     title: zynqtgui.about.selector_path
 
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
+    
     screenId: "about"
 
     Component {
@@ -73,21 +79,25 @@ ZUI.ScreenPage {
             }
         }
     }
-    contentItem: RowLayout {
-        Image {
-            Layout.alignment: Qt.AlignCenter
-            source: "../../img/logo.png"
-        }
-        Loader {
-            id: aboutDetailsLoader
-            Layout.fillWidth: true
-            asynchronous: true
-            sourceComponent: aboutDetailsComponent
-            PlasmaComponents.BusyIndicator {
-                anchors.centerIn: parent
-                visible: parent.status !== Loader.Ready
-                running: visible
+    contentItem: ZUI.SectionGroup{
+        RowLayout {
+            anchors.fill: parent
+            Image {
+                Layout.alignment: Qt.AlignCenter
+                source: "../../img/logo.png"
+            }
+            Loader {
+                id: aboutDetailsLoader
+                Layout.fillWidth: true
+                asynchronous: true
+                sourceComponent: aboutDetailsComponent
+                PlasmaComponents.BusyIndicator {
+                    anchors.centerIn: parent
+                    visible: parent.status !== Loader.Ready
+                    running: visible
+                }
             }
         }
     }
+     
 }

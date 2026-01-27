@@ -35,7 +35,11 @@ ZUI.ScreenPage {
     screenId: "main"
     backAction.visible: false
 
-    padding : 0
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
 
     cuiaCallback: function(cuia) {
         switch (cuia) {

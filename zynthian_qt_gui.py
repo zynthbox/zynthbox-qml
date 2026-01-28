@@ -2068,7 +2068,6 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_GLOBAL_DOWN":
             self.globalButtonPressed = True
         elif cuia == "SWITCH_GLOBAL_RELEASED":
-            self.globalPopupOpened = True
             self.globalButtonPressed = False
 
         elif cuia == "TRACK_1":

@@ -303,6 +303,12 @@ Kirigami.AbstractApplicationWindow {
                     result = true;
                 }
                 break;
+            case "SWITCH_KNOB3_RELEASED":
+                if (zynqtgui.altButtonPressed && zynqtgui.globalPopupOpened === false) {
+                    zynqtgui.globalPopupOpened = true;
+                    result = true;
+                }
+                break;
             case "NAVIGATE_LEFT":
                 if (zynqtgui.modeButtonPressed) {
                     root.selectedChannel.selectedClip = Math.max(0, root.selectedChannel.selectedClip - 1);

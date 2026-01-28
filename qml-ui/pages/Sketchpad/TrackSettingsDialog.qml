@@ -182,6 +182,7 @@ ZUI.DialogQuestion {
         }
         QQC2.Button {
             id: targetTrack
+            visible: zynqtgui.ui_settings.showExperimentalFeatures
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             implicitWidth: Kirigami.Units.gridUnit * 5

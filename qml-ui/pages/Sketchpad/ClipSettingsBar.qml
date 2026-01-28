@@ -382,6 +382,7 @@ ColumnLayout {
                 }
                 ZUI.ActionPickerPopup {
                     id: playbackStylePicker
+                    rows: zynqtgui.ui_settings.showExperimentalFeatures ? 3 : 2
                     actions: [
                         Kirigami.Action {
                             text: root.clipAudioSource
@@ -390,6 +391,7 @@ ColumnLayout {
                                     : qsTr("Inherit from Clip\n(currently %1)").arg(root.clipAudioSource.rootSlice.playbackStyleLabel)
                                 : qsTr("No Clip")
                             visible: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.isRootSlice === false
+                            enabled: visible
                             onTriggered: {
                                 root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle;
                             }
@@ -427,6 +429,8 @@ ColumnLayout {
                             }
                         },
                         Kirigami.Action {
+                            visible: zynqtgui.ui_settings.showExperimentalFeatures
+                            enabled: visible
                             text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle
                                 ? qsTr("<b>Granular Non-looping</b><br />(experimental)")
                                 : qsTr("Granular Non-looping\n(experimental)")
@@ -435,6 +439,8 @@ ColumnLayout {
                             }
                         },
                         Kirigami.Action {
+                            visible: zynqtgui.ui_settings.showExperimentalFeatures
+                            enabled: visible
                             text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle
                                 ? qsTr("<b>Granular Looping</b><br />(experimental)")
                                 : qsTr("Granular Looping\n(experimental)")

@@ -411,7 +411,7 @@ Kirigami.AbstractApplicationWindow {
                         show_modal("channel_external_setup");
                     }
                 }
-                returnValue = true;
+                result = true;
                 break;
             }
         }

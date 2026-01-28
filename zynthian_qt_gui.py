@@ -3401,7 +3401,7 @@ class zynthian_gui(QObject):
         return self.loading > 0
 
     def get_grainerator_enabled(self):
-        return "grainerator" in zynthian_gui_config.experimental_features
+        return self.ui_settings.showExperimentalFeatures
 
     # FIXME: is this necessary?
     def loading_refresh(self):

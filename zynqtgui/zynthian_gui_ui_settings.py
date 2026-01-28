@@ -43,6 +43,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
         self.__temporaryLiveRecordStyle = int(self.zynqtgui.global_settings.value("UI/temporaryLiveRecordStyle", 1))
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
+        self.__showExperimentalFeatures = True if self.zynqtgui.global_settings.value("UI/showExperimentalFeatures", "false") == "true" else False
         self.__showCursor = True if self.zynqtgui.global_settings.value("UI/showCursor", "false") == "true" else False
         self.__touchEncoders = True if self.zynqtgui.global_settings.value("UI/touchEncoders", "false") == "true" else False
         self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
@@ -167,6 +168,22 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     debugMode = Property(bool, get_debugMode, set_debugMode, notify=debugModeChanged)
     ### END Property debugMode
+
+    ### BEGIN Property showExperimentalFeatures
+    def get_showExperimentalFeatures(self):
+        return self.__showExperimentalFeatures
+
+    def set_showExperimentalFeatures(self, value):
+        if value != self.__doubleClickThreshold:
+            self.__showExperimentalFeatures = value
+            self.zynqtgui.global_settings.setValue("UI/showExperimentalFeatures", self.__showExperimentalFeatures)
+            self.showExperimentalFeaturesChanged.emit()
+            zynthian_gui_config.reset_log_level()
+
+    showExperimentalFeaturesChanged = Signal()
+
+    showExperimentalFeatures = Property(bool, get_showExperimentalFeatures, set_showExperimentalFeatures, notify=showExperimentalFeaturesChanged)
+    ### END Property showExperimentalFeatures
 
     ### BEGIN Property showCursor
     def get_showCursor(self):

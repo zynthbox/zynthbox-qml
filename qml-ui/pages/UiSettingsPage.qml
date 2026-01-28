@@ -309,10 +309,27 @@ ZUI.ScreenPage {
             }
 
             EntryDelegate {
+                text: qsTr("Show Experimental Features")
+                infoText: zynqtgui.ui_settings.showExperimentalFeatures ? qsTr("Enabled") : qsTr("Disabled")
+                onClicked: zynqtgui.ui_settings.showExperimentalFeatures = !zynqtgui.ui_settings.showExperimentalFeatures
+                index: 6
+                onIncrementValue: zynqtgui.ui_settings.showExperimentalFeatures = true
+                onDecrementValue: zynqtgui.ui_settings.showExperimentalFeatures = false
+
+                QQC2.Switch {
+                    checked: zynqtgui.ui_settings.showExperimentalFeatures
+                    onClicked: {
+                        zynqtgui.ui_settings.showExperimentalFeatures = checked;
+                    }
+                }
+
+            }
+
+            EntryDelegate {
                 text: qsTr("Show Cursor")
                 infoText: zynqtgui.ui_settings.showCursor ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.showCursor = !zynqtgui.ui_settings.showCursor
-                index: 6
+                index: 7
                 onIncrementValue: zynqtgui.ui_settings.showCursor = true
                 onDecrementValue: zynqtgui.ui_settings.showCursor = false
 
@@ -329,7 +346,7 @@ ZUI.ScreenPage {
                 text: qsTr("Encoder Touch Response")
                 infoText: zynqtgui.ui_settings.touchEncoders ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.touchEncoders = !zynqtgui.ui_settings.touchEncoders
-                index: 7
+                index: 8
                 onIncrementValue: zynqtgui.ui_settings.touchEncoders = true
                 onDecrementValue: zynqtgui.ui_settings.touchEncoders = false
 
@@ -347,7 +364,7 @@ ZUI.ScreenPage {
                 text: qsTr("VNC Server")
                 infoText: zynqtgui.ui_settings.vncserverEnabled ? qsTr("Enabled") : qsTr("Disabled")
                 onClicked: zynqtgui.ui_settings.vncserverEnabled = !zynqtgui.ui_settings.vncserverEnabled
-                index: 8
+                index: 9
                 onIncrementValue: zynqtgui.ui_settings.vncserverEnabled = true
                 onDecrementValue: zynqtgui.ui_settings.vncserverEnabled = false
 

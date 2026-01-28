@@ -946,7 +946,9 @@ ZUI.SectionPanel {
                 }
             },
             QQC2.Action {
-                text: qsTr("Download Sketches...")
+                // There is no such category any longer, so... shouldn't let people try and open the page
+                enabled: false
+                // text: qsTr("Download Sketches...")
                 onTriggered: {
                     zynqtgui.current_modal_screen_id = "sketch_downloader"
                 }
@@ -1019,7 +1021,9 @@ ZUI.SectionPanel {
                 }
             },
             QQC2.Action {
-                text: qsTr("Download Sketches")
+                // There is no such category any longer, so... shouldn't let people try and open the page
+                enabled: false
+                // text: qsTr("Download Sketches")
                 onTriggered: {
                     zynqtgui.current_modal_screen_id = "sketch_downloader";
                 }

@@ -2172,6 +2172,10 @@ class zynthian_gui(QObject):
         elif cuia == "STOP_RECORD":
             self.run_stop_metronome_and_playback.emit()
 
+        elif cuia == "SWITCH_KNOB3_RELEASED":
+            # If we haven't already handled the knob3 release, it should be treated as though select was released
+            self.callable_ui_action_simple("SWITCH_SELECT_SHORT")
+
         elif cuia == "SWITCH_MODE_DOWN":
             self.modeButtonPressed = True
         elif cuia == "SWITCH_MODE_RELEASED":

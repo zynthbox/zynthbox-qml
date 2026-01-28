@@ -106,7 +106,7 @@ if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
         22: {'S': "SELECT_DOWN", 'B': '', 'L': ''},
         23: {'S': "NAVIGATE_RIGHT", 'B': '', 'L': ''},
         24: {'S': "SWITCH_GLOBAL_RELEASED", 'B': '', 'L': ''},
-        25: {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''},
+        # 25: {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''}, # Knob3 push
         26: {'S': "CP_RV1", 'B': '', 'L': ''},
         27: {'S': "CP_RV2", 'B': '', 'L': ''},
         28: {'S': "CP_RV3", 'B': '', 'L': ''},
@@ -139,7 +139,7 @@ else:
         17: {'S': "SELECT_DOWN", 'B': '', 'L': ''},
         16: {'S': "NAVIGATE_RIGHT", 'B': '', 'L': ''},
         24: {'S': "SWITCH_GLOBAL_RELEASED", 'B': '', 'L': ''},
-        29: {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''},
+        # 29: {'S': "SWITCH_SELECT_SHORT", 'B': '', 'L': ''}, # Knob3 push
         26: {'S': "CP_RV1", 'B': '', 'L': ''},
         25: {'S': "CP_RV2", 'B': '', 'L': ''},
         27: {'S': "CP_RV3", 'B': '', 'L': ''},

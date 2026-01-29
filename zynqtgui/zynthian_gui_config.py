@@ -82,11 +82,11 @@ wiring_layout = os.environ.get('ZYNTHIAN_WIRING_LAYOUT',"Z2_V4")
 if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
     custom_switch_ui_actions = {
         0: {'S': "SCREEN_MAIN", 'B': '', 'L': ''},
-        1: {'S': "CHANNEL_1", 'B': '', 'L': ''},
-        2: {'S': "CHANNEL_2", 'B': '', 'L': ''},
-        3: {'S': "CHANNEL_3", 'B': '', 'L': ''},
-        4: {'S': "CHANNEL_4", 'B': '', 'L': ''},
-        5: {'S': "CHANNEL_5", 'B': '', 'L': ''},
+        # 1: {'S': "CHANNEL_1", 'B': '', 'L': ''},
+        # 2: {'S': "CHANNEL_2", 'B': '', 'L': ''},
+        # 3: {'S': "CHANNEL_3", 'B': '', 'L': ''},
+        # 4: {'S': "CHANNEL_4", 'B': '', 'L': ''},
+        # 5: {'S': "CHANNEL_5", 'B': '', 'L': ''},
         # 6: {'S': "SWITCH_STAR_RELEASED", 'B': '', 'L': ''},
         # 7: {'S': "SWITCH_MODE_RELEASED", 'B': '', 'L': ''},
         8: {'S': "SCREEN_SKETCHPAD", 'B': '', 'L': ''},
@@ -115,11 +115,11 @@ if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
 else:
     custom_switch_ui_actions = {
         0: {'S': "SCREEN_MAIN", 'B': '', 'L': ''},
-        1: {'S': "CHANNEL_1", 'B': '', 'L': ''},
-        2: {'S': "CHANNEL_2", 'B': '', 'L': ''},
-        3: {'S': "CHANNEL_3", 'B': '', 'L': ''},
-        4: {'S': "CHANNEL_4", 'B': '', 'L': ''},
-        5: {'S': "CHANNEL_5", 'B': '', 'L': ''},
+        # 1: {'S': "CHANNEL_1", 'B': '', 'L': ''},
+        # 2: {'S': "CHANNEL_2", 'B': '', 'L': ''},
+        # 3: {'S': "CHANNEL_3", 'B': '', 'L': ''},
+        # 4: {'S': "CHANNEL_4", 'B': '', 'L': ''},
+        # 5: {'S': "CHANNEL_5", 'B': '', 'L': ''},
         # 6: {'S': "SWITCH_STAR_RELEASED", 'B': '', 'L': ''},
         # 7: {'S': "MODE_SWITCH_RELEASED", 'B': '', 'L': ''},
         # 8: {'S': "SCREEN_SKETCHPAD", 'B': '', 'L': ''},

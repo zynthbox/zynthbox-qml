@@ -477,6 +477,68 @@ Item {
         valueSetter(initialValue + sign);
     }
 
+    function testForSlot(slotIndex) {
+        if (stepButtonIndex < 5) {
+            // Release the note, if there's one set
+            let synthTestNoteInfo = _private.testSynthsActive[stepButtonIndex];
+            _private.testSynthsActive[stepButtonIndex] = null;
+            if (synthTestNoteInfo !== null) {
+                Zynthbox.MidiRouter.sendMidiMessageToZynthianSynth(synthTestNoteInfo.midiChannel, 3, 128, synthTestNoteInfo.midiNote, _private.starVelocity);
+            }
+        } else if (stepButtonIndex < 10) {
+            // Stop the given slice, if it's ongoing
+            let sampleIndex = stepIndex - 5;
+            let sampleTestNoteInfo = _private.testSamplesSlicesActive[sampleIndex];
+            _private.testSamplesSlicesActive[sampleIndex] = null;
+            if (sampleTestNoteInfo) {
+                let sliceObject = sampleTestNoteInfo.sliceObject;
+                if (sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.OneshotPlaybackStyle) {
+                    // Don't stop a one-shot (this should be done by the slice, really... remember to also stop any existing playback when changing playback style for a slice)
+                    sliceObject.stop(sampleTestNoteInfo.midiNote);
+                }
+            }
+        }
+    }
+    function handleCuiaTemporaryMode(cuia) {
+        let result = false;
+        switch(cuia) {
+            case "SWITCH_RECORD_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_PLAY_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_BACK_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_ARROW_UP_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_SELECT_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_METRONOME_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_STOP_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_ARROW_LEFT_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_ARROW_DOWN_RELEASED":
+                result = true;
+                break;
+            case "SWITCH_ARROW_RIGHT_RELEASED":
+                result = true;
+                break;
+        }
+        if (result) {
+            zynqtgui.ignoreNextModeButtonPress = true;
+        }
+        return result;
+    }
+
     function handleStepButtonPress(stepButtonIndex) {
         let workingModel = _private.pattern.workingModel;
         if (_private.interactionMode === _private.interactionModeSequencer) {
@@ -933,7 +995,7 @@ Item {
                 }
                 break;
 
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 if (_private.temporaryLiveRecordPattern && zynqtgui.startRecordButtonPressed) {
                     _private.temporaryLiveRecordPattern.recordLive = false;
                     _private.temporaryLiveRecordPattern = null;
@@ -1496,7 +1558,7 @@ Item {
                 returnValue = true;
                 break;
 
-            case "SWITCH_PLAY":
+            case "SWITCH_PLAY_RELEASED":
                 if (_private.interactionMode === _private.interactionModeSequencer) {
                     // When in stepsequencer mode and holding down any step button, and then tapping play, toggle enabled for that step to "on" (that is, clear enabled as it's the default)
                     let workingModel = _private.pattern.workingModel;
@@ -1511,7 +1573,7 @@ Item {
                     // Don't do anything with the play button unless a step button is held down
                 }
                 break;
-            case "SWITCH_STOP":
+            case "SWITCH_STOP_RELEASED":
                 if (_private.interactionMode === _private.interactionModeSequencer) {
                     // When in stepsequencer mode and holding down any step button, and then tapping stop, toggle enabled for that step to "off" (that is, set the value to false)
                     let workingModel = _private.pattern.workingModel;
@@ -1694,6 +1756,10 @@ Item {
         // 3: Velocity keyboard (which plays the currently held note at 16 different velocities)
         // 4: Slots (for selecting the 15 slots, with preview for the 10 sound source slots when that slot's button is tapped, colours appropriate for that slot (perhaps with volume indication per slot as a brightness thing and red for muted/bypassed?))
         property int interactionMode: 0
+        // The temporary mode is what shows up when you hold down the mode button.
+        // This also allows you to use the ten buttons in the action block to activate the ten sound slots.
+        // If any button is pressed while mode is held down, the mode will not change once mode is released.
+        property int temporaryInteractionMode: interactionModeTrackClip
         readonly property int interactionModeSequencer: 0
         readonly property int interactionModeTrackClip: 1
         readonly property int interactionModeMusicalKeys: 2
@@ -1718,6 +1784,48 @@ Item {
                 default:
                     applicationWindow().showPassiveNotification("Sequencer", 1500);
                     break;
+            }
+        }
+        function updateActionBlockLedsForTemporaryMode() {
+            if (zynqtgui.modeButtonPressed) {
+                // When the mode button is pressed, the action block functionally ends up displaying the ten sound slots (lit when filled, otherwise only the lightest grey)
+                // Hit one of them to do what the Slots mode does for those slots (the physical layout matches the two rows of five slots)
+                for (let stepIndex = 0; stepIndex < 10; ++stepIndex) {
+                    let slotMuted = false;
+                    let slotGain = 0.0;
+                    let slotPassthroughClient = _private.slotPassthroughClients[stepIndex];
+                    let slotFilled = slotPassthroughClient != null;
+                    if (stepIndex < 5) {
+                        // The five synth slots
+                        if (slotPassthroughClient) {
+                            slotMuted = slotPassthroughClient.muted;
+                            slotGain = slotPassthroughClient.dryGainHandler.gainAbsolute;
+                        }
+                    } else if (stepIndex < 10) {
+                        // The five sample slots
+                        if (slotPassthroughClient) {
+                            slotMuted = sampleObject.selectedSliceObject.gainHandler.muted;
+                            slotGain = sampleObject.selectedSliceObject.gainHandler.gainAbsolute;
+                        }
+                    }
+                    if (slotFilled === false) {
+                        zynqtgui.led_config.setActionBlockButtonColor(stepIndex, _private.stepEmpty, 1.0);
+                    } else if (slotMuted) {
+                        zynqtgui.led_config.setActionBlockButtonColor(stepIndex, _private.stepMuted, 1.0);
+                    } else {
+                        if (stepIndex < 15) {
+                            zynqtgui.led_config.setActionBlockButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + slotGain, 0.01), 1.0);
+                        } else {
+                            zynqtgui.led_config.setActionBlockButtonColor(stepIndex, _private.musicalKeysModeColor, 1.0);
+                        }
+                    }
+                }
+             } else {
+                // Just unset the colours and let the python code take over the LEDs
+                 let anyColor = Qt.rgba(0, 0, 0, 0);
+                 for (let buttonId = 0; buttonId < 10; ++buttonId) {
+                    zynqtgui.led_config.setActionBlockButtonColor(buttonId, anyColor, -1);
+                 }
             }
         }
         function updateLedsForStepSequencer() {
@@ -1929,7 +2037,8 @@ Item {
         interval: 0; running: false; repeat: false;
         onTriggered: {
             if (_private.pattern) {
-                switch (_private.interactionMode) {
+                let interactionMode = zynqtgui.modeButtonPressed ? _private.temporaryInteractionMode : _private.interactionMode;
+                switch (interactionMode) {
                     case _private.interactionModeSlots:
                         _private.updateLedsForSlotButtons();
                         break;
@@ -1955,6 +2064,7 @@ Item {
             } else {
                 zynqtgui.led_config.setStarButtonColor(_private.stepWithNotesDimmed);
             }
+            _private.updateActionBlockLedsForTemporaryMode();
         }
     }
     Repeater {
@@ -2135,6 +2245,7 @@ Item {
     Connections {
         target: zynqtgui
         onAltButtonPressedChanged: _private.updateLedColors()
+        onModeButtonPressedChanged: _private.updateLedColors()
         onAnyStepButtonPressedChanged: _private.updateLedColors()
         onStep1_button_pressed_changed: { _private.heldStepButtons[0] = zynqtgui.step1ButtonPressed; }
         onStep2_button_pressed_changed: { _private.heldStepButtons[1] = zynqtgui.step2ButtonPressed; }

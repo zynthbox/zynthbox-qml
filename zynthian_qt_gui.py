@@ -384,6 +384,16 @@ class zynthian_gui(QObject):
         self.reverbBeforePressingMetronome = 0
         self.__ignoreNextMenuButtonPress = False
         self.__ignoreNextStarButtonPress = False
+        self.__number1_button_pressed__ = False
+        self.__ignoreNextNumber1ButtonPress__ = False
+        self.__number2_button_pressed__ = False
+        self.__ignoreNextNumber2ButtonPress__ = False
+        self.__number3_button_pressed__ = False
+        self.__ignoreNextNumber3ButtonPress__ = False
+        self.__number4_button_pressed__ = False
+        self.__ignoreNextNumber4ButtonPress__ = False
+        self.__number5_button_pressed__ = False
+        self.__ignoreNextNumber5ButtonPress__ = False
         self.__ignoreNextModeButtonPress = False
         self.__ignoreNextRecordButtonPress = False
         self.__ignoreNextMetronomeButtonPress = False
@@ -1677,6 +1687,26 @@ class zynthian_gui(QObject):
             self.menuButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextMenuButtonPress = False
             return
+        elif cuia == "SWITCH_NUMBER_1_RELEASED" and self.ignoreNextNumber1ButtonPress == True:
+            self.number1ButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextNumber1ButtonPress = False
+            return
+        elif cuia == "SWITCH_NUMBER_2_RELEASED" and self.ignoreNextNumber1ButtonPress == True:
+            self.number2ButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextNumber2ButtonPress = False
+            return
+        elif cuia == "SWITCH_NUMBER_3_RELEASED" and self.ignoreNextNumber1ButtonPress == True:
+            self.number3ButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextNumber3ButtonPress = False
+            return
+        elif cuia == "SWITCH_NUMBER_4_RELEASED" and self.ignoreNextNumber1ButtonPress == True:
+            self.number4ButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextNumber4ButtonPress = False
+            return
+        elif cuia == "SWITCH_NUMBER_5_RELEASED" and self.ignoreNextNumber1ButtonPress == True:
+            self.number5ButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextNumber5ButtonPress = False
+            return
         elif cuia == "SWITCH_PLAY_RELEASED" and self.ignoreNextPlayButtonPress == True:
             self.ignoreNextPlayButtonPress = False
             return
@@ -1765,6 +1795,21 @@ class zynthian_gui(QObject):
                 changedAnything = True
             if self.menuButtonPressed == True and self.ignoreNextMenuButtonPress == False:
                 self.ignoreNextMenuButtonPress = True
+                changedAnything = True
+            if self.number1ButtonPressed == True and self.ignoreNextNumber1ButtonPress == False:
+                self.ignoreNextNumber1ButtonPress = True
+                changedAnything = True
+            if self.number2ButtonPressed == True and self.ignoreNextNumber2ButtonPress == False:
+                self.ignoreNextNumber2ButtonPress = True
+                changedAnything = True
+            if self.number3ButtonPressed == True and self.ignoreNextNumber3ButtonPress == False:
+                self.ignoreNextNumber3ButtonPress = True
+                changedAnything = True
+            if self.number4ButtonPressed == True and self.ignoreNextNumber4ButtonPress == False:
+                self.ignoreNextNumber4ButtonPress = True
+                changedAnything = True
+            if self.number5ButtonPressed == True and self.ignoreNextNumber5ButtonPress == False:
+                self.ignoreNextNumber5ButtonPress = True
                 changedAnything = True
             if self.playButtonPressed == True and self.ignoreNextPlayButtonPress == False:
                 self.ignoreNextPlayButtonPress = True
@@ -2070,31 +2115,18 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_GLOBAL_RELEASED":
             self.globalButtonPressed = False
 
+        # The number buttons switch between main pages when they aren't used for anything else
         elif cuia == "SWITCH_NUMBER_1_RELEASED":
-            if self.sketchpad.selectedTrackId == 0 + trackDelta and not self.leftSidebarActive:
-                self.openLeftSidebar.emit()
-            else:
-                self.sketchpad.selectedTrackId = 0 + trackDelta
+            self.callable_ui_action("SCREEN_SKETCHPAD")
         elif cuia == "SWITCH_NUMBER_2_RELEASED":
-            if self.sketchpad.selectedTrackId == 1 + trackDelta and not self.leftSidebarActive:
-                self.openLeftSidebar.emit()
-            else:
-                self.sketchpad.selectedTrackId = 1 + trackDelta
+            self.callable_ui_action("SCREEN_PRESET")
         elif cuia == "SWITCH_NUMBER_3_RELEASED":
-            if self.sketchpad.selectedTrackId == 2 + trackDelta and not self.leftSidebarActive:
-                self.openLeftSidebar.emit()
-            else:
-                self.sketchpad.selectedTrackId = 2 + trackDelta
+            self.callable_ui_action("SCREEN_EDIT_CONTEXTUAL")
         elif cuia == "SWITCH_NUMBER_4_RELEASED":
-            if self.sketchpad.selectedTrackId == 3 + trackDelta and not self.leftSidebarActive:
-                self.openLeftSidebar.emit()
-            else:
-                self.sketchpad.selectedTrackId = 3 + trackDelta
+            self.callable_ui_action("SCREEN_PLAYGRID")
         elif cuia == "SWITCH_NUMBER_5_RELEASED":
-            if self.sketchpad.selectedTrackId == 4 + trackDelta and not self.leftSidebarActive:
-                self.openLeftSidebar.emit()
-            else:
-                self.sketchpad.selectedTrackId = 4 + trackDelta
+            self.callable_ui_action("SCREEN_SONG_MANAGER")
+
         elif cuia == "TRACK_PREVIOUS":
             self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId - 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
         elif cuia == "TRACK_NEXT":
@@ -2432,6 +2464,16 @@ class zynthian_gui(QObject):
                     # Handle button press event
                     if i == 4:
                         self.menuButtonPressed = True
+                    elif i == 5:
+                        self.number1ButtonPressed = True
+                    elif i == 6:
+                        self.number2ButtonPressed = True
+                    elif i == 7:
+                        self.number3ButtonPressed = True
+                    elif i == 8:
+                        self.number4ButtonPressed = True
+                    elif i == 9:
+                        self.number5ButtonPressed = True
                     elif i == 10:
                         self.starButtonPressed = True
                     elif i == 11:
@@ -2506,6 +2548,16 @@ class zynthian_gui(QObject):
                     # Handle button press event
                     if i == 4:
                         self.menuButtonPressed = True
+                    elif i == 5:
+                        self.number1ButtonPressed = True
+                    elif i == 6:
+                        self.number2ButtonPressed = True
+                    elif i == 7:
+                        self.number3ButtonPressed = True
+                    elif i == 8:
+                        self.number4ButtonPressed = True
+                    elif i == 9:
+                        self.number5ButtonPressed = True
                     elif i == 10:
                         self.starButtonPressed = True
                     elif i == 11:
@@ -2586,6 +2638,16 @@ class zynthian_gui(QObject):
                     # Handle button release event
                     if i == 4:
                         self.menuButtonPressed = False
+                    elif i == 5:
+                        self.number1ButtonPressed = False
+                    elif i == 6:
+                        self.number2ButtonPressed = False
+                    elif i == 7:
+                        self.number3ButtonPressed = False
+                    elif i == 8:
+                        self.number4ButtonPressed = False
+                    elif i == 9:
+                        self.number5ButtonPressed = False
                     elif i == 10:
                         self.starButtonPressed = False
                     elif i == 11:
@@ -2663,6 +2725,16 @@ class zynthian_gui(QObject):
                     # Handle button release event
                     if i == 4:
                         self.menuButtonPressed = False
+                    elif i == 5:
+                        self.number1ButtonPressed = False
+                    elif i == 6:
+                        self.number2ButtonPressed = False
+                    elif i == 7:
+                        self.number3ButtonPressed = False
+                    elif i == 8:
+                        self.number4ButtonPressed = False
+                    elif i == 9:
+                        self.number5ButtonPressed = False
                     elif i == 10:
                         self.starButtonPressed = False
                     elif i == 11:
@@ -4152,6 +4224,129 @@ class zynthian_gui(QObject):
 
     ignoreNextMenuButtonPress = Property(bool, get_ignoreNextMenuButtonPress, set_ignoreNextMenuButtonPress, notify=ignoreNextMenuButtonPressChanged)
     ### END Property ignoreNextMenuButtonPress
+
+    ### BEGIN Numbered sidebar buttons
+    ### BEGIN Property number1ButtonPressed
+    def get_number1_button_pressed(self):
+        return self.__number1_button_pressed__
+    def set_number1_button_pressed(self, pressed):
+        if self.__number1_button_pressed__ != pressed:
+            self.__number1_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_1_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_1_RELEASED")
+            self.number1_button_pressed_changed.emit()
+    number1_button_pressed_changed = Signal()
+    number1ButtonPressed = Property(bool, get_number1_button_pressed, set_number1_button_pressed, notify=number1_button_pressed_changed)
+    ### END Property number1ButtonPressed
+    ### BEGIN Property ignoreNextNumber1ButtonPress
+    def get_ignoreNextNumber1ButtonPress(self):
+        return self.__ignoreNextNumber1ButtonPress__
+    def set_ignoreNextNumber1ButtonPress(self, val):
+        if self.__ignoreNextNumber1ButtonPress__ != val:
+            self.__ignoreNextNumber1ButtonPress__ = val
+            self.ignoreNextNumber1ButtonPressChanged.emit()
+    ignoreNextNumber1ButtonPressChanged = Signal()
+    ignoreNextNumber1ButtonPress = Property(bool, get_ignoreNextNumber1ButtonPress, set_ignoreNextNumber1ButtonPress, notify=ignoreNextNumber1ButtonPressChanged)
+    ### END Property ignoreNextNumber1ButtonPress
+    ### BEGIN Property number2ButtonPressed
+    def get_number2_button_pressed(self):
+        return self.__number2_button_pressed__
+    def set_number2_button_pressed(self, pressed):
+        if self.__number2_button_pressed__ != pressed:
+            self.__number2_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_2_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_2_RELEASED")
+            self.number2_button_pressed_changed.emit()
+    number2_button_pressed_changed = Signal()
+    number2ButtonPressed = Property(bool, get_number2_button_pressed, set_number2_button_pressed, notify=number2_button_pressed_changed)
+    ### END Property number2ButtonPressed
+    ### BEGIN Property ignoreNextNumber2ButtonPress
+    def get_ignoreNextNumber2ButtonPress(self):
+        return self.__ignoreNextNumber2ButtonPress__
+    def set_ignoreNextNumber2ButtonPress(self, val):
+        if self.__ignoreNextNumber2ButtonPress__ != val:
+            self.__ignoreNextNumber2ButtonPress__ = val
+            self.ignoreNextNumber2ButtonPressChanged.emit()
+    ignoreNextNumber2ButtonPressChanged = Signal()
+    ignoreNextNumber2ButtonPress = Property(bool, get_ignoreNextNumber2ButtonPress, set_ignoreNextNumber2ButtonPress, notify=ignoreNextNumber2ButtonPressChanged)
+    ### END Property ignoreNextNumber2ButtonPress
+    ### BEGIN Property number3ButtonPressed
+    def get_number3_button_pressed(self):
+        return self.__number3_button_pressed__
+    def set_number3_button_pressed(self, pressed):
+        if self.__number3_button_pressed__ != pressed:
+            self.__number3_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_3_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_3_RELEASED")
+            self.number3_button_pressed_changed.emit()
+    number3_button_pressed_changed = Signal()
+    number3ButtonPressed = Property(bool, get_number3_button_pressed, set_number3_button_pressed, notify=number3_button_pressed_changed)
+    ### END Property number3ButtonPressed
+    ### BEGIN Property ignoreNextNumber3ButtonPress
+    def get_ignoreNextNumber3ButtonPress(self):
+        return self.__ignoreNextNumber3ButtonPress__
+    def set_ignoreNextNumber3ButtonPress(self, val):
+        if self.__ignoreNextNumber3ButtonPress__ != val:
+            self.__ignoreNextNumber3ButtonPress__ = val
+            self.ignoreNextNumber3ButtonPressChanged.emit()
+    ignoreNextNumber3ButtonPressChanged = Signal()
+    ignoreNextNumber3ButtonPress = Property(bool, get_ignoreNextNumber3ButtonPress, set_ignoreNextNumber3ButtonPress, notify=ignoreNextNumber3ButtonPressChanged)
+    ### END Property ignoreNextNumber3ButtonPress
+    ### BEGIN Property number4ButtonPressed
+    def get_number4_button_pressed(self):
+        return self.__number4_button_pressed__
+    def set_number4_button_pressed(self, pressed):
+        if self.__number4_button_pressed__ != pressed:
+            self.__number4_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_4_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_4_RELEASED")
+            self.number4_button_pressed_changed.emit()
+    number4_button_pressed_changed = Signal()
+    number4ButtonPressed = Property(bool, get_number4_button_pressed, set_number4_button_pressed, notify=number4_button_pressed_changed)
+    ### END Property number4ButtonPressed
+    ### BEGIN Property ignoreNextNumber4ButtonPress
+    def get_ignoreNextNumber4ButtonPress(self):
+        return self.__ignoreNextNumber4ButtonPress__
+    def set_ignoreNextNumber4ButtonPress(self, val):
+        if self.__ignoreNextNumber4ButtonPress__ != val:
+            self.__ignoreNextNumber4ButtonPress__ = val
+            self.ignoreNextNumber4ButtonPressChanged.emit()
+    ignoreNextNumber4ButtonPressChanged = Signal()
+    ignoreNextNumber4ButtonPress = Property(bool, get_ignoreNextNumber4ButtonPress, set_ignoreNextNumber4ButtonPress, notify=ignoreNextNumber4ButtonPressChanged)
+    ### END Property ignoreNextNumber4ButtonPress
+    ### BEGIN Property number5ButtonPressed
+    def get_number5_button_pressed(self):
+        return self.__number5_button_pressed__
+    def set_number5_button_pressed(self, pressed):
+        if self.__number5_button_pressed__ != pressed:
+            self.__number5_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_5_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_5_RELEASED")
+            self.number5_button_pressed_changed.emit()
+    number5_button_pressed_changed = Signal()
+    number5ButtonPressed = Property(bool, get_number5_button_pressed, set_number5_button_pressed, notify=number5_button_pressed_changed)
+    ### END Property number5ButtonPressed
+    ### BEGIN Property ignoreNextNumber5ButtonPress
+    def get_ignoreNextNumber5ButtonPress(self):
+        return self.__ignoreNextNumber5ButtonPress__
+    def set_ignoreNextNumber5ButtonPress(self, val):
+        if self.__ignoreNextNumber5ButtonPress__ != val:
+            self.__ignoreNextNumber5ButtonPress__ = val
+            self.ignoreNextNumber5ButtonPressChanged.emit()
+    ignoreNextNumber5ButtonPressChanged = Signal()
+    ignoreNextNumber5ButtonPress = Property(bool, get_ignoreNextNumber5ButtonPress, set_ignoreNextNumber5ButtonPress, notify=ignoreNextNumber5ButtonPressChanged)
+    ### END Property ignoreNextNumber5ButtonPress
+    ### END Numbered sidebar buttons
 
     ### BEGIN Property starButtonPressed
     def get_star_button_pressed(self):

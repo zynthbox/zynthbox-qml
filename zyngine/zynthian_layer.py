@@ -259,7 +259,9 @@ class zynthian_layer(QObject):
         self.bank_list_cache = []
 
     def can_navigate(self):
-        return self.engine.can_navigate
+        if self.engine.can_navigate:
+            return self.bank_dir != self.engine.get_bank_root_dir()
+        return False
 
     def is_bank_dir(self, i):
         if(not self.engine.can_navigate):

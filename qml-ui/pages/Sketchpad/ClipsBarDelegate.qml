@@ -140,7 +140,7 @@ ColumnLayout {
                 QQC2.Label {
                     anchors.centerIn: parent
                     font.pointSize: 12
-                    font.bold: svgBg.highlighted
+                    // font.bold: svgBg.highlighted
                     visible: ["sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
                     color: Kirigami.Theme.textColor
                     opacity: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? 1 : 0.3

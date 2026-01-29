@@ -386,6 +386,7 @@ ZUI.ScreenPage {
                                 // selector: layersView.selector
                                 readonly property int ownIndex: index
                                 highlighted: zynqtgui.current_screen_id === layersView.screenId
+                                checked: index === layersView.selector.current_index
                                 // onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                                 // onItemActivated: layersView.itemActivated(screenId, index)
                                 // onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
@@ -420,6 +421,14 @@ ZUI.ScreenPage {
                                                     ? (model.metadata ? "%1 - %2".arg(index + 1).arg(model.display) : "")
                                                     : ""
                                             }
+                                Text{
+                                    color: "pink"
+                                    text: "////" + checked + " /// " + index + " // " + layersView.selector.current_index
+                                }
+                                                
+                                background: ZUI.DelegateBackground {
+                                    delegate: delegate
+                                }           
                                 // contentItem: ColumnLayout {
                                 //     RowLayout {
                                 //         QQC2.Label {

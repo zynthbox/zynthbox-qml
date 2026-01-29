@@ -313,6 +313,7 @@ class zynthian_layer(QObject):
         logging.info("SOUNDFONTS DIR 0 {}".format(self.bank_info[0]))
 
         if(self.engine.can_navigate and self.is_bank_dir(i)):
+            self.bank_dir = self.engine.get_bank_root_dir()
             return returnVal
 
         if i < len(self.bank_list):

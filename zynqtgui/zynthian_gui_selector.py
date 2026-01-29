@@ -414,5 +414,5 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
     selector_path_element = Property(str, get_selector_path_element, notify = selector_path_element_changed)
     caption = Property(str, get_caption, constant = True)
     autoActivateIndexOnChange = Property(bool, get_autoActivateIndexOnChange, set_autoActivateIndexOnChange, notify=autoActivateIndexOnChangeChanged)
-    can_navigate = Property(bool, get_can_navigate, notify = selector_path_changed)
+    can_navigate = Property(bool, get_can_navigate, notify = list_updated)
 #------------------------------------------------------------------------------

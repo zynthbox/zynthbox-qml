@@ -2115,17 +2115,47 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_GLOBAL_RELEASED":
             self.globalButtonPressed = False
 
-        # The number buttons switch between main pages when they aren't used for anything else
+        # The number buttons switch between main pages when they aren't used for anything else in hardware sequencer interaction mode
         elif cuia == "SWITCH_NUMBER_1_RELEASED":
-            self.callable_ui_action("SCREEN_SKETCHPAD")
+            if self.ui_settings.hardwareSequencer:
+                self.callable_ui_action("SCREEN_SKETCHPAD")
+            else:
+                if self.sketchpad.selectedTrackId == 0 + trackDelta and not self.leftSidebarActive:
+                    self.openLeftSidebar.emit()
+                else:
+                    self.sketchpad.selectedTrackId = 0 + trackDelta
         elif cuia == "SWITCH_NUMBER_2_RELEASED":
-            self.callable_ui_action("SCREEN_PRESET")
+            if self.ui_settings.hardwareSequencer:
+                self.callable_ui_action("SCREEN_PRESET")
+            else:
+                if self.sketchpad.selectedTrackId == 1 + trackDelta and not self.leftSidebarActive:
+                    self.openLeftSidebar.emit()
+                else:
+                    self.sketchpad.selectedTrackId = 1 + trackDelta
         elif cuia == "SWITCH_NUMBER_3_RELEASED":
-            self.callable_ui_action("SCREEN_EDIT_CONTEXTUAL")
+            if self.ui_settings.hardwareSequencer:
+                self.callable_ui_action("SCREEN_EDIT_CONTEXTUAL")
+            else:
+                if self.sketchpad.selectedTrackId == 2 + trackDelta and not self.leftSidebarActive:
+                    self.openLeftSidebar.emit()
+                else:
+                    self.sketchpad.selectedTrackId = 2 + trackDelta
         elif cuia == "SWITCH_NUMBER_4_RELEASED":
-            self.callable_ui_action("SCREEN_PLAYGRID")
+            if self.ui_settings.hardwareSequencer:
+                self.callable_ui_action("SCREEN_PLAYGRID")
+            else:
+                if self.sketchpad.selectedTrackId == 3 + trackDelta and not self.leftSidebarActive:
+                    self.openLeftSidebar.emit()
+                else:
+                    self.sketchpad.selectedTrackId = 3 + trackDelta
         elif cuia == "SWITCH_NUMBER_5_RELEASED":
-            self.callable_ui_action("SCREEN_SONG_MANAGER")
+            if self.ui_settings.hardwareSequencer:
+                self.callable_ui_action("SCREEN_SONG_MANAGER")
+            else:
+                if self.sketchpad.selectedTrackId == 4 + trackDelta and not self.leftSidebarActive:
+                    self.openLeftSidebar.emit()
+                else:
+                    self.sketchpad.selectedTrackId = 4 + trackDelta
 
         elif cuia == "TRACK_PREVIOUS":
             self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId - 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
@@ -2136,6 +2166,23 @@ class zynthian_gui(QObject):
             self.starButtonPressed = True
         elif cuia == "SWITCH_STAR_RELEASED":
             self.starButtonPressed = False
+
+        # Outside of hardware interaction mode, the first five step buttons switch between the five main screens
+        elif cuia == "SWITCH_STEP1_RELEASED":
+            if self.ui_settings.hardwareSequencer == False:
+                self.callable_ui_action("SCREEN_SKETCHPAD")
+        elif cuia == "SWITCH_STEP2_RELEASED":
+            if self.ui_settings.hardwareSequencer == False:
+                self.callable_ui_action("SCREEN_PRESET")
+        elif cuia == "SWITCH_STEP3_RELEASED":
+            if self.ui_settings.hardwareSequencer == False:
+                self.callable_ui_action("SCREEN_EDIT_CONTEXTUAL")
+        elif cuia == "SWITCH_STEP4_RELEASED":
+            if self.ui_settings.hardwareSequencer == False:
+                self.callable_ui_action("SCREEN_PLAYGRID")
+        elif cuia == "SWITCH_STEP5_RELEASED":
+            if self.ui_settings.hardwareSequencer == False:
+                self.callable_ui_action("SCREEN_SONG_MANAGER")
 
         elif cuia == "TOGGLE_KEYBOARD":
             # logging.info("TOGGLE_KEYBOARD")

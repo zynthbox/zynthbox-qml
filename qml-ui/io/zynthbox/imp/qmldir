@@ -3,6 +3,7 @@ module io.zynthbox.imp
 BasePlayGrid 1.0 BasePlayGrid.qml
 BluetoothConnections 1.0 BluetoothConnections.qml
 Stack 1.0 Stack.qml
+SelectorDelegate 1.0 SelectorDelegate.qml
 StatusInfo 1.0 StatusInfo.qml
 FilePickerDialog 1.0 FilePickerDialog.qml
 SaveFileDialog 1.0 SaveFileDialog.qml

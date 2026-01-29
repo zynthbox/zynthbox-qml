@@ -148,6 +148,18 @@ class zynthian_gui_bank(zynthian_gui_selector):
         # logging.debug("BANK INDEX => %s" % self.index)
         super().show()
 
+    def can_navigate_bank_up(self):
+        return self.get_curlayer().can_navigate()
+
+    def navigate_bank_up(self):    
+        logging.info("Nagivate bank UP")
+        if(not self.get_curlayer().can_navigate()):
+            return
+
+        if self.get_curlayer().set_bank_dir_up():
+            self.list_data = self.get_curlayer().bank_list
+            logging.info("BANK DIR FONTS FORM UP {}".format(self.list_data))
+            super().fill_list2()        
 
     def select_action(self, i, t='S'):
         self.select(i)
@@ -170,8 +182,16 @@ class zynthian_gui_bank(zynthian_gui_selector):
         if self.list_data[i][0]=='*FAVS*':
             self.zynqtgui.screens['preset'].set_show_only_favorites(True)
         else:
-            self.zynqtgui.screens['preset'].set_show_only_favorites(False)
+            self.zynqtgui.screens['preset'].set_show_only_favorites(False)        
 
+        if self.get_curlayer().is_bank_dir(i):
+            logging.info("CHECK BANK DIR {}".format(i))
+            self.get_curlayer().set_bank_dir(i)
+            self.list_data = self.get_curlayer().bank_list
+            logging.info("BANK DIR FONTS {}".format(self.list_data))
+            super().fill_list2()
+            return
+            
         if self.get_curlayer().set_bank(i):
             #self.zynqtgui.screens['preset'].disable_only_favs()
             self.zynqtgui.screens['preset'].fill_list()

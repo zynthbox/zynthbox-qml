@@ -78,7 +78,12 @@ class selector_list_model(QAbstractListModel):
 
         self.count_changed.emit()
 
-
+    def reset_entries(self, entries, metadata):       
+        self.beginResetModel()
+        self.entries = entries
+        self.metadata = metadata
+        self.endResetModel()
+        self.count_changed.emit()
 
     def roleNames(self):
         keys = {
@@ -133,7 +138,10 @@ class selector_list_model(QAbstractListModel):
         elif role == selector_list_model.ENTRY_INDEX:
             return entry[1]
         elif role == selector_list_model.ICON:
-            return self.get_metadata(index, 'icon')
+            try:
+                return entry[5]
+            except IndexError:
+                return self.get_metadata(index, 'icon')
         elif role == selector_list_model.SHOW_NUMBERS:
             return self.get_metadata(index, 'show_numbers')
         elif role == selector_list_model.METADATA:
@@ -236,6 +244,14 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         self.effective_count_changed.emit()
         self.list_updated.emit()
 
+    def fill_list2(self):
+        if self.list_model != None:
+            self.list_model.reset_entries(self.list_data, self.list_metadata)
+        self.select()
+        self.last_index_change_ts = datetime.min
+        self.effective_count_changed.emit()
+        self.list_updated.emit()
+
     def update_list(self):
         self.fill_list()
 
@@ -254,6 +270,10 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
     # TODO: remove
     def get_cursel(self):
         return self.index
+
+    @Slot()
+    def navigate_up(self):
+        self.navigate_bank_up()
 
     @Slot('int')
     def activate_index(self, index):
@@ -320,6 +340,12 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
     def select_action(self, index, t='S'):
         pass
 
+    def navigate_bank_up(self):
+        pass
+
+    def can_navigate_bank_up(self):
+        pass
+
     # TODO: remove
     def cb_listbox_push(self,event):
         self.listbox_push_ts=datetime.now()
@@ -370,6 +396,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
             # logging.debug(f"Setting autoActivateIndexOnChange : {value}")
             self.__auto_activate_index_on_change = value
             self.autoActivateIndexOnChangeChanged.emit()
+    
+    def get_can_navigate(self):
+        return self.can_navigate_bank_up()
 
     current_index_changed = Signal()
     selector_path_changed = Signal()
@@ -385,4 +414,5 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
     selector_path_element = Property(str, get_selector_path_element, notify = selector_path_element_changed)
     caption = Property(str, get_caption, constant = True)
     autoActivateIndexOnChange = Property(bool, get_autoActivateIndexOnChange, set_autoActivateIndexOnChange, notify=autoActivateIndexOnChangeChanged)
+    can_navigate = Property(bool, get_can_navigate, notify = selector_path_changed)
 #------------------------------------------------------------------------------

@@ -27,7 +27,8 @@ import copy
 from time import sleep
 import collections
 from collections import OrderedDict
-
+from os.path import isfile, isdir, join
+from pathlib import Path
 # Zynthian specific modules
 from zyncoder import *
 from PySide2.QtCore import QObject, Signal, Property
@@ -57,6 +58,7 @@ class zynthian_layer(QObject):
         self.bank_index = 0
         self.bank_name = None
         self.bank_info = None
+        self.bank_dir = None
 
         self.show_fav_presets = False
         self.preset_list = []
@@ -253,21 +255,72 @@ class zynthian_layer(QObject):
         self.bank_info=None
         self.bankChanged.emit()
 
-
     def reset_bank_cache(self):
         self.bank_list_cache = []
 
+    def can_navigate(self):
+        return self.engine.can_navigate
+
+    def is_bank_dir(self, i):
+        if(not self.engine.can_navigate):
+            return False
+
+        if i < len(self.bank_list):
+            bank_info=copy.deepcopy(self.bank_list[i])
+            logging.info("CHECK BANK is DIR {}".format(isdir(bank_info[0])))
+            logging.info("BANK DIR {}".format(bank_info[0]))
+            if(isdir(bank_info[0])):
+                return True
+        return False
+
+    def set_bank_dir_up(self):
+        if(not self.engine.can_navigate):
+            return False
+        logging.info("DIR UP CURRENT DIR {}".format(self.bank_dir))
+        if (self.bank_dir != None):
+            if(self.bank_dir == self.engine.get_bank_root_dir()):
+                return False
+            dir = str(Path(self.bank_dir).parent)
+            self.set_bank_dir_path(dir)
+            logging.info("DIR UP CURRENT DIR {}".format(self.bank_list))
+            return True
+        return False
+
+    def set_bank_dir_path(self, path): 
+        self.bank_dir=path
+        logging.info("GET SOUNDFONTS IN BANK DIR {}".format(self.bank_dir))
+
+        self.engine.get_preset_favs(self)
+        self.bank_list = self.engine.get_bank_list_dir(self.bank_dir)
+        self.bankCountChanged.emit()
+
+    def set_bank_dir(self, i):
+        if i < len(self.bank_list):
+            bank_info=copy.deepcopy(self.bank_list[i])
+            self.bank_dir=bank_info[0]
+            logging.info("GET SOUNDFONTS IN BANK DIR {}".format(self.bank_dir))
+
+            self.engine.get_preset_favs(self)
+            self.bank_list = self.engine.get_bank_list_dir(self.bank_dir)
+            self.bankCountChanged.emit()
 
     def set_bank(self, i, set_engine=True):
         returnVal = False
+        self.bank_name=self.bank_list[i][2]
+        self.bank_info=copy.deepcopy(self.bank_list[i])
+        logging.info("SOUNDFONTS DIR 0 {}".format(self.bank_info[0]))
+
+        if(self.engine.can_navigate and self.is_bank_dir(i)):
+            return returnVal
+
         if i < len(self.bank_list):
             last_bank_index=self.bank_index
             last_bank_name=self.bank_name
             self.bank_index=i
             self.bank_name=self.bank_list[i][2]
             self.bank_info=copy.deepcopy(self.bank_list[i])
-            logging.info("Bank Selected: %s (%d)" % (self.bank_name,i))
-            if set_engine and (last_bank_index!=i or not last_bank_name):
+            logging.info("Bank Selected: %s (%d)" % (self.bank_name,i))   
+            if set_engine:    
                 self.reset_preset()
                 returnVal = self.engine.set_bank(self, self.bank_info)
                 if returnVal:
@@ -281,6 +334,7 @@ class zynthian_layer(QObject):
 
     #TODO Optimize search!!
     def set_bank_by_name(self, bank_name, set_engine=True):
+        logging.info("SOUNDFONTS DIR 1")
         for i in range(len(self.bank_list)):
             if bank_name==self.bank_list[i][2]:
                 return self.set_bank(i,set_engine)
@@ -289,6 +343,7 @@ class zynthian_layer(QObject):
 
     #TODO Optimize search!!
     def set_bank_by_id(self, bank_id, set_engine=True):
+        logging.info("SOUNDFONTS DIR 2")
         for i in range(len(self.bank_list)):
             if bank_id==self.bank_list[i][0]:
                 return self.set_bank(i,set_engine)
@@ -360,7 +415,6 @@ class zynthian_layer(QObject):
         self.preset_name=None
         self.preset_info=None
         self.presetChanged.emit()
-
 
     def reset_preset_cache(self):
         self.preset_list_cache = {}
@@ -449,6 +503,7 @@ class zynthian_layer(QObject):
 
 
     def restore_preset(self):
+        logging.info("SOUNDFONTS DIR 22")
         if self.preset_name is not None and self.preload_info is not None and not self.engine.cmp_presets(self.preload_info,self.preset_info):
             if self.preset_bank_index is not None and self.bank_index!=self.preset_bank_index:
                 self.set_bank(self.preset_bank_index,False)

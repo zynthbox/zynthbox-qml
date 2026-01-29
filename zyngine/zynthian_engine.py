@@ -32,7 +32,8 @@ import Zynthbox
 import re
 import random
 import string
-from os.path import isfile, isdir, join
+from os.path import isfile, isdir, join, splitext
+from os import scandir
 from string import Template
 from collections import OrderedDict
 from PySide2.QtCore import Property, QObject, Signal, Slot
@@ -226,6 +227,8 @@ class zynthian_engine(zynthian_basic_engine):
         self.learned_cc = [[None for c in range(128)] for chan in range(16)]
         self.learned_zctrls = {}
 
+        self.can_navigate = False
+
         self.__bypassController = None
         self.__volumeController = None
 
@@ -357,8 +360,36 @@ class zynthian_engine(zynthian_basic_engine):
                         title=str.replace(f[:-xlen], '_', ' ')
                         if dn!='_': title=dn+'/'+title
                         #print("filelist => "+title)
-                        res.append([join(dp,f),i,title,dn,f])
+                        res.append([join(dp,f),i,title,dn,f,"music-note-16th"])
                         i=i+1
+            except:
+                pass
+
+        return res
+
+    @staticmethod
+    def get_filelist_test(dpath, fext, sort=True, start_index=0):
+        res=[]
+        if isinstance(dpath, str): dpath=[dpath]
+        i=start_index
+
+        for dp in dpath:            
+            logging.info("SOUNDFONTS DIR IMP {}".format(dp))
+            try:               
+                if(sort): 
+                    files = sorted(os.scandir(dp), key=lambda entry: (not entry.is_dir(), entry.name)) 
+                else:
+                    files = os.scandir(dp)
+
+                for f in files:                    
+                    if not f.name.startswith('.'):
+                        suffix = splitext(f.name)[1][1:]
+
+                        if(f.is_dir() or suffix in fext.split(",")):
+                            title=f.name
+                            icon= "folder" if f.is_dir() else "music-note-16th"                       
+                            res.append([(f.path),i,title,"",f.name,icon])
+                            i=i+1
             except:
                 pass
 
@@ -454,6 +485,11 @@ class zynthian_engine(zynthian_basic_engine):
     def get_bank_list(self, layer=None):
         logging.info('Getting Bank List for %s: NOT IMPLEMENTED!' % self.name)
 
+    def get_bank_list_dir(self, dir, layer=None):
+        logging.info('Getting Bank List Dir for %s: NOT IMPLEMENTED!' % self.name)
+
+    def get_bank_root_dir(self):
+        logging.info('Getting Bank Root Dir for %s: NOT IMPLEMENTED!' % self.name)
 
     def set_bank(self, layer, bank):
         self.zynqtgui.zynmidi.set_midi_bank_msb(layer.get_midi_chan(), bank[1])

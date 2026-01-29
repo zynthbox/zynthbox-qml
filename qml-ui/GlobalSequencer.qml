@@ -539,90 +539,115 @@ Item {
     }
     function handleCuiaTemporaryMode(cuia) {
         let result = false;
-        if (zynqtgui.modeButtonPressed) {
+        let temporarilyHeld = false;
+        let releaseIndex = _private.temporaryActionReleases.indexOf(cuia);
+        if (releaseIndex > -1) {
+            temporarilyHeld = _private.heldTemporaryActionBlockButtons[releaseIndex];
+        }
+        if (zynqtgui.modeButtonPressed || temporarilyHeld) {
             switch(cuia) {
                 case "SWITCH_RECORD_DOWN":
+                    _private.heldTemporaryActionBlockButtons[0] = true;
                     component.testForSlot(0, true);
                     result = true;
                     break;
                 case "SWITCH_RECORD_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[0] = false;
                     component.testForSlot(0, false);
                     result = true;
                     break;
                 case "SWITCH_PLAY_DOWN":
+                    _private.heldTemporaryActionBlockButtons[1] = true;
                     component.testForSlot(1, true);
                     result = true;
                     break;
                 case "SWITCH_PLAY_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[1] = false;
                     component.testForSlot(1, false);
                     result = true;
                     break;
                 case "SWITCH_BACK_DOWN":
+                    _private.heldTemporaryActionBlockButtons[2] = true;
                     component.testForSlot(2, true);
                     result = true;
                     break;
                 case "SWITCH_BACK_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[2] = false;
                     component.testForSlot(2, false);
                     result = true;
                     break;
                 case "SWITCH_ARROW_UP_DOWN":
+                    _private.heldTemporaryActionBlockButtons[3] = true;
                     component.testForSlot(3, true);
                     result = true;
                     break;
                 case "SWITCH_ARROW_UP_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[3] = false;
                     component.testForSlot(3, false);
                     result = true;
                     break;
                 case "SWITCH_SELECT_DOWN":
+                    _private.heldTemporaryActionBlockButtons[4] = true;
                     component.testForSlot(4, true);
                     result = true;
                     break;
                 case "SWITCH_SELECT_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[4] = false;
                     component.testForSlot(4, false);
                     result = true;
                     break;
                 case "SWITCH_METRONOME_DOWN":
+                    _private.heldTemporaryActionBlockButtons[5] = true;
                     component.testForSlot(5, true);
                     result = true;
                     break;
                 case "SWITCH_METRONOME_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[5] = false;
                     component.testForSlot(5, false);
                     result = true;
                     break;
                 case "SWITCH_STOP_DOWN":
+                    _private.heldTemporaryActionBlockButtons[6] = true;
                     component.testForSlot(6, true);
                     result = true;
                     break;
                 case "SWITCH_STOP_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[6] = false;
                     component.testForSlot(6, false);
                     result = true;
                     break;
                 case "SWITCH_ARROW_LEFT_DOWN":
+                    _private.heldTemporaryActionBlockButtons[7] = true;
                     component.testForSlot(7, true);
                     result = true;
                     break;
                 case "SWITCH_ARROW_LEFT_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[7] = false;
                     component.testForSlot(7, false);
                     result = true;
                     break;
                 case "SWITCH_ARROW_DOWN_DOWN":
+                    _private.heldTemporaryActionBlockButtons[8] = true;
                     component.testForSlot(8, true);
                     result = true;
                     break;
                 case "SWITCH_ARROW_DOWN_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[8] = false;
                     component.testForSlot(8, false);
                     result = true;
                     break;
                 case "SWITCH_ARROW_RIGHT_DOWN":
+                    _private.heldTemporaryActionBlockButtons[9] = true;
                     component.testForSlot(9, true);
                     result = true;
                     break;
                 case "SWITCH_ARROW_RIGHT_RELEASED":
+                    _private.heldTemporaryActionBlockButtons[9] = false;
                     component.testForSlot(9, false);
                     result = true;
                     break;
             }
-            if (result) {
+            if (zynqtgui.modeButtonPressed && result) {
                 zynqtgui.ignoreNextModeButtonPress = true;
             }
         }
@@ -1790,7 +1815,13 @@ Item {
             updateLedColors();
         }
 
+        // TODO When releasing a step button, the event should always go to whatever mode we were in when that button was originally pressed, so... write that to here instead of booleans, and use that to decide where to shunt that event
+        // This also means that all the various bits of mode logic really wants to go into explicit functions that just handle that mode... to make many things simpler just in general
         property var heldStepButtons: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
+
+        // When these are set, we will want to swallow release events for these buttons even without the mode button held down
+        property var heldTemporaryActionBlockButtons: [false, false, false, false, false, false, false, false, false, false]
+        readonly property var temporaryActionReleases: ["SWITCH_RECORD_RELEASED", "SWITCH_PLAY_RELEASED", "SWITCH_BACK_RELEASED", "SWITCH_ARROW_UP_RELEASED", "SWITCH_SELECT_RELEASED", "SWITCH_METRONOME_RELEASED", "SWITCH_STOP_RELEASED", "SWITCH_ARROW_LEFT_RELEASED", "SWITCH_ARROW_DOWN_RELEASED", "SWITCH_ARROW_RIGHT_RELEASED"];
 
         // The interaction modes are:
         // 0: Step sequencer (displays the 16 steps of the current bar, tapping toggles the step's entry given either the currently held note, or the clip's key)

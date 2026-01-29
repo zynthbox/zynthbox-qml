@@ -2790,49 +2790,47 @@ class zynthian_gui(QObject):
         fake_key = None
         wiring_layout = os.environ.get("ZYNTHIAN_WIRING_LAYOUT", "Z2_V4")
 
-        if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
-            # ALT
-            if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 17:
-                fake_key = Key.space
+        # If an external app is active, fake some useful keyboard keys based on our hardware buttons
+        if self.isExternalAppActive:
+            if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
 
-            # NAV CLUSTER
-            match i:
-                case 23:
-                    fake_key = Key.up
-                case 26:
-                    fake_key = Key.down
-                case 25:
-                    fake_key = Key.left
-                case 27:
-                    fake_key = Key.right
-                case 24:
-                    fake_key = Key.enter
-                case 22:
-                    fake_key = Key.esc
+                match i:
+                    # ALT
+                    case 17:
+                        fake_key = Key.space
 
-                # Channel buttons
-                case 5:
-                    fake_key = "1"
-                case 6:
-                    fake_key = "2"
-                case 7:
-                    fake_key = "3"
-                case 8:
-                    fake_key = "4"
-                case 9:
-                    fake_key = "5"
+                    # NAV CLUSTER
+                    case 23:
+                        fake_key = Key.up
+                    case 26:
+                        fake_key = Key.down
+                    case 25:
+                        fake_key = Key.left
+                    case 27:
+                        fake_key = Key.right
+                    case 24:
+                        fake_key = Key.enter
+                    case 22:
+                        fake_key = Key.esc
 
-                # Disable emitting key 6 as it will act as modifier
-                # case 10:
-                #     fake_key = "6"
+                    # Channel buttons
+                    case 5:
+                        fake_key = "1"
+                    case 6:
+                        fake_key = "2"
+                    case 7:
+                        fake_key = "3"
+                    case 8:
+                        fake_key = "4"
+                    case 9:
+                        fake_key = "5"
 
-                #F1 .. F16
-                case 12 | 13 | 14 | 15 | 16 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44:
-                    if self.ui_settings.hardwareSequencer:
-                        # When step buttons are pressed, stop key event propagation as the pressed handlers will emit appropriate CUIA events
-                        # If key event is not consumed, it will cause the gui_config.custom_switch_ui_actions to emit, which we do not want to happen in hardwareSequencer mode.
-                        return True
-                    else:
+                    # Disable emitting key 6 as it will act as modifier
+                    # case 10:
+                    #     fake_key = "6"
+
+                    #F1 .. F16
+                    case 12 | 13 | 14 | 15 | 16 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44:
                         match i:
                             case 12:
                                 fake_key = Key.f1
@@ -2867,49 +2865,44 @@ class zynthian_gui(QObject):
                                 fake_key = Key.f15
                             case 44:
                                 fake_key = Key.f16
-        else:
-            # ALT
-            if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 12:
-                fake_key = Key.space
+            else:
+                match i:
+                    # ALT
+                    case 12:
+                        fake_key = Key.space
 
-            # NAV CLUSTER
-            match i:
-                case 26:
-                    fake_key = Key.up
-                case 21:
-                    fake_key = Key.down
-                case 22:
-                    fake_key = Key.left
-                case 20:
-                    fake_key = Key.right
-                case 27:
-                    fake_key = Key.enter
-                case 25:
-                    fake_key = Key.esc
+                    # NAV CLUSTER
+                    case 26:
+                        fake_key = Key.up
+                    case 21:
+                        fake_key = Key.down
+                    case 22:
+                        fake_key = Key.left
+                    case 20:
+                        fake_key = Key.right
+                    case 27:
+                        fake_key = Key.enter
+                    case 25:
+                        fake_key = Key.esc
 
-                # Channel buttons
-                case 5:
-                    fake_key = "1"
-                case 6:
-                    fake_key = "2"
-                case 7:
-                    fake_key = "3"
-                case 8:
-                    fake_key = "4"
-                case 9:
-                    fake_key = "5"
+                    # Channel buttons
+                    case 5:
+                        fake_key = "1"
+                    case 6:
+                        fake_key = "2"
+                    case 7:
+                        fake_key = "3"
+                    case 8:
+                        fake_key = "4"
+                    case 9:
+                        fake_key = "5"
 
-                # Disable emitting key 6 as it will act as modifier
-                # case 10:
-                #     fake_key = "6"
+                    # Disable emitting key 6 as it will act as modifier
+                    # case 10:
+                    #     fake_key = "6"
 
-                #F1 .. F16
-                case 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 :
-                    if self.ui_settings.hardwareSequencer:
-                        # When step buttons are pressed, stop key event propagation as the pressed handlers will emit appropriate CUIA events
-                        # If key event is not consumed, it will cause the gui_config.custom_switch_ui_actions to emit, which we do not want to happen in hardwareSequencer mode.
-                        return True
-                    else:
+                    #F1 .. F16
+                    case 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 :
                         match i:
                             case 34:
                                 fake_key = Key.f1
@@ -4703,6 +4696,10 @@ class zynthian_gui(QObject):
         if self.__global_button_pressed__ != pressed:
             logging.debug(f"Global Button pressed : {pressed}")
             self.__global_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_RELEASED")
             self.global_button_pressed_changed.emit()
 
     global_button_pressed_changed = Signal()
@@ -4732,6 +4729,10 @@ class zynthian_gui(QObject):
         if self.__startRecord_button_pressed__ != pressed:
             logging.debug(f"startRecord Button pressed : {pressed}")
             self.__startRecord_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_RECORD_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_RECORD_RELEASED")
             self.startRecord_button_pressed_changed.emit()
 
     startRecord_button_pressed_changed = Signal()
@@ -4761,6 +4762,10 @@ class zynthian_gui(QObject):
         if self.__play_button_pressed__ != pressed:
             logging.debug(f"play Button pressed : {pressed}")
             self.__play_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_PLAY_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_PLAY_RELEASED")
             self.play_button_pressed_changed.emit()
 
     play_button_pressed_changed = Signal()
@@ -4790,6 +4795,10 @@ class zynthian_gui(QObject):
         if self.__metronome_button_pressed__ != pressed:
             logging.debug(f"metronome Button pressed : {pressed}")
             self.__metronome_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_METRONOME_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_METRONOME_RELEASED")
             self.metronome_button_pressed_changed.emit()
 
     metronome_button_pressed_changed = Signal()
@@ -4819,6 +4828,10 @@ class zynthian_gui(QObject):
         if self.__stop_button_pressed__ != pressed:
             logging.debug(f"stop Button pressed : {pressed}")
             self.__stop_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STOP_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STOP_RELEASED")
             self.stop_button_pressed_changed.emit()
 
     stop_button_pressed_changed = Signal()
@@ -4848,6 +4861,10 @@ class zynthian_gui(QObject):
         if self.__back_button_pressed__ != pressed:
             logging.debug(f"back Button pressed : {pressed}")
             self.__back_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_BACK_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_BACK_RELEASED")
             self.back_button_pressed_changed.emit()
 
     back_button_pressed_changed = Signal()
@@ -4877,6 +4894,10 @@ class zynthian_gui(QObject):
         if self.__up_button_pressed__ != pressed:
             logging.debug(f"up Button pressed : {pressed}")
             self.__up_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_UP_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_UP_RELEASED")
             self.up_button_pressed_changed.emit()
 
     up_button_pressed_changed = Signal()
@@ -4892,6 +4913,10 @@ class zynthian_gui(QObject):
         if self.__select_button_pressed__ != pressed:
             logging.debug(f"select Button pressed : {pressed}")
             self.__select_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_SELECT_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_SELECT_RELEASED")
             self.select_button_pressed_changed.emit()
 
     select_button_pressed_changed = Signal()
@@ -4921,6 +4946,10 @@ class zynthian_gui(QObject):
         if self.__left_button_pressed__ != pressed:
             logging.debug(f"left Button pressed : {pressed}")
             self.__left_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_LEFT_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_LEFT_RELEASED")
             self.left_button_pressed_changed.emit()
 
     left_button_pressed_changed = Signal()
@@ -4936,6 +4965,10 @@ class zynthian_gui(QObject):
         if self.__down_button_pressed__ != pressed:
             logging.debug(f"down Button pressed : {pressed}")
             self.__down_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_DOWN_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_DOWN_RELEASED")
             self.down_button_pressed_changed.emit()
 
     down_button_pressed_changed = Signal()
@@ -4951,6 +4984,10 @@ class zynthian_gui(QObject):
         if self.__right_button_pressed__ != pressed:
             logging.debug(f"right Button pressed : {pressed}")
             self.__right_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_RIGHT_DOWN")
+            else:
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_RIGHT_RELEASED")
             self.right_button_pressed_changed.emit()
 
     right_button_pressed_changed = Signal()
@@ -5282,7 +5319,7 @@ class zynthian_gui(QObject):
 
     ### Property isExternalAppActive
     def get_isExternalAppActive(self):
-        return hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False
+        return self.is_external_app_active()
 
     isExternalAppActiveChanged = Signal()
 
@@ -5703,7 +5740,7 @@ if __name__ == "__main__":
             zynqtgui.ui_settings.set_showCursor(zynqtgui.ui_settings.showCursor, force_set=True)
             zynqtgui.ui_settings.set_vncserverEnabled(zynqtgui.ui_settings.vncserverEnabled, force_set=True)
 
-            # Notify isExternalActive changed when top window active value changes
+            # Notify isExternalAppActive changed when top window active value changes
             zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())
 
     # Delay loading qml to let zynqtgui complete it's init sequence

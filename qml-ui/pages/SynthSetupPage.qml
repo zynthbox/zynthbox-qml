@@ -237,7 +237,7 @@ ZUI.ScreenPage {
                     // Switch to Sounds page when library page is open and F2 is pressed again
                     zynqtgui.show_screen("sound_categories")
                     return true;
-                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_RELEASED":
                     if (zynqtgui.current_screen_id == "layers_for_channel" && !zynqtgui.fixed_layers.current_index_valid) {
                         layerSetupDialog.open();
                         return true
@@ -251,15 +251,15 @@ ZUI.ScreenPage {
                         return true
                     }
                     return false
-                case "NAVIGATE_LEFT":
+                case "SWITCH_ARROW_LEFT_RELEASED":
                     var newIndex = Math.max(0, currentScreenIndex - 1);
                     zynqtgui.current_screen_id = root.screenIds[newIndex];
                     return true;
-                case "NAVIGATE_RIGHT":
+                case "SWITCH_ARROW_RIGHT_RELEASED":
                     var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
                     zynqtgui.current_screen_id = root.screenIds[newIndex];
                     return true;
-                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_RELEASED":
                     zynqtgui.current_screen_id = "layers_for_channel";
                     zynqtgui.go_back();
                     return true;

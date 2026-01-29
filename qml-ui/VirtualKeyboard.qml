@@ -67,7 +67,7 @@ Item {
         var result = false;
 
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 Qt.inputMethod.hide();
                 applicationWindow().forceActiveFocus()
                 result = true;

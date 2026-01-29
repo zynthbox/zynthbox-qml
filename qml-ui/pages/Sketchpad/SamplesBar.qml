@@ -21,23 +21,23 @@ ZUI.Card {
         }
 
         switch (cuia) {
-            case "SELECT_UP":
+            case "SWITCH_ARROW_UP_RELEASED":
                 if (controlObj.selectedSlotRow > 0) {
                     controlObj.selectedSlotRow -= 1
                 }
                 return true;
 
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 if (controlObj.selectedSlotRow < 4) {
                     controlObj.selectedSlotRow += 1
                 }
                 return true;
 
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
 
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 samplePickerDialog.folderModel.folder = samplePickerDialog.rootFolder;
                 samplePickerDialog.open();
 

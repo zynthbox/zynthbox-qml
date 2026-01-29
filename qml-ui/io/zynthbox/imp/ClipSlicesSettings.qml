@@ -40,19 +40,19 @@ Item {
     function cuiaCallback(cuia) {
         let returnValue = false;
         switch (cuia) {
-            case "SELECT_UP":
+            case "SWITCH_ARROW_UP_RELEASED":
                 _private.goUp();
                 returnValue = true;
                 break;
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 _private.goDown();
                 returnValue = true;
                 break;
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 _private.goLeft();
                 returnValue = true;
                 break;
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 _private.goRight();
                 returnValue = true;
                 break;

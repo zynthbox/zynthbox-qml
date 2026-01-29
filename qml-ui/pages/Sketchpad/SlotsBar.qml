@@ -64,27 +64,27 @@ ZUI.SectionPanel {
         var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
 
         switch (cuia) {
-        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_RELEASED":
             handleItemClick()
 
             return true;
 
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             return true;
 
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             return true;
 
-        case "SELECT_UP":
+        case "SWITCH_ARROW_UP_RELEASED":
             if (root.selectedSlotRowItem.channel.selectedSlotRow > 0) {
                 root.selectedSlotRowItem.channel.selectedSlotRow -= 1
             }
 
             return true;
 
-        case "SELECT_DOWN":
+        case "SWITCH_ARROW_DOWN_RELEASED":
             if (root.selectedSlotRowItem.channel.selectedSlotRow < 4) {
                 root.selectedSlotRowItem.channel.selectedSlotRow += 1
             }
@@ -92,7 +92,7 @@ ZUI.SectionPanel {
             return true;
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-        case "TRACK_1":
+        case "SWITCH_NUMBER_1_RELEASED":
             if (fxButton.checked) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 0
             } else {
@@ -101,7 +101,7 @@ ZUI.SectionPanel {
             handleItemClick()
             return true
 
-        case "TRACK_2":
+        case "SWITCH_NUMBER_2_RELEASED":
             if (fxButton.checked) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 1
             } else {
@@ -110,7 +110,7 @@ ZUI.SectionPanel {
             handleItemClick()
             return true
 
-        case "TRACK_3":
+        case "SWITCH_NUMBER_3_RELEASED":
             if (fxButton.checked) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 2
             } else {
@@ -119,7 +119,7 @@ ZUI.SectionPanel {
             handleItemClick()
             return true
 
-        case "TRACK_4":
+        case "SWITCH_NUMBER_4_RELEASED":
             if (fxButton.checked) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 3
             } else {
@@ -128,7 +128,7 @@ ZUI.SectionPanel {
             handleItemClick()
             return true
 
-        case "TRACK_5":
+        case "SWITCH_NUMBER_5_RELEASED":
             if (fxButton.checked) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 4
             } else {
@@ -136,6 +136,7 @@ ZUI.SectionPanel {
             }
             handleItemClick()
             return true
+
         case "KNOB0_UP":
             if (root.synthsButton.checked) {
                 pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)

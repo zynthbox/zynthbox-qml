@@ -57,11 +57,11 @@ ZUI.ScreenPage {
     cuiaCallback: function(cuia) {
         let result = false;
         switch (cuia) {
-        case "SELECT_UP":
+        case "SWITCH_ARROW_UP_RELEASED":
             view.moveCurrentIndexUp();
             result = true;
             break;
-        case "SELECT_DOWN":
+        case "SWITCH_ARROW_DOWN_RELEASED":
             if (view.currentIndex === -1) {
                 view.currentIndex = 0;
             } else {
@@ -69,7 +69,7 @@ ZUI.ScreenPage {
             }
             result = true;
             break;
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
             // if (zynqtgui.engine.pluginFormat === "") { // "" === Other
             //     zynqtgui.engine.pluginFormat = "VST3";
             // } else {
@@ -78,7 +78,7 @@ ZUI.ScreenPage {
             view.moveCurrentIndexLeft();
             result = true;
             break;
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
             // if (zynqtgui.engine.pluginFormat === "LV2") {
             //     zynqtgui.engine.pluginFormat = "VST3";
             // } else {

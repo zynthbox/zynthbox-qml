@@ -56,26 +56,26 @@ ZUI.Dialog {
     property var cuiaCallback: function (cuia) {
         var result = true;
         switch (cuia) {
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 root.goBack();
                 result = true;
                 break;
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 // If the currently selected thing is a directory, then enter that directory
                 if (root.currentFileInfo !== null && root.currentFileInfo.fileIsDir) {
                     root.filesListView.currentItem.selectItem();
                 }
                 result = true;
                 break;
-            case "SELECT_UP":
+            case "SWITCH_ARROW_UP_RELEASED":
                 root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 root.filesListView.currentIndex = ZUI.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
                 result = true;
                 break;
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 if (root.saveMode === false && filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isFile) {
                     // We are loading, and have something selected which is a file
                     root.fileSelected(root.selectedFile);
@@ -86,7 +86,7 @@ ZUI.Dialog {
                 }
                 result = true;
                 break;
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 root.reject();
                 result = true;
                 break;

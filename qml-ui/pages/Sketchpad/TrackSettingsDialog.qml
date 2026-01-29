@@ -55,11 +55,11 @@ ZUI.DialogQuestion {
         case "KNOB3_DOWN":
             returnValue = true;
             break;
-        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_RELEASED":
             root.reject();
             returnValue = true;
             break;
-        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_RELEASED":
             root.accept();
             returnValue = true;
             break;

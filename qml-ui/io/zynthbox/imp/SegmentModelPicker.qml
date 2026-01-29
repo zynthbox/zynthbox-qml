@@ -42,22 +42,21 @@ ZUI.Popup {
     property var cuiaCallback: function(cuia) {
         var result = component.opened;
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 component.close();
                 result = true;
                 break;
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 component.close();
                 result = true;
                 break;
-            case "NAVIGATE_LEFT":
-            case "SELECT_UP":
+            case "SWITCH_ARROW_LEFT_RELEASED":
+            case "SWITCH_ARROW_UP_RELEASED":
                 _private.goPrevious();
                 result = true;
                 break;
-
-            case "NAVIGATE_RIGHT":
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 _private.goNext();
                 result = true;
                 break;

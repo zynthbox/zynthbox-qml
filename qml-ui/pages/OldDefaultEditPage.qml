@@ -65,7 +65,7 @@ RowLayout {
         }
         let focusItem = topLevelFocusItem(Window.activeFocusItem);
         switch (cuia) {
-            case "SELECT_UP":
+            case "SWITCH_ARROW_UP_RELEASED":
                 switch (focusItem) {
                 case control1:
                     return true;
@@ -80,7 +80,7 @@ RowLayout {
                 default:
                     return false;
                 }
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 switch (focusItem) {
                 case control1:
                     control2.item.forceActiveFocus();
@@ -95,7 +95,7 @@ RowLayout {
                 default:
                     return false;
                 }
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 switch (focusItem) {
                 case control1:
                 case control2:
@@ -110,7 +110,7 @@ RowLayout {
                 default:
                     return false;
                 }
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 switch (focusItem) {
                 case control1:
                 case control2:
@@ -139,7 +139,7 @@ RowLayout {
                     Window.activeFocusItem.toggle()
                 }
                 return true;
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
                     Window.activeFocusItem.toggle();
                     return true;

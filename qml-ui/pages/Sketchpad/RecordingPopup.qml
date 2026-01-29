@@ -48,7 +48,7 @@ ZUI.Popup {
 
     spacing: Kirigami.Units.gridUnit * 0.5
 
-    readonly property var acceptedButtonsWhenClosed: ["STOP_RECORD", "SWITCH_STOP", "SWITCH_RECORD"]
+    readonly property var acceptedButtonsWhenClosed: ["STOP_RECORD", "SWITCH_STOP_DOWN", "SWITCH_STOP_RELEASED", "SWITCH_RECORD_DOWN", "SWITCH_RECORD_RELEASED"]
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         // This gets called from main when the dialog is not opened, so let's be explicit about what we want in that case
@@ -70,16 +70,16 @@ ZUI.Popup {
                     root.close();
                     returnValue = false;
                     break;
-                case "TRACK_1":
-                case "TRACK_2":
-                case "TRACK_3":
-                case "TRACK_4":
-                case "TRACK_5":
-                case "NAVIGATE_LEFT":
-                case "NAVIGATE_RIGHT":
-                case "SELECT_UP":
-                case "SELECT_DOWN":
-                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_NUMBER_1_RELEASED":
+                case "SWITCH_NUMBER_2_RELEASED":
+                case "SWITCH_NUMBER_3_RELEASED":
+                case "SWITCH_NUMBER_4_RELEASED":
+                case "SWITCH_NUMBER_5_RELEASED":
+                case "SWITCH_ARROW_LEFT_RELEASED":
+                case "SWITCH_ARROW_RIGHT_RELEASED":
+                case "SWITCH_ARROW_UP_RELEASED":
+                case "SWITCH_ARROW_DOWN_RELEASED":
+                case "SWITCH_SELECT_RELEASED":
                 case "SWITCH_MODE_RELEASED":
                 case "KNOB0_TOUCHED":
                 case "KNOB0_RELEASED":
@@ -125,12 +125,12 @@ ZUI.Popup {
                     Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm - 1;
                     returnValue = true;
                     break;
-                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_RELEASED":
                     root.close();
                     returnValue = true;
                     break;
                 case "STOP_RECORD":
-                case "SWITCH_STOP":
+                case "SWITCH_STOP_RELEASED":
                     if (zynqtgui.sketchpad.recordingType === "midi" && zynqtgui.sketchpad.isRecording) {
                         // If stopping the recording using the stop button, don't open the dialog back up again, just stop recording
                         // Don't reset the state to what we had before recording, as that would be disruptive, just let the user get on where they are
@@ -142,10 +142,10 @@ ZUI.Popup {
                     }
                     // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
                     break;
-                case "SWITCH_RECORD":
+                case "SWITCH_RECORD_RELEASED":
                     if (zynqtgui.sketchpad.isRecording === true && (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed)) {
                         // If user does alt+record or metronome+record, and we're already recording, stop recording
-                        zynqtgui.callable_ui_action_simple("SWITCH_STOP");
+                        zynqtgui.callable_ui_action_simple("SWITCH_STOP_RELEASED");
                         if (zynqtgui.metronomeButtonPressed) {
                             zynqtgui.ignoreNextMetronomeButtonPress = true
                         }
@@ -1291,8 +1291,14 @@ ZUI.Popup {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 18
                     icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                    onPressedChanged: {
+                        if (pressed) {
+                            zynqtgui.callable_ui_action_simple("SWITCH_RECORD_DOWN");
+                        } else {
+                            zynqtgui.callable_ui_action_simple("SWITCH_RECORD_RELEASED");
+                        }
+                    }
                     onClicked: {
-                        zynqtgui.callable_ui_action_simple("SWITCH_RECORD");
                     }
                 }
                 QQC2.Button {

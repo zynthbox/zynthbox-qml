@@ -50,12 +50,12 @@ GridLayout {
             return bottomBar.filePickerDialog.cuiaCallback(cuia);
         }
         switch (cuia) {
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 bottomBar.filePickerDialog.folderModel.folder = zynqtgui.bottomBarControlObj.recordingDir;
                 bottomBar.filePickerDialog.open();
                 return true;
 
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
         }

@@ -47,11 +47,11 @@ ZUI.Popup {
     property var cuiaCallback: function(cuia) {
         var returnValue = root.opened;
         switch (cuia) {
-        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_RELEASED":
             root.close();
             returnValue = true;
             break;
-        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_RELEASED":
             // pick the currently selected channel and close
             root.close();
             returnValue = true;

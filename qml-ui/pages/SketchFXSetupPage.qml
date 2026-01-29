@@ -95,15 +95,15 @@ ZUI.ScreenPage {
                     // Switch to Sounds page when library page is open and F2 is pressed again
                     zynqtgui.show_screen("sound_categories")
                     return true;
-                case "NAVIGATE_LEFT":
+                case "SWITCH_ARROW_LEFT_RELEASED":
                     newIndex = Math.max(0, currentScreenIndex - 1);
                     zynqtgui.current_screen_id = root.screenIds[newIndex];
                     return true;
-                case "NAVIGATE_RIGHT":
+                case "SWITCH_ARROW_RIGHT_RELEASED":
                     newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
                     zynqtgui.current_screen_id = root.screenIds[newIndex];
                     return true;
-                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_RELEASED":
                     zynqtgui.go_back();
                     return true;
                 default:

@@ -93,11 +93,11 @@ ZUI.ScreenPage {
             function cuiaCallback(cuia) {
                 let result = false;
                 switch (cuia) {
-                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_RELEASED":
                     zynqtgui.current_screen_id = "admin";
                     result = true;
                     break;
-                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_RELEASED":
                     if (_private.selectedDeviceIndex > -1)
                         contentStack.push(deviceComponent, {
                         "containingPage": root,
@@ -670,11 +670,11 @@ ZUI.ScreenPage {
         cuiaCallback: function(cuia) {
             let result = false;
             switch (cuia) {
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 midiEventListener.reject();
                 returnValue = true;
                 break;
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 midiEventListener.accept();
                 returnValue = true;
                 break;

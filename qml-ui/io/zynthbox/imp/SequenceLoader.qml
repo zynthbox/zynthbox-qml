@@ -100,7 +100,7 @@ Item {
 
         if (!result) {
             switch(cuia) {
-                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_RELEASED":
                     if (loadedSequenceOptionsPicker.opened) {
                         loadedSequenceOptionsPicker.accept();
                         result = true;
@@ -112,7 +112,7 @@ Item {
                         result = true;
                     }
                     break;
-                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_RELEASED":
                     if (loadedSequenceOptionsPicker.opened) {
                         loadedSequenceOptionsPicker.reject();
                         result = true;

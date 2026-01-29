@@ -109,11 +109,11 @@ ZUI.Dialog {
     property var cuiaCallback: function(cuia) {
         var returnValue = component.opened;
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 component.close();
                 returnValue = true;
                 break;
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 _private.startRecording();
                 returnValue = true;
                 break;

@@ -74,12 +74,12 @@ class zynthian_gui_keybinding(QObject):
             "POWER_OFF": { "modifier" : 4, "keysym" : "End" },
             "RELOAD_MIDI_CONFIG": { "modifier": 4, "keysym": "Insert" },
 
-            "SWITCH_SELECT_SHORT": { "modifier": 0, "keysym": "Return" },
-            "SWITCH_BACK_SHORT": { "modifier": 0, "keysym": "BackSpace, Escape" },
+            "SWITCH_SELECT_RELEASED": { "modifier": 0, "keysym": "Return" },
+            "SWITCH_BACK_RELEASED": { "modifier": 0, "keysym": "BackSpace, Escape" },
             "SWITCH_LAYER_SHORT": { "modifier": 0, "keysym": "l" },
 
-            "SELECT_UP": { "modifier": 0, "keysym": "Up" },
-            "SELECT_DOWN": { "modifier": 0, "keysym": "Down" },
+            "SWITCH_ARROW_UP_RELEASED": { "modifier": 0, "keysym": "Up" },
+            "SWITCH_ARROW_DOWN_RELEASED": { "modifier": 0, "keysym": "Down" },
             "LAYER_UP": { "modifier": 1, "keysym": "Up" },
             "LAYER_DOWN": { "modifier": 1, "keysym": "Down" },
             "SNAPSHOT_UP": { "modifier": 4, "keysym": "Up" },
@@ -105,14 +105,14 @@ class zynthian_gui_keybinding(QObject):
             "SCREEN_LAYER_FX": { "modifier": 0, "keysym": "f" },
 
             # Added in QML version
-            "NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
-            "NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
+            "SWITCH_ARROW_LEFT_RELEASED": { "modifier": 0, "keysym": "Left" },
+            "SWITCH_ARROW_RIGHT_RELEASED": { "modifier": 0, "keysym": "Right" },
 
-            "TRACK_1": { "modifier": 0, "keysym": "1" },
-            "TRACK_2": { "modifier": 0, "keysym": "2" },
-            "TRACK_3": { "modifier": 0, "keysym": "3" },
-            "TRACK_4": { "modifier": 0, "keysym": "4" },
-            "TRACK_5": { "modifier": 0, "keysym": "5" },
+            "SWITCH_NUMBER_1_RELEASED": { "modifier": 0, "keysym": "1" },
+            "SWITCH_NUMBER_2_RELEASED": { "modifier": 0, "keysym": "2" },
+            "SWITCH_NUMBER_3_RELEASED": { "modifier": 0, "keysym": "3" },
+            "SWITCH_NUMBER_4_RELEASED": { "modifier": 0, "keysym": "4" },
+            "SWITCH_NUMBER_5_RELEASED": { "modifier": 0, "keysym": "5" },
 
             "TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
             "TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
@@ -121,10 +121,10 @@ class zynthian_gui_keybinding(QObject):
             "DECREASE" : { "modifier": 0, "keysym": "-" },
 
             "TOGGLE_KEYBOARD" : { "modifier": 0, "keysym": "k" },
-            "SWITCH_PLAY" : { "modifier": 0, "keysym": "a" },
-            "SWITCH_STOP" : { "modifier": 0, "keysym": "s" },
+            "SWITCH_PLAY_RELEASED" : { "modifier": 0, "keysym": "a" },
+            "SWITCH_STOP_RELEASED" : { "modifier": 0, "keysym": "s" },
 
-            "SWITCH_RECORD": {"modifier": 0, "keysym": "`"},
+            "SWITCH_STOP_RELEASED": {"modifier": 0, "keysym": "`"},
             "STOP_RECORD": {"modifier": 4, "keysym": "`"},
         }
     }
@@ -140,12 +140,12 @@ class zynthian_gui_keybinding(QObject):
             "POWER_OFF": { "modifier" : 4, "keysym" : "End" },
             "RELOAD_MIDI_CONFIG": { "modifier": 4, "keysym": "Insert" },
 
-            "SWITCH_SELECT_SHORT": { "modifier": 0, "keysym": "Return" },
-            "SWITCH_BACK_SHORT": { "modifier": 0, "keysym": "BackSpace, Escape" },
+            "SWITCH_SELECT_RELEASED": { "modifier": 0, "keysym": "Return" },
+            "SWITCH_BACK_RELEASED": { "modifier": 0, "keysym": "BackSpace, Escape" },
             "SWITCH_LAYER_SHORT": { "modifier": 0, "keysym": "l" },
 
-            "SELECT_UP": { "modifier": 0, "keysym": "Up" },
-            "SELECT_DOWN": { "modifier": 0, "keysym": "Down" },
+            "SWITCH_ARROW_UP_RELEASED": { "modifier": 0, "keysym": "Up" },
+            "SWITCH_ARROW_DOWN_RELEASED": { "modifier": 0, "keysym": "Down" },
             "LAYER_UP": { "modifier": 1, "keysym": "Up" },
             "LAYER_DOWN": { "modifier": 1, "keysym": "Down" },
             "SNAPSHOT_UP": { "modifier": 4, "keysym": "Up" },
@@ -171,8 +171,8 @@ class zynthian_gui_keybinding(QObject):
             "SCREEN_LAYER_FX": { "modifier": 0, "keysym": "f" },
 
             # Added in QML version
-            "NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
-            "NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
+            "SWITCH_ARROW_LEFT_RELEASED": { "modifier": 0, "keysym": "Left" },
+            "SWITCH_ARROW_RIGHT_RELEASED": { "modifier": 0, "keysym": "Right" },
 
             "TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
             "TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
@@ -198,10 +198,10 @@ class zynthian_gui_keybinding(QObject):
             "DECREASE" : { "modifier": 0, "keysym": "-" },
 
             "TOGGLE_KEYBOARD" : { "modifier": 0, "keysym": "k" },
-            "SWITCH_PLAY" : { "modifier": 0, "keysym": "a" },
-            "SWITCH_STOP" : { "modifier": 0, "keysym": "s" },
+            "SWITCH_PLAY_RELEASED" : { "modifier": 0, "keysym": "a" },
+            "SWITCH_STOP_RELEASED" : { "modifier": 0, "keysym": "s" },
 
-            "SWITCH_RECORD": {"modifier": 0, "keysym": "`"},
+            "SWITCH_STOP_RELEASED": {"modifier": 0, "keysym": "`"},
             "STOP_RECORD": {"modifier": 4, "keysym": "`"},
         }
     }

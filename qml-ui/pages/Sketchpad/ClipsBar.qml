@@ -54,15 +54,15 @@ ZUI.SectionPanel {
         var clip;
         var returnVal = false;
         switch (cuia) {
-        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_RELEASED":
             bottomStack.slotsBar.channelButton.checked = true;
             returnVal = true;
             break;
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
             returnVal = true;
             break;

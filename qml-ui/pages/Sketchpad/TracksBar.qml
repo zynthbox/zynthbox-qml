@@ -351,17 +351,17 @@ ZUI.SectionPanel {
         var returnValue = false;
         // console.log(`TracksBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             returnValue = true;
             break;
 
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
             returnValue = true;
             break;
 
-        case "SELECT_UP":
+        case "SWITCH_ARROW_UP_RELEASED":
             if (zynqtgui.altButtonPressed) {
                 returnValue = true;
                 switch (zynqtgui.sketchpad.lastSelectedObj.className) {
@@ -385,7 +385,7 @@ ZUI.SectionPanel {
             }
             break;
 
-        case "SELECT_DOWN":
+        case "SWITCH_ARROW_DOWN_RELEASED":
             if (zynqtgui.altButtonPressed) {
                 returnValue = true;
                 switch (zynqtgui.sketchpad.lastSelectedObj.className) {
@@ -710,7 +710,7 @@ ZUI.SectionPanel {
                 returnValue = true;
             }
             break;
-        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_RELEASED":
             returnValue = true;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":

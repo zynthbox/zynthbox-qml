@@ -44,11 +44,11 @@ QQC2.ScrollView {
     function cuiaCallback(cuia) {
         let result = false;
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 contentStack.pop();
                 result = true;
                 break;
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_RELEASED":
                 if (component.currentRow.selectPressed) {
                     component.currentRow.selectPressed();
                 }

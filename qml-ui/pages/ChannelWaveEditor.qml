@@ -125,16 +125,16 @@ ZUI.ScreenPage {
                     returnValue = true;
                 }
                 break;
-            case "SELECT_UP":
+            case "SWITCH_ARROW_UP_RELEASED":
                 returnValue = _private.goUp(cuia);
                 break;
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 returnValue = _private.goDown(cuia);
                 break;
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 returnValue = _private.goLeft(cuia);
                 break;
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 returnValue = _private.goRight(cuia);
                 break;
             case "KNOB0_TOUCHED":

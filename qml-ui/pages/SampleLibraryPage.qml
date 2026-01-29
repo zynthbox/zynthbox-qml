@@ -163,7 +163,7 @@ ZUI.ScreenPage {
                     zynqtgui.show_screen("sound_categories")
                     returnValue = true;
                     break;
-                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_RELEASED":
                     switch (_private.selectedColumn) {
                         case 0:
                             if (component.selectedChannel.trackType === "sample-loop") {
@@ -208,11 +208,11 @@ ZUI.ScreenPage {
                     }
                     returnValue = true;
                     break;
-                case "NAVIGATE_LEFT":
+                case "SWITCH_ARROW_LEFT_RELEASED":
                     _private.selectedColumn = Math.max(0, _private.selectedColumn - 1);
                     returnValue = true;
                     break;
-                case "NAVIGATE_RIGHT":
+                case "SWITCH_ARROW_RIGHT_RELEASED":
                     if (_private.selectedColumn == 2) {
                         // Then we just kind of... use this as a "play" button style thing for testing samples (toggle the preview playback for whatever is currently selected)
                         if (filesListView.selector.current_index > -1) {

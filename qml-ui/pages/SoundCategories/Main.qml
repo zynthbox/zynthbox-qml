@@ -163,8 +163,7 @@ ZUI.ScreenPage {
                     result = true;
                 }
                 return true;
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_LONG":
+            case "SWITCH_BACK_RELEASED":
             {
                 switch (root.selectedState) {
                     case "updateCategoryMode":
@@ -183,8 +182,7 @@ ZUI.ScreenPage {
                 }
                 break;
             }
-            case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_LONG":
+            case "SWITCH_SELECT_RELEASED":
                 // For now, toggle whatever's the current item as selected... (when not in updateCategoryMode)
                 switch (root.selectedState) {
                     case "updateCategoryMode":
@@ -197,7 +195,7 @@ ZUI.ScreenPage {
                 }
                 result = true;
                 break;
-            case "SELECT_UP":
+            case "SWITCH_ARROW_UP_RELEASED":
                 // Select the next category up (when not in updateCategoryMode)
                 switch (root.selectedState) {
                     case "updateCategoryMode":
@@ -210,7 +208,7 @@ ZUI.ScreenPage {
                 }
                 result = true;
                 break;
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 // Select the next category down (when not in updateCategoryMode)
                 switch (root.selectedState) {
                     case "updateCategoryMode":

@@ -83,7 +83,7 @@ Kirigami.AbstractApplicationWindow {
 
         if (result === false) {
             switch (cuia) {
-            case "SWITCH_METRONOME_SHORT":
+            case "SWITCH_METRONOME_RELEASED":
                 zynqtgui.sketchpad.metronomeEnabled = !zynqtgui.sketchpad.metronomeEnabled
                 result = true;
                 break;
@@ -309,14 +309,14 @@ Kirigami.AbstractApplicationWindow {
                     result = true;
                 }
                 break;
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 if (zynqtgui.modeButtonPressed) {
                     root.selectedChannel.selectedClip = Math.max(0, root.selectedChannel.selectedClip - 1);
                     zynqtgui.ignoreNextModeButtonPress = true;
                     result = true;
                 }
                 break;
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 if (zynqtgui.modeButtonPressed) {
                     root.selectedChannel.selectedClip = Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, root.selectedChannel.selectedClip + 1);
                     zynqtgui.ignoreNextModeButtonPress = true;
@@ -325,7 +325,7 @@ Kirigami.AbstractApplicationWindow {
                 break;
             case "SWITCH_MENU_RELEASED":
                 if (["main", "admin", "about", "audio_settings", "midicontroller_settings", "test_knobs", "synth_behaviour",  "network", "network_info", "wifi_settings", "hardware", "ui_settings", "led_config", "bluetooth_config", "theme_chooser", "theme_downloader", "apps_downloader"].includes(zynqtgui.current_screen_id) === true) {
-                    zynqtgui.callable_ui_action_simple("SWITCH_BACK_SHORT");
+                    zynqtgui.callable_ui_action_simple("SWITCH_BACK_RELEASED");
                 } else {
                     zynqtgui.callable_ui_action_simple("SCREEN_MAIN_MENU");
                 }
@@ -1573,9 +1573,9 @@ Kirigami.AbstractApplicationWindow {
                         height: parent.height
                         onClicked: {
                             if (zynqtgui.sketchpad.isMetronomeRunning) {
-                                zynqtgui.callable_ui_action_simple("SWITCH_STOP");
+                                zynqtgui.callable_ui_action_simple("SWITCH_STOP_RELEASED");
                             } else {
-                                zynqtgui.callable_ui_action_simple("SWITCH_PLAY");
+                                zynqtgui.callable_ui_action_simple("SWITCH_PLAY_RELEASED");
                             }
                         }
                         checked: highlighted
@@ -1977,36 +1977,36 @@ Kirigami.AbstractApplicationWindow {
             var returnVal = false
 
             switch (cuia) {
-            case "TRACK_1":
+            case "SWITCH_NUMBER_1_RELEASED":
                 clipBar.handleItemClick(0);
                 returnVal = true;
                 break
-            case "TRACK_2":
+            case "SWITCH_NUMBER_2_RELEASED":
                 clipBar.handleItemClick(1);
                 returnVal = true;
                 break
-            case "TRACK_3":
+            case "SWITCH_NUMBER_3_RELEASED":
                 clipBar.handleItemClick(2);
                 returnVal = true;
                 break
-            case "TRACK_4":
+            case "SWITCH_NUMBER_4_RELEASED":
                 clipBar.handleItemClick(3);
                 returnVal = true;
                 break
-            case "TRACK_5":
+            case "SWITCH_NUMBER_5_RELEASED":
                 clipBar.handleItemClick(4);
                 returnVal = true;
                 break
-            case "SELECT_UP":
+            case "SWITCH_ARROW_UP_RELEASED":
                 returnVal = true
                 break
-            case "SELECT_DOWN":
+            case "SWITCH_ARROW_DOWN_RELEASED":
                 returnVal = true
                 break
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 returnVal = true
                 break
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 returnVal = true
                 break
             case "KNOB0_UP":

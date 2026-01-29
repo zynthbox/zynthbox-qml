@@ -38,7 +38,7 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
         }

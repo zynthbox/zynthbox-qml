@@ -119,7 +119,7 @@ IMP.BasePlayGrid {
                         }
                     }
                     break;
-                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_RELEASED":
                     if (zynqtgui.altButtonPressed) {
                         _private.workingPatternModel.clear();
                     } else {
@@ -135,7 +135,7 @@ IMP.BasePlayGrid {
                     }
                     returnValue = true;
                     break;
-                case "SELECT_UP":
+                case "SWITCH_ARROW_UP_RELEASED":
                     if (zynqtgui.modeButtonPressed) {
                         _private.nextBar();
                         zynqtgui.ignoreNextModeButtonPress = true;
@@ -143,7 +143,7 @@ IMP.BasePlayGrid {
                         _private.octaveUp();
                     }
                     break;
-                case "SELECT_DOWN":
+                case "SWITCH_ARROW_DOWN_RELEASED":
                     if (zynqtgui.modeButtonPressed) {
                         _private.previousBar();
                         zynqtgui.ignoreNextModeButtonPress = true;
@@ -151,35 +151,35 @@ IMP.BasePlayGrid {
                         _private.octaveDown();
                     }
                     break;
-                case "NAVIGATE_LEFT":
+                case "SWITCH_ARROW_LEFT_RELEASED":
                     if (zynqtgui.sketchpad.selectedTrackId > 0) {
                         zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack - 1;
                     }
                     returnValue = true;
                     break;
-                case "NAVIGATE_RIGHT":
+                case "SWITCH_ARROW_RIGHT_RELEASED":
                     if (zynqtgui.sketchpad.selectedTrackId < Zynthbox.Plugin.sketchpadTrackCount) {
                         zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack + 1;
                     }
                     returnValue = true;
                     break;
-                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_RELEASED":
                     _private.activateSelectedItem();
                     returnValue = true;
                     break;
-                case "TRACK_1":
+                case "SWITCH_NUMBER_1_RELEASED":
                     returnValue = backButtonClearPatternHelper(0 + trackDelta);
                     break;
-                case "TRACK_2":
+                case "SWITCH_NUMBER_2_RELEASED":
                     returnValue = backButtonClearPatternHelper(1 + trackDelta);
                     break;
-                case "TRACK_3":
+                case "SWITCH_NUMBER_3_RELEASED":
                     returnValue = backButtonClearPatternHelper(2 + trackDelta);
                     break;
-                case "TRACK_4":
+                case "SWITCH_NUMBER_4_RELEASED":
                     returnValue = backButtonClearPatternHelper(3 + trackDelta);
                     break;
-                case "TRACK_5":
+                case "SWITCH_NUMBER_5_RELEASED":
                     returnValue = backButtonClearPatternHelper(4 + trackDelta);
                     break;
                 case "KNOB0_UP":

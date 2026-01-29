@@ -54,8 +54,10 @@ ColumnLayout {
     function cuiaCallback(cuia) {
         let result = true;
         switch(cuia) {
-            case "SWITCH_PLAY":
-            case "SWITCH_STOP":
+            case "SWITCH_PLAY_DOWN":
+            case "SWITCH_PLAY_RELEASED":
+            case "SWITCH_STOP_DOWN":
+            case "SWITCH_STOP_RELEASED":
                 // Pass basic playback control through
                 result = false
                 break;
@@ -73,15 +75,15 @@ ColumnLayout {
                 break;
             case "SCREEN_PLAYGRID":
                 // To partner with the bit in main which shows it, this will cause us to toggle when hitting the playgrid button
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_BACK_RELEASED":
+            case "SWITCH_SELECT_RELEASED":
                 component.close();
                 break;
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 // page down
                 applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex - 1);
                 break;
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 // page up
                 applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex + 1);
                 break;

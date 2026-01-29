@@ -42,7 +42,7 @@ RowLayout {
         var columnIndex = zynqtgui.control.selectedColumn - zynqtgui.control.selectedPage * 4
 
         switch (cuia) {
-        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_RELEASED":
             if (zynqtgui.control.selectedEngineBypassController) {
                 if (zynqtgui.control.selectedEngineBypassController.value === 0) {
                     zynqtgui.control.selectedEngineBypassController.value = 1;
@@ -52,18 +52,18 @@ RowLayout {
             }
             return true;
             break;
-        case "SELECT_UP":
+        case "SWITCH_ARROW_UP_RELEASED":
             zynqtgui.control.selectPrevPage()
             return true
-        case "SELECT_DOWN":
+        case "SWITCH_ARROW_DOWN_RELEASED":
             zynqtgui.control.selectNextPage()
             return true
 
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
             zynqtgui.control.selectPrevColumn()
             return true
 
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
             zynqtgui.control.selectNextColumn()
             return true
         case "KNOB0_UP":

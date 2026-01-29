@@ -160,15 +160,15 @@ ZUI.ScreenPage {
         layerSetupDialog.close(); // Close the new layer popup at any keyboard interaction
 
         switch (cuia) {
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
             var newIndex = Math.max(0, currentScreenIndex - 1);
             zynqtgui.current_screen_id = root.screenIds[newIndex];
             return true;
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
             var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
             zynqtgui.current_screen_id = root.screenIds[newIndex];
             return true;
-        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_RELEASED":
             zynqtgui.current_screen_id = "main_layers_view";
             zynqtgui.go_back();
             return true;

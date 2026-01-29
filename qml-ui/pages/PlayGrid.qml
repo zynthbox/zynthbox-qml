@@ -53,7 +53,7 @@ ZUI.ScreenPage {
 
         // Before passing on to the current playgrid, handle our internals
         switch (cuia) {
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 if (playGridSwitcher.visible) {
                     playGridSwitcher.visible = false;
                     returnValue = true;

@@ -46,11 +46,11 @@ ZUI.ScreenPage {
         //     return true;
 
         switch (cuia) {
-        case "SELECT_DOWN":
+        case "SWITCH_ARROW_DOWN_RELEASED":
         case "KNOB3_UP":
             root.incrementCurrentIndex();
             return true;
-        case "SELECT_UP":
+        case "SWITCH_ARROW_UP_RELEASED":
         case "KNOB3_DOWN":
             root.decrementCurrentIndex();
             return true;

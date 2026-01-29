@@ -134,7 +134,7 @@ ZUI.DialogQuestion {
                 }
                 break;
             case "KNOB3_UP":
-            case "NAVIGATE_RIGHT":
+            case "SWITCH_ARROW_RIGHT_RELEASED":
                 // Move between synth and sample slots (so just rotate between those two, not others)
                 if (component.selectedChannel) {
                     let tracksBar = pageManager.getPage("sketchpad").bottomStack.tracksBar;
@@ -152,7 +152,7 @@ ZUI.DialogQuestion {
                 }
                 break;
             case "KNOB3_DOWN":
-            case "NAVIGATE_LEFT":
+            case "SWITCH_ARROW_LEFT_RELEASED":
                 // Move between synth and sample slots (so just rotate between those two, not others)
                 if (component.selectedChannel) {
                     let tracksBar = pageManager.getPage("sketchpad").bottomStack.tracksBar;
@@ -169,8 +169,8 @@ ZUI.DialogQuestion {
                     component.thisIsCheating = 0;
                 }
                 break;
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_BACK_RELEASED":
+            case "SWITCH_SELECT_RELEASED":
                 component.accept();
                 break;
         }

@@ -43,7 +43,7 @@ ZUI.ScreenPage {
 
     cuiaCallback: function(cuia) {
         switch (cuia) {
-        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_RELEASED":
             if (zynqtgui.main.visibleCategory === "sessions-versions") {
                 // Mimic back to return to sketchpad folder view when versions are being displayed
                 zynqtgui.main.visibleCategory = "sessions"
@@ -53,46 +53,46 @@ ZUI.ScreenPage {
 
             zynqtgui.admin.power_off()
             return true
-        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_RELEASED":
             mainviewGridId.activateCurrent();
             return true;
             break;
-        case "SELECT_UP":
+        case "SWITCH_ARROW_UP_RELEASED":
             mainviewGridId.moveCurrentIndexUp();
             return true;
-        case "SELECT_DOWN":
+        case "SWITCH_ARROW_DOWN_RELEASED":
             if (mainviewGridId.currentIndex === -1) {
                 mainviewGridId.currentIndex = 0;
             } else {
                 mainviewGridId.moveCurrentIndexDown();
             }
             return true;
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
         case "KNOB3_DOWN":
             mainviewGridId.moveCurrentIndexLeft();
             return true;
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
         case "KNOB3_UP":
             mainviewGridId.moveCurrentIndexRight();
             return true;
 
-        case "TRACK_1":
+        case "SWITCH_NUMBER_1_RELEASED":
             zynqtgui.main.visibleCategory = "modules"
             return true
 
-        case "TRACK_2":
+        case "SWITCH_NUMBER_2_RELEASED":
             zynqtgui.main.visibleCategory = "appimages"
             return true
 
-        case "TRACK_3":
+        case "SWITCH_NUMBER_3_RELEASED":
             zynqtgui.main.visibleCategory = "sessions"
             return true
 
-        case "TRACK_4":
+        case "SWITCH_NUMBER_4_RELEASED":
             zynqtgui.main.visibleCategory = "templates"
             return true
 
-        case "TRACK_5":
+        case "SWITCH_NUMBER_5_RELEASED":
             zynqtgui.main.visibleCategory = "discover"
             return true
 

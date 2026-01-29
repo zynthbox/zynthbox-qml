@@ -336,14 +336,14 @@ class zynthian_gui(QObject):
         "39": "START_MIDI_PLAY",
         "40": "STOP_MIDI_PLAY",
         "51": "SELECT_ITEM",
-        "52": "SELECT_UP",
-        "53": "SELECT_DOWN",
+        "52": "SWITCH_ARROW_UP_RELEASED",
+        "53": "SWITCH_ARROW_DOWN_RELEASED",
         "56": "LAYER_UP",
         "57": "LAYER_DOWN",
         "58": "SNAPSHOT_UP",
         "59": "SNAPSHOT_DOWN",
-        "64": "SWITCH_BACK_SHORT",
-        "65": "SWITCH_SELECT_SHORT",
+        "64": "SWITCH_BACK_RELEASED",
+        "65": "SWITCH_SELECT_RELEASED",
         "60": "SWITCH_LAYER_SHORT",
         "71": "SWITCH_SNAPSHOT_SHORT",
         "80": "SCREEN_ADMIN",
@@ -357,7 +357,7 @@ class zynthian_gui(QObject):
         "93": "MODAL_MIDI_RECORDER",
         "94": "MODAL_ALSA_MIXER",
         "95": "SCREEN_PLAYGRID",
-        "96": "NAVIGATE_RIGHT",
+        "96": "SWITCH_ARROW_RIGHT_RELEASED",
         "101": "LAYER_1",
         "102": "LAYER_2",
         "103": "LAYER_3",
@@ -1637,18 +1637,18 @@ class zynthian_gui(QObject):
         if cuia == "SELECT":
             rewriteLegacyAs = "SELECT_ITEM"
         if cuia == "ZL_PLAY":
-            rewriteLegacyAs = "SWITCH_PLAY"
+            rewriteLegacyAs = "SWITCH_PLAY_RELEASED"
         elif cuia == "ZL_STOP":
-            rewriteLegacyAs = "SWITCH_STOP"
+            rewriteLegacyAs = "SWITCH_STOP_RELEASED"
         elif cuia == "START_RECORD":
-            rewriteLegacyAs = "SWITCH_RECORD"
+            rewriteLegacyAs = "SWITCH_RECORD_RELEASED"
         elif cuia == "KEYBOARD":
             rewriteLegacyAs = "TOGGLE_KEYBOARD"
         elif cuia == "MODAL_STEPSEQ":
             rewriteLegacyAs = "SCREEN_PLAYGRID"
         elif cuia.startswith("CHANNEL_"):
             # Catch all five numerical entries, and the two next/previous ones
-            rewriteLegacyAs = cuia.replace("CHANNEL_", "TRACK_")
+            rewriteLegacyAs = cuia.replace("CHANNEL_", "NUMBER_")
         elif cuia == "SCREEN_AUDIO_SETTINGS" or cuia == "MODAL_ALSA_MIXER":
             rewriteLegacyAs = "SWITCH_GLOBAL_RELEASED"
         elif cuia in ["START_MIDI_RECORD", "STOP_MIDI_RECORD", "TOGGLE_MIDI_RECORD", "START_MIDI_PLAY", "STOP_MIDI_PLAY", "TOGGLE_MIDI_PLAY", "MODAL_MIDI_RECORDER",
@@ -1666,7 +1666,7 @@ class zynthian_gui(QObject):
 
         # BEGIN Button ignore logic
         # NOTE If any of these are hit, we will return early from this function
-        if cuia == "SWITCH_BACK_SHORT" and self.ignoreNextBackButtonPress == True:
+        if cuia == "SWITCH_BACK_RELEASED" and self.ignoreNextBackButtonPress == True:
             self.ignoreNextBackButtonPress = False
             return
         elif cuia == "SWITCH_MODE_RELEASED" and self.ignoreNextModeButtonPress == True:
@@ -1677,16 +1677,16 @@ class zynthian_gui(QObject):
             self.menuButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextMenuButtonPress = False
             return
-        elif cuia == "SWITCH_PLAY" and self.ignoreNextPlayButtonPress == True:
+        elif cuia == "SWITCH_PLAY_RELEASED" and self.ignoreNextPlayButtonPress == True:
             self.ignoreNextPlayButtonPress = False
             return
-        elif cuia == "SWITCH_STOP" and self.ignoreNextStopButtonPress == True:
+        elif cuia == "SWITCH_STOP_RELEASED" and self.ignoreNextStopButtonPress == True:
             self.ignoreNextStopButtonPress = False
             return
-        elif cuia == "SWITCH_RECORD" and self.ignoreNextRecordButtonPress == True:
+        elif cuia == "SWITCH_RECORD_RELEASED" and self.ignoreNextRecordButtonPress == True:
             self.ignoreNextRecordButtonPress = False
             return
-        elif cuia == "SWITCH_METRONOME_SHORT" and self.ignoreNextMetronomeButtonPress == True:
+        elif cuia == "SWITCH_METRONOME_RELEASED" and self.ignoreNextMetronomeButtonPress == True:
             self.ignoreNextMetronomeButtonPress = False
             return
         elif cuia == "SWITCH_KNOB3_RELEASED" and self.ignoreNextKnob3Press == True:
@@ -1695,7 +1695,7 @@ class zynthian_gui(QObject):
             self.globalButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextGlobalButtonPress = False
             return
-        elif cuia == "SWITCH_SELECT_SHORT" and self.ignoreNextSelectButtonPress == True:
+        elif cuia == "SWITCH_SELECT_RELEASED" and self.ignoreNextSelectButtonPress == True:
             self.ignoreNextSelectButtonPress = False
             return
         elif cuia == "SWITCH_STEP1_RELEASED" and self.ignoreNextStep1ButtonPress == True:
@@ -1752,7 +1752,7 @@ class zynthian_gui(QObject):
         # NOTE If any of these are hit, we will return early from this function
         # If we press the back button when any of the modifier-capable
         # buttons are held down, abort that button's release actions
-        if cuia == "SWITCH_BACK_SHORT":
+        if cuia == "SWITCH_BACK_RELEASED":
             changedAnything = False
             if self.knob3Pressed == True and self.ignoreNextKnob3Press == False:
                 self.ignoreNextKnob3Press = True
@@ -1936,13 +1936,13 @@ class zynthian_gui(QObject):
             except:
                 pass
 
-        elif cuia == "SELECT_UP":
+        elif cuia == "SWITCH_ARROW_UP_RELEASED":
             try:
                 self.get_current_screen().select_up()
             except:
                 pass
 
-        elif cuia == "SELECT_DOWN":
+        elif cuia == "SWITCH_ARROW_DOWN_RELEASED":
             try:
                 self.get_current_screen().select_down()
             except:
@@ -1987,13 +1987,13 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_LAYER_SHORT":
             self.zynswitch_short(0)
 
-        elif cuia == "SWITCH_BACK_SHORT":
+        elif cuia == "SWITCH_BACK_RELEASED":
             self.zynswitch_short(1)
 
         elif cuia == "SWITCH_SNAPSHOT_SHORT":
             self.zynswitch_short(2)
 
-        elif cuia == "SWITCH_SELECT_SHORT":
+        elif cuia == "SWITCH_SELECT_RELEASED":
             self.zynswitch_short(3)
 
         elif cuia == "SCREEN_MAIN_MENU":
@@ -2070,27 +2070,27 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_GLOBAL_RELEASED":
             self.globalButtonPressed = False
 
-        elif cuia == "TRACK_1":
+        elif cuia == "SWITCH_NUMBER_1_RELEASED":
             if self.sketchpad.selectedTrackId == 0 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
                 self.sketchpad.selectedTrackId = 0 + trackDelta
-        elif cuia == "TRACK_2":
+        elif cuia == "SWITCH_NUMBER_2_RELEASED":
             if self.sketchpad.selectedTrackId == 1 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
                 self.sketchpad.selectedTrackId = 1 + trackDelta
-        elif cuia == "TRACK_3":
+        elif cuia == "SWITCH_NUMBER_3_RELEASED":
             if self.sketchpad.selectedTrackId == 2 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
                 self.sketchpad.selectedTrackId = 2 + trackDelta
-        elif cuia == "TRACK_4":
+        elif cuia == "SWITCH_NUMBER_4_RELEASED":
             if self.sketchpad.selectedTrackId == 3 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
                 self.sketchpad.selectedTrackId = 3 + trackDelta
-        elif cuia == "TRACK_5":
+        elif cuia == "SWITCH_NUMBER_5_RELEASED":
             if self.sketchpad.selectedTrackId == 4 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
@@ -2118,7 +2118,7 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_ALT_RELEASED":
             self.altButtonPressed = False
 
-        elif cuia == "SWITCH_PLAY":
+        elif cuia == "SWITCH_PLAY_RELEASED":
             zl = self.screens["sketchpad"]
 
             if self.metronomeButtonPressed:
@@ -2129,7 +2129,7 @@ class zynthian_gui(QObject):
                     self.run_stop_metronome_and_playback.emit()
                 else:
                     self.run_start_metronome_and_playback.emit()
-        elif cuia == "SWITCH_STOP":
+        elif cuia == "SWITCH_STOP_RELEASED":
             if self.screens["sketchpad"].isRecording:
                 # TODO 1.1 Revisit when we re-introduce audio recording (logic should be "stop when recording stops recording, otherwise stop when playing stops playback, otherwise stop sends out all notes off")
                 # Some Clip is currently being recorded
@@ -2141,7 +2141,7 @@ class zynthian_gui(QObject):
             else:
                 self.callable_ui_action("ALL_NOTES_OFF")
 
-        elif cuia == "SWITCH_RECORD":
+        elif cuia == "SWITCH_RECORD_RELEASED":
             zl = self.screens["sketchpad"]
             # TODO 1.1 Revisit when we re-introduce audio recording (metronome button likely just wants to be "start recording now, but just midi, and also don't show the dlg), but for now, just don't
             if self.recording_popup_active: # or self.metronomeButtonPressed:
@@ -2174,7 +2174,7 @@ class zynthian_gui(QObject):
 
         elif cuia == "SWITCH_KNOB3_RELEASED":
             # If we haven't already handled the knob3 release, it should be treated as though select was released
-            self.callable_ui_action_simple("SWITCH_SELECT_SHORT")
+            self.callable_ui_action_simple("SWITCH_SELECT_RELEASED")
 
         elif cuia == "SWITCH_MODE_DOWN":
             self.modeButtonPressed = True
@@ -2391,7 +2391,7 @@ class zynthian_gui(QObject):
 
     def custom_switch_ui_action(self, i, t):
         try:
-            if t in zynthian_gui_config.custom_switch_ui_actions[i]:
+            if i in zynthian_gui_config.custom_switch_ui_actions and t in zynthian_gui_config.custom_switch_ui_actions[i]:
                 # logging.info("Executing CUIA action: {}".format(zynthian_gui_config.custom_switch_ui_actions[i]))
                 self.callable_ui_action(
                     zynthian_gui_config.custom_switch_ui_actions[i][t]

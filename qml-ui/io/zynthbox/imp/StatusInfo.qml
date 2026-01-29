@@ -359,23 +359,23 @@ ZUI.SectionGroup
             property var cuiaCallback: function(cuia) {
                 var result = popup.opened;
                 switch(cuia) {
-                case "SWITCH_PLAY":
-                case "SWITCH_STOP":
+                case "SWITCH_PLAY_RELEASED":
+                case "SWITCH_STOP_RELEASED":
                 case "ALL_NOTES_OFF":
                 case "ALL_SOUNDS_OFF":
                 case "ALL_OFF":
                     // Playback control is not handled by us, so pass these through
                     result = false;
                     break;
-                case "SELECT_UP":
-                case "SELECT_DOWN":
-                case "NAVIGATE_LEFT":
-                case "NAVIGATE_RIGHT":
+                case "SWITCH_ARROW_UP_RELEASED":
+                case "SWITCH_ARROW_DOWN_RELEASED":
+                case "SWITCH_ARROW_LEFT_RELEASED":
+                case "SWITCH_ARROW_RIGHT_RELEASED":
                     // Let's ensure we don't accidentally switch tracks and whatnot with the popup open
                     result = true;
                     break;
-                case "SWITCH_SELECT_SHORT":
-                case "SWITCH_BACK_SHORT":
+                case "SWITCH_SELECT_RELEASED":
+                case "SWITCH_BACK_RELEASED":
                 case "SWITCH_GLOBAL_RELEASED":
                     zynqtgui.globalPopupOpened = false;
                     result = true;

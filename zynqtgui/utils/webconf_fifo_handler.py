@@ -209,7 +209,7 @@ class webconf_fifo_handler(QObject):
     #   or if you wish to activate a track, you can safely pass any value to the slot and value parameters:
     #   cuia/ACTIVATE_TRACK/1/-1/0 (which activates track 1 (index 0))
     #   For commands which are singular (such as button presses), you don't have to pass track, slot, and value:
-    #   cuia/switch_play (which will simulate pressing the play button)
+    #   cuia/switch_play_released (which will simulate pressing the play button)
     # sounds
     #   This section of commands will affect the sound library
     #   sounds/process/absolute\/file\/path.snd will process the snd file /absolute/file/path.snd
@@ -230,7 +230,7 @@ class webconf_fifo_handler(QObject):
     #         Note that the types must be compatible (which essentially means that they must match, unless you are loading a sketch from an snd file into a sample slot)
     #
     # NOTE: The separator should only exist between elements, and all elements must be filled, as any empty elements would be filtered out before handling
-    # This means that technically, /cuia//switch_stop//// would be valid, as it would be interpreted as cuia/switch_stop, but you should endeavour to avoid this kind of thing.
+    # This means that technically, /cuia//switch_stop_released//// would be valid, as it would be interpreted as cuia/switch_stop_released, but you should endeavour to avoid this kind of thing.
     #
     # @param inputData The raw data as received from Webconf (a single line of text)
     @Slot(str)

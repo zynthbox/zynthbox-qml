@@ -93,7 +93,7 @@ ColumnLayout {
             case "KNOB2_TOUCHED":
             case "KNOB3_TOUCHED":
                 return true;
-            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_RELEASED":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
             case "KNOB0_UP":

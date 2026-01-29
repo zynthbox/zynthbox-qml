@@ -46,11 +46,11 @@ ZUI.SectionPanel {
     
     function cuiaCallback(cuia) {
         switch (cuia) {
-        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_RELEASED":
             bottomStack.slotsBar.channelButton.checked = true
             return true
 
-        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_RELEASED":
             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
             zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
             bottomStack.slotsBar.bottomBarButton.checked = true
@@ -58,14 +58,14 @@ ZUI.SectionPanel {
 
             return true;
 
-        case "NAVIGATE_LEFT":
+        case "SWITCH_ARROW_LEFT_RELEASED":
             if (zynqtgui.sketchpad.selectedTrackId > 0) {
                 zynqtgui.sketchpad.selectedTrackId -= 1;
             }
 
             return true;
 
-        case "NAVIGATE_RIGHT":
+        case "SWITCH_ARROW_RIGHT_RELEASED":
             if (zynqtgui.sketchpad.selectedTrackId < 9) {
                 zynqtgui.sketchpad.selectedTrackId += 1;
             }

@@ -1021,36 +1021,35 @@ Item {
                     returnValue = true;
                     break;
 
-                // Would perhaps make sense that the sidebar buttons should be less strictly named and just... also be numbered buttons?
-                case "SCREEN_SKETCHPAD":
+                case "SWITCH_NUMBER_1_RELEASED":
                     if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
                         component.setParameterPage(0);
                         component.ignoreHeldStepButtonsReleases();
                         returnValue = true;
                     }
                     break;
-                case "SCREEN_LAYER":
+                case "SWITCH_NUMBER_2_RELEASED":
                     if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
                         component.setParameterPage(1);
                         component.ignoreHeldStepButtonsReleases();
                         returnValue = true;
                     }
                     break;
-                case "SCREEN_EDIT_CONTEXTUAL":
+                case "SWITCH_NUMBER_3_RELEASED":
                     if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
                         component.setParameterPage(2);
                         component.ignoreHeldStepButtonsReleases();
                         returnValue = true;
                     }
                     break;
-                case "SCREEN_PLAYGRID":
+                case "SWITCH_NUMBER_4_RELEASED":
                     if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
                         component.setParameterPage(3);
                         component.ignoreHeldStepButtonsReleases();
                         returnValue = true;
                     }
                     break;
-                case "SCREEN_SONG_MANAGER":
+                case "SWITCH_NUMBER_5_RELEASED":
                     if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
                         component.setParameterPage(4);
                         component.ignoreHeldStepButtonsReleases();

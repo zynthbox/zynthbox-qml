@@ -58,7 +58,8 @@ class zynthian_layer(QObject):
         self.bank_index = 0
         self.bank_name = None
         self.bank_info = None
-        self.bank_dir = None
+        self.bank_dir = self.engine.get_bank_root_dir()
+        self.bank_id = None
 
         self.show_fav_presets = False
         self.preset_list = []
@@ -320,10 +321,11 @@ class zynthian_layer(QObject):
             last_bank_index=self.bank_index
             last_bank_name=self.bank_name
             self.bank_index=i
-            self.bank_name=self.bank_list[i][2]
+            self.bank_name=self.bank_list[i][2]            
             self.bank_info=copy.deepcopy(self.bank_list[i])
             logging.info("Bank Selected: %s (%d)" % (self.bank_name,i))   
-            if set_engine:    
+            if set_engine:
+                self.bank_id=self.bank_info[0]    
                 self.reset_preset()
                 returnVal = self.engine.set_bank(self, self.bank_info)
                 if returnVal:
@@ -356,6 +358,12 @@ class zynthian_layer(QObject):
     # FIXME
     def get_bank_name(self):
         return self.bank_name
+    
+    def get_bank_id(self):
+        return self.bank_id
+
+    def get_bank_dir(self):
+        return self.bank_dir
 
     def get_bank_index(self):
         return self.bank_index
@@ -366,6 +374,8 @@ class zynthian_layer(QObject):
     bankChanged = Signal()
     bankCountChanged = Signal()
     bankName = Property(str, get_bank_name, notify=bankChanged)
+    bankId = Property(str, get_bank_id, notify=bankChanged)
+    bankDir = Property(str, get_bank_dir, notify=bankChanged)
     bankIndex = Property(int, get_bank_index, notify=bankChanged)
     bankCount = Property(int, get_bank_count, notify=bankCountChanged)
 

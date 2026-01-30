@@ -27,6 +27,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
 import Qt.labs.folderlistmodel 2.15
 
@@ -364,6 +365,7 @@ ZUI.ScreenPage {
                             // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                             active: zynqtgui.isBootingComplete
                             autoActivateIndexOnChange: true
+                            view.spacing: ZUI.Theme.sectionSpacing
 
                             onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                             onItemActivated: {
@@ -372,7 +374,7 @@ ZUI.ScreenPage {
                                 } else {
                                     pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index);
                                 }
-                                root.itemActivated(screenId, index);
+                                // root.itemActivated(screenId, index);
                             }
                             onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
 
@@ -382,25 +384,25 @@ ZUI.ScreenPage {
                             delegate: QQC2.ItemDelegate {
                                 id: delegate
                                 width: ListView.view.width
-                                // screenId: layersView.screenId
-                                // selector: layersView.selector
+                                // height: layersView.view.height/5
+
+                                padding: 2
+
                                 readonly property int ownIndex: index
-                                highlighted: zynqtgui.current_screen_id === layersView.screenId
-                                checked: index === layersView.selector.current_index
-                                // onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
-                                // onItemActivated: layersView.itemActivated(screenId, index)
-                                // onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
-                                //visible: (model.display === "-" && y+layersView.view.originY < layersView.view.height) ||
-                                //   layersView.selectedChannel.chainedSounds.indexOf(index) !== -1
-                                /*layersView.selectedChannel.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedChannel.connectedSound) !== -1*/
-                                height: layersView.view.height/5
-                                onClicked: {
+                                readonly property bool isEmpty : model.metadata ? model.display.length <= 1 : true
+
+                                highlighted: index === layersView.selector.current_index
+                                checked: highlighted
+
+                                onClicked: {                                    
                                     layersView.selector.current_index = index;
                                     layersView.selector.activate_index(index);
-                                    if (!zynqtgui.fixed_layers.current_index_valid) {
-                                        // layerSetupDialog.open();
-                                        delegate.selector.activate_index(index);
-                                    }
+                                    layersView.itemActivated(layersView.screenId, index)
+                                    // if (!zynqtgui.fixed_layers.current_index_valid) {
+                                    //     // layerSetupDialog.open();
+                                    //     layersView.selector.activate_index(index);
+                                    // }
+                                    
                                 }
                                 function toggleCloned() {
                                     if (model.metadata.midi_cloned) {
@@ -411,157 +413,189 @@ ZUI.ScreenPage {
                                         zynqtgui.layer.clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
                                     }
                                     zynqtgui.layer.ensure_contiguous_cloned_layers();
-                                }
-
-                                Binding { // Optimization
-                                                target: delegate
-                                                property: "text"
-                                                delayed: true
-                                                value: delegate.visible
-                                                    ? (model.metadata ? "%1 - %2".arg(index + 1).arg(model.display) : "")
-                                                    : ""
-                                            }
-                                Text{
-                                    color: "pink"
-                                    text: "////" + checked + " /// " + index + " // " + layersView.selector.current_index
-                                }
-                                                
+                                }                                                
                                 background: ZUI.DelegateBackground {
-                                    delegate: delegate
-                                }           
-                                // contentItem: ColumnLayout {
-                                //     RowLayout {
-                                //         QQC2.Label {
-                                //             id: mainLabel
-                                //             Layout.fillWidth: true
-                                //             Binding { // Optimization
-                                //                 target: mainLabel
-                                //                 property: "text"
-                                //                 delayed: true
-                                //                 value: mainLabel.visible
-                                //                     ? (model.metadata ? "%1 - %2".arg(index + 1).arg(model.display) : "")
-                                //                     : ""
-                                //             }
-                                //             elide: Text.ElideRight
-                                //         }
-                                //         QQC2.Label {
-                                //             function constructText() {
-                                //                 let text = "";
-                                //                 if (model.metadata && model.metadata.note_high < 60) {
-                                //                     text = "L";
-                                //                 } else if (model.metadata && model.metadata.note_low >= 60) {
-                                //                     text = "H";
-                                //                 }
-                                //                 if (model.metadata && model.metadata.octave_transpose !== 0) {
-                                //                     if (model.metadata.octave_transpose > 0) {
-                                //                         text += "+"
-                                //                     }
-                                //                     text += model.metadata.octave_transpose;
-                                //                 }
-                                //                 return text;
-                                //             }
-                                //             text: zynqtgui.isBootingComplete && root.isVisible ? constructText() : ""
-                                //         }
-                                //         QQC2.Button {
-                                //             icon.name: "configure"
-                                //             // visible: model.display != "-"
-                                //             visible: false // Hide configure button for now
-                                //             onClicked: {
-                                //                 //delegate.clicked();
-                                //                 optionsMenu.open();
-                                //             }
-                                //             QQC2.Menu {
-                                //                 id: optionsMenu
-                                //                 y: parent.height
-                                //                 modal: true
-                                //                 dim: false
-                                //                 QQC2.MenuItem {
-                                //                     width: parent.width
-                                //                     text: qsTr("Change Synth...")
-                                //                     onClicked: {
-                                //                         optionsMenu.close();
-                                //                         delegate.clicked();
-                                //                         zynqtgui.layer.select_engine(model.metadata.midi_channel);
-                                //                     }
-                                //                 }
-                                //                 QQC2.MenuItem {
-                                //                     width: parent.width
-                                //                     text: qsTr("Range && Transpose...")
-                                //                     onClicked: {
-                                //                         optionsMenu.close();
-                                //                         delegate.clicked();
-                                //                         zynqtgui.current_modal_screen_id = "midi_key_range";
-                                //                     }
-                                //                 }
-                                //                 QQC2.MenuItem {
-                                //                     width: parent.width
-                                //                     text: qsTr("Add Audio FX...")
-                                //                     onClicked: {
-                                //                         optionsMenu.close();
-                                //                         delegate.clicked();
-                                //                         zynqtgui.layer_options.show();
-                                //                         zynqtgui.current_screen_id = "layer_effects";
-                                //                     }
-                                //                 }
-                                //                 QQC2.MenuItem {
-                                //                     width: parent.width
-                                //                     text: qsTr("Add Midi FX...")
-                                //                     onClicked: {
-                                //                         optionsMenu.close();
-                                //                         delegate.clicked();
-                                //                         zynqtgui.layer_options.show();
-                                //                         zynqtgui.current_screen_id = "layer_midi_effects";
-                                //                     }
-                                //                 }
-                                //                 QQC2.MenuItem {
-                                //                     width: parent.width
-                                //                     text: qsTr("Layer Options...")
-                                //                     onClicked: {
-                                //                         optionsMenu.close();
-                                //                         delegate.clicked();
-                                //                         let oldCurrent_screen_id = zynqtgui.current_screen_id;
-                                //                         delegate.selector.current_index = delegate.ownIndex;
-                                //                         delegate.selector.activate_index_secondary(delegate.ownIndex);
-                                //                         delegate.itemActivatedSecondary(delegate.screenId, delegate.ownIndex);
-                                //                         if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
-                                //                             delegate.currentScreenIdRequested(screenId);
-                                //                         }
-                                //                     }
-                                //                 }
-                                //             }
-                                //         }
-                                //     }
-                                //     RowLayout {
-                                //         id: fxLayout
-                                //         Layout.fillWidth: true
-                                //         Layout.fillHeight: true
-                                //         /* QQC2.Label {
-                                //             text: "|"
-                                //             opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
-                                //         }*/
-                                //         QQC2.Label {
-                                //             Layout.fillWidth: true
-                                //             font.pointSize: mainLabel.font.pointSize * 0.9
-                                //             Binding {
-                                //                 property: "text"
-                                //                 value: model.metadata && model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
-                                //                 delayed: true
-                                //             }
-                                //             elide: Text.ElideRight
-                                //         }
-                                //     }
-                                //     Item {
-                                //         Layout.fillWidth: true
-                                //         Layout.fillHeight: true
-                                //     }
-                                //     Rectangle {
-                                //         Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryGainHandler.gainAbsolute
-                                //         Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                                //         visible: root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel)
-                                //         color: Kirigami.Theme.highlightColor
-                                //         opacity: 0.7
-                                //     }
-                                // }
+                                       visible : delegate.highlighted
+                                }  
+
+                                // background: Rectangle {
+                                //     Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                //     Kirigami.Theme.inherit: false
+                                //     color: delegate.highlighted ?  Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                //     radius: ZUI.Theme.radius
+                                // } //TOTHEME
+
+                                contentItem: ColumnLayout {
+
+                                    Item {                                        
+                                        Layout.fillWidth: true
+                                        implicitHeight: Kirigami.Units.gridUnit * 2
+                                        PlasmaCore.FrameSvgItem {
+                                                id: svgBg
+                                                anchors.fill: parent
+                                                visible: fromCurrentTheme
+
+                                                readonly property real leftPadding: margins.left
+                                                readonly property real rightPadding: margins.right
+                                                readonly property real topPadding: margins.top
+                                                readonly property real bottomPadding: margins.bottom
+
+                                                imagePath: "widgets/slots-delegate-background"
+                                                prefix: delegate.highlighted ? ["focus", ""] : (delegate.isEmpty ? "inactive" : "")
+                                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                                            } 
+
+                                        ColumnLayout {
+                                            anchors.fill: parent
+                                            anchors.margins: 2
+                                            spacing: ZUI.Theme.spacing
+
+                                            Item {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                RowLayout {
+                                                   anchors.fill: parent
+                                                    QQC2.Label {
+                                                        id: mainLabel
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        padding: 2
+                                                        elide: Text.ElideRight
+                                                        background: Rectangle {
+                                                            visible: ZUI.Theme.altVolume
+                                                            opacity: delegate.isEmpty || delegate.highlighted ? 0 : 1
+
+                                                            color: delegate.isEmpty  ? "#181918" : "#1f2022"
+                                                            radius: 2
+                                                        }
+                                                        Binding { // Optimization
+                                                            target: mainLabel
+                                                            property: "text"
+                                                            delayed: true
+                                                            value: mainLabel.visible
+                                                                ? (model.metadata ? "%1 - %2".arg(index + 1).arg(model.display) : "")
+                                                                : ""
+                                                        }                                                    
+                                                    }
+                                                    // QQC2.Label {
+                                                    //     function constructText() {
+                                                    //         let text = "";
+                                                    //         if (model.metadata && model.metadata.note_high < 60) {
+                                                    //             text = "L";
+                                                    //         } else if (model.metadata && model.metadata.note_low >= 60) {
+                                                    //             text = "H";
+                                                    //         }
+                                                    //         if (model.metadata && model.metadata.octave_transpose !== 0) {
+                                                    //             if (model.metadata.octave_transpose > 0) {
+                                                    //                 text += "+"
+                                                    //             }
+                                                    //             text += model.metadata.octave_transpose;
+                                                    //         }
+                                                    //         return text;
+                                                    //     }
+                                                    //     text: zynqtgui.isBootingComplete && root.isVisible ? constructText() : ""
+                                                    // }
+                                                    // QQC2.Button {
+                                                    //     icon.name: "configure"
+                                                    //     // visible: model.display != "-"
+                                                    //     visible: false // Hide configure button for now
+                                                    //     onClicked: {
+                                                    //         //delegate.clicked();
+                                                    //         optionsMenu.open();
+                                                    //     }
+                                                    //     QQC2.Menu {
+                                                    //         id: optionsMenu
+                                                    //         y: parent.height
+                                                    //         modal: true
+                                                    //         dim: false
+                                                    //         QQC2.MenuItem {
+                                                    //             width: parent.width
+                                                    //             text: qsTr("Change Synth...")
+                                                    //             onClicked: {
+                                                    //                 optionsMenu.close();
+                                                    //                 delegate.clicked();
+                                                    //                 zynqtgui.layer.select_engine(model.metadata.midi_channel);
+                                                    //             }
+                                                    //         }
+                                                    //         QQC2.MenuItem {
+                                                    //             width: parent.width
+                                                    //             text: qsTr("Range && Transpose...")
+                                                    //             onClicked: {
+                                                    //                 optionsMenu.close();
+                                                    //                 delegate.clicked();
+                                                    //                 zynqtgui.current_modal_screen_id = "midi_key_range";
+                                                    //             }
+                                                    //         }
+                                                    //         QQC2.MenuItem {
+                                                    //             width: parent.width
+                                                    //             text: qsTr("Add Audio FX...")
+                                                    //             onClicked: {
+                                                    //                 optionsMenu.close();
+                                                    //                 delegate.clicked();
+                                                    //                 zynqtgui.layer_options.show();
+                                                    //                 zynqtgui.current_screen_id = "layer_effects";
+                                                    //             }
+                                                    //         }
+                                                    //         QQC2.MenuItem {
+                                                    //             width: parent.width
+                                                    //             text: qsTr("Add Midi FX...")
+                                                    //             onClicked: {
+                                                    //                 optionsMenu.close();
+                                                    //                 delegate.clicked();
+                                                    //                 zynqtgui.layer_options.show();
+                                                    //                 zynqtgui.current_screen_id = "layer_midi_effects";
+                                                    //             }
+                                                    //         }
+                                                    //         QQC2.MenuItem {
+                                                    //             width: parent.width
+                                                    //             text: qsTr("Layer Options...")
+                                                    //             onClicked: {
+                                                    //                 optionsMenu.close();
+                                                    //                 delegate.clicked();
+                                                    //                 let oldCurrent_screen_id = zynqtgui.current_screen_id;
+                                                    //                 delegate.selector.current_index = delegate.ownIndex;
+                                                    //                 delegate.selector.activate_index_secondary(delegate.ownIndex);
+                                                    //                 delegate.itemActivatedSecondary(delegate.screenId, delegate.ownIndex);
+                                                    //                 if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
+                                                    //                     delegate.currentScreenIdRequested(screenId);
+                                                    //                 }
+                                                    //             }
+                                                    //         }
+                                                    //     }
+                                                    // }
+                                                }
+                                            }
+                                            Rectangle {
+                                                Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryGainHandler.gainAbsolute
+                                                Layout.preferredHeight: 6
+                                                visible: root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel)
+                                                color: ZUI.Theme.monoColorHandles ? Kirigami.Theme.textColor : Kirigami.Theme.highlightColor
+                                                opacity: 0.8
+                                                radius: ZUI.Theme.radius
+                                            }
+                                        }     
+                                    }
+                                    
+                                    // RowLayout {
+                                    //     id: fxLayout
+                                    //     Layout.fillWidth: true
+                                    //     // Layout.fillHeight: true
+                                    //     /* QQC2.Label {
+                                    //         text: "|"
+                                    //         opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
+                                    //     }*/
+                                    //     QQC2.Label {
+                                    //         Layout.fillWidth: true
+                                    //         font.pointSize: mainLabel.font.pointSize * 0.9
+                                    //         Binding {
+                                    //             property: "text"
+                                    //             value: model.metadata && model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
+                                    //             delayed: true
+                                    //         }
+                                    //         elide: Text.ElideRight
+                                    //     }
+                                    // }                                  
+                                }
                             }
                         }
                     }
@@ -639,36 +673,25 @@ ZUI.ScreenPage {
                                     bankView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                                 }
                                 delegate: QQC2.ItemDelegate {
+                                    id: bankDelegate
                                     width: ListView.view.width
+                                    implicitHeight: Kirigami.Units.gridUnit * 2
                                     icon.name: model.icon
                                     text: model.display === "None" ? qsTr("Single Presets") : model.display
-                                    highlighted: ListView.view.activeFocus
-
+                                    highlighted: (zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.action_id == zynqtgui.curLayer.bankId) || ( zynqtgui.curLayer != null && zynqtgui.curLayer.bankId.startsWith(model.action_id))
+                                 
+                                    checked: highlighted
+                                    // background: Rectangle {
+                                    //     color: bankDelegate.highlighted ? "blue" : Kirigami.Theme.backgroundColor
+                                    // }   
+                                    background: ZUI.DelegateBackground {
+                                       visible : bankDelegate.highlighted
+                                    }
                                     onClicked: {
                                         console.log("Delegate clicked", parent.text, index)
                                         bankView.selector.current_index = index;
                                         bankView.selector.activate_index(index);
                                     } 
-                                    // screenId: bankView.screenId
-                                    // selector: bankView.selector
-                                    // // Show highlight frame only if current bank name matches selected one
-                                    // // background.visible: zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
-                                    // background.visible: {
-                                    //     // Bind to current_index as well as bankName. This ensures the selected frame is correctly updated.
-                                    //     // Do not use index to check when showing favorites as it ignores the case where current index might not be the selected preset since the list got filtered
-                                    //     // It also ignores the case when selecting a preset to be a favorite but not switching to it
-                                    //     return zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
-
-                                    //     // if (zynqtgui.preset.show_only_favorites) {
-                                    //     // } else {
-                                    //     //     // When not showing favorites, bind to current_index and check if delegate's index is the same
-                                    //     //     // This will result in faster displaying highlighted frame when changed
-                                    //     //     return zynqtgui.bank.current_index == index
-                                    //     // }
-                                    // }
-                                    // onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
-                                    // onItemActivated: bankView.itemActivated(screenId, index)
-                                    // onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
                                 }
                             }
                         }

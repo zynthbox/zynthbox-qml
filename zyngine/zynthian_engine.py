@@ -388,7 +388,7 @@ class zynthian_engine(zynthian_basic_engine):
                         if(f.is_dir() or suffix in fext.split(",")):
                             title=f.name
                             icon= "folder" if f.is_dir() else "music-note-16th"                       
-                            res.append([(f.path),i,title,"",f.name,icon])
+                            res.append([f.path,i,title,"",f.name,icon])
                             i=i+1
             except:
                 pass
@@ -490,6 +490,7 @@ class zynthian_engine(zynthian_basic_engine):
 
     def get_bank_root_dir(self):
         logging.info('Getting Bank Root Dir for %s: NOT IMPLEMENTED!' % self.name)
+        return None
 
     def set_bank(self, layer, bank):
         self.zynqtgui.zynmidi.set_midi_bank_msb(layer.get_midi_chan(), bank[1])

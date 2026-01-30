@@ -53,72 +53,77 @@ ColumnLayout {
 
     function cuiaCallback(cuia) {
         let result = true;
-        switch(cuia) {
-            case "SWITCH_PLAY_DOWN":
-            case "SWITCH_PLAY_RELEASED":
-            case "SWITCH_STOP_DOWN":
-            case "SWITCH_STOP_RELEASED":
-                // Pass basic playback control through
-                result = false
-                break;
-            case "SCREEN_LAYER":
-            case "SCREEN_LAYER_FX":
-            case "SCREEN_BANK":
-            case "SCREEN_PRESET":
-            case "SCREEN_CONTROL":
-            case "SCREEN_SKETCHPAD":
-            case "SCREEN_SONG_MANAGER":
-            case "SCREEN_ALSA_MIXER":
-                // For the screen buttons... pass those through explicitly
-                result = false;
-                component.close();
-                break;
-            case "SCREEN_PLAYGRID":
-                // To partner with the bit in main which shows it, this will cause us to toggle when hitting the playgrid button
-            case "SWITCH_BACK_RELEASED":
-            case "SWITCH_SELECT_RELEASED":
-                component.close();
-                break;
-            case "SWITCH_ARROW_LEFT_RELEASED":
-                // page down
-                applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex - 1);
-                break;
-            case "SWITCH_ARROW_RIGHT_RELEASED":
-                // page up
-                applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex + 1);
-                break;
-            case "KNOB0_UP":
-                result = false;
-                break;
-            case "KNOB0_DOWN":
-                result = false;
-                break;
-            case "KNOB1_UP":
-                result = false;
-                break;
-            case "KNOB1_DOWN":
-                result = false;
-                break;
-            case "KNOB2_UP":
-                result = false;
-                break;
-            case "KNOB2_DOWN":
-                result = false;
-                break;
-            case "KNOB3_UP":
-                if (component.currentIndex + 1 < component.listData.length) {
-                    component.currentIndex = component.currentIndex + 1;
-                }
-                break;
-            case "KNOB3_DOWN":
-                // -1 being the "nothing selected" state, we should be able to navigate back to that state
-                // -using the knob as well (also since that's how the sequencer controls work)
-                if (component.currentIndex > -1) {
-                    component.currentIndex = component.currentIndex - 1;
-                }
-                break;
-            default:
-                break;
+        if (cuia.startsWith("SWITCH_STEP_") || cuia.startsWith("SWITCH_NUMBER_")) {
+            // Pass the step and number buttons through
+            result = false;
+        } else {
+            switch(cuia) {
+                case "SWITCH_PLAY_DOWN":
+                case "SWITCH_PLAY_RELEASED":
+                case "SWITCH_STOP_DOWN":
+                case "SWITCH_STOP_RELEASED":
+                    // Pass basic playback control through
+                    result = false
+                    break;
+                case "SCREEN_LAYER":
+                case "SCREEN_LAYER_FX":
+                case "SCREEN_BANK":
+                case "SCREEN_PRESET":
+                case "SCREEN_CONTROL":
+                case "SCREEN_SKETCHPAD":
+                case "SCREEN_SONG_MANAGER":
+                case "SCREEN_ALSA_MIXER":
+                    // For the move-away-from-playgrid buttons... pass those through explicitly
+                    result = false;
+                    component.close();
+                    break;
+                case "SCREEN_PLAYGRID":
+                    // To partner with the bit in main which shows it, this will cause us to toggle when hitting the playgrid button
+                case "SWITCH_BACK_RELEASED":
+                case "SWITCH_SELECT_RELEASED":
+                    component.close();
+                    break;
+                case "SWITCH_ARROW_LEFT_RELEASED":
+                    // page down
+                    applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex - 1);
+                    break;
+                case "SWITCH_ARROW_RIGHT_RELEASED":
+                    // page up
+                    applicationWindow().globalSequencer.setParameterPage(component.currentParameterPageIndex + 1);
+                    break;
+                case "KNOB0_UP":
+                    result = false;
+                    break;
+                case "KNOB0_DOWN":
+                    result = false;
+                    break;
+                case "KNOB1_UP":
+                    result = false;
+                    break;
+                case "KNOB1_DOWN":
+                    result = false;
+                    break;
+                case "KNOB2_UP":
+                    result = false;
+                    break;
+                case "KNOB2_DOWN":
+                    result = false;
+                    break;
+                case "KNOB3_UP":
+                    if (component.currentIndex + 1 < component.listData.length) {
+                        component.currentIndex = component.currentIndex + 1;
+                    }
+                    break;
+                case "KNOB3_DOWN":
+                    // -1 being the "nothing selected" state, we should be able to navigate back to that state
+                    // -using the knob as well (also since that's how the sequencer controls work)
+                    if (component.currentIndex > -1) {
+                        component.currentIndex = component.currentIndex - 1;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
         return result;
     }

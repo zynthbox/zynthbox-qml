@@ -2110,7 +2110,7 @@ class zynthian_gui(QObject):
         elif cuia == "MODAL_SNAPSHOT_SAVE":
             self.toggle_modal("snapshot", "SAVE")
 
-        elif cuia == "SWITCH_GLOBAL_DOWN":
+        elif cuia == "SWITCH_GLOBAL_PRESSED":
             self.globalButtonPressed = True
         elif cuia == "SWITCH_GLOBAL_RELEASED":
             self.globalButtonPressed = False
@@ -2162,7 +2162,7 @@ class zynthian_gui(QObject):
         elif cuia == "TRACK_NEXT":
             self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId + 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
 
-        elif cuia == "SWITCH_STAR_DOWN":
+        elif cuia == "SWITCH_STAR_PRESSED":
             self.starButtonPressed = True
         elif cuia == "SWITCH_STAR_RELEASED":
             self.starButtonPressed = False
@@ -2192,7 +2192,7 @@ class zynthian_gui(QObject):
         elif cuia == "HIDE_KEYBOARD":
             self.showMiniPlayGrid = False
 
-        elif cuia == "SWITCH_ALT_DOWN":
+        elif cuia == "SWITCH_ALT_PRESSED":
             self.altButtonPressed = True
         elif cuia == "SWITCH_ALT_RELEASED":
             self.altButtonPressed = False
@@ -2255,7 +2255,7 @@ class zynthian_gui(QObject):
             # If we haven't already handled the knob3 release, it should be treated as though select was released
             self.callable_ui_action_simple("SWITCH_SELECT_RELEASED")
 
-        elif cuia == "SWITCH_MODE_DOWN":
+        elif cuia == "SWITCH_MODE_PRESSED":
             self.modeButtonPressed = True
         elif cuia == "SWITCH_MODE_RELEASED":
             if self.leftSidebarActive:
@@ -3693,7 +3693,7 @@ class zynthian_gui(QObject):
             # If action is a SWITCH_STEP*_DOWN, also call the corresponding RELEASED action
             # This will enable using keyboard F buttons as step buttons in hardwareSequencer mode
             # TODO : This is a bit hacky. The proper solution would be to detect keyboard key press and release events
-            match_result = re.match(r"SWITCH_STEP\d+_DOWN", action)
+            match_result = re.match(r"SWITCH_STEP\d+_PRESSED", action)
             if match_result:
                 zynqtgui.callable_ui_action(action.replace("DOWN", "RELEASED"))
 
@@ -4248,7 +4248,7 @@ class zynthian_gui(QObject):
             logging.debug(f"Menu Button pressed : {pressed}")
             self.__menu_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MENU_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MENU_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MENU_RELEASED")
             self.menu_button_pressed_changed.emit()
@@ -4280,7 +4280,7 @@ class zynthian_gui(QObject):
         if self.__number1_button_pressed__ != pressed:
             self.__number1_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_1_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_1_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_1_RELEASED")
             self.number1_button_pressed_changed.emit()
@@ -4304,7 +4304,7 @@ class zynthian_gui(QObject):
         if self.__number2_button_pressed__ != pressed:
             self.__number2_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_2_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_2_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_2_RELEASED")
             self.number2_button_pressed_changed.emit()
@@ -4328,7 +4328,7 @@ class zynthian_gui(QObject):
         if self.__number3_button_pressed__ != pressed:
             self.__number3_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_3_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_3_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_3_RELEASED")
             self.number3_button_pressed_changed.emit()
@@ -4352,7 +4352,7 @@ class zynthian_gui(QObject):
         if self.__number4_button_pressed__ != pressed:
             self.__number4_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_4_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_4_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_4_RELEASED")
             self.number4_button_pressed_changed.emit()
@@ -4376,7 +4376,7 @@ class zynthian_gui(QObject):
         if self.__number5_button_pressed__ != pressed:
             self.__number5_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_5_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_5_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_NUMBER_5_RELEASED")
             self.number5_button_pressed_changed.emit()
@@ -4404,7 +4404,7 @@ class zynthian_gui(QObject):
             # logging.error(f"Star Button pressed : {pressed}")
             self.__star_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STAR_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STAR_PRESSED")
                 if self.ui_settings.hardwareSequencer == False:
                     self.tracksModActive = not self.tracksModActive
             else:
@@ -4450,7 +4450,7 @@ class zynthian_gui(QObject):
         if self.__step1_button_pressed__ != pressed:
             self.__step1_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP1_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP1_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP1_RELEASED")
             self.step1_button_pressed_changed.emit()
@@ -4475,7 +4475,7 @@ class zynthian_gui(QObject):
         if self.__step2_button_pressed__ != pressed:
             self.__step2_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP2_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP2_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP2_RELEASED")
             self.step2_button_pressed_changed.emit()
@@ -4500,7 +4500,7 @@ class zynthian_gui(QObject):
         if self.__step3_button_pressed__ != pressed:
             self.__step3_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP3_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP3_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP3_RELEASED")
             self.step3_button_pressed_changed.emit()
@@ -4525,7 +4525,7 @@ class zynthian_gui(QObject):
         if self.__step4_button_pressed__ != pressed:
             self.__step4_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP4_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP4_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP4_RELEASED")
             self.step4_button_pressed_changed.emit()
@@ -4550,7 +4550,7 @@ class zynthian_gui(QObject):
         if self.__step5_button_pressed__ != pressed:
             self.__step5_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP5_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP5_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP5_RELEASED")
             self.step5_button_pressed_changed.emit()
@@ -4575,7 +4575,7 @@ class zynthian_gui(QObject):
         if self.__step6_button_pressed__ != pressed:
             self.__step6_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP6_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP6_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP6_RELEASED")
             self.step6_button_pressed_changed.emit()
@@ -4600,7 +4600,7 @@ class zynthian_gui(QObject):
         if self.__step7_button_pressed__ != pressed:
             self.__step7_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP7_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP7_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP7_RELEASED")
             self.step7_button_pressed_changed.emit()
@@ -4625,7 +4625,7 @@ class zynthian_gui(QObject):
         if self.__step8_button_pressed__ != pressed:
             self.__step8_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP8_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP8_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP8_RELEASED")
             self.step8_button_pressed_changed.emit()
@@ -4650,7 +4650,7 @@ class zynthian_gui(QObject):
         if self.__step9_button_pressed__ != pressed:
             self.__step9_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP9_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP9_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP9_RELEASED")
             self.step9_button_pressed_changed.emit()
@@ -4675,7 +4675,7 @@ class zynthian_gui(QObject):
         if self.__step10_button_pressed__ != pressed:
             self.__step10_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP10_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP10_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP10_RELEASED")
             self.step10_button_pressed_changed.emit()
@@ -4700,7 +4700,7 @@ class zynthian_gui(QObject):
         if self.__step11_button_pressed__ != pressed:
             self.__step11_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP11_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP11_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP11_RELEASED")
             self.step11_button_pressed_changed.emit()
@@ -4725,7 +4725,7 @@ class zynthian_gui(QObject):
         if self.__step12_button_pressed__ != pressed:
             self.__step12_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP12_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP12_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP12_RELEASED")
             self.step12_button_pressed_changed.emit()
@@ -4750,7 +4750,7 @@ class zynthian_gui(QObject):
         if self.__step13_button_pressed__ != pressed:
             self.__step13_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP13_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP13_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP13_RELEASED")
             self.step13_button_pressed_changed.emit()
@@ -4775,7 +4775,7 @@ class zynthian_gui(QObject):
         if self.__step14_button_pressed__ != pressed:
             self.__step14_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP14_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP14_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP14_RELEASED")
             self.step14_button_pressed_changed.emit()
@@ -4800,7 +4800,7 @@ class zynthian_gui(QObject):
         if self.__step15_button_pressed__ != pressed:
             self.__step15_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP15_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP15_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP15_RELEASED")
             self.step15_button_pressed_changed.emit()
@@ -4825,7 +4825,7 @@ class zynthian_gui(QObject):
         if self.__step16_button_pressed__ != pressed:
             self.__step16_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP16_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP16_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STEP16_RELEASED")
             self.step16_button_pressed_changed.emit()
@@ -4854,7 +4854,7 @@ class zynthian_gui(QObject):
             logging.debug(f"Mode Button pressed : {pressed}")
             self.__mode_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MODE_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MODE_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MODE_RELEASED")
             self.mode_button_pressed_changed.emit()
@@ -4887,7 +4887,7 @@ class zynthian_gui(QObject):
             logging.debug(f"alt Button pressed : {pressed}")
             self.__alt_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ALT_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ALT_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ALT_RELEASED")
             self.altButtonPressedChanged.emit()
@@ -4906,7 +4906,7 @@ class zynthian_gui(QObject):
             logging.debug(f"Knob 3 pressed : {pressed}")
             self.__knob3_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_KNOB3_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_KNOB3_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_KNOB3_RELEASED")
             self.knob3_pressed_changed.emit()
@@ -4939,7 +4939,7 @@ class zynthian_gui(QObject):
             logging.debug(f"Global Button pressed : {pressed}")
             self.__global_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_RELEASED")
             self.global_button_pressed_changed.emit()
@@ -4972,7 +4972,7 @@ class zynthian_gui(QObject):
             logging.debug(f"startRecord Button pressed : {pressed}")
             self.__startRecord_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_RECORD_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_RECORD_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_RECORD_RELEASED")
             self.startRecord_button_pressed_changed.emit()
@@ -5005,7 +5005,7 @@ class zynthian_gui(QObject):
             logging.debug(f"play Button pressed : {pressed}")
             self.__play_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_PLAY_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_PLAY_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_PLAY_RELEASED")
             self.play_button_pressed_changed.emit()
@@ -5038,7 +5038,7 @@ class zynthian_gui(QObject):
             logging.debug(f"metronome Button pressed : {pressed}")
             self.__metronome_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_METRONOME_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_METRONOME_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_METRONOME_RELEASED")
             self.metronome_button_pressed_changed.emit()
@@ -5071,7 +5071,7 @@ class zynthian_gui(QObject):
             logging.debug(f"stop Button pressed : {pressed}")
             self.__stop_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STOP_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STOP_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_STOP_RELEASED")
             self.stop_button_pressed_changed.emit()
@@ -5104,7 +5104,7 @@ class zynthian_gui(QObject):
             logging.debug(f"back Button pressed : {pressed}")
             self.__back_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_BACK_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_BACK_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_BACK_RELEASED")
             self.back_button_pressed_changed.emit()
@@ -5137,7 +5137,7 @@ class zynthian_gui(QObject):
             logging.debug(f"up Button pressed : {pressed}")
             self.__up_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_UP_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_UP_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_UP_RELEASED")
             self.up_button_pressed_changed.emit()
@@ -5156,7 +5156,7 @@ class zynthian_gui(QObject):
             logging.debug(f"select Button pressed : {pressed}")
             self.__select_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_SELECT_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_SELECT_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_SELECT_RELEASED")
             self.select_button_pressed_changed.emit()
@@ -5189,7 +5189,7 @@ class zynthian_gui(QObject):
             logging.debug(f"left Button pressed : {pressed}")
             self.__left_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_LEFT_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_LEFT_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_LEFT_RELEASED")
             self.left_button_pressed_changed.emit()
@@ -5208,7 +5208,7 @@ class zynthian_gui(QObject):
             logging.debug(f"down Button pressed : {pressed}")
             self.__down_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_DOWN_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_DOWN_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_DOWN_RELEASED")
             self.down_button_pressed_changed.emit()
@@ -5227,7 +5227,7 @@ class zynthian_gui(QObject):
             logging.debug(f"right Button pressed : {pressed}")
             self.__right_button_pressed__ = pressed
             if pressed:
-                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_RIGHT_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_RIGHT_PRESSED")
             else:
                 Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_ARROW_RIGHT_RELEASED")
             self.right_button_pressed_changed.emit()

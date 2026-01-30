@@ -48,7 +48,7 @@ ZUI.Popup {
 
     spacing: Kirigami.Units.gridUnit * 0.5
 
-    readonly property var acceptedButtonsWhenClosed: ["STOP_RECORD", "SWITCH_STOP_DOWN", "SWITCH_STOP_RELEASED", "SWITCH_RECORD_DOWN", "SWITCH_RECORD_RELEASED"]
+    readonly property var acceptedButtonsWhenClosed: ["STOP_RECORD", "SWITCH_STOP_PRESSED", "SWITCH_STOP_RELEASED", "SWITCH_RECORD_PRESSED", "SWITCH_RECORD_RELEASED"]
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         // This gets called from main when the dialog is not opened, so let's be explicit about what we want in that case
@@ -1293,7 +1293,7 @@ ZUI.Popup {
                     icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                     onPressedChanged: {
                         if (pressed) {
-                            zynqtgui.callable_ui_action_simple("SWITCH_RECORD_DOWN");
+                            zynqtgui.callable_ui_action_simple("SWITCH_RECORD_PRESSED");
                         } else {
                             zynqtgui.callable_ui_action_simple("SWITCH_RECORD_RELEASED");
                         }

@@ -546,7 +546,7 @@ Item {
         }
         if (zynqtgui.modeButtonPressed || temporarilyHeld) {
             switch(cuia) {
-                case "SWITCH_RECORD_DOWN":
+                case "SWITCH_RECORD_PRESSED":
                     _private.heldTemporaryActionBlockButtons[0] = true;
                     component.testForSlot(0, true);
                     result = true;
@@ -556,7 +556,7 @@ Item {
                     component.testForSlot(0, false);
                     result = true;
                     break;
-                case "SWITCH_PLAY_DOWN":
+                case "SWITCH_PLAY_PRESSED":
                     _private.heldTemporaryActionBlockButtons[1] = true;
                     component.testForSlot(1, true);
                     result = true;
@@ -566,7 +566,7 @@ Item {
                     component.testForSlot(1, false);
                     result = true;
                     break;
-                case "SWITCH_BACK_DOWN":
+                case "SWITCH_BACK_PRESSED":
                     _private.heldTemporaryActionBlockButtons[2] = true;
                     component.testForSlot(2, true);
                     result = true;
@@ -576,7 +576,7 @@ Item {
                     component.testForSlot(2, false);
                     result = true;
                     break;
-                case "SWITCH_ARROW_UP_DOWN":
+                case "SWITCH_ARROW_UP_PRESSED":
                     _private.heldTemporaryActionBlockButtons[3] = true;
                     component.testForSlot(3, true);
                     result = true;
@@ -586,7 +586,7 @@ Item {
                     component.testForSlot(3, false);
                     result = true;
                     break;
-                case "SWITCH_SELECT_DOWN":
+                case "SWITCH_SELECT_PRESSED":
                     _private.heldTemporaryActionBlockButtons[4] = true;
                     component.testForSlot(4, true);
                     result = true;
@@ -596,7 +596,7 @@ Item {
                     component.testForSlot(4, false);
                     result = true;
                     break;
-                case "SWITCH_METRONOME_DOWN":
+                case "SWITCH_METRONOME_PRESSED":
                     _private.heldTemporaryActionBlockButtons[5] = true;
                     component.testForSlot(5, true);
                     result = true;
@@ -606,7 +606,7 @@ Item {
                     component.testForSlot(5, false);
                     result = true;
                     break;
-                case "SWITCH_STOP_DOWN":
+                case "SWITCH_STOP_PRESSED":
                     _private.heldTemporaryActionBlockButtons[6] = true;
                     component.testForSlot(6, true);
                     result = true;
@@ -616,7 +616,7 @@ Item {
                     component.testForSlot(6, false);
                     result = true;
                     break;
-                case "SWITCH_ARROW_LEFT_DOWN":
+                case "SWITCH_ARROW_LEFT_PRESSED":
                     _private.heldTemporaryActionBlockButtons[7] = true;
                     component.testForSlot(7, true);
                     result = true;
@@ -626,7 +626,7 @@ Item {
                     component.testForSlot(7, false);
                     result = true;
                     break;
-                case "SWITCH_ARROW_DOWN_DOWN":
+                case "SWITCH_ARROW_DOWN_PRESSED":
                     _private.heldTemporaryActionBlockButtons[8] = true;
                     component.testForSlot(8, true);
                     result = true;
@@ -636,7 +636,7 @@ Item {
                     component.testForSlot(8, false);
                     result = true;
                     break;
-                case "SWITCH_ARROW_RIGHT_DOWN":
+                case "SWITCH_ARROW_RIGHT_PRESSED":
                     _private.heldTemporaryActionBlockButtons[9] = true;
                     component.testForSlot(9, true);
                     result = true;
@@ -892,7 +892,7 @@ Item {
         let returnValue = component.handleCuiaTemporaryMode(cuia);
         if (returnValue == false) {
             switch (cuia) {
-                case "SWITCH_STEP1_DOWN":
+                case "SWITCH_STEP1_PRESSED":
                     component.handleStepButtonDown(0);
                     returnValue = true;
                     break;
@@ -900,7 +900,7 @@ Item {
                     component.handleStepButtonPress(0);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP2_DOWN":
+                case "SWITCH_STEP2_PRESSED":
                     component.handleStepButtonDown(1);
                     returnValue = true;
                     break;
@@ -908,7 +908,7 @@ Item {
                     component.handleStepButtonPress(1);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP3_DOWN":
+                case "SWITCH_STEP3_PRESSED":
                     component.handleStepButtonDown(2);
                     returnValue = true;
                     break;
@@ -916,7 +916,7 @@ Item {
                     component.handleStepButtonPress(2);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP4_DOWN":
+                case "SWITCH_STEP4_PRESSED":
                     component.handleStepButtonDown(3);
                     returnValue = true;
                     break;
@@ -924,7 +924,7 @@ Item {
                     component.handleStepButtonPress(3);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP5_DOWN":
+                case "SWITCH_STEP5_PRESSED":
                     component.handleStepButtonDown(4);
                     returnValue = true;
                     break;
@@ -932,7 +932,7 @@ Item {
                     component.handleStepButtonPress(4);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP6_DOWN":
+                case "SWITCH_STEP6_PRESSED":
                     component.handleStepButtonDown(5);
                     returnValue = true;
                     break;
@@ -940,7 +940,7 @@ Item {
                     component.handleStepButtonPress(5);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP7_DOWN":
+                case "SWITCH_STEP7_PRESSED":
                     component.handleStepButtonDown(6);
                     returnValue = true;
                     break;
@@ -948,7 +948,7 @@ Item {
                     component.handleStepButtonPress(6);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP8_DOWN":
+                case "SWITCH_STEP8_PRESSED":
                     component.handleStepButtonDown(7);
                     returnValue = true;
                     break;
@@ -956,7 +956,7 @@ Item {
                     component.handleStepButtonPress(7);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP9_DOWN":
+                case "SWITCH_STEP9_PRESSED":
                     component.handleStepButtonDown(8);
                     returnValue = true;
                     break;
@@ -964,7 +964,7 @@ Item {
                     component.handleStepButtonPress(8);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP10_DOWN":
+                case "SWITCH_STEP10_PRESSED":
                     component.handleStepButtonDown(9);
                     returnValue = true;
                     break;
@@ -972,7 +972,7 @@ Item {
                     component.handleStepButtonPress(9);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP11_DOWN":
+                case "SWITCH_STEP11_PRESSED":
                     component.handleStepButtonDown(10);
                     returnValue = true;
                     break;
@@ -980,7 +980,7 @@ Item {
                     component.handleStepButtonPress(10);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP12_DOWN":
+                case "SWITCH_STEP12_PRESSED":
                     component.handleStepButtonDown(11);
                     returnValue = true;
                     break;
@@ -988,7 +988,7 @@ Item {
                     component.handleStepButtonPress(11);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP13_DOWN":
+                case "SWITCH_STEP13_PRESSED":
                     component.handleStepButtonDown(12);
                     returnValue = true;
                     break;
@@ -996,7 +996,7 @@ Item {
                     component.handleStepButtonPress(12);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP14_DOWN":
+                case "SWITCH_STEP14_PRESSED":
                     component.handleStepButtonDown(13);
                     returnValue = true;
                     break;
@@ -1004,7 +1004,7 @@ Item {
                     component.handleStepButtonPress(13);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP15_DOWN":
+                case "SWITCH_STEP15_PRESSED":
                     component.handleStepButtonDown(14);
                     returnValue = true;
                     break;
@@ -1012,7 +1012,7 @@ Item {
                     component.handleStepButtonPress(14);
                     returnValue = true;
                     break;
-                case "SWITCH_STEP16_DOWN":
+                case "SWITCH_STEP16_PRESSED":
                     component.handleStepButtonDown(15);
                     returnValue = true;
                     break;
@@ -1605,7 +1605,7 @@ Item {
                     }
                     break;
 
-                case "SWITCH_STAR_DOWN":
+                case "SWITCH_STAR_PRESSED":
                     // TODO Maybe we can set the key's velocity by holding star and twisting K1?
                     // Note-on for the current pattern's key, save the note value in _private so we can be sure it's the same one being turned off again if people change clips or whatever while holding down the thing
                     _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);

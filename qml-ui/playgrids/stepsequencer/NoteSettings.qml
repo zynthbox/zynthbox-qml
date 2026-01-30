@@ -58,9 +58,9 @@ ColumnLayout {
             result = false;
         } else {
             switch(cuia) {
-                case "SWITCH_PLAY_DOWN":
+                case "SWITCH_PLAY_PRESSED":
                 case "SWITCH_PLAY_RELEASED":
-                case "SWITCH_STOP_DOWN":
+                case "SWITCH_STOP_PRESSED":
                 case "SWITCH_STOP_RELEASED":
                     // Pass basic playback control through
                     result = false

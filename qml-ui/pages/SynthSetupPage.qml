@@ -430,21 +430,7 @@ ZUI.ScreenPage {
                                     Item {                                        
                                         Layout.fillWidth: true
                                         implicitHeight: Kirigami.Units.gridUnit * 2
-                                        PlasmaCore.FrameSvgItem {
-                                                id: svgBg
-                                                anchors.fill: parent
-                                                visible: fromCurrentTheme
-
-                                                readonly property real leftPadding: margins.left
-                                                readonly property real rightPadding: margins.right
-                                                readonly property real topPadding: margins.top
-                                                readonly property real bottomPadding: margins.bottom
-
-                                                imagePath: "widgets/slots-delegate-background"
-                                                prefix: delegate.highlighted ? ["focus", ""] : (delegate.isEmpty ? "inactive" : "")
-                                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                                            } 
-
+                                        
                                         ColumnLayout {
                                             anchors.fill: parent
                                             anchors.margins: 2

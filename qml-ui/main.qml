@@ -1378,7 +1378,7 @@ Kirigami.AbstractApplicationWindow {
                     visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
                     Component.onCompleted: synthButton.updateSoundName();
 
-                    highlighted: zynqtgui.current_screen_id === "layer_midi_effect_chooser"
+                    highlighted: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
                     checked: highlighted
 
                     // Open preset screen on clicking this synth button
@@ -1500,6 +1500,12 @@ Kirigami.AbstractApplicationWindow {
 
         implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
         leftPadding: ZUI.Theme.useBreadcrumb ? 0 : rightPadding
+
+        // Text {
+        //     color: "orange"
+        //     text: zynqtgui.current_screen_id + " / " +zynqtgui.current_modal_screen_id 
+        //     z: contentItem.z+9999
+        // }
 
         contentItem: RowLayout {
             spacing: ZUI.Theme.sectionSpacing

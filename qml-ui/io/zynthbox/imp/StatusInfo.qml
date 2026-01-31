@@ -449,8 +449,8 @@ ZUI.SectionGroup
                 GridLayout {
                     anchors.fill: parent
                     columns: 3
-                    rowSpacing:  ZUI.Theme.padding
-                    columnSpacing: ZUI.Theme.padding
+                    rowSpacing: ZUI.Theme.spacing
+                    columnSpacing: ZUI.Theme.spacing
                     ZUI.Card {
                         Layout.fillWidth: true
                         Layout.fillHeight: true

@@ -365,7 +365,7 @@ ZUI.ScreenPage {
                             // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                             active: zynqtgui.isBootingComplete
                             autoActivateIndexOnChange: true
-                            view.spacing: ZUI.Theme.sectionSpacing
+                            view.spacing: ZUI.Theme.spacing
 
                             onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                             onItemActivated: {
@@ -629,18 +629,18 @@ ZUI.ScreenPage {
                                         }
                                     }
 
-                                    ZUI.SectionButton {
-                                        // Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        text: qsTr("All Favorites")
-                                        checked: zynqtgui.preset.show_only_favorites
-                                        onClicked: {
-                                            zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
-                                            bankView.forceViewPosition(true)
-                                            presetView.forceViewPosition(true)
-                                        }
-                                    }
+                                    // ZUI.SectionButton {
+                                    //     // Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                                    //     Layout.fillWidth: true
+                                    //     Layout.fillHeight: true
+                                    //     text: qsTr("All Favorites")
+                                    //     checked: zynqtgui.preset.show_only_favorites
+                                    //     onClicked: {
+                                    //         zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
+                                    //         bankView.forceViewPosition(true)
+                                    //         presetView.forceViewPosition(true)
+                                    //     }
+                                    // }
                                 }
                             }
                             ZUI.SelectorView {
@@ -649,6 +649,7 @@ ZUI.ScreenPage {
                                 Layout.fillHeight: true
                                 screenId: "bank"
                                 autoActivateIndexOnChange: true
+                                view.spacing: ZUI.Theme.spacing
 
                                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                                 active: zynqtgui.isBootingComplete
@@ -798,6 +799,7 @@ ZUI.ScreenPage {
                             implicitHeight: 0
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            view.spacing: ZUI.Theme.spacing
                             screenId: "preset"
                             autoActivateIndexOnChange: true
                             onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)

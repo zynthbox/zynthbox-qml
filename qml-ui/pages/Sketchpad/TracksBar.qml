@@ -753,13 +753,13 @@ ZUI.SectionPanel {
     QQC2.ButtonGroup {
         buttons: tabButtons.children
     }
-    QQC2.ButtonGroup {
-        buttons: buttonsColumn.children
-    }
-
+    
     contentItem: Item {
-        RowLayout {
-            spacing: ZUI.Theme.sectionSpacing
+        GridLayout {
+            columnSpacing: ZUI.Theme.sectionSpacing
+            rowSpacing: columnSpacing
+            columns: 2
+            rows: 1
             anchors.fill: parent
 
             BottomStackTabs {
@@ -768,37 +768,15 @@ ZUI.SectionPanel {
                 Layout.fillHeight: true
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 6
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+                Layout.column: ZUI.Theme.altTabs ? 1: 0
+                
             }
 
             QQC2.Pane {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                // Layout.topMargin: svgBg4.visible ? svgBg4.inset.top : 0
-                // Layout.leftMargin: svgBg4.visible ? svgBg4.inset.left : 0
-                // Layout.rightMargin: svgBg4.visible ? svgBg4.inset.right : 0
-                // Layout.bottomMargin: svgBg4.visible ? svgBg4.inset.bottom : 0
-
-                // topPadding: svgBg4.visible ? svgBg4.topPadding : ZUI.Theme.padding
-                // bottomPadding: svgBg4.visible ? svgBg4.bottomPadding  : ZUI.Theme.padding
-                // leftPadding: svgBg4.visible ? svgBg4.leftPadding : ZUI.Theme.padding
-                // rightPadding: svgBg4.visible ? svgBg4.rightPadding : ZUI.Theme.padding
-
-                // background: Item {
-                //     PlasmaCore.FrameSvgItem {
-                //         id: svgBg4
-                //         visible: fromCurrentTheme
-                //         anchors.fill: parent
-
-                //         readonly property real leftPadding: fixedMargins.left
-                //         readonly property real rightPadding: fixedMargins.right
-                //         readonly property real topPadding: fixedMargins.top
-                //         readonly property real bottomPadding: fixedMargins.bottom
-
-                //         imagePath: "widgets/tracks_view_background"
-                //         colorGroup: PlasmaCore.Theme.ViewColorGroup
-                //     }
-                // }
+                Layout.column: ZUI.Theme.altTabs ? 0: 1
 
                 contentItem: Item {
                     Layout.fillWidth: true
@@ -810,7 +788,6 @@ ZUI.SectionPanel {
                         anchors.fill: parent
 
                         RowLayout {
-                            id: tabButtons
                             spacing: ZUI.Theme.sectionSpacing
                             Layout.fillWidth: true
                             Layout.fillHeight: false
@@ -838,6 +815,7 @@ ZUI.SectionPanel {
                                 Layout.fillHeight: true
 
                                 RowLayout {
+                                    id: tabButtons
                                     anchors.fill: parent
                                     spacing: ZUI.Theme.spacing
 
@@ -935,7 +913,7 @@ ZUI.SectionPanel {
                         RowLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
                             Item {
                                 Layout.fillWidth: true
@@ -1060,7 +1038,8 @@ ZUI.SectionPanel {
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter
-                            spacing: ZUI.Theme.sectionSpacing                            
+                            // spacing: ZUI.Theme.sectionSpacing                            
+                            spacing: ZUI.Theme.slotSpacing[0]                       
 
                             Item {
                                 Layout.fillWidth: true
@@ -1375,10 +1354,10 @@ ZUI.SectionPanel {
                                                 }
 
                                                 
-                                                ColumnLayout {
+                                                RowLayout {
                                                     Layout.fillWidth: false
                                                     Layout.fillHeight: true
-                                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                                                     Layout.alignment: Qt.AlignVCenter
                                                     spacing: ZUI.Theme.spacing
 

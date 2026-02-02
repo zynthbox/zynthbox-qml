@@ -39,7 +39,7 @@ Rectangle {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_RELEASED":
-                bottomStack.slotsBar.channelButton.checked = true
+                bottomStack.setView(Main.BarView.TracksBar);
                 return true;
         }
         

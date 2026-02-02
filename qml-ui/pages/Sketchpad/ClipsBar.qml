@@ -55,7 +55,7 @@ ZUI.SectionPanel {
         var returnVal = false;
         switch (cuia) {
         case "SWITCH_BACK_RELEASED":
-            bottomStack.slotsBar.channelButton.checked = true;
+            bottomStack.setView(Main.BarView.TracksBar);
             returnVal = true;
             break;
         case "SWITCH_ARROW_LEFT_RELEASED":
@@ -73,10 +73,6 @@ ZUI.SectionPanel {
 
     Layout.fillWidth: true
     
-    QQC2.ButtonGroup {
-        buttons: buttonsColumn.children
-    }
-
     contentItem: Item {
         ZUI.ActionPickerPopup {
             id: clipSettingsPopup

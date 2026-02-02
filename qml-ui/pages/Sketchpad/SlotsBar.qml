@@ -41,13 +41,6 @@ import io.zynthbox.components 1.0 as Zynthbox
 ZUI.SectionPanel {
     id: root
 
-    property alias bottomBarButton: bottomBarButton
-    property alias channelButton: channelButton
-    property alias mixerButton: mixerButton
-    property alias clipsButton: clipsButton
-    property alias synthsButton: synthsButton
-    property alias samplesButton: samplesButton
-    property alias fxButton: fxButton
     property alias soundCombinatorButton: soundCombinatorButton
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
 
@@ -279,11 +272,29 @@ ZUI.SectionPanel {
                 break;
             }
         }
-    }
+    } 
+   
+    //// INVISIBLE BUTTONS
+    Item {
+        visible: false     
 
-    QQC2.ButtonGroup {
-        buttons: buttonsColumn.children
-    }
+        QQC2.Button {
+            id: soundCombinatorButton
+            checkable: true
+            enabled: !root.displaySceneButtons
+            visible: false
+            text: qsTr("Sound Combinator")
+            onCheckedChanged: {
+                if (checked) {
+                    bottomStack.currentIndex = 5
+                    updateLedVariablesTimer.restart()
+                }
+            }
+        }
+    }   
+
+    //// END INVISIBLE BUTTONS
+
 
     contentItem: Item {
         ColumnLayout {
@@ -299,141 +310,13 @@ ZUI.SectionPanel {
                 Layout.fillHeight: true
                 spacing: ZUI.Theme.sectionSpacing
 
-                ColumnLayout {
+                BottomStackTabs {
                     id: buttonsColumn
                     Layout.fillWidth: false
                     Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    Layout.minimumWidth: Kirigami.Units.gridUnit * 6
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                    // Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
-                    spacing: ZUI.Theme.spacing
-
-                    //// INVISIBLE BUTTONS
-                    QQC2.Button {
-                        id: bottomBarButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        checked: bottomStack.currentIndex === 0
-                        enabled: !root.displaySceneButtons
-                        text: qsTr("BottomBar")
-                        visible: false
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 0
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
-
-                    QQC2.Button {
-                        id: mixerButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        enabled: !root.displaySceneButtons
-                        visible: false
-                        text: qsTr("Mixer")
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 1
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
-
-                    QQC2.Button {
-                        id: soundCombinatorButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        enabled: !root.displaySceneButtons
-                        visible: false
-                        text: qsTr("Sound Combinator")
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 5
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
-
-                    //// END INVISIBLE BUTTONS
-
-                    QQC2.Button {
-                        id: channelButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        enabled: !root.displaySceneButtons
-                        text: qsTr("Track")
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 3
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
-
-                    QQC2.Button {
-                        id: clipsButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        enabled: !root.displaySceneButtons
-                        text: qsTr("Clips")
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 4
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
-
-                    QQC2.Button {
-                        id: synthsButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        enabled: !root.displaySceneButtons
-                        text: qsTr("Synths")
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 2
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
-
-                    QQC2.Button {
-                        id: samplesButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        enabled: !root.displaySceneButtons
-                        text: qsTr("Samples")
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 2
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
-
-                    QQC2.Button {
-                        id: fxButton
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        checkable: true
-                        enabled: !root.displaySceneButtons
-                        text: qsTr("FX")
-                        onCheckedChanged: {
-                            if (checked) {
-                                bottomStack.currentIndex = 2
-                                updateLedVariablesTimer.restart()
-                            }
-                        }
-                    }
+                    // Layout.column: ZUI.Theme.altTabs ? 1: 0                
                 }
 
                 ZUI.SectionGroup {

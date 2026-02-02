@@ -47,13 +47,13 @@ ZUI.SectionPanel {
     function cuiaCallback(cuia) {
         switch (cuia) {
         case "SWITCH_BACK_RELEASED":
-            bottomStack.slotsBar.channelButton.checked = true
+            bottomStack.setView(Main.BarView.TracksBar);
             return true
 
         case "SWITCH_SELECT_RELEASED":
             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
             zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-            bottomStack.slotsBar.bottomBarButton.checked = true
+            bottomStack.setView(Main.BarView.BottomBar)
             zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", root.selectedChannel.id, mixerItemsRepeater.itemAt(root.selectedChannel.id), root.selectedChannel)
 
             return true;
@@ -123,10 +123,6 @@ ZUI.SectionPanel {
         return false;
     }
 
-    QQC2.ButtonGroup {
-        buttons: buttonsColumn.children
-    }
-
     contentItem: Item {
 
         ColumnLayout {
@@ -142,8 +138,7 @@ ZUI.SectionPanel {
                 Layout.fillHeight: true
                 spacing: ZUI.Theme.sectionSpacing
 
-                BottomStackTabs {
-                    id: buttonsColumn
+                Item {
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.minimumWidth: Kirigami.Units.gridUnit * 6

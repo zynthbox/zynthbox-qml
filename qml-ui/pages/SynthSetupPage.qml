@@ -663,7 +663,7 @@ ZUI.ScreenPage {
                                     id: bankDelegate
                                     width: ListView.view.width
                                     implicitHeight: Kirigami.Units.gridUnit * 2
-                                    icon.name: model.icon
+                                    icon.name: model.icon ? model.icon : ""
                                     text: model.display === "None" ? qsTr("Single Presets") : model.display
                                     highlighted: (zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.action_id == zynqtgui.curLayer.bankId) || ( zynqtgui.curLayer != null && zynqtgui.curLayer.bankId.startsWith(model.action_id))
                                  

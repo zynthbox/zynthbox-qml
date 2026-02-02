@@ -921,7 +921,6 @@ Kirigami.AbstractApplicationWindow {
                     }
                 }
                 ZUI.BreadcrumbButton {
-                    id: channelButton
                     icon.color: Kirigami.Theme.textColor
                     text: qsTr("Track %1 ˬ")
                     .arg(zynqtgui.sketchpad.selectedTrackId+1)
@@ -1496,108 +1495,110 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    header: ZUI.SectionPanel {
+    Component {
+        id: _headerComponent
+        ZUI.SectionPanel {
 
-        implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
-        leftPadding: ZUI.Theme.useBreadcrumb ? 0 : rightPadding
+            implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
+            leftPadding: ZUI.Theme.useBreadcrumb ? 0 : rightPadding
 
-        // Text {
-        //     color: "orange"
-        //     text: zynqtgui.current_screen_id + " / " +zynqtgui.current_modal_screen_id 
-        //     z: contentItem.z+9999
-        // }
+            // Text {
+            //     color: "orange"
+            //     text: zynqtgui.current_screen_id + " / " +zynqtgui.current_modal_screen_id 
+            //     z: contentItem.z+9999
+            // }
 
-        contentItem: RowLayout {
-            spacing: ZUI.Theme.sectionSpacing
+            contentItem: RowLayout {
+                spacing: ZUI.Theme.sectionSpacing
 
-            Loader {
-                active: ZUI.Theme.useBreadcrumb
-                visible: active
-                sourceComponent: _breadCrumbSectionComponent
-                Layout.fillHeight: true
-                Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
-            }
+                Loader {
+                    active: ZUI.Theme.useBreadcrumb
+                    visible: active
+                    sourceComponent: _breadCrumbSectionComponent
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
+                }
 
-            Loader {
-                active: !ZUI.Theme.useBreadcrumb
-                visible: active
-                sourceComponent: _groupSectionComponent1
-                Layout.fillHeight: true
-                Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
-            }
+                Loader {
+                    active: !ZUI.Theme.useBreadcrumb
+                    visible: active
+                    sourceComponent: _groupSectionComponent1
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
+                }
 
-            Loader {
-                active: !ZUI.Theme.useBreadcrumb
-                visible: active
-                sourceComponent: _groupSectionComponent2
-                Layout.fillHeight: true
-                Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
-            }
+                Loader {
+                    active: !ZUI.Theme.useBreadcrumb
+                    visible: active
+                    sourceComponent: _groupSectionComponent2
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: visible ? implicitWidth : - ZUI.Theme.sectionSpacing
+                }
 
-            Item {
-                Layout.fillWidth: true
-            }
+                Item {
+                    Layout.fillWidth: true
+                }
 
-            ZUI.SectionGroup {
-                Layout.fillHeight: true
+                ZUI.SectionGroup {
+                    Layout.fillHeight: true
 
-                Row {
-                    anchors.fill: parent
-                    spacing: ZUI.Theme.spacing
+                    Row {
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.spacing
 
-                    ZUI.SectionButton {
-                        id: globalRecordButton
-                        width: Kirigami.Units.gridUnit*4
-                        height: parent.height
-                        property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
-                        onClicked: {
-                            // handle live-recording-is-going state here, otherwise you might turn it
-                            // on in the sequencer, then head out, and try and turn it off and it just
-                            // opens the recording popup, which isn't what you'd be after
-                            if (globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive) {
-                                globalRecordButton.currentSequence.activePatternObject.recordLive = false;
-                                if (Zynthbox.PlayGridManager.metronomeActive) {
-                                    ZUI.CommonUtils.stopMetronomeAndPlayback();
+                        ZUI.SectionButton {
+                            id: globalRecordButton
+                            width: Kirigami.Units.gridUnit*4
+                            height: parent.height
+                            property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+                            onClicked: {
+                                // handle live-recording-is-going state here, otherwise you might turn it
+                                // on in the sequencer, then head out, and try and turn it off and it just
+                                // opens the recording popup, which isn't what you'd be after
+                                if (globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive) {
+                                    globalRecordButton.currentSequence.activePatternObject.recordLive = false;
+                                    if (Zynthbox.PlayGridManager.metronomeActive) {
+                                        ZUI.CommonUtils.stopMetronomeAndPlayback();
+                                    }
+                                } else {
+                                    applicationWindow().openRecordingPopup();
                                 }
-                            } else {
-                                applicationWindow().openRecordingPopup();
                             }
+                            icon.name: "media-record-symbolic"
+                            icon.width: 24
+                            icon.height: 24
+                            icon.color:  globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive
+                                        ? "#ff5cf436" // A green with the same values as the red audio record colour below
+                                        : zynqtgui.sketchpad.isRecording ? "#fff44336" : "red"
+                            checked: highlighted
+                            highlighted: zynqtgui.sketchpad.isRecording 
                         }
-                        icon.name: "media-record-symbolic"
-                        icon.width: 24
-                        icon.height: 24
-                        icon.color:  globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive
-                                     ? "#ff5cf436" // A green with the same values as the red audio record colour below
-                                     : zynqtgui.sketchpad.isRecording ? "#fff44336" : "red"
-                        checked: highlighted
-                        highlighted: zynqtgui.sketchpad.isRecording 
-                    }
 
-                    ZUI.SectionButton {
-                        id: globalPlaybackButton
-                        width: Kirigami.Units.gridUnit*4
-                        height: parent.height
-                        onClicked: {
-                            if (zynqtgui.sketchpad.isMetronomeRunning) {
-                                zynqtgui.callable_ui_action_simple("SWITCH_STOP_RELEASED");
-                            } else {
-                                zynqtgui.callable_ui_action_simple("SWITCH_PLAY_RELEASED");
+                        ZUI.SectionButton {
+                            id: globalPlaybackButton
+                            width: Kirigami.Units.gridUnit*4
+                            height: parent.height
+                            onClicked: {
+                                if (zynqtgui.sketchpad.isMetronomeRunning) {
+                                    zynqtgui.callable_ui_action_simple("SWITCH_STOP_RELEASED");
+                                } else {
+                                    zynqtgui.callable_ui_action_simple("SWITCH_PLAY_RELEASED");
+                                }
                             }
+                            checked: highlighted
+                            highlighted: zynqtgui.sketchpad.isMetronomeRunning 
+                            icon.name: zynqtgui.sketchpad.isMetronomeRunning ? "media-playback-stop" : "media-playback-start"
+                            icon.width: 24
+                            icon.height: 24
+                            icon.color: checked || pressed || highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                         }
-                        checked: highlighted
-                        highlighted: zynqtgui.sketchpad.isMetronomeRunning 
-                        icon.name: zynqtgui.sketchpad.isMetronomeRunning ? "media-playback-stop" : "media-playback-start"
-                        icon.width: 24
-                        icon.height: 24
-                        icon.color: checked || pressed || highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                     }
                 }
-            }
 
-            IMP.StatusInfo {}
+                IMP.StatusInfo {}
+            }
         }
     }
-
     background: Rectangle {
         Kirigami.Theme.inherit: false
         // TODO: this should eventually go to Window and the panels to View
@@ -1623,12 +1624,25 @@ Kirigami.AbstractApplicationWindow {
         //     }
         // }
     }
-    footer: ZUI.ActionBar {
-        z: 999999
-        currentPage: root.currentPage
-        visible: root.visible && root.controlsVisible && !zynqtgui.doingLongTask
-        height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 2.5)
+
+    Component
+    {
+        id: _footerComponent
+        ZUI.ActionBar {
+            z: 999999
+            currentPage: root.currentPage
+            visible: root.visible && root.controlsVisible && !zynqtgui.doingLongTask
+            height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 2.5)
+        }
     }
+
+    header: Loader {
+        sourceComponent: ZUI.Theme.altPanels ? _footerComponent : _headerComponent
+    }
+    footer: Loader {
+       sourceComponent: ZUI.Theme.altPanels ? _headerComponent : _footerComponent
+    }
+
     Component.onCompleted: {
         zynqtgui.showMessageDialog.connect(root.showMessageDialog)
     }

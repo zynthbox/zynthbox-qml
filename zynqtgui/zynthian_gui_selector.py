@@ -121,8 +121,6 @@ class selector_list_model(QAbstractListModel):
         else:
             return None
 
-
-
     def data(self, index, role):
         if not index.isValid():
             return None

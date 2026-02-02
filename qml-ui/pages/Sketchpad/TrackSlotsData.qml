@@ -310,15 +310,6 @@ GridLayout {
                         id: backgroundItem
                         property bool highlightBorder: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === realIndex)
                         
-                        // Rectangle {
-                        //     id: butterfly
-                        //     visible: !delegate.isEmpty
-                        //     anchors.fill: parent
-                        //     color: "#040507"
-                        //     border.color: backgroundItem.highlightBorder && !delegate.isEmpty  ? Kirigami.Theme.highlightColor : "transparent"
-                        //     radius: 4
-                        //     opacity: delegate.isEmpty ? 0.5 : 1
-                        // }
                         // Show highlighted color on slot border when slot is a sample-loop and is enabled
                         Rectangle {
                             visible: !svgBg.visible

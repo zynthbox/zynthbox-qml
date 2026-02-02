@@ -28,78 +28,81 @@ import io.zynthbox.ui 1.0 as ZUI
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-ZUI.SectionGroup {
+QQC2.Control {
     id: root
 
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
+    property alias tracksButton : _tracksButton
+    property alias clipsButton : _clipsButton
+    property alias synthsButton : _synthsButton
+    property alias samplesButton : _samplesButton
+    property alias fxButton : _fxButton
 
-    // Layout.bottomMargin: 1 // Without this magic number, last button's border goes out of view
- 
-    ColumnLayout {
-        anchors.fill: parent
-        spacing: ZUI.Theme.spacing
-
-        ZUI.SectionButton {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            checked: highlighted
-            highlighted: bottomStack.slotsBar ? bottomStack.slotsBar.channelButton.checked : false
-            enabled: !root.displaySceneButtons
-            text: qsTr("Track")
-            onClicked: {
-                bottomStack.slotsBar.channelButton.checked = true;
-            }
-        }
-
-        ZUI.SectionButton {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            checkable: true
-            checked: highlighted
-            highlighted: bottomStack.slotsBar ? bottomStack.slotsBar.clipsButton.checked : false
-            enabled: !root.displaySceneButtons
-            text: qsTr("Clips")
-            onClicked: {
-                bottomStack.slotsBar.clipsButton.checked = true;
-            }  
-        }
-
-        ZUI.SectionButton {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            checkable: true
-            checked: bottomStack.slotsBar ? bottomStack.slotsBar.synthsButton.checked : false
-            enabled: !root.displaySceneButtons
-            text: qsTr("Synths")
-            onClicked: {
-                bottomStack.slotsBar.synthsButton.checked = true;
-            }
-        }
-
-        ZUI.SectionButton {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            checkable: true
-            checked: bottomStack.slotsBar ? bottomStack.slotsBar.samplesButton.checked : false
-            enabled: !root.displaySceneButtons
-            text: qsTr("Samples")
-            onClicked: {
-                bottomStack.slotsBar.samplesButton.checked = true;
-            }
-        }
-
-        ZUI.SectionButton {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            checkable: true
-            checked: bottomStack.slotsBar ? bottomStack.slotsBar.fxButton.checked : false
-            enabled: !root.displaySceneButtons
-            text: qsTr("FX")
-            onClicked: {
-                bottomStack.slotsBar.fxButton.checked = true;
-            }
-        }
-
+    component TabButton :  ZUI.SectionButton {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        property int viewValue : -1
+        checked: highlighted
+        checkable: false
+        highlighted: bottomStack.currentBarView === viewValue
+        enabled: !root.displaySceneButtons
+        onClicked: bottomStack.setView(viewValue)
     }
 
+    QQC2.ButtonGroup {
+        buttons: [_tracksButton, _clipsButton,_synthsButton, _samplesButton, _fxButton ]
+    }
+
+    contentItem: ColumnLayout {
+        spacing: ZUI.Theme.sectionSpacing
+    
+        ZUI.SectionGroup {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: ZUI.Theme.spacing
+
+                TabButton {
+                    id: _tracksButton
+                    viewValue: Main.BarView.TracksBar
+                    text: qsTr("Track")
+                }
+
+                TabButton {
+                    id: _clipsButton
+                    viewValue: Main.BarView.ClipsBar
+                    text: qsTr("Clips")
+                }
+            }
+        }
+
+        ZUI.SectionGroup {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: ZUI.Theme.spacing
+
+                TabButton {
+                    id: _synthsButton
+                    viewValue: Main.BarView.SynthsBar
+                    text: qsTr("Synths")
+                }
+
+                TabButton {
+                    id: _samplesButton
+                    viewValue: Main.BarView.SamplesBar
+                    text: qsTr("Samples")
+                }
+
+                TabButton {
+                    id: _fxButton
+                    viewValue: Main.BarView.FXBar
+                    text: qsTr("FX")
+                }
+
+            }
+        }
+    }
 }

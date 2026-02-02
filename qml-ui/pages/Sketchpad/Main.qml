@@ -223,7 +223,7 @@ ZUI.ScreenPage {
         function valueSetter(value) {
             if (-1 < channelId && channelId < Zynthbox.Plugin.sketchpadTrackCount) {
                 theTrack.pan = ZUI.CommonUtils.clamp(Math.round((theTrack.pan + sign * 0.05 + Number.EPSILON) * 100) / 100, -1, 1);
-                if (root.bottomStack.slotsBar.mixerButton.checked === false)
+                if (bottomStack.currentBarView !== Main.BarView.MixerBar)
                     applicationWindow().showOsd({
                     "parameterName": "track_pan",
                     "description": qsTr("Track %1 Pan").arg(channelId + 1),
@@ -618,14 +618,24 @@ ZUI.ScreenPage {
 
     function resetBottomBar(toggleBottomBar) {
         if (toggleBottomBar) {
-            if (bottomStack.slotsBar.channelButton.checked)
-                bottomStack.slotsBar.clipsButton.checked = true;
+            if (bottomStack.currentBarView === Main.BarView.TracksView)
+                bottomStack.setView(Main.BarView.ClipsBar);
             else
-                bottomStack.slotsBar.channelButton.checked = true;
+               bottomStack.setView(Main.BarView.TracksBar);
         } else {
-            bottomStack.slotsBar.channelButton.checked = true;
+            bottomStack.setView(Main.BarView.TracksBar);
         }
     }
+
+    enum BarView {
+        BottomBar,
+        MixerBar,
+        TracksBar,
+        ClipsBar,
+        SynthsBar,
+        SamplesBar,
+        FXBar
+    } 
 
     title: qsTr("Sketchpad")
     screenId: "sketchpad"
@@ -655,20 +665,20 @@ ZUI.ScreenPage {
                 case "SWITCH_MODE_RELEASED":
                     if (zynqtgui.altButtonPressed) {
                         // Cycle between channel, mixer, synths, samples, fx when alt button is pressed
-                        if (bottomStack.slotsBar.mixerButton.checked)
-                            bottomStack.slotsBar.channelButton.checked = true;
-                        else if (bottomStack.slotsBar.channelButton.checked)
-                            bottomStack.slotsBar.clipsButton.checked = true;
-                        else if (bottomStack.slotsBar.clipsButton.checked)
-                            bottomStack.slotsBar.synthsButton.checked = true;
-                        else if (bottomStack.slotsBar.synthsButton.checked)
-                            bottomStack.slotsBar.samplesButton.checked = true;
-                        else if (bottomStack.slotsBar.samplesButton.checked)
-                            bottomStack.slotsBar.fxButton.checked = true;
-                        else if (bottomStack.slotsBar.fxButton.checked)
-                            bottomStack.slotsBar.channelButton.checked = true;
+                        if (bottomStack.currentBarView === Main.BarView.MixerBar)
+                            bottomStack.setView(Main.BarView.TracksBar);
+                        else if (bottomStack.currentBarView === Main.BarView.TracksView)
+                            bottomStack.setView(Main.BarView.ClipsBar);
+                        else if (bottomStack.currentBarView === Main.BarView.ClipsBar)
+                            bottomStack.setView(Main.BarView.SynthsBar);
+                        else if (bottomStack.currentBarView === Main.BarView.SynthsBar)
+                            bottomStack.setView(Main.BarView.SamplesBar);
+                        else if (bottomStack.currentBarView === Main.BarView.SamplesBar)
+                            bottomStack.setView(Main.BarView.FXBar);
+                        else if (bottomStack.currentBarView === Main.BarView.SynthsBar)
+                            bottomStack.setView(Main.BarView.TracksBar);
                         else
-                            bottomStack.slotsBar.channelButton.checked = true;
+                            bottomStack.setView(Main.BarView.TracksBar);
                         returnValue = true;
                     }
                     break;
@@ -691,7 +701,7 @@ ZUI.ScreenPage {
                             if (sample && !sample.isEmpty) {
                                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                 zynqtgui.bottomBarControlObj = root.selectedChannel;
-                                bottomStack.slotsBar.bottomBarButton.checked = true;
+                                bottomStack.setView(Main.BarView.BottomBar);
                                 bottomStack.bottomBar.channelWaveEditorAction.trigger();
                             } else {
                                 bottomStack.slotsBar.handleItemClick("sample-trig");
@@ -704,7 +714,7 @@ ZUI.ScreenPage {
                         if (clip && !clip.isEmpty) {
                             zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                             zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
-                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                            bottomStack.setView(Main.BarView.BottomBar);
                             bottomStack.bottomBar.waveEditorAction.trigger();
                         } else {
                             bottomStack.slotsBar.handleItemClick("sample-loop");
@@ -801,7 +811,7 @@ ZUI.ScreenPage {
         applicationWindow().controlsVisible = true;
         zynqtgui.bottomBarControlType = "bottombar-controltype-song";
         zynqtgui.bottomBarControlObj = root.song;
-        bottomStack.slotsBar.channelButton.checked = true;
+        bottomStack.setView(Main.BarView.TracksBar);
         selectedChannelThrottle.restart();
     }
     Component.onDestruction: {
@@ -878,7 +888,7 @@ ZUI.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Mixer")
-            checked: bottomStack.slotsBar.mixerButton.checked
+            checked: bottomStack.currentBarView === Main.BarView.MixerBar
             onTriggered: zynqtgui.toggleSketchpadMixer()
         }
     ]
@@ -902,19 +912,19 @@ ZUI.ScreenPage {
     Connections {
         target: zynqtgui
         onToggleMixer: {
-            if (bottomStack.slotsBar.mixerButton.checked) {
-                bottomStack.slotsBar.channelButton.checked = true;
+            if (bottomStack.currentBarView === Main.BarView.MixerBar) {
+                bottomStack.setView(Main.BarView.TracksBar)
             } else {
-                bottomStack.slotsBar.mixerButton.checked = true;
+                bottomStack.setView(Main.BarView.MixerBar)
                 zynqtgui.sketchpad.displaySceneButtons = false;
             }
         }
         onShowMixer: {
-            bottomStack.slotsBar.mixerButton.checked = true;
+            bottomStack.setView(Main.BarView.MixerBar);
             zynqtgui.sketchpad.displaySceneButtons = false;
         }
         onHideMixer: {
-            bottomStack.slotsBar.channelButton.checked = true;
+            bottomStack.setView(Main.BarView.TracksBar);
         }
     }
 
@@ -927,7 +937,7 @@ ZUI.ScreenPage {
         // Checks if bottombar is visible
         // Checks if current active page is sound combinator or not
         // Check if sound combinator is active
-        // if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
+        // if (bottomStack.currentBarView === Main.BarView.BottomBar && // Checks if bottombar is visible
         //     bottomBar.tabbedView.activeAction.page.search("ChannelsViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
         // ) {
         //     zynqtgui.soundCombinatorActive = true;
@@ -957,26 +967,26 @@ ZUI.ScreenPage {
         repeat: false
         onTriggered: {
             // Check if song bar is active
-            if (bottomStack.slotsBar.bottomBarButton.checked && bottomBar.tabbedView.activeAction.page.search("SongBar") >= 0)
+            if (bottomStack.currentBarView === Main.BarView.BottomBar && bottomBar.tabbedView.activeAction.page.search("SongBar") >= 0)
                 zynqtgui.songBarActive = true;
             else
                 zynqtgui.songBarActive = false;
             // Check if sound combinator is active
-            if (bottomStack.slotsBar.bottomBarButton.checked && bottomBar.tabbedView.activeAction.page.search("SamplesBar") >= 0)
+            if (bottomStack.currentBarView === Main.BarView.BottomBar && bottomBar.tabbedView.activeAction.page.search("SamplesBar") >= 0)
                 zynqtgui.channelSamplesBarActive = true;
             else
                 zynqtgui.channelSamplesBarActive = false;
             // Check if channel wave editor bar is active
-            if (bottomStack.slotsBar.bottomBarButton.checked && zynqtgui.bottomBarControlType === "bottombar-controltype-channel" && bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0)
+            if (bottomStack.currentBarView === Main.BarView.BottomBar && zynqtgui.bottomBarControlType === "bottombar-controltype-channel" && bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0)
                 zynqtgui.channelWaveEditorBarActive = true;
             else
                 zynqtgui.channelWaveEditorBarActive = false;
             // Check if clip wave editor bar is active
-            if (bottomStack.slotsBar.bottomBarButton.checked && (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0)
+            if (bottomStack.currentBarView === Main.BarView.BottomBar && (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0)
                 zynqtgui.clipWaveEditorBarActive = true;
             else
                 zynqtgui.clipWaveEditorBarActive = false;
-            if (bottomStack.slotsBar.channelButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.TracksView) {
                 console.log("LED : Slots Channel Bar active");
                 zynqtgui.slotsBarChannelActive = true;
                 zynqtgui.slotsBarClipsActive = false;
@@ -984,7 +994,7 @@ ZUI.ScreenPage {
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
                 zynqtgui.slotsBarFxActive = false;
-            } else if (bottomStack.slotsBar.mixerButton.checked) {
+            } else if (bottomStack.currentBarView === Main.BarView.MixerBar) {
                 console.log("LED : Slots Mixer Bar active");
                 zynqtgui.slotsBarChannelActive = false;
                 zynqtgui.slotsBarClipsActive = false;
@@ -992,7 +1002,7 @@ ZUI.ScreenPage {
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
                 zynqtgui.slotsBarFxActive = false;
-            } else if (bottomStack.slotsBar.clipsButton.checked) {
+            } else if (bottomStack.currentBarView === Main.BarView.ClipsBar) {
                 console.log("LED : Slots Clips Bar active");
                 zynqtgui.slotsBarChannelActive = false;
                 zynqtgui.slotsBarClipsActive = true;
@@ -1000,7 +1010,7 @@ ZUI.ScreenPage {
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
                 zynqtgui.slotsBarFxActive = false;
-            } else if (bottomStack.slotsBar.synthsButton.checked) {
+            } else if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                 console.log("LED : Slots Synths Bar active");
                 zynqtgui.slotsBarChannelActive = false;
                 zynqtgui.slotsBarClipsActive = false;
@@ -1008,7 +1018,7 @@ ZUI.ScreenPage {
                 zynqtgui.slotsBarSynthsActive = true;
                 zynqtgui.slotsBarSamplesActive = false;
                 zynqtgui.slotsBarFxActive = false;
-            } else if (bottomStack.slotsBar.samplesButton.checked) {
+            } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
                 console.log("LED : Slots Samples Bar active");
                 zynqtgui.slotsBarChannelActive = false;
                 zynqtgui.slotsBarClipsActive = false;
@@ -1016,7 +1026,7 @@ ZUI.ScreenPage {
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = true;
                 zynqtgui.slotsBarFxActive = false;
-            } else if (bottomStack.slotsBar.fxButton.checked) {
+            } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
                 console.log("LED : Slots FX Bar active");
                 zynqtgui.slotsBarChannelActive = false;
                 zynqtgui.slotsBarClipsActive = false;
@@ -1024,7 +1034,7 @@ ZUI.ScreenPage {
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
                 zynqtgui.slotsBarFxActive = true;
-            } else if (bottomStack.slotsBar.soundCombinatorButton.checked) {
+            } else if (bottomStack.slotsBar.soundCombinatorButton.checked) { //this does not exists
                 console.log("LED : Slots FX Bar active");
                 zynqtgui.slotsBarChannelActive = false;
                 zynqtgui.slotsBarClipsActive = false;
@@ -1050,7 +1060,7 @@ ZUI.ScreenPage {
             console.log("$$$ Song Changed :", song);
             zynqtgui.bottomBarControlType = "bottombar-controltype-song";
             zynqtgui.bottomBarControlObj = root.song;
-            bottomStack.slotsBar.channelButton.checked = true;
+            bottomStack.setView(Main.BarView.TracksBar);
         }
     }
 
@@ -1249,10 +1259,10 @@ ZUI.ScreenPage {
                                             onClicked: {
                                                 if (zynqtgui.sketchpad.displaySceneButtons) {
                                                     zynqtgui.sketchpad.displaySceneButtons = false;
-                                                    bottomStack.slotsBar.channelButton.checked = true;
+                                                    bottomStack.setView(Main.BarView.TracksBar);
                                                 } else {
                                                     zynqtgui.sketchpad.displaySceneButtons = true;
-                                                    bottomStack.slotsBar.clipsButton.checked = true;
+                                                    bottomStack.setView(Main.BarView.ClipsBar);
                                                 }
                                             }
                                         }
@@ -1272,7 +1282,7 @@ ZUI.ScreenPage {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             spacing: ZUI.Theme.spacing
-                                            visible: bottomStack.slotsBar.mixerButton.checked
+                                            visible: bottomStack.currentBarView === Main.BarView.MixerBar
 
                                             ZUI.SectionButton {
                                                 Layout.fillWidth: true
@@ -1412,7 +1422,7 @@ ZUI.ScreenPage {
                                                 zynqtgui.sketchpad.selectedTrackId = index;
                                                 Qt.callLater(function() {
                                                     // Open TracksBar and switch to channel
-                                                    // bottomStack.slotsBar.channelButton.checked = true
+                                                    // bottomStack.setView(Main.BarView.TracksBar);
                                                     root.resetBottomBar(false);
                                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                                     zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
@@ -1577,7 +1587,7 @@ ZUI.ScreenPage {
                                                     root.resetBottomBar(allowToggle);
                                                 } else {
                                                     // Clip overview is not selected. Open clips grid view
-                                                    bottomStack.slotsBar.clipsButton.checked = true;
+                                                    bottomStack.setView(Main.BarView.ClipsBar);
                                                     zynqtgui.sketchpad.lastSelectedObj.setTo("sketchpad_clipoverview", index, clipCell, clipCell.channel);
                                                     zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id;
                                                 }
@@ -1586,7 +1596,7 @@ ZUI.ScreenPage {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
 
-                                            state: bottomStack.slotsBar.mixerButton.checked ? "MixerMode" : "ClipsMode"
+                                            state: bottomStack.currentBarView === Main.BarView.MixerBar ? "MixerMode" : "ClipsMode"
                                             states: [
                                                 State {
                                                     name: "ClipsMode"
@@ -2075,9 +2085,38 @@ ZUI.ScreenPage {
                         property alias slotsBar: slotsBar
                         property alias tracksBar: tracksBar
                         property alias clipsBar: clipsBar
+                    
+                        property int currentBarView: Main.BarView.TracksBar 
 
                         anchors.fill: parent
                         onCurrentIndexChanged: updateLedVariablesTimer.restart()
+
+                        currentIndex: setViewIndex(currentBarView)
+
+                        function setViewIndex(view) {
+                            switch(view) 
+                            {
+                                case Main.BarView.BottomBar:
+                                    return bottomStack.currentIndex = 0
+                                case Main.BarView.MixerBar: 
+                                    return bottomStack.currentIndex = 1
+                                case Main.BarView.SynthsBar:
+                                case Main.BarView.SamplesBar: 
+                                case Main.BarView.FXBar: 
+                                    return bottomStack.currentIndex = 2
+                                case Main.BarView.TracksBar: 
+                                    return bottomStack.currentIndex = 3
+                                case Main.BarView.ClipsBar:
+                                    return bottomStack.currentIndex = 4
+                                default : 
+                                    return bottomStack.currentIndex = 3                               
+                            }
+                        }
+
+                        function setView(view) {
+                            bottomStack.currentBarView = view
+                            bottomStack.currentIndex = setViewIndex(bottomStack.currentBarView)
+                        }
 
                         BottomBar {
                             id: bottomBar

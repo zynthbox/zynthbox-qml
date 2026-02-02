@@ -94,7 +94,7 @@ ColumnLayout {
             case "KNOB3_TOUCHED":
                 return true;
             case "SWITCH_BACK_RELEASED":
-                bottomStack.slotsBar.channelButton.checked = true
+                bottomStack.setView(Main.BarView.TracksBar);
                 return true;
             case "KNOB0_UP":
                 if (root.clipAudioSource) {

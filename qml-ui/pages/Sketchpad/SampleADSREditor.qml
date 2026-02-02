@@ -52,7 +52,7 @@ GridLayout {
         var returnValue = false;
         switch (cuia) {
             case "SWITCH_BACK_RELEASED":
-                bottomStack.slotsBar.channelButton.checked = true
+                bottomStack.setView(Main.BarView.TracksBar);
                 returnValue = true;
                 break;
             case "SWITCH_ARROW_UP_RELEASED":

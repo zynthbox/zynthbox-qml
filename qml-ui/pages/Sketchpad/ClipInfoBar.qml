@@ -31,8 +31,6 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
-
-
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
     id: waveBar
@@ -43,7 +41,7 @@ GridLayout {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_RELEASED":
-                bottomStack.slotsBar.channelButton.checked = true
+                bottomStack.currentBarView === Main.BarView.TracksView
                 return true;
         }
         

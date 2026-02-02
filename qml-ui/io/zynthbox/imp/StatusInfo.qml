@@ -440,7 +440,7 @@ ZUI.SectionGroup
             }
 
             visible: zynqtgui.globalPopupOpened
-            y: parent.height
+            y: ZUI.Theme.altPanels ? -(height) : parent.height
             x: parent.width - width
             width: Kirigami.Units.gridUnit * 24
             height: Kirigami.Units.gridUnit * 28

@@ -57,7 +57,7 @@ GridLayout {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_RELEASED":
-                bottomStack.slotsBar.channelButton.checked = true
+                bottomStack.setView(Main.BarView.TracksBar);
                 return true;
             case "KNOB0_TOUCHED":
                 if (waveBar.cppClipObject) {

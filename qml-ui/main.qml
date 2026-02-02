@@ -949,8 +949,6 @@ Kirigami.AbstractApplicationWindow {
                     }
                 }
                 ZUI.BreadcrumbButton {
-                    id: samplesButton
-
                     property QtObject selectedSample: null
                     Timer {
                         id: samplesButtonThrottle

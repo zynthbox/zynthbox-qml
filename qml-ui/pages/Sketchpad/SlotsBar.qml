@@ -41,6 +41,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 ZUI.SectionPanel {
     id: root
 
+    property alias bottomBarButton: bottomBarButton
     property alias soundCombinatorButton: soundCombinatorButton
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
 
@@ -86,7 +87,7 @@ ZUI.SectionPanel {
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
         case "SWITCH_NUMBER_1_RELEASED":
-            if (fxButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.FXBar) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 0
             } else {
                 root.selectedSlotRowItem.channel.selectedSlotRow = 0
@@ -95,7 +96,7 @@ ZUI.SectionPanel {
             return true
 
         case "SWITCH_NUMBER_2_RELEASED":
-            if (fxButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.FXBar) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 1
             } else {
                 root.selectedSlotRowItem.channel.selectedSlotRow = 1
@@ -104,7 +105,7 @@ ZUI.SectionPanel {
             return true
 
         case "SWITCH_NUMBER_3_RELEASED":
-            if (fxButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.FXBar) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 2
             } else {
                 root.selectedSlotRowItem.channel.selectedSlotRow = 2
@@ -113,7 +114,7 @@ ZUI.SectionPanel {
             return true
 
         case "SWITCH_NUMBER_4_RELEASED":
-            if (fxButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.FXBar) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 3
             } else {
                 root.selectedSlotRowItem.channel.selectedSlotRow = 3
@@ -122,7 +123,7 @@ ZUI.SectionPanel {
             return true
 
         case "SWITCH_NUMBER_5_RELEASED":
-            if (fxButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.FXBar) {
                 root.selectedSlotRowItem.channel.selectedFxSlotRow = 4
             } else {
                 root.selectedSlotRowItem.channel.selectedSlotRow = 4
@@ -131,32 +132,32 @@ ZUI.SectionPanel {
             return true
 
         case "KNOB0_UP":
-            if (root.synthsButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                 pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
             }
             return true;
         case "KNOB0_DOWN":
-            if (root.synthsButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                 pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
             }
             return true;
         case "KNOB1_UP":
-            if (root.synthsButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                 pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1)
             }
             return true;
         case "KNOB1_DOWN":
-            if (root.synthsButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                 pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1)
             }
             return true;
         case "KNOB2_UP":
-            if (root.synthsButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                 pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1)
             }
             return true;
         case "KNOB2_DOWN":
-            if (root.synthsButton.checked) {
+            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                 pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1)
             }
             return true;
@@ -203,7 +204,7 @@ ZUI.SectionPanel {
             type = ""
         }
 
-        if (synthsButton.checked || type === "synth") {
+        if (bottomStack.currentBarView === Main.BarView.SynthsBar || type === "synth") {
             // Clicked entry is synth
             console.log("handleItemClick : Synth")
 
@@ -217,7 +218,7 @@ ZUI.SectionPanel {
             } else {
                 layerSetupDialog.open()
             }
-        } else if (fxButton.checked || type === "fx") {
+        } else if (bottomStack.currentBarView === Main.BarView.FXBar || type === "fx") {
             // Clicked entry is fx
             console.log("handleItemClick : FX")
 
@@ -237,7 +238,7 @@ ZUI.SectionPanel {
             } else {
                 fxSetupDialog.open()
             }
-        } else if (samplesButton.checked || type === "sample-trig") {
+        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar || type === "sample-trig") {
             // Clicked entry is samples
             console.log("handleItemClick : Samples")
 
@@ -276,7 +277,21 @@ ZUI.SectionPanel {
    
     //// INVISIBLE BUTTONS
     Item {
-        visible: false     
+        visible: false
+        QQC2.Button {
+            id: bottomBarButton                      
+            checkable: true
+            checked: bottomStack.currentIndex === 0
+            enabled: !root.displaySceneButtons
+            text: qsTr("BottomBar")
+            visible: false
+            onCheckedChanged: {
+                if (checked) {
+                    bottomStack.currentIndex = 0
+                    updateLedVariablesTimer.restart()
+                }
+            }
+        }
 
         QQC2.Button {
             id: soundCombinatorButton
@@ -430,22 +445,22 @@ ZUI.SectionPanel {
                                         columnSpacing: Kirigami.Units.gridUnit * 0.7
                                         channel: channelDelegate.channel
                                         slotData: {
-                                            if (synthsButton.checked) {
+                                            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                                                 return channelDelegate.channel.synthSlotsData
-                                            } else if (samplesButton.checked) {
+                                            } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
                                                 return channelDelegate.channel.sampleSlotsData
-                                            } else if (fxButton.checked) {
+                                            } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
                                                 return channelDelegate.channel.fxSlotsData
                                             } else {
                                                 return channelDelegate.channel.synthSlotsData // Fallback to synths when none of the tab buttons are checked
                                             }
                                         }
                                         slotType: {
-                                            if (synthsButton.checked) {
+                                            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                                                 return "synth"
-                                            } else if (samplesButton.checked) {
+                                            } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
                                                 return "sample-trig"
-                                            } else if (fxButton.checked) {
+                                            } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
                                                 return "fx"
                                             } else {
                                                 return "synth" // Fallback to synths when none of the tab buttons are checked
@@ -492,7 +507,7 @@ ZUI.SectionPanel {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             // Layout.alignment: Qt.AlignHCenter
-                            visible: synthsButton.checked
+                            visible: bottomStack.currentBarView === Main.BarView.SynthsBar
                             font.pointSize: 10
                             text: qsTr("Synth")
                         }
@@ -501,7 +516,7 @@ ZUI.SectionPanel {
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignHCenter
                             font.pointSize: 10
-                            visible: fxButton.checked
+                            visible: bottomStack.currentBarView === Main.BarView.FXBar
                             text: qsTr("Fx")
                         }
                         QQC2.Label {
@@ -509,7 +524,7 @@ ZUI.SectionPanel {
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignHCenter
                             font.pointSize: 10
-                            visible: samplesButton.checked
+                            visible: bottomStack.currentBarView === Main.BarView.SamplesBar
                             text: qsTr("Sample")
                         }
 
@@ -563,11 +578,11 @@ ZUI.SectionPanel {
                                     wrapMode: Text.WrapAnywhere
                                     font.pointSize: 8
                                     text: {
-                                        if (synthsButton.checked) {
+                                        if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                                             return root.selectedChannel.synthSlotsData[root.selectedChannel.selectedSlot.value]
-                                        } else if (samplesButton.checked) {
+                                        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
                                             return root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].filename
-                                        } else if (fxButton.checked) {
+                                        } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
                                             return root.selectedChannel.fxSlotsData[root.selectedChannel.selectedSlot.value]
                                         } else {
                                             return ""
@@ -593,7 +608,7 @@ ZUI.SectionPanel {
                             Layout.fillHeight: false
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
 
-                            visible: synthsButton.checked
+                            visible: bottomStack.currentBarView === Main.BarView.SynthsBar
                             enabled: volumeSlider.synthPassthroughClient != null && chainedSound >= 0 && (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
                             value: volumeSlider.synthPassthroughClient ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
                             stepSize: 0.01
@@ -614,11 +629,11 @@ ZUI.SectionPanel {
                             text: qsTr("Swap with...")
                             onClicked: {
                                 let swapType = "unknown";
-                                if (synthsButton.checked) {
+                                if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                                     swapType = "synth";
-                                } else if (fxButton.checked) {
+                                } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
                                     swapType = "fx";
-                                } else if (samplesButton.checked) {
+                                } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
                                     swapType = "sample";
                                 }
                                 bottomStack.slotsBar.pickSlotToSwapWith(root.selectedSlotRowItem.channel, swapType, root.selectedSlotRowItem.channel.selectedSlotRow);

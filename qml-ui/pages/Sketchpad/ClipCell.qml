@@ -106,8 +106,9 @@ ZUI.CellControl {
 
         RowLayout {
             id: activeItemsRow
-            property string highlightColor: "#ffffffff" // green "#ccaaff00"
-            property string inactiveColor: "#33ffffff"
+            property string highlightColor: Kirigami.Theme.highlightColor // green "#ccaaff00"
+            readonly property color tColor : Kirigami.Theme.textColor
+            property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0.2)
             anchors.centerIn: parent
             spacing: 0
             visible: ["synth", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0
@@ -118,7 +119,7 @@ ZUI.CellControl {
                 QQC2.Label {
                     property bool isClipEnabled: root.channel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).enabled
                     property bool patternHasNotes: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.channel.id, index).hasNotes
-
+                    
                     color: {
                         let occupied = false;
                         if (["synth", "external"].indexOf(root.channel.trackType) >= 0 && patternHasNotes && isClipEnabled) {

@@ -879,13 +879,26 @@ ZUI.ScreenPage {
 
         },
         Kirigami.Action {
-            text: "" //qsTr("Sounds")
-            onTriggered: zynqtgui.show_modal("sound_categories")
-            enabled: false
+            text: qsTr("Load Sketchpad")
+            onTriggered: {
+                zynqtgui.show_screen("sound_categories")
+            }
         },
         Kirigami.Action {
-            enabled: false
+            text: "Save Sketchpad"
+            onTriggered: {
+                zynqtgui.show_screen("sound_categories")
+                applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
+            }
         },
+        // Kirigami.Action {
+        //     text: "" //qsTr("Sounds")
+        //     onTriggered: zynqtgui.show_modal("sound_categories")
+        //     enabled: false
+        // },
+        // Kirigami.Action {
+        //     enabled: false
+        // },
         Kirigami.Action {
             text: qsTr("Mixer")
             checked: bottomStack.currentBarView === Main.BarView.MixerBar
@@ -1965,6 +1978,7 @@ ZUI.ScreenPage {
 
                             ColumnLayout {
                                 id: sketchpadCopyPasteButtonsColumn
+                                visible: bottomStack.currentBarView !== Main.BarView.MixerBar
                                 anchors.fill: parent
                                 spacing: ZUI.Theme.spacing
 

@@ -85,6 +85,13 @@ ZUI.ScreenPage {
     rightPadding: 8
     topPadding: 8
     bottomPadding: 8
+
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
+
     onShowSaveSoundDialog: {
         saveSoundDialog.open()
     }

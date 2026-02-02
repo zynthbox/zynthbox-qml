@@ -84,7 +84,7 @@ ColumnLayout {
                                     ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.clips.indexOf(clipDelegate.clip) >= 0
                                         ? true
                                         : false
-                            : clipDelegate.clip && clipDelegate.clip.inCurrentScene
+                            : clipDelegate.clip && clipDelegate.clip.inCurrentScene && clipDelegate.pattern.hasNotes
                             ? true
                             : false            
 
@@ -140,10 +140,10 @@ ColumnLayout {
                 QQC2.Label {
                     anchors.centerIn: parent
                     font.pointSize: 12
-                    // font.bold: svgBg.highlighted
                     visible: ["sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
-                    color: Kirigami.Theme.textColor
-                    opacity: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? 1 : 0.3
+                    color:  clipDelegate.highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                    font.bold: clipDelegate.highlighted
+                    opacity: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? 1 : 0
                     text: String.fromCharCode(clipDelegate.clipIndex + 65)
                 }
                 QQC2.Label {

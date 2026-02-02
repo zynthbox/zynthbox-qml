@@ -618,6 +618,7 @@ ZUI.SectionPanel {
 
                     ZUI.SectionButton {
                         Layout.fillWidth: true
+                        implicitHeight: Kirigami.Units.gridUnit*2 
                         text: qsTr("Swap with...")
                         onClicked: {
                             let swapType = "unknown";

@@ -245,7 +245,7 @@ ZUI.SectionPanel {
 
                         ZUI.SectionButton {
                             Layout.fillWidth: true
-                            implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
+                            implicitHeight: Kirigami.Units.gridUnit*2 
 
                             enabled: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
                             text: qsTr("Swap with...")
@@ -256,7 +256,7 @@ ZUI.SectionPanel {
 
                         ZUI.SectionButton {
                             Layout.fillWidth: true
-                            implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
+                            implicitHeight: Kirigami.Units.gridUnit*2 
 
                             text: qsTr("Clear Column")
                             onClicked: {

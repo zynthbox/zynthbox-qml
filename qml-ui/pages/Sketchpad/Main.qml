@@ -819,7 +819,7 @@ ZUI.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Sketchpad")
+            text: qsTr("Jam")
 
             Kirigami.Action {
                 // Rename Save button as Save as for temp sketchpad
@@ -879,13 +879,13 @@ ZUI.ScreenPage {
 
         },
         Kirigami.Action {
-            text: qsTr("Load Sketchpad")
+            text: qsTr("Load Sketch")
             onTriggered: {
                 zynqtgui.show_screen("sound_categories")
             }
         },
         Kirigami.Action {
-            text: "Save Sketchpad"
+            text: "Save Sketch"
             onTriggered: {
                 zynqtgui.show_screen("sound_categories")
                 applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
@@ -1913,7 +1913,6 @@ ZUI.ScreenPage {
                                                                         text: qsTr("%1\%").arg(applicationWindow().channels[index].wetFx1Amount)
                                                                     }
                                                                 }
-
                                                             }
                                                         }
                                                     }

@@ -1119,7 +1119,7 @@ ZUI.SectionPanel {
 
                             Layout.fillWidth: true
                             Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
                             spacing: ZUI.Theme.sectionSpacing
 
                             Timer {
@@ -1161,15 +1161,17 @@ ZUI.SectionPanel {
 
                             // Take 3/5 th of available width
                            Item {
+                                // color: "yellow"
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+
                                 ColumnLayout {
                                    
-                                   anchors.fill: parent
-
+                                    anchors.fill: parent
                                     QQC2.Label {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit *1.5
                                         font.pointSize: 9
                                         opacity: waveformContainer.showWaveform ? 1 : 0
                                         text: waveformContainer.clip
@@ -1362,6 +1364,26 @@ ZUI.SectionPanel {
                                                     spacing: ZUI.Theme.spacing
 
                                                     ZUI.SectionButton {
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        text: qsTr("Fav")
+                                                        icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                                                        enabled: infoBar.zynthianLayer != null
+                                                        checkable: false
+                                                        color: checked ? "yellow" : Kirigami.Theme.textColor
+                                                        // Bind to current index to properly update when preset changed from other screen
+                                                        checked: highlighted
+                                                        highlighted: infoBar.zynthianLayer != null
+                                                                ? zynqtgui.preset.current_index >= 0 && zynqtgui.preset.current_is_favorite
+                                                                : false
+                                                        onClicked: {
+                                                            if (infoBar.zynthianLayer != null) {
+                                                                zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
+                                                            }
+                                                        }
+                                                    }
+
+                                                    ZUI.SectionButton {
                                                         property int midiChannel: root.selectedChannel != null && root.selectedChannel.chainedSounds != null && root.selectedChannel.selectedSlot != null ? root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value] : -1
                                                         property QtObject synthPassthroughClient: root.selectedChannel != null && midiChannel >= 0 && root.selectedChannel.checkIfLayerExists(midiChannel) && Zynthbox.Plugin.synthPassthroughClients[midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[midiChannel] : null
                                                         Layout.fillWidth: true
@@ -1392,27 +1414,7 @@ ZUI.SectionPanel {
                                                         onClicked: {
                                                             fxPassthroughClient.bypass = !fxPassthroughClient.bypass
                                                         }
-                                                    }
-
-                                                    ZUI.SectionButton {
-                                                        Layout.fillWidth: true
-                                                        Layout.fillHeight: true
-                                                        text: qsTr("Fav")
-                                                        icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
-                                                        enabled: infoBar.zynthianLayer != null
-                                                        checkable: false
-                                                        color: checked ? "yellow" : Kirigami.Theme.textColor
-                                                        // Bind to current index to properly update when preset changed from other screen
-                                                        checked: highlighted
-                                                        highlighted: infoBar.zynthianLayer != null
-                                                                ? zynqtgui.preset.current_index >= 0 && zynqtgui.preset.current_is_favorite
-                                                                : false
-                                                        onClicked: {
-                                                            if (infoBar.zynthianLayer != null) {
-                                                                zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
-                                                            }
-                                                        }
-                                                    }
+                                                    }                                                    
                                                 }
                                             }
 
@@ -1566,6 +1568,7 @@ ZUI.SectionPanel {
 
                             // Take remaining available width
                             Item {
+                                // color: "yellow"
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 ColumnLayout {
@@ -1607,30 +1610,34 @@ ZUI.SectionPanel {
                                             }
                                         }
                                     }
-                                    RowLayout {
+
+                                    ZUI.SectionGroup {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
-                                        Repeater {
-                                            id: clipBar
-                                            model: Zynthbox.Plugin.sketchpadSlotCount
-                                            QQC2.Label {
-                                                id: clipDelegate
-                                                Layout.fillWidth: true
-                                                Layout.preferredWidth: Kirigami.Units.gridUnit
-                                                text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
-                                                font.underline: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
-                                                font.pointSize: 9
-                                                font.capitalization: Font.AllUppercase
-                                                color: Kirigami.Theme.textColor
-                                                property int clipIndex: model.index
-                                                property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
-                                                property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
-                                                property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
-                                                property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
-                                                property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
-                                                property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
-                                                MouseArea {
-                                                    anchors.fill: parent
+                                        implicitHeight: Kirigami.Units.gridUnit *1.5
+                                        RowLayout {
+                                           anchors.fill: parent
+                                           spacing: ZUI.Theme.spacing
+                                            Repeater {
+                                                id: clipBar
+                                                model: Zynthbox.Plugin.sketchpadSlotCount
+                                                delegate: ZUI.SectionButton {
+                                                    id: clipDelegate
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    // Layout.preferredWidth: Kirigami.Units.gridUnit
+                                                    text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
+                                                    highlighted: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
+                                                    font.pointSize: 9
+                                                    font.capitalization: Font.AllUppercase
+                                                    // color: Kirigami.Theme.textColor
+                                                    property int clipIndex: model.index
+                                                    property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
+                                                    property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
+                                                    property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
+                                                    property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
+                                                    property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
+                                                    property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
                                                     onClicked: {
                                                         if (root.selectedChannel.selectedClip === clipDelegate.clipIndex) {
                                                             clipDelegate.clip.enabled = !clipDelegate.clip.enabled;
@@ -1639,33 +1646,33 @@ ZUI.SectionPanel {
                                                             clipDelegate.clip.enabled = true;
                                                         }
                                                     }
-                                                }
-                                                Kirigami.Icon {
-                                                    anchors {
-                                                        left: parent.left
-                                                        verticalCenter: parent.verticalCenter
-                                                        leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                    Kirigami.Icon {
+                                                        anchors {
+                                                            left: parent.left
+                                                            verticalCenter: parent.verticalCenter
+                                                            leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                        }
+                                                        height: parent.height - Kirigami.Units.smallSpacing
+                                                        width: height
+                                                        color: clipDelegate.color
+                                                        // Visible if we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
+                                                        // Also visible (non-blinking) if the timer is running, the clip is playing, and it is going to keep playing on the next bar
+                                                        visible: (Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === false && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0)
+                                                                || (Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState)
+                                                        source: "media-playback-start-symbolic"
                                                     }
-                                                    height: parent.height - Kirigami.Units.smallSpacing
-                                                    width: height
-                                                    color: clipDelegate.color
-                                                    // Visible if we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
-                                                    // Also visible (non-blinking) if the timer is running, the clip is playing, and it is going to keep playing on the next bar
-                                                    visible: (Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === false && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0)
-                                                            || (Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState)
-                                                    source: "media-playback-start-symbolic"
-                                                }
-                                                Kirigami.Icon {
-                                                    anchors {
-                                                        left: parent.left
-                                                        verticalCenter: parent.verticalCenter
-                                                        leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                    Kirigami.Icon {
+                                                        anchors {
+                                                            left: parent.left
+                                                            verticalCenter: parent.verticalCenter
+                                                            leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                        }
+                                                        height: parent.height - Kirigami.Units.smallSpacing
+                                                        width: height
+                                                        // Visible if we are running playback, the clip is playing, and we are going to stop the clip at the top of the next bar
+                                                        visible: Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.StoppedState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
+                                                        source: "media-playback-stop-symbolic"
                                                     }
-                                                    height: parent.height - Kirigami.Units.smallSpacing
-                                                    width: height
-                                                    // Visible if we are running playback, the clip is playing, and we are going to stop the clip at the top of the next bar
-                                                    visible: Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.StoppedState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
-                                                    source: "media-playback-stop-symbolic"
                                                 }
                                             }
                                         }
@@ -1726,7 +1733,6 @@ ZUI.SectionPanel {
                                 }
                             }
                         }
-
                     }
                 }
             }

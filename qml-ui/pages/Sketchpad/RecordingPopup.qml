@@ -1292,7 +1292,7 @@ ZUI.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 18
                     icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                     icon.width: 64
-                    icon.height: icon.width
+                    icon.height: 64
                     icon.color: "red"
                     onPressedChanged: {
                         if (pressed) {
@@ -1311,7 +1311,7 @@ ZUI.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     icon.name: "view-grid-symbolic"
                     icon.width: 22
-                    icon.height: icon.width
+                    icon.height: 22
                     onClicked: {
                         zynqtgui.callable_ui_action_simple("SHOW_KEYBOARD");
                     }

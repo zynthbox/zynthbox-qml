@@ -807,7 +807,9 @@ ZUI.SectionPanel {
                                     horizontalAlignment: Text.AlignLeft
                                     level: 3
                                     font.bold: true
-                                    text: qsTr("Track T%1: %2").arg(root.selectedChannel ? root.selectedChannel.id+1 : "").arg(root.selectedChannel ? root.selectedChannel.name : "")
+                                    readonly property string trackId: ("T%1").arg(root.selectedChannel ? root.selectedChannel.id+1 : "")
+                                    readonly property string trackName: root.selectedChannel ? root.selectedChannel.name : ""
+                                    text: qsTr("Track %1").arg(trackId === trackName ? trackId : trackId + ": " + trackName)
                                 }
                             }
 

@@ -1633,17 +1633,21 @@ ZUI.SectionPanel {
                                                     Layout.fillHeight: true
                                                     // Layout.preferredWidth: Kirigami.Units.gridUnit
                                                     text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
+                                                    // highlighted: clipDelegate.clip.enabled && clipDelegate.patternHasNotes
                                                     highlighted: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
                                                     font.pointSize: 9
                                                     font.capitalization: Font.AllUppercase
                                                     // color: Kirigami.Theme.textColor
                                                     property int clipIndex: model.index
+                                                    readonly property bool patternHasNotes: root.sequence.getByClipId(root.selectedChannel.id, index).hasNotes
+
                                                     property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
                                                     property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
                                                     property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
                                                     property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
                                                     property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
                                                     property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
+
                                                     onClicked: {
                                                         if (root.selectedChannel.selectedClip === clipDelegate.clipIndex) {
                                                             clipDelegate.clip.enabled = !clipDelegate.clip.enabled;

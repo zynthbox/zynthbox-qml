@@ -7,7 +7,7 @@ Rectangle {
     property string highlightColor: "#ccaaff00" // green
     property string inactiveColor: Kirigami.Theme.textColor
 
-    opacity: highlighted ? 1 : 0.2
+    opacity: highlighted ? 1 : 0
     radius: ZUI.Theme.radius
     color: highlighted ? highlightColor : inactiveColor
 }

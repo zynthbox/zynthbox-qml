@@ -108,7 +108,7 @@ ZUI.CellControl {
             id: activeItemsRow
             property string highlightColor: Kirigami.Theme.highlightColor // green "#ccaaff00"
             readonly property color tColor : Kirigami.Theme.textColor
-            property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0.07)
+            property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0)
             anchors.centerIn: parent
             spacing: 0
             visible: ["synth", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0
@@ -116,7 +116,8 @@ ZUI.CellControl {
             Repeater {
                 model: root.channel ? 5 : 0
 
-                QQC2.Label {
+                delegate: QQC2.Label {
+                    horizontalAlignment: Qt.AlignHCenter
                     property bool isClipEnabled: root.channel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).enabled
                     property bool patternHasNotes: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.channel.id, index).hasNotes
                     
@@ -130,7 +131,7 @@ ZUI.CellControl {
 
                         if (occupied) {
                             return activeItemsRow.highlightColor;
-                        } else {
+                        } else {                           
                             return activeItemsRow.inactiveColor;
                         }
                     }
@@ -146,6 +147,14 @@ ZUI.CellControl {
 
                     font.pointSize: 12
                     font.bold: true
+                    
+                    Rectangle {
+                        height: 1
+                        width: parent.width
+                        anchors.top: parent.bottom
+                        color: Kirigami.Theme.textColor
+                        visible:(applicationWindow().selectedChannel.selectedClip === index) && patternHasNotes && isClipEnabled  && (root.colIndex === applicationWindow().selectedChannel.id)               
+                    }
                 }
             }
         }

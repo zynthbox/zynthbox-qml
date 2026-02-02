@@ -108,7 +108,7 @@ ZUI.CellControl {
             id: activeItemsRow
             property string highlightColor: Kirigami.Theme.highlightColor // green "#ccaaff00"
             readonly property color tColor : Kirigami.Theme.textColor
-            property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0.2)
+            property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0.07)
             anchors.centerIn: parent
             spacing: 0
             visible: ["synth", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0

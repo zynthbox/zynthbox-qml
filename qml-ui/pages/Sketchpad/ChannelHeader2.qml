@@ -145,16 +145,16 @@ ZUI.CellControl {
                 Layout.leftMargin: Kirigami.Units.largeSpacing
                 Layout.rightMargin: Kirigami.Units.largeSpacing
 
-                QQC2.Label {
-                    id: subContents
-                    width: parent.width
-                    visible: root.subText != null
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    elide: Text.ElideRight
-                    text: root.subText ? root.subText : ""
-                    font.pointSize: 8
-                }
+                // QQC2.Label {
+                //     id: subContents
+                //     width: parent.width
+                //     visible: root.subText != null
+                //     horizontalAlignment: Text.AlignHCenter
+                //     verticalAlignment: Text.AlignVCenter
+                //     elide: Text.ElideRight
+                //     text: root.subText ? root.subText : ""
+                //     font.pointSize: 8
+                // }
 
                 ColumnLayout {
                     width: parent.width
@@ -328,6 +328,18 @@ ZUI.CellControl {
                     visible: root.channel.trackType === "external"
                     text: root.channel.externalMidiChannel > -1 ? root.channel.externalMidiChannel + 1 : root.channel.id + 1
                 }
+            }
+
+            QQC2.Label {
+                id: contents2
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
+                font.pointSize: 8
+                font.bold: true
+                text: root.subText ? root.subText : ""
+                visible: root.subText != null
             }
 
             // Rectangle {

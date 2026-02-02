@@ -807,7 +807,7 @@ ZUI.SectionPanel {
                                     horizontalAlignment: Text.AlignLeft
                                     level: 3
                                     font.bold: true
-                                    text: qsTr("Track: %1").arg(root.selectedChannel ? root.selectedChannel.name : "")
+                                    text: qsTr("Track T%1: %2").arg(root.selectedChannel ? root.selectedChannel.id+1 : "").arg(root.selectedChannel ? root.selectedChannel.name : "")
                                 }
                             }
 
@@ -1231,6 +1231,9 @@ ZUI.SectionPanel {
                                                                     root.selectedChannel.samples[root.selectedChannel.selectedSlot.value].play()
                                                                 }
                                                                 break;
+                                                            case "TracksBar_synthslot":
+                                                                zynqtgui.current_screen_id = "preset";
+                                                                break;
                                                         }
                                                     } else {
                                                         if (horizontalDrag > 0) {
@@ -1288,6 +1291,7 @@ ZUI.SectionPanel {
                                                             break;
                                                     }
                                                 }
+                                                // onClicked: zynqtgui.current_screen_id = "preset"
                                             }
 
                                             RowLayout {

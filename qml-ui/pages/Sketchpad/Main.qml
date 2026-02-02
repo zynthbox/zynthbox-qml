@@ -856,7 +856,7 @@ ZUI.ScreenPage {
             }
 
             Kirigami.Action {
-                text: qsTr("Load Sketchpad")
+                text: qsTr("Load Jam")
                 onTriggered: {
                     sketchpadPickerDialog.folderModel.folder = sketchpadPickerDialog.rootFolder;
                     sketchpadPickerDialog.open();
@@ -864,14 +864,14 @@ ZUI.ScreenPage {
             }
 
             Kirigami.Action {
-                text: qsTr("New Sketchpad")
+                text: qsTr("New Jam")
                 onTriggered: {
                     zynqtgui.sketchpad.newSketchpad();
                 }
             }
 
             Kirigami.Action {
-                text: "Get New Sketchpads"
+                text: "Get New Jams"
                 onTriggered: {
                     zynqtgui.show_modal("sketchpad_downloader");
                 }
@@ -1492,8 +1492,8 @@ ZUI.ScreenPage {
 
                                                 anchors.fill: parent
                                                 channel: headerDelegate.channel
-                                                text: channelHeaderDelegate.channel.name
-                                                subText: null
+                                                text: "T"+(index+1)
+                                                subText: channelHeaderDelegate.channel.name === text ? "" :  channelHeaderDelegate.channel.name
                                                 subSubText: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected")
                                                 subSubTextSize: 7
                                                 highlightOnFocus: false

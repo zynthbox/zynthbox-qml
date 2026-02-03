@@ -342,7 +342,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         pass
 
     def can_navigate_bank_up(self):
-        pass
+        return False;
 
     # TODO: remove
     def cb_listbox_push(self,event):

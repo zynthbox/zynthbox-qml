@@ -275,11 +275,11 @@ IMP.BasePlayGrid {
         id:_private;
         readonly property int activeBarModelWidth: 16
 
-        property QtObject sequence
-        property int activePattern: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePattern : -1
-        property QtObject activePatternModel: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePatternObject : null;
-        property QtObject workingPatternModel: activePatternModel ? activePatternModel.workingModel : null;
-        property QtObject activeBarModel: workingPatternModel && activeBar > -1 && workingPatternModel.data(workingPatternModel.index(activeBar + bankOffset, 0), workingPatternModel.roles["rowModel"])
+        readonly property QtObject sequence: applicationWindow().globalSequencer.sequence
+        readonly property int activePattern: sequence ? sequence.indexOf(applicationWindow().globalSequencer.pattern) : -1 // sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePattern : -1
+        readonly property QtObject activePatternModel: sequence && sequence.isLoading == false ? applicationWindow().globalSequencer.pattern : null // sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePatternObject : null;
+        readonly property QtObject workingPatternModel: activePatternModel ? activePatternModel.workingModel : null;
+        readonly property QtObject activeBarModel: workingPatternModel && activeBar > -1 && workingPatternModel.data(workingPatternModel.index(activeBar + bankOffset, 0), workingPatternModel.roles["rowModel"])
             ? workingPatternModel.data(workingPatternModel.index(activeBar + bankOffset, 0), workingPatternModel.roles["rowModel"])
             : null;
 
@@ -551,12 +551,7 @@ IMP.BasePlayGrid {
         function adoptSequence() {
             if (zynqtgui.isBootingComplete) {
                 console.log("Adopting the scene sequence");
-                var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
-                if (_private.sequence != sequence) {
-                    console.log("Scene has changed, switch places!");
-                    _private.sequence = sequence;
-                    _private.updateChannel();
-                }
+                _private.updateChannel();
             }
         }
         function updateUniqueCurrentRowNotes() {
@@ -1748,6 +1743,7 @@ IMP.BasePlayGrid {
                                     onActivePatternModelChanged: sequencerPadNoteApplicator.restart();
                                     onActiveBarChanged: sequencerPadNoteApplicator.restart();
                                     onBankOffsetChanged: sequencerPadNoteApplicator.restart();
+                                    onWorkingPatternModelChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: _private.sequence
@@ -1766,6 +1762,7 @@ IMP.BasePlayGrid {
                                     target: zynqtgui.sketchpad
                                     onSongChanged: sequencerPadNoteApplicator.restart();
                                 }
+                                Component.onCompleted: sequencerPadNoteApplicator.restart();
                             }
                         }
                     }

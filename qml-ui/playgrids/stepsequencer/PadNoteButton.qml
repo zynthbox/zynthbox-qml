@@ -153,11 +153,11 @@ QQC2.Button {
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.workingModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
                     property double actualSubnoteVelocity: subNoteVelocity == undefined
-                        ? 0
+                        ? component.patternModel.defaultVelocity
                         : subNoteVelocity == -1
                             ? 0
                             : subNoteVelocity == 0
-                                ? 64
+                                ? component.patternModel.defaultVelocity
                                 : subNoteVelocity
 
                     Layout.fillWidth: true

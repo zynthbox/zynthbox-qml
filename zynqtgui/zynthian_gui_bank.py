@@ -149,10 +149,15 @@ class zynthian_gui_bank(zynthian_gui_selector):
         super().show()
 
     def can_navigate_bank_up(self):
-        return self.get_curlayer().can_navigate()
+        if(self.get_curlayer() != None):
+            return self.get_curlayer().can_navigate()
+        return False
 
     def navigate_bank_up(self):    
         logging.info("Nagivate bank UP")
+        if(self.get_curlayer() == None):
+            return
+            
         if(not self.get_curlayer().can_navigate()):
             return
 

@@ -242,16 +242,75 @@ GridLayout {
 
             Component{
                 id: _realComp   
-                QQC2.Control {
+                ZUI.SlotControl  {
                     id: slotDelegate
                     anchors.fill: parent
-                    property int realIndex : index/2
+                    // For external mode the first three slots are visible
+                    // For other modes all slots are visible
+                    enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || realIndex === 2))
+                    visible: enabled
+                    isEmpty: text.trim().length == 0
+                    dragEnabled: control.dragEnabled
+                    doubleClickEnabled: control.doubleClickEnabled
+                    clickAndHoldEnabled: control.clickAndHoldEnabled
 
-                    property bool highlighted: zynqtgui.sketchpad.lastSelectedObj != null &&
+                    opacity: slotMakesSound ? 1 : 0.3   
+                    checked: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === realIndex)
+                    highlighted: zynqtgui.sketchpad.lastSelectedObj != null &&
                                             zynqtgui.sketchpad.lastSelectedObj.track == control.channel &&
                                             zynqtgui.sketchpad.lastSelectedObj.className == _private.className &&
                                             zynqtgui.sketchpad.lastSelectedObj.value === realIndex &&
                                             zynqtgui.sketchpad.lastSelectedObj.component == slotDelegate
+
+                    text: {
+                        if (control.slotData && control.slotData[realIndex] != null) {
+                            if (control.slotType === "synth") {
+                                return control.slotData[realIndex]
+                            } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop")) {
+                                if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false) {
+                                    return "Missing: %1".arg(control.slotData[realIndex].title ? control.slotData[realIndex].title : "");
+                                } else {
+                                    return control.slotData[realIndex].title ? control.slotData[realIndex].title : ""
+                                }
+                            } else if (control.slotType === "external") {
+                                return realIndex < 3 ? control.slotData[realIndex] : ""
+                            } else if (control.slotType === "fx") {
+                                return control.slotData[realIndex]
+                            } else if (control.slotType === "sketch-fx") {
+                                return control.slotData[realIndex]
+                            } else if (control.slotType === "text") {
+                                if (typeof control.slotData[realIndex] === "string") {
+                                    return control.slotData[realIndex]
+                                } else {
+                                    return control.slotData[realIndex].toString();
+                                }
+                            } else {
+                                return ""
+                            }
+                        } else {
+                            return ""
+                        }
+                    }
+                    elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
+                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
+                    barValue: {
+                        // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                        if(control.slotType === "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0) 
+                            return (slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0)   
+
+                        // QdryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                        if(control.slotType === "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0)
+                            return (slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0)
+
+                        if(slotDelegate.cppClipObject)
+                            return (slotDelegate.cppClipObject ? slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0 )   
+
+                        if(control.slotType === "synth" && text.trim().length > 0)
+                            return (slotDelegate.synthPassthroughClient ? slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0)
+                    }
+                    readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
+
+                    property int realIndex : index/2
                     property int slotIndex: realIndex
                     property bool isSketchpadClip: control.slotData && control.slotData[realIndex] != null && control.slotData[realIndex].hasOwnProperty("className") && control.slotData[realIndex].className == "sketchpad_clip"
                     property QtObject clip: isSketchpadClip ? control.slotData[realIndex] : null
@@ -300,44 +359,7 @@ GridLayout {
                             return true
                         }
                     }
-
-                    
-                    opacity: slotMakesSound ? 1 : 0.3
-                    // padding: svgBg.visible ? svgBg.leftPadding : 0
-                    padding: 2
-
-                    background: Item {
-                        id: backgroundItem
-                        property bool highlightBorder: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === realIndex)
                         
-                        // Show highlighted color on slot border when slot is a sample-loop and is enabled
-                        Rectangle {
-                            visible: !svgBg.visible
-                            anchors.fill: parent
-                            Kirigami.Theme.inherit: false
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            color: Kirigami.Theme.backgroundColor
-                            // If slot is a enabled clip or slot is selectedSlot, show highlighted border
-                            border.color: backgroundItem.highlightBorder ? Kirigami.Theme.highlightColor : "#ff999999"
-                            border.width: 2
-                            radius: ZUI.Theme.radius
-                        }
-                        PlasmaCore.FrameSvgItem {
-                            id: svgBg
-                            anchors.fill: parent
-                            visible: fromCurrentTheme
-
-                            readonly property real leftPadding: margins.left
-                            readonly property real rightPadding: margins.right
-                            readonly property real topPadding: margins.top
-                            readonly property real bottomPadding: margins.bottom
-
-                            imagePath: "widgets/slots-delegate-background"
-                            prefix: backgroundItem.highlightBorder ? ["focus", ""] : (delegate.isEmpty ? "inactive" : "")
-                            colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                        }
-                    }
-
                     function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                         if (control.performSlotInteractions) {
                             if (!control.singleClickEnabled) {
@@ -388,8 +410,11 @@ GridLayout {
                                         }
                                     } else {
                                         // Handle item click only if not dragged
-                                        if (!delegateMouseArea.dragHappened && !onlyFocus) {
-                                            pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
+                                        if (!onlyFocus) {
+                                            if(control.channel.selectedSlot.isEmpty())
+                                                pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
+                                            else
+                                                zynqtgui.show_modal("control")
                                         }
                                     }
                                 }
@@ -423,340 +448,51 @@ GridLayout {
                         control.slotClicked(slotDelegate.slotIndex);
                     }
 
-                    contentItem: Item {
-                        id: delegate
+                    onDoubleClicked: {
+                        // Double press has happened. Toggle mute/bypass state the slot
+                        switch (control.slotType) {
+                            case "synth":
+                                if (slotDelegate.synthPassthroughClient) {
+                                    slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
+                                }
+                                break;
+                            case "sample-trig":
+                                if (slotDelegate.cppClipObject) {
+                                    slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
+                                }
+                                break;
+                            case "fx":
+                                if (slotDelegate.fxPassthroughClient) {
+                                    slotDelegate.fxPassthroughClient.bypass = !slotDelegate.fxPassthroughClient.bypass;
+                                }
+                                break;
+                        }
+                    }
 
-                        // For external mode the first three slots are visible
-                        // For other modes all slots are visible
-                        enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || realIndex === 2))
-                        opacity: enabled ? 1 : 0
-                        visible: enabled
-                        readonly property bool isEmpty : synthNameLabel.text.trim().length == 0
-                        readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
-                        
-                        Loader { 
-                            anchors {
-                                fill: parent
-                                margins: ZUI.Theme.padding
-                            }
-                            active: !ZUI.Theme.altVolume
-                            visible: control.dragEnabled && active
-                            sourceComponent: Item {
-                                id: slotDelegateVisualsContainer
+                    onClicked: {
+                        slotDelegate.switchToThisSlot();
+                    }
+
+                    onPressAndHold: {
+                        if (!control.channel.selectedSlot.isEmpty()) {
+                            // zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                            pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
+                        }                        
+                    }
+
+                    onMoved: {
+                        if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel)) {
                             
-                                Rectangle {
-                                    width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
-                                    anchors {
-                                        left: parent.left
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                    }
-                                    radius: ZUI.Theme.radius
-                                    opacity: 0.8
-                                    visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
-                                    color: Kirigami.Theme.highlightColor
-                                }
-                                Rectangle {
-                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
-                                    anchors {
-                                        left: parent.left
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                    }
-                                    radius: ZUI.Theme.radius
-                                    opacity: 0.8
-                                    visible: slotDelegate.cppClipObject
-                                    color: Kirigami.Theme.highlightColor
-                                }
-                                Rectangle {
-                                    // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                    width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                    anchors {
-                                        left: parent.left
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                    }
-                                    radius: ZUI.Theme.radius
-                                    opacity: 0.8
-                                    visible: control.slotType === "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
-                                    color: Kirigami.Theme.highlightColor
-                                }
-                                Rectangle {
-                                    // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                    width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                    anchors {
-                                        left: parent.left
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                    }
-                                    radius: ZUI.Theme.radius
-                                    opacity: 0.8
-                                    visible: control.slotType === "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
-                                    color: Kirigami.Theme.highlightColor
-                                }
-
-                                property int availableWidth: width - 6
-                                Rectangle {
-                                    anchors {
-                                        top: parent.top
-                                        left: parent.left
-                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                    }
-                                    height: 1
-                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
-                                    opacity: width > 1 ? 0.8 : 0
-                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
-                                }
-                                Rectangle {
-                                    anchors {
-                                        left: parent.left
-                                        bottom: parent.bottom
-                                        bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
-                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                    }
-                                    height: 1
-                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
-                                    opacity: width > 1 ? 0.8 : 0
-                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
-                                }
-                            }
-                        }
-
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: ZUI.Theme.spacing
-                            QQC2.Label {
-                                id: synthNameLabel
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                padding: 2
-                                background: Rectangle {
-                                    visible: ZUI.Theme.altVolume
-                                    opacity: delegate.isEmpty || backgroundItem.highlightBorder  ? 0 : 1
-
-                                    color: delegate.isEmpty  ? "#181918" : "#1f2022"
-                                    radius: 2
-                                }
-
-                                horizontalAlignment: Text.AlignLeft
-                                text: {
-                                    if (control.slotData && control.slotData[realIndex] != null) {
-                                        if (control.slotType === "synth") {
-                                            return control.slotData[realIndex]
-                                        } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop")) {
-                                            if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false) {
-                                                return "Missing: %1".arg(control.slotData[realIndex].title ? control.slotData[realIndex].title : "");
-                                            } else {
-                                                return control.slotData[realIndex].title ? control.slotData[realIndex].title : ""
-                                            }
-                                        } else if (control.slotType === "external") {
-                                            return realIndex < 3 ? control.slotData[realIndex] : ""
-                                        } else if (control.slotType === "fx") {
-                                            return control.slotData[realIndex]
-                                        } else if (control.slotType === "sketch-fx") {
-                                            return control.slotData[realIndex]
-                                        } else if (control.slotType === "text") {
-                                            if (typeof control.slotData[realIndex] === "string") {
-                                                return control.slotData[realIndex]
-                                            } else {
-                                                return control.slotData[realIndex].toString();
-                                            }
-                                        } else {
-                                            return ""
-                                        }
-                                    } else {
-                                        return ""
-                                    }
-                                }
-                                elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
-                                color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
-                            }
-                            
-                            Loader { 
-                                Layout.fillWidth: true
-                                active: ZUI.Theme.altVolume
-                                visible: control.dragEnabled && active
-                                sourceComponent: Item {
-                                    id: slotDelegateVisualsContainer
-                                    implicitHeight: 6                            
-                                    Rectangle {
-                                        width: slotDelegate.synthPassthroughClient ? parent.width * slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
-                                        height: 6
-                                        anchors {
-                                            left: parent.left
-                                            bottom: parent.bottom
-                                        }
-                                        radius: ZUI.Theme.radius
-                                        opacity: 0.8
-                                        visible: control.slotType === "synth" && synthNameLabel.text.trim().length > 0
-                                        // color: Kirigami.Theme.highlightColor
-                                        color: Kirigami.Theme.textColor
-                                    }
-                                    Rectangle {
-                                        width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
-                                        anchors {
-                                            left: parent.left
-                                            top: parent.top
-                                            bottom: parent.bottom
-                                        }
-                                        radius: ZUI.Theme.radius
-                                        opacity: 0.8
-                                        visible: slotDelegate.cppClipObject
-                                        color: Kirigami.Theme.textColor
-                                    }
-                                    Rectangle {
-                                        // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                        width: slotDelegate.fxPassthroughClient && slotDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                        height: 6
-                                        anchors {
-                                            left: parent.left
-                                            bottom: parent.bottom
-                                        }
-                                        radius: ZUI.Theme.radius
-                                        opacity: 0.8
-                                        visible: control.slotType === "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
-                                        color: Kirigami.Theme.textColor
-                                    }
-                                    Rectangle {
-                                        // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                        width: slotDelegate.sketchFxPassthroughClient && slotDelegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(slotDelegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                        anchors {
-                                            left: parent.left
-                                            top: parent.top
-                                            bottom: parent.bottom
-                                        }
-                                        radius: ZUI.Theme.radius
-                                        opacity: 0.8
-                                        visible: control.slotType === "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0
-                                        color: Kirigami.Theme.textColor
-                                    }
-
-                                    property int availableWidth: width - 6
-                                    Rectangle {
-                                        anchors {
-                                            top: parent.top
-                                            left: parent.left
-                                            leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                        }
-                                        height: 1
-                                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
-                                        opacity: width > 1 ? 0.8 : 0
-                                        width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
-                                    }
-                                    Rectangle {
-                                        anchors {
-                                            left: parent.left
-                                            bottom: parent.bottom
-                                            bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
-                                            leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                        }
-                                        height: 1
-                                        color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
-                                        opacity: width > 1 ? 0.8 : 0
-                                        width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
-                                    }
-                                }
-                            }
-                        }
-
-                        // Implement a double tap gesture
-                        // On released event, start the double tap timer if it is not already running
-                        // On pressed event, if the timer is already running then it means the 2nd tap was done within given time and hence a double tap event should be emitted
-                        // On pressed event, if the timer is not running then it means it is the first click. Dont do anything as released handler will start the double tap timer
-                        Timer {
-                            id: doublePressedTimer
-                            interval: zynqtgui.ui_settings.doubleClickThreshold
-                            repeat: false
-                            onTriggered: {
-                                if (!delegateMouseArea.dragHappened) {
-                                    slotDelegate.switchToThisSlot();
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            id: delegateMouseArea
-                            property real initialMouseX
-                            property bool dragHappened: false
-
-                            anchors.fill: parent
-                            onPressed: {
-                                if (control.dragEnabled) {
-                                    delegateMouseArea.initialMouseX = mouse.x
-                                }
-                            }
-                            onReleased: {
-                                if (control.dragEnabled) {
-                                    dragHappenedResetTimer.restart();
-                                }
-                                if (control.doubleClickEnabled) {
-                                    if (doublePressedTimer.running) {
-                                        doublePressedTimer.stop();
-                                        // Double press has happened. Toggle mute/bypass state the slot
-                                        switch (control.slotType) {
-                                            case "synth":
-                                                if (slotDelegate.synthPassthroughClient) {
-                                                    slotDelegate.synthPassthroughClient.muted = !slotDelegate.synthPassthroughClient.muted;
-                                                }
-                                                break;
-                                            case "sample-trig":
-                                                if (slotDelegate.cppClipObject) {
-                                                    slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
-                                                }
-                                                break;
-                                            case "fx":
-                                                if (slotDelegate.fxPassthroughClient) {
-                                                    slotDelegate.fxPassthroughClient.bypass = !slotDelegate.fxPassthroughClient.bypass;
-                                                }
-                                                break;
-                                        }
-                                    } else {
-                                        doublePressedTimer.restart();
-                                    }
-                                } else {
-                                    slotDelegate.switchToThisSlot();
-                                }
-                            }
-                            onMouseXChanged: {
-                                if (control.dragEnabled) {
-                                    var newVal
-                                    if (control.slotType === "synth" && control.channel.checkIfLayerExists(slotDelegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                        delegateMouseArea.dragHappened = true;
-                                        let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
-                                        synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
-                                    } else if (control.slotType == "sample-trig" && control.slotData[realIndex] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                        delegateMouseArea.dragHappened = true;
-                                        slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
-                                    } else if (control.slotType == "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                        delegateMouseArea.dragHappened = true;
-                                        // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                        control.channel.set_passthroughValue("fxPassthrough", realIndex, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
-                                    } else if (control.slotType == "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                        newVal = ZUI.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                        delegateMouseArea.dragHappened = true;
-                                        // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                        control.channel.set_passthroughValue("sketchFxPassthrough", realIndex, "dryWetMixAmount", ZUI.CommonUtils.interp(newVal, 0, 1, 0, 2));
-                                    }
-                                }
-                            }
-                            onPressAndHold: {
-                                if (control.clickAndHoldEnabled && slotDelegate.highlighted && !delegateMouseArea.dragHappened) {
-                                    if (!control.channel.selectedSlot.isEmpty()) {
-                                        zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
-                                    }
-                                }
-                            }
-                            Timer {
-                                id: dragHappenedResetTimer
-                                interval: 300
-                                repeat: false
-                                onTriggered: {
-                                    delegateMouseArea.dragHappened = false
-                                }
-                            }
+                            let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
+                            synthPassthroughClient.dryGainHandler.gainAbsolute = value;
+                        } else if (control.slotType == "sample-trig" && control.slotData[realIndex] != null) {
+                            slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = value;
+                        } else if (control.slotType == "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0 ) {
+                            // dryWetMixAmount ranges from 0 to 2. Interpolate value to range from 0 to 1 to 0 to 2
+                            control.channel.set_passthroughValue("fxPassthrough", realIndex, "dryWetMixAmount", ZUI.CommonUtils.interp(value, 0, 1, 0, 2));
+                        } else if (control.slotType == "sketch-fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0 ) {
+                            // dryWetMixAmount ranges from 0 to 2. Interpolate value to range from 0 to 1 to 0 to 2
+                            control.channel.set_passthroughValue("sketchFxPassthrough", realIndex, "dryWetMixAmount", ZUI.CommonUtils.interp(value, 0, 1, 0, 2));
                         }
                     }
                 }

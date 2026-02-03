@@ -34,7 +34,6 @@ import io.zynthbox.ui 1.0 as ZUI
 import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
 
-
 ZUI.CellControl {
     id: root
 

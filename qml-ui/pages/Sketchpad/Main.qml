@@ -541,6 +541,8 @@ ZUI.ScreenPage {
      * @param sign Sign to determine if the value should be incremented / decremented. Pass 1 to increment, and -1 to decrement. Pass 0 to simply display the OSD without changing the value.
      */
     function updateClipScale(trackId, clipId, sign) {
+        let theSequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
+        let thePattern = sequence.getByClipId(trackId, clipId);
         function valueSetter(value) {
             let scaleIndex = Zynthbox.KeyScales.scaleEnumKeyToIndex(thePattern.scaleKey);
             scaleIndex = ZUI.CommonUtils.clamp(value, 0, 51);
@@ -565,8 +567,6 @@ ZUI.ScreenPage {
 
         if (-1 < trackId && trackId < Zynthbox.Plugin.sketchpadTrackCount) {
             if (-1 < clipId && clipId < Zynthbox.Plugin.sketchpadSlotCount) {
-                let theSequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
-                let thePattern = sequence.getByClipId(trackId, clipId);
                 valueSetter(Zynthbox.KeyScales.scaleEnumKeyToIndex(thePattern.scaleKey) + sign);
             } else {
                 console.log("Clip ID is out of range:", clipId);

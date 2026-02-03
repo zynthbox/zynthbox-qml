@@ -601,6 +601,23 @@ Item {
             } else {
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
                 // console.log("Toggle entry for step", stepOffset + stepButtonIndex);
+                let applyAccent = false;
+                let applyGhost = false;
+                if (zynqtgui.upButtonPressed) {
+                    zynqtgui.ignoreNextUpButtonPress = true;
+                    applyAccent = true;
+                }
+                if (zynqtgui.downButtonPressed) {
+                    zynqtgui.ignoreNextDownButtonPress = true;
+                    applyGhost = true;
+                }
+                let velocityAdjustment = applyAccent
+                    ? applyGhost
+                        ? 1 // Apply both, so we land back at 1.0 times velocity
+                        : 1.5 // Apply only accent, making it 1.5 times velocity
+                    : applyGhost
+                        ? 0.5 // Apply only ghost, making it 0.5 times velocity
+                        : 1 // Apply neither, leaving us at 1.0 times velocity
                 if (_private.heardNotes.length > 0) {
                     let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
                     let removedAtLeastOne = false;
@@ -618,7 +635,7 @@ Item {
                         var subNoteIndex = -1;
                         for (var i = 0; i < _private.heardNotes.length; ++i) {
                             subNoteIndex = workingModel.insertSubnoteSorted(padNoteRow, stepOffset + stepButtonIndex, _private.heardNotes[i]);
-                            workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "velocity", _private.heardVelocities[i]);
+                            workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(_private.heardVelocities[i] * velocityAdjustment), 1, 127));
                             if (workingModel.defaultNoteDuration > 0) {
                                 workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "duration", workingModel.defaultNoteDuration);
                             }

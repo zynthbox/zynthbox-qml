@@ -1170,20 +1170,98 @@ ZUI.SectionPanel {
                                 ColumnLayout {
                                    
                                     anchors.fill: parent
-                                    QQC2.Label {
-                                        Layout.fillWidth: true
+
+                                    ZUI.SectionGroup {
+                                        Layout.fillWidth: false
                                         Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit *1.5
-                                        font.pointSize: 9
-                                        opacity: waveformContainer.showWaveform ? 1 : 0
-                                        text: waveformContainer.clip
-                                            ? progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false
-                                                ? qsTr("Missing Wave: %1").arg(waveformContainer.clip.filename)
-                                                : qsTr("Wave : %1").arg(waveformContainer.clip.filename)
-                                        : ""
-                                        elide: Text.ElideMiddle
-                                        color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
-                                    }
+                                        implicitHeight: Kirigami.Units.gridUnit *1.5
+                                        RowLayout {
+                                           anchors.fill: parent
+                                           spacing: ZUI.Theme.spacing
+
+                                            QQC2.Label {
+                                                Layout.fillWidth: false
+                                                Layout.fillHeight: true
+                                                font.pointSize: 9
+                                                visible: waveformContainer.showWaveform
+                                                text: waveformContainer.clip
+                                                    ? progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false
+                                                        ? qsTr("Missing Wave: %1").arg(waveformContainer.clip.filename)
+                                                        : qsTr("Wave : %1").arg(waveformContainer.clip.filename)
+                                                : ""
+                                                elide: Text.ElideMiddle
+                                                color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
+                                            }
+
+                                            ZUI.SectionButton {
+                                                visible: !waveformContainer.showWaveform
+                                                Layout.fillHeight: true
+                                                Layout.minimumWidth: Kirigami.Units.gridUnit * 3
+                                                icon.name: "go-first"
+                                                onClicked: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
+                                                }
+                                            }
+
+                                             ZUI.SectionButton {
+                                                visible: !waveformContainer.showWaveform
+                                                Layout.fillHeight: true
+                                                Layout.minimumWidth: Kirigami.Units.gridUnit * 3
+                                                icon.name: "go-last"
+                                                onClicked: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
+                                                }
+                                            }
+
+                                            ZUI.SectionButton {
+                                                visible: !waveformContainer.showWaveform
+                                                Layout.fillHeight: true
+                                                Layout.minimumWidth: Kirigami.Units.gridUnit * 3
+                                                icon.name: "go-previous"
+                                                onClicked: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
+                                                }
+                                            }
+
+                                            ZUI.SectionButton {
+                                                visible: !waveformContainer.showWaveform
+                                                Layout.minimumWidth: Kirigami.Units.gridUnit * 3
+                                                Layout.fillHeight: true
+                                                icon.name: "go-next"
+                                                onClicked: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }                                    
 
                                     ZUI.SectionGroup {
                                         Layout.fillWidth: true
@@ -1373,6 +1451,7 @@ ZUI.SectionPanel {
                                                         Layout.fillWidth: true
                                                         Layout.fillHeight: true
                                                         text: qsTr("Fav")
+                                                        display: QQC2.ToolButton.IconOnly
                                                         icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
                                                         enabled: infoBar.zynthianLayer != null
                                                         checkable: false
@@ -1709,7 +1788,7 @@ ZUI.SectionPanel {
 
                                             Zynthbox.PatternModelVisualiserItem {
                                                 id: patternVisualiser
-
+                                                // visible: !root.pattern.isEmpty
                                                 anchors.fill: parent
                                                 patternModel: root.pattern
                                                 Rectangle { // Progress

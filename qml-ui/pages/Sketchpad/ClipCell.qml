@@ -107,7 +107,8 @@ ZUI.CellControl {
             id: activeItemsRow
             property string highlightColor: Kirigami.Theme.highlightColor // green "#ccaaff00"
             readonly property color tColor : Kirigami.Theme.textColor
-            property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0)
+            property color emptyColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0)
+            property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0.5)
             anchors.centerIn: parent
             spacing: 0
             visible: ["synth", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0
@@ -130,8 +131,10 @@ ZUI.CellControl {
 
                         if (occupied) {
                             return activeItemsRow.highlightColor;
-                        } else {                           
-                            return activeItemsRow.inactiveColor;
+                        } else {       
+                            if(_focusIndicator.visible && patternHasNotes)
+                                return activeItemsRow.inactiveColor                    
+                            else return activeItemsRow.emptyColor;
                         }
                     }
                     text: {
@@ -148,11 +151,12 @@ ZUI.CellControl {
                     font.bold: true
                     
                     Rectangle {
+                        id: _focusIndicator
                         height: 1
                         width: parent.width
                         anchors.top: parent.bottom
                         color: Kirigami.Theme.textColor
-                        visible:(applicationWindow().selectedChannel.selectedClip === index) && patternHasNotes && isClipEnabled  && (root.colIndex === applicationWindow().selectedChannel.id)               
+                        visible:(applicationWindow().selectedChannel.selectedClip === index) && (root.colIndex === applicationWindow().selectedChannel.id)               
                     }
                 }
             }

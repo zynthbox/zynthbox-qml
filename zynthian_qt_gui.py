@@ -469,10 +469,14 @@ class zynthian_gui(QObject):
         self.__stop_button_pressed__ = False
         self.__back_button_pressed__ = False
         self.__up_button_pressed__ = False
+        self.__ignoreNextUpButtonPress = False
         self.__select_button_pressed__ = False
         self.__left_button_pressed__ = False
+        self.__ignoreNextLeftButtonPress = False
         self.__down_button_pressed__ = False
+        self.__ignoreNextDownButtonPress = False
         self.__right_button_pressed__ = False
+        self.__ignoreNextRightButtonPress = False
         self.__knob0touched__ = False
         self.__knob1touched__ = False
         self.__knob2touched__ = False
@@ -1725,8 +1729,20 @@ class zynthian_gui(QObject):
             self.globalButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextGlobalButtonPress = False
             return
+        elif cuia == "SWITCH_ARROW_UP_RELEASED" and self.ignoreNextUpButtonPress == True:
+            self.ignoreNextUpButtonPress = False
+            return
         elif cuia == "SWITCH_SELECT_RELEASED" and self.ignoreNextSelectButtonPress == True:
             self.ignoreNextSelectButtonPress = False
+            return
+        elif cuia == "SWITCH_ARROW_LEFT_RELEASED" and self.ignoreNextLeftButtonPress == True:
+            self.ignoreNextLeftButtonPress = False
+            return
+        elif cuia == "SWITCH_ARROW_DOWN_RELEASED" and self.ignoreNextDownButtonPress == True:
+            self.ignoreNextDownButtonPress = False
+            return
+        elif cuia == "SWITCH_ARROW_RIGHT_RELEASED" and self.ignoreNextRightButtonPress == True:
+            self.ignoreNextRightButtonPress = False
             return
         elif cuia == "SWITCH_STEP1_RELEASED" and self.ignoreNextStep1ButtonPress == True:
             self.ignoreNextStep1ButtonPress = False
@@ -1823,8 +1839,20 @@ class zynthian_gui(QObject):
             if self.metronomeButtonPressed == True and self.ignoreNextMetronomeButtonPress == False:
                 self.ignoreNextMetronomeButtonPress = True
                 changedAnything = True
+            if self.upButtonPressed == True and self.ignoreNextUpButtonPress == False:
+                self.ignoreNextUpButtonPress = True
+                changedAnything = True
             if self.selectButtonPressed == True and self.ignoreNextSelectButtonPress == False:
                 self.ignoreNextSelectButtonPress = True
+                changedAnything = True
+            if self.leftButtonPressed == True and self.ignoreNextLeftButtonPress == False:
+                self.ignoreNextLeftButtonPress = True
+                changedAnything = True
+            if self.downButtonPressed == True and self.ignoreNextDownButtonPress == False:
+                self.ignoreNextDownButtonPress = True
+                changedAnything = True
+            if self.rightButtonPressed == True and self.ignoreNextRightButtonPress == False:
+                self.ignoreNextRightButtonPress = True
                 changedAnything = True
             if self.step1ButtonPressed == True and self.ignoreNextStep1ButtonPress == False:
                 self.ignoreNextStep1ButtonPress = True
@@ -5147,6 +5175,20 @@ class zynthian_gui(QObject):
     upButtonPressed = Property(bool, get_up_button_pressed, set_up_button_pressed, notify=up_button_pressed_changed)
     ### END Property upButtonPressed
 
+    ### BEGIN Property ignoreNextUpButtonPress
+    def get_ignoreNextUpButtonPress(self):
+        return self.__ignoreNextUpButtonPress
+
+    def set_ignoreNextUpButtonPress(self, val):
+        if self.__ignoreNextUpButtonPress != val:
+            self.__ignoreNextUpButtonPress = val
+            self.ignoreNextUpButtonPressChanged.emit()
+
+    ignoreNextUpButtonPressChanged = Signal()
+
+    ignoreNextUpButtonPress = Property(bool, get_ignoreNextUpButtonPress, set_ignoreNextUpButtonPress, notify=ignoreNextUpButtonPressChanged)
+    ### END Property ignoreNextUpButtonPress
+
     ### Property selectButtonPressed
     def get_select_button_pressed(self):
         return self.__select_button_pressed__
@@ -5199,6 +5241,20 @@ class zynthian_gui(QObject):
     leftButtonPressed = Property(bool, get_left_button_pressed, set_left_button_pressed, notify=left_button_pressed_changed)
     ### END Property leftButtonPressed
 
+    ### BEGIN Property ignoreNextLeftButtonPress
+    def get_ignoreNextLeftButtonPress(self):
+        return self.__ignoreNextLeftButtonPress
+
+    def set_ignoreNextLeftButtonPress(self, val):
+        if self.__ignoreNextLeftButtonPress != val:
+            self.__ignoreNextLeftButtonPress = val
+            self.ignoreNextLeftButtonPressChanged.emit()
+
+    ignoreNextLeftButtonPressChanged = Signal()
+
+    ignoreNextLeftButtonPress = Property(bool, get_ignoreNextLeftButtonPress, set_ignoreNextLeftButtonPress, notify=ignoreNextLeftButtonPressChanged)
+    ### END Property ignoreNextLeftButtonPress
+
     ### Property downButtonPressed
     def get_down_button_pressed(self):
         return self.__down_button_pressed__
@@ -5218,6 +5274,20 @@ class zynthian_gui(QObject):
     downButtonPressed = Property(bool, get_down_button_pressed, set_down_button_pressed, notify=down_button_pressed_changed)
     ### END Property downButtonPressed
 
+    ### BEGIN Property ignoreNextDownButtonPress
+    def get_ignoreNextDownButtonPress(self):
+        return self.__ignoreNextDownButtonPress
+
+    def set_ignoreNextDownButtonPress(self, val):
+        if self.__ignoreNextDownButtonPress != val:
+            self.__ignoreNextDownButtonPress = val
+            self.ignoreNextDownButtonPressChanged.emit()
+
+    ignoreNextDownButtonPressChanged = Signal()
+
+    ignoreNextDownButtonPress = Property(bool, get_ignoreNextDownButtonPress, set_ignoreNextDownButtonPress, notify=ignoreNextDownButtonPressChanged)
+    ### END Property ignoreNextDownButtonPress
+
     ### Property rightButtonPressed
     def get_right_button_pressed(self):
         return self.__right_button_pressed__
@@ -5236,6 +5306,20 @@ class zynthian_gui(QObject):
 
     rightButtonPressed = Property(bool, get_right_button_pressed, set_right_button_pressed, notify=right_button_pressed_changed)
     ### END Property rightButtonPressed
+
+    ### BEGIN Property ignoreNextRightButtonPress
+    def get_ignoreNextRightButtonPress(self):
+        return self.__ignoreNextRightButtonPress
+
+    def set_ignoreNextRightButtonPress(self, val):
+        if self.__ignoreNextRightButtonPress != val:
+            self.__ignoreNextRightButtonPress = val
+            self.ignoreNextRightButtonPressChanged.emit()
+
+    ignoreNextRightButtonPressChanged = Signal()
+
+    ignoreNextRightButtonPress = Property(bool, get_ignoreNextRightButtonPress, set_ignoreNextRightButtonPress, notify=ignoreNextRightButtonPressChanged)
+    ### END Property ignoreNextRightButtonPress
 
     ### Property anyKnobTouched
     def get_anyKnobTouched(self):

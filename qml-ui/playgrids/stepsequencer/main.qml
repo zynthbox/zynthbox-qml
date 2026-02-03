@@ -555,6 +555,7 @@ IMP.BasePlayGrid {
                 if (_private.sequence != sequence) {
                     console.log("Scene has changed, switch places!");
                     _private.sequence = sequence;
+                    _private.updateChannel();
                 }
             }
         }
@@ -1751,6 +1752,7 @@ IMP.BasePlayGrid {
                                 Connections {
                                     target: _private.sequence
                                     onModelReset: sequencerPadNoteApplicator.restart();
+                                    onIsLoadingChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: _private.activePatternModel

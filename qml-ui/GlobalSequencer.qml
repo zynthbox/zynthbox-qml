@@ -33,6 +33,8 @@ Item {
     id: component
     readonly property alias heardNotes: _private.heardNotes
     readonly property alias heardVelocities: _private.heardVelocities
+    readonly property alias sequence: _private.sequence
+    readonly property alias pattern: _private.pattern
 
     property QtObject selectedChannel: null
     readonly property alias parameterPage: _private.parameterPage
@@ -566,207 +568,17 @@ Item {
             }
         }
     }
-    function handleCuiaTemporaryMode(cuia) {
-        let result = false;
-        let temporarilyHeld = false;
-        let releaseIndex = _private.temporaryActionReleases.indexOf(cuia);
-        if (releaseIndex > -1) {
-            temporarilyHeld = _private.heldTemporaryActionBlockButtons[releaseIndex];
-        }
-        if (zynqtgui.modeButtonPressed || temporarilyHeld) {
-            let heldMode = zynqtgui.modeButtonPressed ? (zynqtgui.altButtonPressed ? 2 : 1) : false
-            switch(cuia) {
-                case "SWITCH_RECORD_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[0] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(0, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[0], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_RECORD_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[0] === 1) {
-                        component.testForSlot(0, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[0], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[0] = false;
-                    result = true;
-                    break;
-                case "SWITCH_PLAY_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[1] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(1, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[1], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_PLAY_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[1] === 1) {
-                        component.testForSlot(1, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[1], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[1] = false;
-                    result = true;
-                    break;
-                case "SWITCH_BACK_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[2] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(2, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[2], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_BACK_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[2] === 1) {
-                        component.testForSlot(2, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[2], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[2] = false;
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_UP_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[3] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(3, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[3], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_UP_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[3] === 1) {
-                        component.testForSlot(3, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[3], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[3] = false;
-                    result = true;
-                    break;
-                case "SWITCH_SELECT_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[4] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(4, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[4], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_SELECT_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[4] === 1) {
-                        component.testForSlot(4, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[4], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[4] = false;
-                    result = true;
-                    break;
-                case "SWITCH_METRONOME_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[5] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(5, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[5], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_METRONOME_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[5] === 1) {
-                        component.testForSlot(5, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[5], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[5] = false;
-                    result = true;
-                    break;
-                case "SWITCH_STOP_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[6] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(6, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[6], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_STOP_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[6] === 1) {
-                        component.testForSlot(6, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[6], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[6] = false;
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_LEFT_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[7] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(7, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[7], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_LEFT_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[7] === 1) {
-                        component.testForSlot(7, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[7], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[7] = false;
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_DOWN_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[8] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(8, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[8], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_DOWN_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[8] === 1) {
-                        component.testForSlot(8, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[8], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[8] = false;
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_RIGHT_PRESSED":
-                    _private.heldTemporaryActionBlockButtons[9] = heldMode;
-                    if (heldMode === 1) {
-                        component.testForSlot(9, true);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[9], true);
-                    }
-                    result = true;
-                    break;
-                case "SWITCH_ARROW_RIGHT_RELEASED":
-                    if (_private.heldTemporaryActionBlockButtons[9] === 1) {
-                        component.testForSlot(9, false);
-                    } else {
-                        component.musicalNoteForStep(_private.actionBlockNoteIndices[9], false);
-                    }
-                    _private.heldTemporaryActionBlockButtons[9] = false;
-                    result = true;
-                    break;
-            }
-            if (zynqtgui.modeButtonPressed && result) {
-                zynqtgui.ignoreNextModeButtonPress = true;
-            }
-        }
-        return result;
-    }
-
-    function handleStepButtonReleased(stepButtonIndex) {
+    /// BEGIN Sequencer mode cuia handling
+    function handleSequencerStepButton(stepButtonIndex, buttonDown) {
         let workingModel = _private.pattern.workingModel;
-        if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
+        if (buttonDown) {
+            if (zynqtgui.playButtonPressed) {
+                zynqtgui.ignoreNextPlayButtonPress = true;
+                // Test-play the entries of the step pressed while holding down the play button
+                let stepOffset = (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width;
+                _private.pattern.playStep(stepOffset + stepButtonIndex);
+            }
+        } else {
             if (zynqtgui.altButtonPressed) {
                 if (zynqtgui.backButtonPressed) {
                     zynqtgui.ignoreNextBackButtonPress = true;
@@ -790,7 +602,6 @@ Item {
                 let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
                 // console.log("Toggle entry for step", stepOffset + stepButtonIndex);
                 if (_private.heardNotes.length > 0) {
-                    let workingModel = _private.pattern.workingModel;
                     let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
                     let removedAtLeastOne = false;
                     // First, let's see if any of the notes in our list are already on this position, and if so, remove them
@@ -817,7 +628,495 @@ Item {
                     // TODO Pick the notes from that pad into the current selection
                 }
             }
-        } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
+        }
+    }
+    function handleCuiaSequencerMode(cuia) {
+        let returnValue = false;
+        let previouslyHeld = false;
+        let releaseIndex = _private.stepButtonReleases.indexOf(cuia);
+        if (releaseIndex > -1) {
+            if (_private.heldStepButtons[releaseIndex] === _private.interactionModeSequencer) {
+                previouslyHeld = true;
+            }
+        }
+        if (_private.effectiveInteractionMode === _private.interactionModeSequencer || previouslyHeld) {
+            let workingModel = _private.pattern.workingModel;
+            switch (cuia) {
+                case "SWITCH_STEP1_PRESSED":
+                    component.handleSequencerStepButton(0, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP1_RELEASED":
+                    component.handleSequencerStepButton(0, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_PRESSED":
+                    component.handleSequencerStepButton(1, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_RELEASED":
+                    component.handleSequencerStepButton(1, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_PRESSED":
+                    component.handleSequencerStepButton(2, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_RELEASED":
+                    component.handleSequencerStepButton(2, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_PRESSED":
+                    component.handleSequencerStepButton(3, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_RELEASED":
+                    component.handleSequencerStepButton(3, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_PRESSED":
+                    component.handleSequencerStepButton(4, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_RELEASED":
+                    component.handleSequencerStepButton(4, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_PRESSED":
+                    component.handleSequencerStepButton(5, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_RELEASED":
+                    component.handleSequencerStepButton(5, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_PRESSED":
+                    component.handleSequencerStepButton(6, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_RELEASED":
+                    component.handleSequencerStepButton(6, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_PRESSED":
+                    component.handleSequencerStepButton(7, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_RELEASED":
+                    component.handleSequencerStepButton(7, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_PRESSED":
+                    component.handleSequencerStepButton(8, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_RELEASED":
+                    component.handleSequencerStepButton(8, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_PRESSED":
+                    component.handleSequencerStepButton(9, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_RELEASED":
+                    component.handleSequencerStepButton(9, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_PRESSED":
+                    component.handleSequencerStepButton(10, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_RELEASED":
+                    component.handleSequencerStepButton(10, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_PRESSED":
+                    component.handleSequencerStepButton(11, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_RELEASED":
+                    component.handleSequencerStepButton(11, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_PRESSED":
+                    component.handleSequencerStepButton(12, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_RELEASED":
+                    component.handleSequencerStepButton(12, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_PRESSED":
+                    component.handleSequencerStepButton(13, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_RELEASED":
+                    component.handleSequencerStepButton(13, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_PRESSED":
+                    component.handleSequencerStepButton(14, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_RELEASED":
+                    component.handleSequencerStepButton(14, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_PRESSED":
+                    component.handleSequencerStepButton(15, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_RELEASED":
+                    component.handleSequencerStepButton(15, false);
+                    returnValue = true;
+                    break;
+
+                case "SWITCH_NUMBER_1_RELEASED":
+                    if (zynqtgui.anyStepButtonPressed && zynqtgui.altButtonPressed == false) {
+                        component.setParameterPage(0);
+                        component.ignoreHeldStepButtonsReleases();
+                        returnValue = true;
+                    }
+                    break;
+                case "SWITCH_NUMBER_2_RELEASED":
+                    if (zynqtgui.anyStepButtonPressed && zynqtgui.altButtonPressed == false) {
+                        component.setParameterPage(1);
+                        component.ignoreHeldStepButtonsReleases();
+                        returnValue = true;
+                    }
+                    break;
+                case "SWITCH_NUMBER_3_RELEASED":
+                    if (zynqtgui.anyStepButtonPressed && zynqtgui.altButtonPressed == false) {
+                        component.setParameterPage(2);
+                        component.ignoreHeldStepButtonsReleases();
+                        returnValue = true;
+                    }
+                    break;
+                case "SWITCH_NUMBER_4_RELEASED":
+                    if (zynqtgui.anyStepButtonPressed && zynqtgui.altButtonPressed == false) {
+                        component.setParameterPage(3);
+                        component.ignoreHeldStepButtonsReleases();
+                        returnValue = true;
+                    }
+                    break;
+                case "SWITCH_NUMBER_5_RELEASED":
+                    if (zynqtgui.anyStepButtonPressed && zynqtgui.altButtonPressed == false) {
+                        component.setParameterPage(4);
+                        component.ignoreHeldStepButtonsReleases();
+                        returnValue = true;
+                    }
+                    break;
+                case "SWITCH_PLAY_RELEASED":
+                    // When in stepsequencer mode and holding down any step button, and then tapping play, toggle enabled for that step to "on" (that is, clear enabled as it's the default)
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            workingModel.setKeyedDataValue(workingModel.barOffset + workingModel.activeBar, stepButtonIndex, "enabled", undefined);
+                            component.ignoreHeldStepButtonsReleases();
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "SWITCH_STOP_RELEASED":
+                    // When in stepsequencer mode and holding down any step button, and then tapping stop, toggle enabled for that step to "off" (that is, set the value to false)
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            workingModel.setKeyedDataValue(workingModel.barOffset + workingModel.activeBar, stepButtonIndex, "enabled", false);
+                            component.ignoreHeldStepButtonsReleases();
+                            returnValue = true;
+                        }
+                    }
+                    break;
+
+                // K1 controls velocity (but don't steal the star button's interaction if held)
+                case "KNOB0_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                switch (_private.parameterPage) {
+                                    case 2:
+                                        component.updateStepRatchetStyle(0, stepButtonIndex);
+                                        break;
+                                    case 1:
+                                        component.updateStepProbability(0, stepButtonIndex);
+                                        break;
+                                    case 0:
+                                    default:
+                                        component.updateStepVelocity(0, stepButtonIndex);
+                                        break;
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+                case "KNOB0_RELEASED":
+                    break;
+                case "KNOB0_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                switch (_private.parameterPage) {
+                                    case 2:
+                                        component.updateStepRatchetStyle(1, stepButtonIndex);
+                                        break;
+                                    case 1:
+                                        component.updateStepProbability(1, stepButtonIndex);
+                                        break;
+                                    case 0:
+                                    default:
+                                        component.updateStepVelocity(1, stepButtonIndex);
+                                        break;
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+                case "KNOB0_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                switch (_private.parameterPage) {
+                                    case 2:
+                                        component.updateStepRatchetStyle(-1, stepButtonIndex);
+                                        break;
+                                    case 1:
+                                        component.updateStepProbability(-1, stepButtonIndex);
+                                        break;
+                                    case 0:
+                                    default:
+                                        component.updateStepVelocity(-1, stepButtonIndex);
+                                        break;
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+
+                // K2 controls length
+                case "KNOB1_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetCount(0, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepDuration(0, stepButtonIndex);
+                                    break;
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB1_RELEASED":
+                    break;
+                case "KNOB1_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetCount(1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepDuration(1, stepButtonIndex);
+                                    break;
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB1_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetCount(-1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepDuration(-1, stepButtonIndex);
+                                    break;
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+
+                // K3 controls position
+                case "KNOB2_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetProbability(0, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    component.updateStepNextStep(0, stepButtonIndex);
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepPosition(0, stepButtonIndex);
+                                    break;
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB2_RELEASED":
+                    break;
+                case "KNOB2_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetProbability(1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    component.updateStepNextStep(1, stepButtonIndex);
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepPosition(1, stepButtonIndex);
+                                    break;
+                            }
+                            returnValue = true;
+                            break;
+                        }
+                    }
+                    break;
+                case "KNOB2_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            switch (_private.parameterPage) {
+                                case 2:
+                                    component.updateStepRatchetProbability(-1, stepButtonIndex);
+                                    break;
+                                case 1:
+                                    component.updateStepNextStep(-1, stepButtonIndex);
+                                    break;
+                                case 0:
+                                default:
+                                    component.updateStepPosition(-1, stepButtonIndex);
+                                    break;
+                            }
+                            returnValue = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                // BK controls the note values (transposing the note, and also adjusting the current global captured note, so the display keeps making sense)
+                // - hold star button and scroll BK to change the current pattern's key (this being global, don't steal if star button is pressed)
+                case "KNOB3_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    break;
+                case "KNOB3_RELEASED":
+                    component.ignoreHeldStepButtonsReleases();
+                    // Release doesn't really want anything doing...
+                    break;
+                case "KNOB3_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                let transposeOctave = false;
+                                if (zynqtgui.knob3Pressed) {
+                                    zynqtgui.ignoreNextKnob3PressedPress = true;
+                                    transposeOctave = true;
+                                }
+                                if (zynqtgui.altButtonPressed) {
+                                    // Hold down a bar button and twist BK to transpose all that bar's notes
+                                    if (stepButtonIndex < 8) {
+                                        workingModel.startLongOperation();
+                                        for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
+                                            workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, 1, -1, transposeOctave);
+                                        }
+                                        workingModel.endLongOperation();
+                                    }
+                                } else {
+                                    // Hold down a step button and twist BK to transpose that step's notes
+                                    workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, 1, -1, transposeOctave);
+                                    let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
+                                    let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
+                                    if (theNote) {
+                                        applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
+                                            .arg(stepIndex + 1)
+                                            .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
+                                            , 1000);
+                                        component.handleStepDataChanged(stepIndex);
+                                    }
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+                case "KNOB3_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                let transposeOctave = false;
+                                if (zynqtgui.knob3Pressed) {
+                                    zynqtgui.ignoreNextKnob3PressedPress = true;
+                                    transposeOctave = true;
+                                }
+                                if (zynqtgui.altButtonPressed) {
+                                    // Hold down a bar button and twist BK to transpose all that bar's notes
+                                    if (stepButtonIndex < 8) {
+                                        workingModel.startLongOperation();
+                                        for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
+                                            workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, -1, -1, transposeOctave);
+                                        }
+                                        workingModel.endLongOperation();
+                                    }
+                                } else {
+                                    // Hold down a step button and twist BK to transpose that step's notes
+                                    workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, -1, -1, transposeOctave);
+                                    let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
+                                    let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
+                                    if (theNote) {
+                                        applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
+                                            .arg(stepIndex + 1)
+                                            .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
+                                            , 1000);
+                                        component.handleStepDataChanged(stepIndex);
+                                    }
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        return returnValue;
+    }
+    /// END Sequencer mode cuia handling
+    /// BEGIN Track/Clip mode cuia handling
+    function handleTrackClipStepButton(stepButtonIndex, buttonDown) {
+        if (buttonDown) {
+            // No down action for track/clip
+        } else {
             if (zynqtgui.backButtonPressed) {
                 zynqtgui.ignoreNextBackButtonPress = true;
                 // Clear the track/clip contents when holding down the back button and pressing a step
@@ -832,37 +1131,510 @@ Item {
                     component.selectedChannel.selectedClip = stepButtonIndex - 11;
                 }
             }
-        } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-            component.musicalNoteForStep(stepButtonIndex, false);
-        } else if (_private.effectiveInteractionMode === _private.interactionModeVelocityKeys) {
-            // If we've released all the buttons... stop any active notes (to allow for aftertouch to be a thing)
-            let anyHeldButton = false;
-            for (let buttonIndex = 0; buttonIndex < _private.heldStepButtons.length; ++buttonIndex) {
-                if (_private.heldStepButtons[buttonIndex]) {
-                    anyHeldButton = true;
+        }
+    }
+    function handleCuiaTrackClipMode(cuia) {
+        let returnValue = false;
+        let previouslyHeld = false;
+        let releaseIndex = _private.stepButtonReleases.indexOf(cuia);
+        if (releaseIndex > -1) {
+            if (_private.heldStepButtons[releaseIndex] === _private.interactionModeTrackClip) {
+                previouslyHeld = true;
+            }
+        }
+        if (_private.effectiveInteractionMode === _private.interactionModeTrackClip || previouslyHeld) {
+            switch (cuia) {
+                case "SWITCH_STEP1_PRESSED":
+                    component.handleTrackClipStepButton(0, true);
+                    returnValue = true;
                     break;
-                }
+                case "SWITCH_STEP1_RELEASED":
+                    component.handleTrackClipStepButton(0, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_PRESSED":
+                    component.handleTrackClipStepButton(1, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_RELEASED":
+                    component.handleTrackClipStepButton(1, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_PRESSED":
+                    component.handleTrackClipStepButton(2, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_RELEASED":
+                    component.handleTrackClipStepButton(2, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_PRESSED":
+                    component.handleTrackClipStepButton(3, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_RELEASED":
+                    component.handleTrackClipStepButton(3, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_PRESSED":
+                    component.handleTrackClipStepButton(4, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_RELEASED":
+                    component.handleTrackClipStepButton(4, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_PRESSED":
+                    component.handleTrackClipStepButton(5, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_RELEASED":
+                    component.handleTrackClipStepButton(5, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_PRESSED":
+                    component.handleTrackClipStepButton(6, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_RELEASED":
+                    component.handleTrackClipStepButton(6, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_PRESSED":
+                    component.handleTrackClipStepButton(7, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_RELEASED":
+                    component.handleTrackClipStepButton(7, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_PRESSED":
+                    component.handleTrackClipStepButton(8, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_RELEASED":
+                    component.handleTrackClipStepButton(8, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_PRESSED":
+                    component.handleTrackClipStepButton(9, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_RELEASED":
+                    component.handleTrackClipStepButton(9, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_PRESSED":
+                    component.handleTrackClipStepButton(10, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_RELEASED":
+                    component.handleTrackClipStepButton(10, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_PRESSED":
+                    component.handleTrackClipStepButton(11, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_RELEASED":
+                    component.handleTrackClipStepButton(11, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_PRESSED":
+                    component.handleTrackClipStepButton(12, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_RELEASED":
+                    component.handleTrackClipStepButton(12, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_PRESSED":
+                    component.handleTrackClipStepButton(13, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_RELEASED":
+                    component.handleTrackClipStepButton(13, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_PRESSED":
+                    component.handleTrackClipStepButton(14, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_RELEASED":
+                    component.handleTrackClipStepButton(14, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_PRESSED":
+                    component.handleTrackClipStepButton(15, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_RELEASED":
+                    component.handleTrackClipStepButton(15, false);
+                    returnValue = true;
+                    break;
+
+                // K1 controls velocity (but don't steal the star button's interaction)
+                case "KNOB0_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                if (stepButtonIndex < 10) {
+                                    applicationWindow().updateChannelVolume(0, stepButtonIndex);
+                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Clip button + k1 adjusts the clip's step length
+                                    component.updatePatternProperty(0, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+                case "KNOB0_RELEASED":
+                    break;
+                case "KNOB0_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                if (stepButtonIndex < 10) {
+                                    applicationWindow().updateChannelVolume(1, stepButtonIndex);
+                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Clip button + k1 adjusts the clip's step length
+                                    component.updatePatternProperty(1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+                case "KNOB0_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().updateChannelVolume(-1, stepButtonIndex);
+                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip button + k1 adjusts the clip's step length
+                                component.updatePatternProperty(-1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+
+                // K2 controls length
+                case "KNOB1_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
+                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k2 adjusts the pattern's swing
+                                component.updatePatternProperty(0, "swing", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB1_RELEASED":
+                    break;
+                case "KNOB1_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
+                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k2 adjusts the pattern's swing
+                                component.updatePatternProperty(1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB1_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            if (stepButtonIndex < 10) {
+                                applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
+                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k2 adjusts the pattern's swing
+                                component.updatePatternProperty(-1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+
+                // K3 controls position
+                case "KNOB2_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k3 adjusts pattern length
+                                component.updatePatternProperty(0, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB2_RELEASED":
+                    break;
+                case "KNOB2_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k3 adjusts pattern length
+                                component.updatePatternProperty(1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                            returnValue = true;
+                            // The mod value is global, so only send that once per twist
+                            break;
+                        }
+                    }
+                    break;
+                case "KNOB2_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                // Clip+k3 adjusts pattern length
+                                component.updatePatternProperty(-1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            }
+                            returnValue = true;
+                            // The mod value is global, so only send that once per twist
+                            break;
+                        }
+                    }
+                    break;
+
+                // BK controls the note values (transposing the note, and also adjusting the current global captured note, so the display keeps making sense)
+                // - hold star button and scroll BK to change the current pattern's key
+                case "KNOB3_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    break;
+                case "KNOB3_RELEASED":
+                    component.ignoreHeldStepButtonsReleases();
+                    break;
+                case "KNOB3_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Hold down a clip button and twist BK to transpose all notes in that clip
+                                    let workingModel = _private.sequence.getClipById(component.selectedChannel.id, stepButtonIndex - 10).workingModel;
+                                    workingModel.startLongOperation();
+                                    let allDone = false;
+                                    for (let row = 0; row < workingModel.bankLength; ++row) {
+                                        for (let column = 0; column < workingModel.width; ++column) {
+                                            if ((row * workingModel.width) + column == workingModel.patternLength) {
+                                                allDone = true;
+                                                break;
+                                            }
+                                            workingModel.transposeNote(row, column, 1);
+                                        }
+                                        if (allDone) { break; }
+                                    }
+                                    workingModel.endLongOperation();
+                                    returnValue = true;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case "KNOB3_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Hold down a clip button and twist BK to transpose all notes in that clip
+                                    let workingModel = _private.sequence.getClipById(component.selectedChannel.id, stepButtonIndex - 10).workingModel;
+                                    workingModel.startLongOperation();
+                                    let allDone = false;
+                                    for (let row = 0; row < workingModel.bankLength; ++row) {
+                                        for (let column = 0; column < workingModel.width; ++column) {
+                                            if ((row * workingModel.width) + column == workingModel.patternLength) {
+                                                allDone = true;
+                                                break;
+                                            }
+                                            workingModel.transposeNote(row, column, -1);
+                                        }
+                                        if (allDone) { break; }
+                                    }
+                                    workingModel.endLongOperation();
+                                    returnValue = true;
+                                }
+                            }
+                        }
+                    }
+                    break;
             }
-            if (anyHeldButton === false) {
-                for (let noteIndex = 0; noteIndex < _private.velocityKeyNotesActive.length; ++noteIndex) {
-                    _private.velocityKeyNotesActive[noteIndex].setOff();
-                    _private.velocityKeyNotesActive[noteIndex].sendPitchChange(0);
-                }
-                _private.velocityKeyNotesActive = [];
-            }
-        } else if (_private.effectiveInteractionMode === _private.interactionModeSlots) {
+        }
+        return returnValue;
+    }
+    /// END Track/Clip mode cuia handling
+    /// BEGIN Slots mode cuia handling
+    function handleSlotsStepButton(stepButtonIndex, buttonDown) {
+        if (buttonDown) {
+            component.testForSlot(stepButtonIndex, true);
+        } else {
             component.testForSlot(stepButtonIndex, false);
         }
     }
-    function handleStepButtonDown(stepButtonIndex) {
-        if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-            if (zynqtgui.playButtonPressed) {
-                zynqtgui.ignoreNextPlayButtonPress = true;
-                // Test-play the entries of the step pressed while holding down the play button
-                let stepOffset = (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width;
-                _private.pattern.playStep(stepOffset + stepButtonIndex);
+    function handleCuiaSlotsMode(cuia) {
+        let returnValue = false;
+        let previouslyHeld = false;
+        let releaseIndex = _private.stepButtonReleases.indexOf(cuia);
+        if (releaseIndex > -1) {
+            if (_private.heldStepButtons[releaseIndex] === _private.interactionModeSlots) {
+                previouslyHeld = true;
             }
-        } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
+        }
+        if (_private.effectiveInteractionMode === _private.interactionModeSlots || previouslyHeld) {
+            switch (cuia) {
+                case "SWITCH_STEP1_PRESSED":
+                    component.handleSlotsStepButton(0, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP1_RELEASED":
+                    component.handleSlotsStepButton(0, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_PRESSED":
+                    component.handleSlotsStepButton(1, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_RELEASED":
+                    component.handleSlotsStepButton(1, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_PRESSED":
+                    component.handleSlotsStepButton(2, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_RELEASED":
+                    component.handleSlotsStepButton(2, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_PRESSED":
+                    component.handleSlotsStepButton(3, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_RELEASED":
+                    component.handleSlotsStepButton(3, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_PRESSED":
+                    component.handleSlotsStepButton(4, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_RELEASED":
+                    component.handleSlotsStepButton(4, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_PRESSED":
+                    component.handleSlotsStepButton(5, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_RELEASED":
+                    component.handleSlotsStepButton(5, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_PRESSED":
+                    component.handleSlotsStepButton(6, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_RELEASED":
+                    component.handleSlotsStepButton(6, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_PRESSED":
+                    component.handleSlotsStepButton(7, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_RELEASED":
+                    component.handleSlotsStepButton(7, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_PRESSED":
+                    component.handleSlotsStepButton(8, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_RELEASED":
+                    component.handleSlotsStepButton(8, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_PRESSED":
+                    component.handleSlotsStepButton(9, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_RELEASED":
+                    component.handleSlotsStepButton(9, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_PRESSED":
+                    component.handleSlotsStepButton(10, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_RELEASED":
+                    component.handleSlotsStepButton(10, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_PRESSED":
+                    component.handleSlotsStepButton(11, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_RELEASED":
+                    component.handleSlotsStepButton(11, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_PRESSED":
+                    component.handleSlotsStepButton(12, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_RELEASED":
+                    component.handleSlotsStepButton(12, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_PRESSED":
+                    component.handleSlotsStepButton(13, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_RELEASED":
+                    component.handleSlotsStepButton(13, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_PRESSED":
+                    component.handleSlotsStepButton(14, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_RELEASED":
+                    component.handleSlotsStepButton(14, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_PRESSED":
+                    component.handleSlotsStepButton(15, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_RELEASED":
+                    component.handleSlotsStepButton(15, false);
+                    returnValue = true;
+                    break;
+            }
+        }
+        return returnValue;
+    }
+    /// END Slots mode cuia handling
+    /// BEGIN Musical Keys mode cuia handling
+    function handleMusicalKeysStepButton(stepButtonIndex, buttonDown) {
+        if (buttonDown) {
             if (zynqtgui.altButtonPressed) {
                 let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                 if (stepButtonIndex < 11) {
@@ -883,7 +1655,325 @@ Item {
             } else {
                 component.musicalNoteForStep(stepButtonIndex, true);
             }
-        } else if (_private.effectiveInteractionMode === _private.interactionModeVelocityKeys) {
+        } else {
+            component.musicalNoteForStep(stepButtonIndex, false);
+        }
+    }
+    function handleCuiaMusicalKeysMode(cuia) {
+        let returnValue = false;
+        let previouslyHeld = false;
+        let releaseIndex = _private.stepButtonReleases.indexOf(cuia);
+        if (releaseIndex > -1) {
+            if (_private.heldStepButtons[releaseIndex] === _private.interactionModeMusicalKeys) {
+                previouslyHeld = true;
+            }
+        }
+        if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys || previouslyHeld) {
+            switch (cuia) {
+                case "SWITCH_STEP1_PRESSED":
+                    component.handleMusicalKeysStepButton(0, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP1_RELEASED":
+                    component.handleMusicalKeysStepButton(0, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_PRESSED":
+                    component.handleMusicalKeysStepButton(1, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_RELEASED":
+                    component.handleMusicalKeysStepButton(1, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_PRESSED":
+                    component.handleMusicalKeysStepButton(2, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_RELEASED":
+                    component.handleMusicalKeysStepButton(2, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_PRESSED":
+                    component.handleMusicalKeysStepButton(3, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_RELEASED":
+                    component.handleMusicalKeysStepButton(3, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_PRESSED":
+                    component.handleMusicalKeysStepButton(4, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_RELEASED":
+                    component.handleMusicalKeysStepButton(4, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_PRESSED":
+                    component.handleMusicalKeysStepButton(5, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_RELEASED":
+                    component.handleMusicalKeysStepButton(5, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_PRESSED":
+                    component.handleMusicalKeysStepButton(6, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_RELEASED":
+                    component.handleMusicalKeysStepButton(6, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_PRESSED":
+                    component.handleMusicalKeysStepButton(7, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_RELEASED":
+                    component.handleMusicalKeysStepButton(7, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_PRESSED":
+                    component.handleMusicalKeysStepButton(8, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_RELEASED":
+                    component.handleMusicalKeysStepButton(8, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_PRESSED":
+                    component.handleMusicalKeysStepButton(9, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_RELEASED":
+                    component.handleMusicalKeysStepButton(9, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_PRESSED":
+                    component.handleMusicalKeysStepButton(10, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_RELEASED":
+                    component.handleMusicalKeysStepButton(10, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_PRESSED":
+                    component.handleMusicalKeysStepButton(11, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_RELEASED":
+                    component.handleMusicalKeysStepButton(11, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_PRESSED":
+                    component.handleMusicalKeysStepButton(12, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_RELEASED":
+                    component.handleMusicalKeysStepButton(12, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_PRESSED":
+                    component.handleMusicalKeysStepButton(13, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_RELEASED":
+                    component.handleMusicalKeysStepButton(13, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_PRESSED":
+                    component.handleMusicalKeysStepButton(14, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_RELEASED":
+                    component.handleMusicalKeysStepButton(14, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_PRESSED":
+                    component.handleMusicalKeysStepButton(15, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_RELEASED":
+                    component.handleMusicalKeysStepButton(15, false);
+                    returnValue = true;
+                    break;
+
+                // K1 controls velocity (but don't eat the star button's interaction)
+                case "KNOB0_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            // Send aftertouch to any held note - no display, so don't actually do anything for touched
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB0_RELEASED":
+                    break;
+                case "KNOB0_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                // Send aftertouch to any held note
+                                let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                                if (stepNote) {
+                                    if (_private.stepKeyPolyphonicAftertouch[stepButtonIndex] < 127) {
+                                        _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = _private.stepKeyPolyphonicAftertouch[stepButtonIndex] + 1;
+                                        stepNote.sendPolyphonicAftertouch(_private.stepKeyPolyphonicAftertouch[stepButtonIndex]);
+                                    }
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+                case "KNOB0_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                // Send aftertouch to any held note
+                                let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                                if (stepNote) {
+                                    if (0 < _private.stepKeyPolyphonicAftertouch[stepButtonIndex]) {
+                                        _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = _private.stepKeyPolyphonicAftertouch[stepButtonIndex] - 1;
+                                        stepNote.sendPolyphonicAftertouch(_private.stepKeyPolyphonicAftertouch[stepButtonIndex]);
+                                    }
+                                }
+                                returnValue = true;
+                            }
+                        }
+                    }
+                    break;
+
+                // K2 controls length
+                case "KNOB1_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            // Send pitch bend to any active note - no display, so don't actually do anything here
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB1_RELEASED":
+                    break;
+                case "KNOB1_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            // Send pitch bend to any held note
+                            let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                            if (stepNote) {
+                                if (_private.stepKeyPitchBend[stepButtonIndex] < 1) {
+                                    _private.stepKeyPitchBend[stepButtonIndex] = Math.min(_private.stepKeyPitchBend[stepButtonIndex] + 0.005, 1);
+                                    stepNote.sendPitchChange(Math.max(-8192, Math.min(_private.stepKeyPitchBend[stepButtonIndex] * 8192, 8191)));
+                                }
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB1_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            // Send pitch bend to any held note
+                            let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
+                            if (stepNote) {
+                                if (-1 < _private.stepKeyPitchBend[stepButtonIndex]) {
+                                    _private.stepKeyPitchBend[stepButtonIndex] = Math.max(-1, _private.stepKeyPitchBend[stepButtonIndex] - 0.005);
+                                    stepNote.sendPitchChange(Math.max(-8192, Math.min(_private.stepKeyPitchBend[stepButtonIndex] * 8192, 8191)));
+                                }
+                            }
+                            returnValue = true;
+                        }
+                    }
+                    break;
+
+                // K3 controls position
+                case "KNOB2_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            // Send mod wheel to any held note - no display, so don't actually do anything here
+                            returnValue = true;
+                        }
+                    }
+                    break;
+                case "KNOB2_RELEASED":
+                    break;
+                case "KNOB2_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            // Send mod wheel to any held note
+                            _private.modulationValue = Math.max(0, Math.min(_private.modulationValue + 1, 127));
+                            returnValue = true;
+                            // The mod value is global, so only send that once per twist
+                            break;
+                        }
+                    }
+                    break;
+                case "KNOB2_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
+                        if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                            // Send mod wheel to any held note
+                            _private.modulationValue = Math.max(0, Math.min(_private.modulationValue - 1, 127));
+                            returnValue = true;
+                            // The mod value is global, so only send that once per twist
+                            break;
+                        }
+                    }
+                    break;
+
+                // BK controls the note values (transposing the note, and also adjusting the current global captured note, so the display keeps making sense)
+                // - hold star button and scroll BK to change the current pattern's key
+                case "KNOB3_TOUCHED":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        if (zynqtgui.altButtonPressed) {
+                            applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
+                            returnValue = true;
+                        } else {
+                        }
+                    }
+                    break;
+                case "KNOB3_RELEASED":
+                    component.ignoreHeldStepButtonsReleases();
+                    // Release doesn't really want anything doing...
+                    break;
+                case "KNOB3_UP":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        if (zynqtgui.altButtonPressed) {
+                            applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
+                            returnValue = true;
+                        } else {
+                        }
+                    }
+                    break;
+                case "KNOB3_DOWN":
+                    component.ignoreHeldStepButtonsReleases();
+                    if (zynqtgui.starButtonPressed === false) {
+                        if (zynqtgui.altButtonPressed) {
+                            applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
+                            returnValue = true;
+                        } else {
+                        }
+                    }
+                    break;
+            }
+        }
+        return returnValue;
+    }
+    /// END Musical Keys mode cuia handling
+    /// BEGIN Velocity Keys mode cuia handling
+    function handleVelocityKeysStepButton(stepButtonIndex, buttonDown) {
+        if (buttonDown) {
             // Stop any currently active notes (because multiple velocities is a little odd when it's all the same notes)
             if (_private.velocityKeyNotesActive.length > 0) {
                 // If we've got active notes, treat the new button as aftertouch
@@ -900,10 +1990,515 @@ Item {
                 }
                 _private.velocityKeyNotesActive = newNotes;
             }
-        } else if (_private.effectiveInteractionMode === _private.interactionModeSlots) {
-            component.testForSlot(stepButtonIndex, true);
+        } else {
+            // If we've released all the buttons... stop any active notes (to allow for aftertouch to be a thing)
+            let anyHeldButton = false;
+            for (let buttonIndex = 0; buttonIndex < _private.heldStepButtons.length; ++buttonIndex) {
+                if (_private.heldStepButtons[buttonIndex]) {
+                    anyHeldButton = true;
+                    break;
+                }
+            }
+            if (anyHeldButton === false) {
+                for (let noteIndex = 0; noteIndex < _private.velocityKeyNotesActive.length; ++noteIndex) {
+                    _private.velocityKeyNotesActive[noteIndex].setOff();
+                    _private.velocityKeyNotesActive[noteIndex].sendPitchChange(0);
+                }
+                _private.velocityKeyNotesActive = [];
+            }
         }
     }
+    function handleCuiaVelocityKeysMode(cuia) {
+        let returnValue = false;
+        let previouslyHeld = false;
+        let releaseIndex = _private.stepButtonReleases.indexOf(cuia);
+        if (releaseIndex > -1) {
+            if (_private.heldStepButtons[releaseIndex] === _private.interactionModeVelocityKeys) {
+                previouslyHeld = true;
+            }
+        }
+        if (_private.effectiveInteractionMode === _private.interactionModeVelocityKeys || previouslyHeld) {
+            switch (cuia) {
+                case "SWITCH_STEP1_PRESSED":
+                    component.handleVelocityKeysStepButton(0, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP1_RELEASED":
+                    component.handleVelocityKeysStepButton(0, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_PRESSED":
+                    component.handleVelocityKeysStepButton(1, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP2_RELEASED":
+                    component.handleVelocityKeysStepButton(1, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_PRESSED":
+                    component.handleVelocityKeysStepButton(2, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP3_RELEASED":
+                    component.handleVelocityKeysStepButton(2, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_PRESSED":
+                    component.handleVelocityKeysStepButton(3, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP4_RELEASED":
+                    component.handleVelocityKeysStepButton(3, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_PRESSED":
+                    component.handleVelocityKeysStepButton(4, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP5_RELEASED":
+                    component.handleVelocityKeysStepButton(4, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_PRESSED":
+                    component.handleVelocityKeysStepButton(5, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP6_RELEASED":
+                    component.handleVelocityKeysStepButton(5, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_PRESSED":
+                    component.handleVelocityKeysStepButton(6, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP7_RELEASED":
+                    component.handleVelocityKeysStepButton(6, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_PRESSED":
+                    component.handleVelocityKeysStepButton(7, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP8_RELEASED":
+                    component.handleVelocityKeysStepButton(7, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_PRESSED":
+                    component.handleVelocityKeysStepButton(8, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP9_RELEASED":
+                    component.handleVelocityKeysStepButton(8, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_PRESSED":
+                    component.handleVelocityKeysStepButton(9, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP10_RELEASED":
+                    component.handleVelocityKeysStepButton(9, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_PRESSED":
+                    component.handleVelocityKeysStepButton(10, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP11_RELEASED":
+                    component.handleVelocityKeysStepButton(10, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_PRESSED":
+                    component.handleVelocityKeysStepButton(11, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP12_RELEASED":
+                    component.handleVelocityKeysStepButton(11, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_PRESSED":
+                    component.handleVelocityKeysStepButton(12, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP13_RELEASED":
+                    component.handleVelocityKeysStepButton(12, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_PRESSED":
+                    component.handleVelocityKeysStepButton(13, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP14_RELEASED":
+                    component.handleVelocityKeysStepButton(13, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_PRESSED":
+                    component.handleVelocityKeysStepButton(14, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP15_RELEASED":
+                    component.handleVelocityKeysStepButton(14, false);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_PRESSED":
+                    component.handleVelocityKeysStepButton(15, true);
+                    returnValue = true;
+                    break;
+                case "SWITCH_STEP16_RELEASED":
+                    component.handleVelocityKeysStepButton(15, false);
+                    returnValue = true;
+                    break;
+            }
+        }
+        return returnValue;
+    }
+    /// END Velocity Keys mode cuia handling
+    /// BEGIN Temporary mode cuia handling
+    function handleCuiaTemporaryMode(cuia) {
+        let returnValue = false;
+        let previouslyHeld = false;
+        let releaseIndex = _private.temporaryActionReleases.indexOf(cuia);
+        if (releaseIndex > -1) {
+            previouslyHeld = _private.heldTemporaryActionBlockButtons[releaseIndex];
+        }
+        if (zynqtgui.modeButtonPressed || previouslyHeld) {
+            let heldMode = zynqtgui.modeButtonPressed ? (zynqtgui.altButtonPressed ? 2 : 1) : false
+            switch(cuia) {
+                case "SWITCH_RECORD_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[0] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(0, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[0], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_RECORD_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[0] === 1) {
+                        component.testForSlot(0, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[0], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[0] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_PLAY_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[1] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(1, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[1], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_PLAY_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[1] === 1) {
+                        component.testForSlot(1, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[1], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[1] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_BACK_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[2] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(2, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[2], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_BACK_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[2] === 1) {
+                        component.testForSlot(2, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[2], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[2] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_UP_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[3] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(3, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[3], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_UP_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[3] === 1) {
+                        component.testForSlot(3, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[3], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[3] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_SELECT_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[4] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(4, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[4], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_SELECT_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[4] === 1) {
+                        component.testForSlot(4, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[4], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[4] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_METRONOME_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[5] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(5, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[5], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_METRONOME_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[5] === 1) {
+                        component.testForSlot(5, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[5], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[5] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_STOP_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[6] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(6, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[6], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_STOP_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[6] === 1) {
+                        component.testForSlot(6, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[6], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[6] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_LEFT_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[7] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(7, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[7], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_LEFT_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[7] === 1) {
+                        component.testForSlot(7, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[7], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[7] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_DOWN_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[8] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(8, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[8], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_DOWN_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[8] === 1) {
+                        component.testForSlot(8, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[8], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[8] = false;
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_RIGHT_PRESSED":
+                    _private.heldTemporaryActionBlockButtons[9] = heldMode;
+                    if (heldMode === 1) {
+                        component.testForSlot(9, true);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[9], true);
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_ARROW_RIGHT_RELEASED":
+                    if (_private.heldTemporaryActionBlockButtons[9] === 1) {
+                        component.testForSlot(9, false);
+                    } else {
+                        component.musicalNoteForStep(_private.actionBlockNoteIndices[9], false);
+                    }
+                    _private.heldTemporaryActionBlockButtons[9] = false;
+                    returnValue = true;
+                    break;
+            }
+            if (zynqtgui.modeButtonPressed && returnValue) {
+                zynqtgui.ignoreNextModeButtonPress = true;
+            }
+        }
+        return returnValue;
+    }
+    /// END Temporary mode cuia handling
+
+    /// BEGIN Star button cuia handling
+    function handleCuiaStarButton(cuia) {
+        let returnValue = false;
+        switch (cuia) {
+            // K1 controls velocity
+            case "KNOB0_TOUCHED":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
+                    returnValue = true;
+                }
+                break;
+            case "KNOB0_RELEASED":
+                break;
+            case "KNOB0_UP":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
+                    returnValue = true;
+                }
+                break;
+            case "KNOB0_DOWN":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
+                    returnValue = true;
+                }
+                break;
+
+            // K2 controls length
+            case "KNOB1_TOUCHED":
+                component.ignoreHeldStepButtonsReleases();
+                break;
+            case "KNOB1_RELEASED":
+                break;
+            case "KNOB1_UP":
+                component.ignoreHeldStepButtonsReleases();
+                break;
+            case "KNOB1_DOWN":
+                component.ignoreHeldStepButtonsReleases();
+                break;
+
+            // K3 controls position
+            case "KNOB2_TOUCHED":
+                component.ignoreHeldStepButtonsReleases();
+                break;
+            case "KNOB2_RELEASED":
+                break;
+            case "KNOB2_UP":
+                component.ignoreHeldStepButtonsReleases();
+                break;
+            case "KNOB2_DOWN":
+                component.ignoreHeldStepButtonsReleases();
+                break;
+
+            // BK controls the note values (transposing the note, and also adjusting the current global captured note, so the display keeps making sense)
+            // - hold star button and scroll BK to change the current pattern's key
+            case "KNOB3_TOUCHED":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
+                        .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
+                        .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
+                        .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
+                        , 1000);
+                    returnValue = true;
+                }
+                break;
+            case "KNOB3_RELEASED":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    // Release doesn't really want anything doing...
+                }
+                break;
+            case "KNOB3_UP":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
+                    if (currentKey > 0) {
+                        if (zynqtgui.selectButtonPressed) {
+                            zynqtgui.ignoreNextSelectButtonPress = true;
+                            currentKey = Math.min(127, currentKey + 12);
+                        } else {
+                            currentKey = Math.min(127, currentKey + 1);
+                        }
+                        _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
+                        _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
+                    }
+                    applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
+                        .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
+                        .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
+                        .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
+                        , 1000);
+                    // Since we're holding the key down while we're here, restart the note when we do the twist here
+                    _private.starNote.setOff();
+                    _private.starNote.sendPitchChange(0);
+                    _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                    _private.starNote.setOn(_private.starVelocity);
+                    returnValue = true;
+                }
+                break;
+            case "KNOB3_DOWN":
+                component.ignoreHeldStepButtonsReleases();
+                if (zynqtgui.starButtonPressed) {
+                    let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
+                    if (currentKey < 127) {
+                        if (zynqtgui.selectButtonPressed) {
+                            zynqtgui.ignoreNextSelectButtonPress = true;
+                            currentKey = Math.max(0, currentKey - 12);
+                        } else {
+                            currentKey = currentKey - 1;
+                        }
+                        _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
+                        _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
+                    }
+                    applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
+                        .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
+                        .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
+                        .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
+                        , 1000);
+                    // Since we're holding the key down while we're here, restart the note when we do the twist here
+                    _private.starNote.setOff();
+                    _private.starNote.sendPitchChange(0);
+                    _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                    _private.starNote.setOn(_private.starVelocity);
+                    returnValue = true;
+                }
+                break;
+
+            case "SWITCH_STAR_PRESSED":
+                // Note-on for the current pattern's key, save the note value in _private so we can be sure it's the same one being turned off again if people change clips or whatever while holding down the thing
+                _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
+                _private.starNote.setOn(_private.starVelocity);
+                returnValue = true;
+                break;
+            case "SWITCH_STAR_RELEASED":
+                // Note-off for whatever's stored on the _private.starNote property, and then remove it
+                _private.starNote.setOff();
+                _private.starNote.sendPitchChange(0);
+                _private.starNote = null;
+                returnValue = true;
+                break;
+        }
+        return returnValue;
+    }
+    /// END Star button cuia handling
+
     function ignoreHeldStepButtonsReleases() {
         // If we're holding a step button down, make sure that we ignore the next release of those buttons
         // Don't do this for the musical keys and velocity keys modes (otherwise we'll potentially end up not releasing notes, which would be sort of weird)
@@ -979,172 +2574,25 @@ Item {
     function cuiaCallback(cuia, originId, track, slot, value) {
         let returnValue = component.handleCuiaTemporaryMode(cuia);
         if (returnValue == false) {
+            returnValue = component.handleCuiaStarButton(cuia);
+        }
+        if (returnValue == false) {
+            returnValue = component.handleCuiaSequencerMode(cuia);
+        }
+        if (returnValue == false) {
+            returnValue = component.handleCuiaTrackClipMode(cuia);
+        }
+        if (returnValue == false) {
+            returnValue = component.handleCuiaSlotsMode(cuia);
+        }
+        if (returnValue == false) {
+            returnValue = component.handleCuiaMusicalKeysMode(cuia);
+        }
+        if (returnValue == false) {
+            returnValue = component.handleCuiaVelocityKeysMode(cuia);
+        }
+        if (returnValue == false) {
             switch (cuia) {
-                case "SWITCH_STEP1_PRESSED":
-                    component.handleStepButtonDown(0);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP1_RELEASED":
-                    component.handleStepButtonReleased(0);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP2_PRESSED":
-                    component.handleStepButtonDown(1);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP2_RELEASED":
-                    component.handleStepButtonReleased(1);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP3_PRESSED":
-                    component.handleStepButtonDown(2);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP3_RELEASED":
-                    component.handleStepButtonReleased(2);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP4_PRESSED":
-                    component.handleStepButtonDown(3);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP4_RELEASED":
-                    component.handleStepButtonReleased(3);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP5_PRESSED":
-                    component.handleStepButtonDown(4);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP5_RELEASED":
-                    component.handleStepButtonReleased(4);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP6_PRESSED":
-                    component.handleStepButtonDown(5);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP6_RELEASED":
-                    component.handleStepButtonReleased(5);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP7_PRESSED":
-                    component.handleStepButtonDown(6);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP7_RELEASED":
-                    component.handleStepButtonReleased(6);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP8_PRESSED":
-                    component.handleStepButtonDown(7);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP8_RELEASED":
-                    component.handleStepButtonReleased(7);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP9_PRESSED":
-                    component.handleStepButtonDown(8);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP9_RELEASED":
-                    component.handleStepButtonReleased(8);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP10_PRESSED":
-                    component.handleStepButtonDown(9);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP10_RELEASED":
-                    component.handleStepButtonReleased(9);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP11_PRESSED":
-                    component.handleStepButtonDown(10);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP11_RELEASED":
-                    component.handleStepButtonReleased(10);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP12_PRESSED":
-                    component.handleStepButtonDown(11);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP12_RELEASED":
-                    component.handleStepButtonReleased(11);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP13_PRESSED":
-                    component.handleStepButtonDown(12);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP13_RELEASED":
-                    component.handleStepButtonReleased(12);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP14_PRESSED":
-                    component.handleStepButtonDown(13);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP14_RELEASED":
-                    component.handleStepButtonReleased(13);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP15_PRESSED":
-                    component.handleStepButtonDown(14);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP15_RELEASED":
-                    component.handleStepButtonReleased(14);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP16_PRESSED":
-                    component.handleStepButtonDown(15);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STEP16_RELEASED":
-                    component.handleStepButtonReleased(15);
-                    returnValue = true;
-                    break;
-
-                case "SWITCH_NUMBER_1_RELEASED":
-                    if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
-                        component.setParameterPage(0);
-                        component.ignoreHeldStepButtonsReleases();
-                        returnValue = true;
-                    }
-                    break;
-                case "SWITCH_NUMBER_2_RELEASED":
-                    if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
-                        component.setParameterPage(1);
-                        component.ignoreHeldStepButtonsReleases();
-                        returnValue = true;
-                    }
-                    break;
-                case "SWITCH_NUMBER_3_RELEASED":
-                    if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
-                        component.setParameterPage(2);
-                        component.ignoreHeldStepButtonsReleases();
-                        returnValue = true;
-                    }
-                    break;
-                case "SWITCH_NUMBER_4_RELEASED":
-                    if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
-                        component.setParameterPage(3);
-                        component.ignoreHeldStepButtonsReleases();
-                        returnValue = true;
-                    }
-                    break;
-                case "SWITCH_NUMBER_5_RELEASED":
-                    if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
-                        component.setParameterPage(4);
-                        component.ignoreHeldStepButtonsReleases();
-                        returnValue = true;
-                    }
-                    break;
-
                 case "SWITCH_BACK_RELEASED":
                     if (_private.temporaryLiveRecordPattern && zynqtgui.startRecordButtonPressed) {
                         _private.temporaryLiveRecordPattern.recordLive = false;
@@ -1155,591 +2603,8 @@ Item {
                     }
                     component.ignoreHeldStepButtonsReleases();
                     break;
-
-                // K1 controls velocity
-                case "KNOB0_TOUCHED":
-                    component.ignoreHeldStepButtonsReleases();
-                    if (zynqtgui.starButtonPressed) {
-                        applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
-                        returnValue = true;
-                    } else {
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                    switch (_private.parameterPage) {
-                                        case 2:
-                                            component.updateStepRatchetStyle(0, stepButtonIndex);
-                                            break;
-                                        case 1:
-                                            component.updateStepProbability(0, stepButtonIndex);
-                                            break;
-                                        case 0:
-                                        default:
-                                            component.updateStepVelocity(0, stepButtonIndex);
-                                            break;
-                                    }
-                                } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                    if (stepButtonIndex < 10) {
-                                        applicationWindow().updateChannelVolume(0, stepButtonIndex);
-                                    } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                        // Clip button + k1 adjusts the clip's step length
-                                        component.updatePatternProperty(0, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
-                                    }
-                                } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                    // Send aftertouch to any held note - no display, so don't actually do anything for touched
-                                }
-                                returnValue = true;
-                            }
-                        }
-                    }
-                    break;
-                case "KNOB0_RELEASED":
-                    break;
-                case "KNOB0_UP":
-                    component.ignoreHeldStepButtonsReleases();
-                    if (zynqtgui.starButtonPressed) {
-                        applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
-                        returnValue = true;
-                    } else {
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                    switch (_private.parameterPage) {
-                                        case 2:
-                                            component.updateStepRatchetStyle(1, stepButtonIndex);
-                                            break;
-                                        case 1:
-                                            component.updateStepProbability(1, stepButtonIndex);
-                                            break;
-                                        case 0:
-                                        default:
-                                            component.updateStepVelocity(1, stepButtonIndex);
-                                            break;
-                                    }
-                                } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                    if (stepButtonIndex < 10) {
-                                        applicationWindow().updateChannelVolume(1, stepButtonIndex);
-                                    } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                        // Clip button + k1 adjusts the clip's step length
-                                        component.updatePatternProperty(1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
-                                    }
-                                } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                    // Send aftertouch to any held note
-                                    let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
-                                    if (stepNote) {
-                                        if (_private.stepKeyPolyphonicAftertouch[stepButtonIndex] < 127) {
-                                            _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = _private.stepKeyPolyphonicAftertouch[stepButtonIndex] + 1;
-                                            stepNote.sendPolyphonicAftertouch(_private.stepKeyPolyphonicAftertouch[stepButtonIndex]);
-                                        }
-                                    }
-                                }
-                                returnValue = true;
-                            }
-                        }
-                    }
-                    break;
-                case "KNOB0_DOWN":
-                    component.ignoreHeldStepButtonsReleases();
-                    if (zynqtgui.starButtonPressed) {
-                        applicationWindow().pageStack.getPage("sketchpad").updateClipDefaultVelocity(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
-                        returnValue = true;
-                    } else {
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                    switch (_private.parameterPage) {
-                                        case 2:
-                                            component.updateStepRatchetStyle(-1, stepButtonIndex);
-                                            break;
-                                        case 1:
-                                            component.updateStepProbability(-1, stepButtonIndex);
-                                            break;
-                                        case 0:
-                                        default:
-                                            component.updateStepVelocity(-1, stepButtonIndex);
-                                            break;
-                                    }
-                                } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                    if (stepButtonIndex < 10) {
-                                        applicationWindow().updateChannelVolume(-1, stepButtonIndex);
-                                    } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                        // Clip button + k1 adjusts the clip's step length
-                                        component.updatePatternProperty(-1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
-                                    }
-                                } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                    // Send aftertouch to any held note
-                                    let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
-                                    if (stepNote) {
-                                        if (0 < _private.stepKeyPolyphonicAftertouch[stepButtonIndex]) {
-                                            _private.stepKeyPolyphonicAftertouch[stepButtonIndex] = _private.stepKeyPolyphonicAftertouch[stepButtonIndex] - 1;
-                                            stepNote.sendPolyphonicAftertouch(_private.stepKeyPolyphonicAftertouch[stepButtonIndex]);
-                                        }
-                                    }
-                                }
-                                returnValue = true;
-                            }
-                        }
-                    }
-                    break;
-
-                // K2 controls length
-                case "KNOB1_TOUCHED":
-                    component.ignoreHeldStepButtonsReleases();
-                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                        if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                switch (_private.parameterPage) {
-                                    case 2:
-                                        component.updateStepRatchetCount(0, stepButtonIndex);
-                                        break;
-                                    case 1:
-                                        break;
-                                    case 0:
-                                    default:
-                                        component.updateStepDuration(0, stepButtonIndex);
-                                        break;
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                if (stepButtonIndex < 10) {
-                                    applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(0, stepButtonIndex);
-                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Clip+k2 adjusts the pattern's swing
-                                    component.updatePatternProperty(0, "swing", component.selectedChannel.id, stepButtonIndex - 10);
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                // Send pitch bend to any active note - no display, so don't actually do anything here
-                            }
-                            returnValue = true;
-                        }
-                    }
-                    break;
-                case "KNOB1_RELEASED":
-                    break;
-                case "KNOB1_UP":
-                    component.ignoreHeldStepButtonsReleases();
-                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                        if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                switch (_private.parameterPage) {
-                                    case 2:
-                                        component.updateStepRatchetCount(1, stepButtonIndex);
-                                        break;
-                                    case 1:
-                                        break;
-                                    case 0:
-                                    default:
-                                        component.updateStepDuration(1, stepButtonIndex);
-                                        break;
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                if (stepButtonIndex < 10) {
-                                    applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(1, stepButtonIndex);
-                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Clip+k2 adjusts the pattern's swing
-                                    component.updatePatternProperty(1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                // Send pitch bend to any held note
-                                let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
-                                if (stepNote) {
-                                    if (_private.stepKeyPitchBend[stepButtonIndex] < 1) {
-                                        _private.stepKeyPitchBend[stepButtonIndex] = Math.min(_private.stepKeyPitchBend[stepButtonIndex] + 0.005, 1);
-                                        stepNote.sendPitchChange(Math.max(-8192, Math.min(_private.stepKeyPitchBend[stepButtonIndex] * 8192, 8191)));
-                                    }
-                                }
-                            }
-                            returnValue = true;
-                        }
-                    }
-                    break;
-                case "KNOB1_DOWN":
-                    component.ignoreHeldStepButtonsReleases();
-                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                        if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                switch (_private.parameterPage) {
-                                    case 2:
-                                        component.updateStepRatchetCount(-1, stepButtonIndex);
-                                        break;
-                                    case 1:
-                                        break;
-                                    case 0:
-                                    default:
-                                        component.updateStepDuration(-1, stepButtonIndex);
-                                        break;
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                if (stepButtonIndex < 10) {
-                                    applicationWindow().pageStack.getPage("sketchpad").updateChannelPan(-1, stepButtonIndex);
-                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Clip+k2 adjusts the pattern's swing
-                                    component.updatePatternProperty(-1, "swing", component.selectedChannel.id, stepButtonIndex - 10);
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                // Send pitch bend to any held note
-                                let stepNote = _private.stepKeyNotesActive[stepButtonIndex];
-                                if (stepNote) {
-                                    if (-1 < _private.stepKeyPitchBend[stepButtonIndex]) {
-                                        _private.stepKeyPitchBend[stepButtonIndex] = Math.max(-1, _private.stepKeyPitchBend[stepButtonIndex] - 0.005);
-                                        stepNote.sendPitchChange(Math.max(-8192, Math.min(_private.stepKeyPitchBend[stepButtonIndex] * 8192, 8191)));
-                                    }
-                                }
-                            }
-                            returnValue = true;
-                        }
-                    }
-                    break;
-
-                // K3 controls position
-                case "KNOB2_TOUCHED":
-                    component.ignoreHeldStepButtonsReleases();
-                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                        if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                switch (_private.parameterPage) {
-                                    case 2:
-                                        component.updateStepRatchetProbability(0, stepButtonIndex);
-                                        break;
-                                    case 1:
-                                        component.updateStepNextStep(0, stepButtonIndex);
-                                        break;
-                                    case 0:
-                                    default:
-                                        component.updateStepPosition(0, stepButtonIndex);
-                                        break;
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Clip+k3 adjusts pattern length
-                                    component.updatePatternProperty(0, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                // Send mod wheel to any held note - no display, so don't actually do anything here
-                            }
-                            returnValue = true;
-                        }
-                    }
-                    break;
-                case "KNOB2_RELEASED":
-                    break;
-                case "KNOB2_UP":
-                    component.ignoreHeldStepButtonsReleases();
-                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                        if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                switch (_private.parameterPage) {
-                                    case 2:
-                                        component.updateStepRatchetProbability(1, stepButtonIndex);
-                                        break;
-                                    case 1:
-                                        component.updateStepNextStep(1, stepButtonIndex);
-                                        break;
-                                    case 0:
-                                    default:
-                                        component.updateStepPosition(1, stepButtonIndex);
-                                        break;
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Clip+k3 adjusts pattern length
-                                    component.updatePatternProperty(1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                // Send mod wheel to any held note
-                                _private.modulationValue = Math.max(0, Math.min(_private.modulationValue + 1, 127));
-                            }
-                            returnValue = true;
-                            // The mod value is global, so only send that once per twist
-                            break;
-                        }
-                    }
-                    break;
-                case "KNOB2_DOWN":
-                    component.ignoreHeldStepButtonsReleases();
-                    for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                        if (_private.heldStepButtons[stepButtonIndex]) {
-                            if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                                switch (_private.parameterPage) {
-                                    case 2:
-                                        component.updateStepRatchetProbability(-1, stepButtonIndex);
-                                        break;
-                                    case 1:
-                                        component.updateStepNextStep(-1, stepButtonIndex);
-                                        break;
-                                    case 0:
-                                    default:
-                                        component.updateStepPosition(-1, stepButtonIndex);
-                                        break;
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                                if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Clip+k3 adjusts pattern length
-                                    component.updatePatternProperty(-1, "patternLength", component.selectedChannel.id, stepButtonIndex - 10);
-                                }
-                            } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                                // Send mod wheel to any held note
-                                _private.modulationValue = Math.max(0, Math.min(_private.modulationValue - 1, 127));
-                            }
-                            returnValue = true;
-                            // The mod value is global, so only send that once per twist
-                            break;
-                        }
-                    }
-                    break;
-
-                // BK controls the note values (transposing the note, and also adjusting the current global captured note, so the display keeps making sense)
-                // - hold star button and scroll BK to change the current pattern's key
-                case "KNOB3_TOUCHED":
-                    component.ignoreHeldStepButtonsReleases();
-                    if (zynqtgui.starButtonPressed) {
-                        applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
-                            .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
-                            .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
-                            .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
-                            , 1000);
-                        returnValue = true;
-                    } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                        if (zynqtgui.altButtonPressed) {
-                            applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 0);
-                            returnValue = true;
-                        } else {
-                        }
-                    }
-                    break;
-                case "KNOB3_RELEASED":
-                    component.ignoreHeldStepButtonsReleases();
-                    if (zynqtgui.starButtonPressed) {
-                        // Release doesn't really want anything doing...
-                    }
-                    break;
-                case "KNOB3_UP":
-                    component.ignoreHeldStepButtonsReleases();
-                    if (zynqtgui.starButtonPressed) {
-                        let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
-                        if (currentKey > 0) {
-                            if (zynqtgui.selectButtonPressed) {
-                                zynqtgui.ignoreNextSelectButtonPress = true;
-                                currentKey = Math.min(127, currentKey + 12);
-                            } else {
-                                currentKey = Math.min(127, currentKey + 1);
-                            }
-                            _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
-                            _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
-                        }
-                        applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
-                            .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
-                            .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
-                            .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
-                            , 1000);
-                        // Since we're holding the key down while we're here, restart the note when we do the twist here
-                        _private.starNote.setOff();
-                        _private.starNote.sendPitchChange(0);
-                        _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
-                        _private.starNote.setOn(_private.starVelocity);
-                        returnValue = true;
-                    } else if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                        let workingModel = _private.pattern.workingModel;
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                let transposeOctave = false;
-                                if (zynqtgui.knob3Pressed) {
-                                    zynqtgui.ignoreNextKnob3PressedPress = true;
-                                    transposeOctave = true;
-                                }
-                                if (zynqtgui.altButtonPressed) {
-                                    // Hold down a bar button and twist BK to transpose all that bar's notes
-                                    if (stepButtonIndex < 8) {
-                                        workingModel.startLongOperation();
-                                        for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
-                                            workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, 1, -1, transposeOctave);
-                                        }
-                                        workingModel.endLongOperation();
-                                    }
-                                } else {
-                                    // Hold down a step button and twist BK to transpose that step's notes
-                                    workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, 1, -1, transposeOctave);
-                                    let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
-                                    let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
-                                    if (theNote) {
-                                        applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
-                                            .arg(stepIndex + 1)
-                                            .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
-                                            , 1000);
-                                        component.handleStepDataChanged(stepIndex);
-                                    }
-                                }
-                                returnValue = true;
-                            }
-                        }
-                    } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Hold down a clip button and twist BK to transpose all notes in that clip
-                                    let workingModel = _private.sequence.getClipById(component.selectedChannel.id, stepButtonIndex - 10).workingModel;
-                                    workingModel.startLongOperation();
-                                    let allDone = false;
-                                    for (let row = 0; row < workingModel.bankLength; ++row) {
-                                        for (let column = 0; column < workingModel.width; ++column) {
-                                            if ((row * workingModel.width) + column == workingModel.patternLength) {
-                                                allDone = true;
-                                                break;
-                                            }
-                                            workingModel.transposeNote(row, column, 1);
-                                        }
-                                        if (allDone) { break; }
-                                    }
-                                    workingModel.endLongOperation();
-                                    returnValue = true;
-                                }
-                            }
-                        }
-                    } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                        if (zynqtgui.altButtonPressed) {
-                            applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, 1);
-                            returnValue = true;
-                        } else {
-                        }
-                    }
-                    break;
-                case "KNOB3_DOWN":
-                    component.ignoreHeldStepButtonsReleases();
-                    if (zynqtgui.starButtonPressed) {
-                        let currentKey = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
-                        if (currentKey < 127) {
-                            if (zynqtgui.selectButtonPressed) {
-                                zynqtgui.ignoreNextSelectButtonPress = true;
-                                currentKey = Math.max(0, currentKey - 12);
-                            } else {
-                                currentKey = currentKey - 1;
-                            }
-                            _private.pattern.octaveKey = Zynthbox.KeyScales.midiNoteToOctave(currentKey);
-                            _private.pattern.pitchKey = Zynthbox.KeyScales.midiNoteToPitch(currentKey);
-                        }
-                        applicationWindow().showPassiveNotification(qsTr("Clip %1 Key: %2%3")
-                            .arg((_private.pattern.sketchpadTrack + 1) + _private.pattern.clipName)
-                            .arg(Zynthbox.KeyScales.pitchName(_private.pattern.pitchKey))
-                            .arg(Zynthbox.KeyScales.octaveName(_private.pattern.octaveKey))
-                            , 1000);
-                        // Since we're holding the key down while we're here, restart the note when we do the twist here
-                        _private.starNote.setOff();
-                        _private.starNote.sendPitchChange(0);
-                        _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
-                        _private.starNote.setOn(_private.starVelocity);
-                        returnValue = true;
-                    } else if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                        let workingModel = _private.pattern.workingModel;
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                let transposeOctave = false;
-                                if (zynqtgui.knob3Pressed) {
-                                    zynqtgui.ignoreNextKnob3PressedPress = true;
-                                    transposeOctave = true;
-                                }
-                                if (zynqtgui.altButtonPressed) {
-                                    // Hold down a bar button and twist BK to transpose all that bar's notes
-                                    if (stepButtonIndex < 8) {
-                                        workingModel.startLongOperation();
-                                        for (let barStepIndex = 0; barStepIndex < workingModel.width; ++barStepIndex) {
-                                            workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, barStepIndex, -1, -1, transposeOctave);
-                                        }
-                                        workingModel.endLongOperation();
-                                    }
-                                } else {
-                                    // Hold down a step button and twist BK to transpose that step's notes
-                                    workingModel.transposeStep(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex, -1, -1, transposeOctave);
-                                    let theNote = workingModel.getNote(workingModel.bankOffset + workingModel.activeBar, stepButtonIndex);
-                                    let stepIndex = (workingModel.activeBar * workingModel.width) + stepButtonIndex;
-                                    if (theNote) {
-                                        applicationWindow().showPassiveNotification(qsTr("Step %1 Transposed to: %2")
-                                            .arg(stepIndex + 1)
-                                            .arg(Zynthbox.Chords.shorthand(theNote.subnotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey))
-                                            , 1000);
-                                        component.handleStepDataChanged(stepIndex);
-                                    }
-                                }
-                                returnValue = true;
-                            }
-                        }
-                    } else if (_private.effectiveInteractionMode === _private.interactionModeTrackClip) {
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                    // Hold down a clip button and twist BK to transpose all notes in that clip
-                                    let workingModel = _private.sequence.getClipById(component.selectedChannel.id, stepButtonIndex - 10).workingModel;
-                                    workingModel.startLongOperation();
-                                    let allDone = false;
-                                    for (let row = 0; row < workingModel.bankLength; ++row) {
-                                        for (let column = 0; column < workingModel.width; ++column) {
-                                            if ((row * workingModel.width) + column == workingModel.patternLength) {
-                                                allDone = true;
-                                                break;
-                                            }
-                                            workingModel.transposeNote(row, column, -1);
-                                        }
-                                        if (allDone) { break; }
-                                    }
-                                    workingModel.endLongOperation();
-                                    returnValue = true;
-                                }
-                            }
-                        }
-                    } else if (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys) {
-                        if (zynqtgui.altButtonPressed) {
-                            applicationWindow().pageStack.getPage("sketchpad").updateClipScale(component.selectedChannel.id, component.selectedChannel.selectedClip, -1);
-                            returnValue = true;
-                        } else {
-                        }
-                    }
-                    break;
-
-                case "SWITCH_STAR_PRESSED":
-                    // TODO Maybe we can set the key's velocity by holding star and twisting K1?
-                    // Note-on for the current pattern's key, save the note value in _private so we can be sure it's the same one being turned off again if people change clips or whatever while holding down the thing
-                    _private.starNote = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
-                    _private.starNote.setOn(_private.starVelocity);
-                    returnValue = true;
-                    break;
-                case "SWITCH_STAR_RELEASED":
-                    // Note-off for whatever's stored on the _private property, and then remove it
-                    _private.starNote.setOff();
-                    _private.starNote.sendPitchChange(0);
-                    _private.starNote = null;
-                    returnValue = true;
-                    break;
-
-                case "SWITCH_PLAY_RELEASED":
-                    if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                        // When in stepsequencer mode and holding down any step button, and then tapping play, toggle enabled for that step to "on" (that is, clear enabled as it's the default)
-                        let workingModel = _private.pattern.workingModel;
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                workingModel.setKeyedDataValue(workingModel.barOffset + workingModel.activeBar, stepButtonIndex, "enabled", undefined);
-                                component.ignoreHeldStepButtonsReleases();
-                                returnValue = true;
-                            }
-                        }
-                    } else {
-                        // Don't do anything with the play button unless a step button is held down
-                    }
-                    break;
-                case "SWITCH_STOP_RELEASED":
-                    if (_private.effectiveInteractionMode === _private.interactionModeSequencer) {
-                        // When in stepsequencer mode and holding down any step button, and then tapping stop, toggle enabled for that step to "off" (that is, set the value to false)
-                        let workingModel = _private.pattern.workingModel;
-                        for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (_private.heldStepButtons[stepButtonIndex]) {
-                                workingModel.setKeyedDataValue(workingModel.barOffset + workingModel.activeBar, stepButtonIndex, "enabled", false);
-                                component.ignoreHeldStepButtonsReleases();
-                                returnValue = true;
-                            }
-                        }
-                    } else {
-                        // Don't do anything with the stop button unless a step button is held down
-                    }
-                    break;
                 case "SWITCH_MODE_RELEASED":
-                    if (zynqtgui.step1ButtonPressed || zynqtgui.step2ButtonPressed || zynqtgui.step3ButtonPressed || zynqtgui.step4ButtonPressed || zynqtgui.step5ButtonPressed || zynqtgui.step6ButtonPressed || zynqtgui.step7ButtonPressed || zynqtgui.step8ButtonPressed || zynqtgui.step9ButtonPressed || zynqtgui.step10ButtonPressed || zynqtgui.step11ButtonPressed || zynqtgui.step12ButtonPressed || zynqtgui.step13ButtonPressed || zynqtgui.step14ButtonPressed || zynqtgui.step15ButtonPressed || zynqtgui.step16ButtonPressed) {
+                    if (zynqtgui.anyStepButtonPressed) {
                         // Don't allow switching modes when holding down a button, that just makes interaction weird...
                     } else {
                         // When holding alt, always switch to the musical keys mode, otherwise toggle between steps and track/clip
@@ -1912,6 +2777,7 @@ Item {
         // TODO When releasing a step button, the event should always go to whatever mode we were in when that button was originally pressed, so... write that to here instead of booleans, and use that to decide where to shunt that event
         // This also means that all the various bits of mode logic really wants to go into explicit functions that just handle that mode... to make many things simpler just in general
         property var heldStepButtons: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
+        readonly property var stepButtonReleases: ["SWITCH_STEP1_RELEASED", "SWITCH_STEP2_RELEASED", "SWITCH_STEP3_RELEASED", "SWITCH_STEP4_RELEASED", "SWITCH_STEP5_RELEASED", "SWITCH_STEP6_RELEASED", "SWITCH_STEP7_RELEASED", "SWITCH_STEP8_RELEASED", "SWITCH_STEP9_RELEASED", "SWITCH_STEP10_RELEASED", "SWITCH_STEP11_RELEASED", "SWITCH_STEP12_RELEASED", "SWITCH_STEP13_RELEASED", "SWITCH_STEP14_RELEASED", "SWITCH_STEP15_RELEASED", "SWITCH_STEP16_RELEASED"]
 
         // When these are set, we will want to swallow release events for these buttons even without the mode button held down (false means not held, 1 means held as a slot, 2 means held as a musical pad)
         property var heldTemporaryActionBlockButtons: [false, false, false, false, false, false, false, false, false, false]
@@ -2433,22 +3299,22 @@ Item {
         onAltButtonPressedChanged: _private.updateLedColors()
         onModeButtonPressedChanged: _private.updateLedColors()
         onAnyStepButtonPressedChanged: _private.updateLedColors()
-        onStep1_button_pressed_changed: { _private.heldStepButtons[0] = zynqtgui.step1ButtonPressed; }
-        onStep2_button_pressed_changed: { _private.heldStepButtons[1] = zynqtgui.step2ButtonPressed; }
-        onStep3_button_pressed_changed: { _private.heldStepButtons[2] = zynqtgui.step3ButtonPressed; }
-        onStep4_button_pressed_changed: { _private.heldStepButtons[3] = zynqtgui.step4ButtonPressed; }
-        onStep5_button_pressed_changed: { _private.heldStepButtons[4] = zynqtgui.step5ButtonPressed; }
-        onStep6_button_pressed_changed: { _private.heldStepButtons[5] = zynqtgui.step6ButtonPressed; }
-        onStep7_button_pressed_changed: { _private.heldStepButtons[6] = zynqtgui.step7ButtonPressed; }
-        onStep8_button_pressed_changed: { _private.heldStepButtons[7] = zynqtgui.step8ButtonPressed; }
-        onStep9_button_pressed_changed: { _private.heldStepButtons[8] = zynqtgui.step9ButtonPressed; }
-        onStep10_button_pressed_changed: { _private.heldStepButtons[9] = zynqtgui.step10ButtonPressed; }
-        onStep11_button_pressed_changed: { _private.heldStepButtons[10] = zynqtgui.step11ButtonPressed; }
-        onStep12_button_pressed_changed: { _private.heldStepButtons[11] = zynqtgui.step12ButtonPressed; }
-        onStep13_button_pressed_changed: { _private.heldStepButtons[12] = zynqtgui.step13ButtonPressed; }
-        onStep14_button_pressed_changed: { _private.heldStepButtons[13] = zynqtgui.step14ButtonPressed; }
-        onStep15_button_pressed_changed: { _private.heldStepButtons[14] = zynqtgui.step15ButtonPressed; }
-        onStep16_button_pressed_changed: { _private.heldStepButtons[15] = zynqtgui.step16ButtonPressed; }
+        onStep1_button_pressed_changed: { _private.heldStepButtons[0] = zynqtgui.step1ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep2_button_pressed_changed: { _private.heldStepButtons[1] = zynqtgui.step2ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep3_button_pressed_changed: { _private.heldStepButtons[2] = zynqtgui.step3ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep4_button_pressed_changed: { _private.heldStepButtons[3] = zynqtgui.step4ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep5_button_pressed_changed: { _private.heldStepButtons[4] = zynqtgui.step5ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep6_button_pressed_changed: { _private.heldStepButtons[5] = zynqtgui.step6ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep7_button_pressed_changed: { _private.heldStepButtons[6] = zynqtgui.step7ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep8_button_pressed_changed: { _private.heldStepButtons[7] = zynqtgui.step8ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep9_button_pressed_changed: { _private.heldStepButtons[8] = zynqtgui.step9ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep10_button_pressed_changed: { _private.heldStepButtons[9] = zynqtgui.step10ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep11_button_pressed_changed: { _private.heldStepButtons[10] = zynqtgui.step11ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep12_button_pressed_changed: { _private.heldStepButtons[11] = zynqtgui.step12ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep13_button_pressed_changed: { _private.heldStepButtons[12] = zynqtgui.step13ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep14_button_pressed_changed: { _private.heldStepButtons[13] = zynqtgui.step14ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep15_button_pressed_changed: { _private.heldStepButtons[14] = zynqtgui.step15ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep16_button_pressed_changed: { _private.heldStepButtons[15] = zynqtgui.step16ButtonPressed ? _private.effectiveInteractionMode : false; }
         onStartRecord_button_pressed_changed: {
             // Temporary live recording style 1 is to live record when holding down the record button, and style 2 is to also leave live recording on when released if at least one note was recorded (so don't disable live recording in that case)
             if (Zynthbox.SyncTimer.timerRunning) {

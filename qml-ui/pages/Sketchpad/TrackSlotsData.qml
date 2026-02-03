@@ -305,9 +305,15 @@ GridLayout {
                         if(slotDelegate.cppClipObject)
                             return (slotDelegate.cppClipObject ? slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0 )   
 
-                        if(control.slotType === "synth" && text.trim().length > 0)
+                        if(control.slotType === "synth" && slotDelegate.text.trim().length > 0)
                             return (slotDelegate.synthPassthroughClient ? slotDelegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0)
+
+                        return 0
                     }
+
+                    meterValue: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? slotDelegate.cppClipObject.playbackPositions.peakGainLeft : 0
+                    // meterValue: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? slotDelegate.cppClipObject.playbackPositions.peakGainRight : 0
+
                     readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
 
                     property int realIndex : index/2

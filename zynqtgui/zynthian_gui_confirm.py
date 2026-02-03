@@ -25,7 +25,6 @@
 #******************************************************************************
 
 import sys
-import tkinter
 import logging
 
 # Zynthian specific modules

@@ -24,7 +24,6 @@
 #******************************************************************************
 
 import sys
-import tkinter
 import logging
 from ctypes import c_ubyte
 

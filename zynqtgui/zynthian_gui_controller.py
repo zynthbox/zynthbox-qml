@@ -27,7 +27,6 @@ import sys
 import math
 import liblo
 import ctypes
-import tkinter
 import logging
 from time import sleep
 from string import Template

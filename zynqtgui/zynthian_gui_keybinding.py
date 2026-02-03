@@ -28,7 +28,7 @@ from sys import stderr
 import oyaml as yaml
 import logging
 import copy
-import liblo
+import pyliblo3 as liblo
 
 # Zynthian specific modules
 from . import zynthian_gui_config

@@ -25,7 +25,7 @@
 import os
 import re
 import logging
-import liblo
+import pyliblo3 as liblo
 import shutil
 from time import sleep
 from os.path import isfile, join

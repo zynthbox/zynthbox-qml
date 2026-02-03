@@ -25,7 +25,7 @@
 #import sys
 import os
 import json
-import liblo
+import pyliblo3 as liblo
 import logging
 import shlex
 import Zynthbox

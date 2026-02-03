@@ -23,7 +23,7 @@
 #******************************************************************************
 
 import math
-import liblo
+import pyliblo3 as liblo
 import ctypes
 import logging
 

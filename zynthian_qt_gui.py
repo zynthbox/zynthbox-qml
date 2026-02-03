@@ -29,7 +29,7 @@ import re
 import sys
 import copy
 import alsaaudio
-import liblo
+import pyliblo3 as liblo
 import signal
 import math
 import logging

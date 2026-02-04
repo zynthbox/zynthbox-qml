@@ -1788,9 +1788,14 @@ ZUI.SectionPanel {
 
                                             Zynthbox.PatternModelVisualiserItem {
                                                 id: patternVisualiser
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                Kirigami.Theme.inherit: false
                                                 // visible: !root.pattern.isEmpty
                                                 anchors.fill: parent
                                                 patternModel: root.pattern
+                                                backgroundColor: Kirigami.Theme.backgroundColor
+                                                foregroundColor: Kirigami.Theme.textColor
+                                                fillColor: "transparent"
                                                 Rectangle { // Progress
                                                     anchors {
                                                         top: parent.top

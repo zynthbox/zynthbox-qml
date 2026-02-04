@@ -121,6 +121,13 @@ ColumnLayout {
                 Zynthbox.PatternModelVisualiserItem {
                     anchors.fill: parent
                     anchors.margins: 2
+
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    Kirigami.Theme.inherit: false
+                    backgroundColor: Kirigami.Theme.backgroundColor
+                    foregroundColor: Kirigami.Theme.textColor
+                    fillColor: "transparent"
+
                     visible: root.visible && root.channel.trackType !== "sample-loop" &&
                              clipDelegate.pattern &&
                              clipDelegate.pattern.hasNotes

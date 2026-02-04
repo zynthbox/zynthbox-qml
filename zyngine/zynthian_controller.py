@@ -23,9 +23,13 @@
 #******************************************************************************
 
 import math
-import liblo
 import ctypes
 import logging
+# Try importing liblo by both old and new import names
+try:
+    import liblo
+except ImportError:
+    import pyliblo3 as liblo
 
 from PySide2.QtCore import QObject, Signal, Slot, Property
 # Zynthian specific modules

@@ -25,7 +25,6 @@
 
 import sys
 import math
-import liblo
 import ctypes
 import logging
 from time import sleep

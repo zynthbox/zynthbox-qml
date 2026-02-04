@@ -25,13 +25,17 @@
 #import sys
 import os
 import json
-import liblo
 import logging
 import shlex
 import Zynthbox
 import re
 import random
 import string
+# Try importing liblo by both old and new import names
+try:
+    import liblo
+except ImportError:
+    import pyliblo3 as liblo
 from os.path import isfile, isdir, join, splitext
 from os import scandir
 from string import Template

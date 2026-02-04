@@ -150,7 +150,7 @@ ColumnLayout {
                     visible: ["sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
                     color:  clipDelegate.highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                     font.bold: clipDelegate.highlighted
-                    opacity: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? 1 : 0
+                    opacity: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? ( clipDelegate.highlighted ? 1 : 0.2) : 0
                     text: String.fromCharCode(clipDelegate.clipIndex + 65)
                 }
                 QQC2.Label {

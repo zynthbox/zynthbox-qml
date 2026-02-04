@@ -106,6 +106,8 @@ ZUI.ScreenPage {
     }
 
     contentItem: ZUI.SectionPanel {
+        background: null
+
         contentItem: RowLayout {
             spacing: ZUI.Theme.sectionSpacing
 
@@ -129,7 +131,7 @@ ZUI.ScreenPage {
                             checkable: true
                             checked: highlighted
                             highlighted: zynqtgui.main.visibleCategory === "modules"
-                            text: qsTr("Modules")
+                            text: qsTr("Miko")
                             onClicked: zynqtgui.main.visibleCategory = "modules"
                         }
 
@@ -152,7 +154,7 @@ ZUI.ScreenPage {
                             checked: highlighted
                             highlighted: zynqtgui.main.visibleCategory === "sessions" ||
                                     zynqtgui.main.visibleCategory === "sessions-versions"
-                            text: qsTr("Sketchpads")
+                            text: qsTr("Jams")
                             onClicked: zynqtgui.main.visibleCategory = "sessions"
                         }
 
@@ -163,7 +165,7 @@ ZUI.ScreenPage {
                             checkable: true
                             checked: highlighted
                             highlighted: zynqtgui.main.visibleCategory === "services"
-                            text: qsTr("Services")
+                            text: qsTr("Settings")
                             onClicked: zynqtgui.main.visibleCategory = "services"
                         }
 
@@ -238,7 +240,7 @@ ZUI.ScreenPage {
                 //     }
                 // }
 
-            contentItem: MouseArea {
+                contentItem: MouseArea {
                     id: gridMouseArea
                     property bool blocked: false
                     drag.filterChildren: true

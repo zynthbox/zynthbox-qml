@@ -100,9 +100,6 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.song_manager, 0, "Song Manager"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/song-player.svg"})
 
-            self.list_data.append((self.admin, 0, "Settings"))
-            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/settings.svg"})
-
             # We probably no longer need it. Comment it out temporarily and delete later
             # self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
             # self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/snapshots.svg"})
@@ -164,6 +161,12 @@ class zynthian_gui_main(zynthian_gui_selector):
             for version in self.zynqtgui.sketchpad.get_sketchpad_versions(self.__selected_sketchpad_folder__):
                 self.list_data.append(("sketchpad-version", str(version), version.name.replace(".sketchpad.json", "")))
                 self.list_metadata.append({"icon": "/zynthian/zynthbox-qml/img/file.svg"})
+
+        if self.visibleCategory == "services" :
+
+            self.list_data.append((self.admin, 0, "Settings"))
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/settings.svg"})
+
 
         super().fill_list()
 

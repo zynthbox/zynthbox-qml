@@ -29,7 +29,6 @@ import re
 import sys
 import copy
 import alsaaudio
-import pyliblo3 as liblo
 import signal
 import math
 import logging
@@ -41,6 +40,11 @@ import faulthandler
 import Xlib.display
 import Xlib.Xatom
 import Xlib.X
+# Try importing liblo by both old and new import names
+try:
+    import liblo
+except ImportError:
+    import pyliblo3 as liblo
 from pathlib import Path
 from datetime import datetime
 from threading import Thread, Lock, Event

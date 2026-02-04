@@ -25,8 +25,12 @@
 import os
 import re
 import logging
-import pyliblo3 as liblo
 import shutil
+# Try importing liblo by both old and new import names
+try:
+    import liblo
+except ImportError:
+    import pyliblo3 as liblo
 from time import sleep
 from os.path import isfile, join
 from subprocess import check_output

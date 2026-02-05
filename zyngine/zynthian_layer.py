@@ -325,7 +325,8 @@ class zynthian_layer(QObject):
             self.bank_name=self.bank_list[i][2]
             self.bank_info=copy.deepcopy(self.bank_list[i])
             logging.info("Bank Selected: %s (%d)" % (self.bank_name,i))
-            if set_engine and (last_bank_index!=i or not last_bank_name):
+            self.bank_id=self.bank_info[0]
+            if set_engine and (last_bank_index!=i or not last_bank_name):                
                 self.reset_preset()
                 returnVal = self.engine.set_bank(self, self.bank_info)
                 if returnVal:

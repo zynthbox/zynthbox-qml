@@ -312,20 +312,20 @@ class zynthian_layer(QObject):
         self.bank_name=self.bank_list[i][2]
         self.bank_info=copy.deepcopy(self.bank_list[i])
         logging.info("SOUNDFONTS DIR 0 {}".format(self.bank_info[0]))
-
+        logging.info("SOUNDFONTS BANKDIR 0 {}".format(self.bank_info[0]))
+        
         if(self.engine.can_navigate and self.is_bank_dir(i)):
             self.bank_dir = self.engine.get_bank_root_dir()
             return returnVal
-
+        
         if i < len(self.bank_list):
             last_bank_index=self.bank_index
             last_bank_name=self.bank_name
             self.bank_index=i
-            self.bank_name=self.bank_list[i][2]            
+            self.bank_name=self.bank_list[i][2]
             self.bank_info=copy.deepcopy(self.bank_list[i])
-            logging.info("Bank Selected: %s (%d)" % (self.bank_name,i))   
-            if set_engine:
-                self.bank_id=self.bank_info[0]    
+            logging.info("Bank Selected: %s (%d)" % (self.bank_name,i))
+            if set_engine and (last_bank_index!=i or not last_bank_name):
                 self.reset_preset()
                 returnVal = self.engine.set_bank(self, self.bank_info)
                 if returnVal:
@@ -335,7 +335,6 @@ class zynthian_layer(QObject):
                 returnVal = True
             self.bankChanged.emit()
         return returnVal
-
 
     #TODO Optimize search!!
     def set_bank_by_name(self, bank_name, set_engine=True):

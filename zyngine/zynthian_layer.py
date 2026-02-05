@@ -312,7 +312,7 @@ class zynthian_layer(QObject):
         self.bank_name=self.bank_list[i][2]
         self.bank_info=copy.deepcopy(self.bank_list[i])
         logging.info("SOUNDFONTS DIR 0 {}".format(self.bank_info[0]))
-        logging.info("SOUNDFONTS BANKDIR 0 {}".format(self.bank_info[0]))
+        logging.info("SOUNDFONTS BANKDIR 0 {}".format(i))
         
         if(self.engine.can_navigate and self.is_bank_dir(i)):
             self.bank_dir = self.engine.get_bank_root_dir()

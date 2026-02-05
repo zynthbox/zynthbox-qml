@@ -367,6 +367,24 @@ ZUI.ScreenPage {
                         autoActivateIndexOnChange: true
                         view.spacing: ZUI.Theme.spacing
 
+                        //Hacky way to force update the banks views to the current selected bank
+                        readonly property int trackId : applicationWindow().selectedChannel.id
+                        onTrackIdChanged: {
+                            _syncTimer.restart()
+                        }
+
+                        Timer {
+                            id: _syncTimer
+                            repeat: false
+                            interval: 1000
+                            onTriggered: {
+                                console.log("Update Selected synth")
+                                layersView.selector.current_index = layersView.selector.current_index;
+                                layersView.selector.activate_index(layersView.selector.current_index);
+                            }
+                        }
+                        //end of the Hacky update
+
                         onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                         onItemActivated: {
                             if (root.selectedChannel.selectedSlot.value === index) {
@@ -844,14 +862,6 @@ ZUI.ScreenPage {
                 }
             }
         }
-
-        // QQC2.Label {
-        //     color: "orange"
-        //     text: zynqtgui.curLayer.bankName + " / " + zynqtgui.curLayer.bankName
-        //     background: Rectangle {
-        //         color: "black"
-        //     }
-        // }
     }
 
     Connections {

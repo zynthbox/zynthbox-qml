@@ -56,6 +56,11 @@ xsetroot -cursor blank_cursor.xbm blank_cursor.xbm
 
 cd $ZYNTHIAN_UI_DIR
 
+# DSI display on trixie does not turn on after bootloader
+# Try to turn on display before starting application
+# FIXME : DISPLAY should automatically turn on during boot and should turn off after powering off
+xrandr --output DSI-1-2 --mode 1280x800 || true
+
 screensaver_off
 
 #Load Config Environment

@@ -2058,9 +2058,12 @@ ZUI.ScreenPage {
                 }
             }
 
-            ZUI.SectionPanel {                
+            QQC2.Control {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                background: Item {
+                }
 
                 contentItem: Item {
                     StackLayout {
@@ -2155,7 +2158,10 @@ ZUI.ScreenPage {
                     }
 
                 }
+
             }
         }
+
     }
+
 }

@@ -71,6 +71,11 @@ ZUI.SectionPanel {
         return returnVal;
     }
 
+    function handleItemClick(channelId, clipId){
+        console.log("Handle clip cell click event", channelId, clipId)
+        clipDelegateRepeater.itemAt(channelId).handleItemClick(clipId)
+    }
+
     Layout.fillWidth: true
     
     contentItem: Item {

@@ -1121,7 +1121,7 @@ ZUI.SectionPanel {
 
                             Layout.fillWidth: true
                             Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 5
                             spacing: ZUI.Theme.sectionSpacing
 
                             Timer {
@@ -1174,7 +1174,7 @@ ZUI.SectionPanel {
                                     ZUI.SectionGroup {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
-                                        implicitHeight: Kirigami.Units.gridUnit *1.5
+                                        implicitHeight: Kirigami.Units.gridUnit * 2
                                         RowLayout {
                                            anchors.fill: parent
                                            spacing: ZUI.Theme.spacing
@@ -1699,7 +1699,7 @@ ZUI.SectionPanel {
                                     ZUI.SectionGroup {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
-                                        implicitHeight: Kirigami.Units.gridUnit *1.5
+                                        implicitHeight: Kirigami.Units.gridUnit * 2
                                         RowLayout {
                                            anchors.fill: parent
                                            spacing: ZUI.Theme.spacing
@@ -1728,12 +1728,14 @@ ZUI.SectionPanel {
                                                     property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
 
                                                     onClicked: {
-                                                        if (root.selectedChannel.selectedClip === clipDelegate.clipIndex) {
-                                                            clipDelegate.clip.enabled = !clipDelegate.clip.enabled;
-                                                        } else {
-                                                            root.selectedChannel.selectedClip = clipDelegate.clipIndex;
-                                                            clipDelegate.clip.enabled = true;
-                                                        }
+                                                        // if (root.selectedChannel.selectedClip === clipDelegate.clipIndex) {
+                                                        //     clipDelegate.clip.enabled = !clipDelegate.clip.enabled;
+                                                        // } else {
+                                                        //     root.selectedChannel.selectedClip = clipDelegate.clipIndex;
+                                                        //     clipDelegate.clip.enabled = true;
+                                                        // }
+
+                                                        pageManager.getPage("sketchpad").bottomStack.clipsBar.handleItemClick(root.selectedChannel.id, clipDelegate.clipIndex);
                                                     }
                                                     Kirigami.Icon {
                                                         anchors {

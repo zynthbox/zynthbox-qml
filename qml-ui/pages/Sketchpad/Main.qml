@@ -2058,29 +2058,9 @@ ZUI.ScreenPage {
                 }
             }
 
-            QQC2.Control {
-                // topPadding: svgBg3.topPadding
-                // bottomPadding: svgBg3.bottomPadding
-                // leftPadding: svgBg3.leftPadding
-                // rightPadding: svgBg3.rightPadding
-                // PlasmaCore.FrameSvgItem {
-                //     id: svgBg3
-                //     visible: fromCurrentTheme
-                //     anchors.fill: parent
-                //     readonly property real leftPadding: visible ? fixedMargins.left : 0
-                //     readonly property real rightPadding: visible ? fixedMargins.right : 0
-                //     readonly property real topPadding: visible ? fixedMargins.top : 0
-                //     readonly property real bottomPadding: visible ? fixedMargins.bottom : 0
-                //     imagePath: "widgets/statusinfo_background"
-                //     colorGroup: PlasmaCore.Theme.NormalColorGroup
-                //     enabledBorders: PlasmaCore.FrameSvgItem.NoBorder
-                // }
-
+            ZUI.SectionPanel {                
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-
-                background: Item {
-                }
 
                 contentItem: Item {
                     StackLayout {
@@ -2175,11 +2155,7 @@ ZUI.ScreenPage {
                     }
 
                 }
-
             }
-
         }
-
     }
-
 }

@@ -68,13 +68,13 @@ ZUI.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Load Sound")
+            text: qsTr("Load Sketch")
             onTriggered: {
                 zynqtgui.show_screen("sound_categories")
             }
         },
         Kirigami.Action {
-            text: "Save Sound"
+            text: "Save Sketch"
             onTriggered: {
                 zynqtgui.show_screen("sound_categories")
                 applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
@@ -683,7 +683,9 @@ ZUI.ScreenPage {
                                 implicitHeight: Kirigami.Units.gridUnit * 2
                                 icon.name: model.icon ? model.icon : ""
                                 text: model.display === "None" ? qsTr("Single Presets") : model.display
-                                highlighted: (zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.action_id == zynqtgui.curLayer.bankId) || ( zynqtgui.curLayer != null && zynqtgui.curLayer.bankId.startsWith(model.action_id))
+                                highlighted: (zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.action_id == zynqtgui.curLayer.bankId) 
+                                || (zynqtgui.curLayer != null && zynqtgui.curLayer.bankId.startsWith(model.action_id)
+                                || (bankView.selector.current_index === index && model.icon == "folder"))
                                 
                                 checked: highlighted
                                 background: ZUI.DelegateBackground {

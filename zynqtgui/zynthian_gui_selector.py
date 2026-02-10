@@ -197,7 +197,11 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         # Auto activate selected index if current screen is self and not already activated
         if self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self and self.__last_auto_activated_index != self.index:
             self.select(self.index)
-            self.select_action(self.index, 'S')
+            #Check if the current index value is one of a bank dir, instead of a bank soundfont. if a dir then do not perform any action, only select it.
+            if self.is_bank_dir(self.index):
+                return
+            else:
+                self.select_action(self.index, 'S')
             self.__last_auto_activated_index = self.index
 
     def get_selector_list(self):
@@ -242,7 +246,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         self.effective_count_changed.emit()
         self.list_updated.emit()
 
-    def fill_list2(self):
+    def reset_list(self):
         if self.list_model != None:
             self.list_model.reset_entries(self.list_data, self.list_metadata)
         self.select()
@@ -342,7 +346,10 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         pass
 
     def can_navigate_bank_up(self):
-        return False;
+        return False
+
+    def is_bank_dir(self, index):
+        return False
 
     # TODO: remove
     def cb_listbox_push(self,event):

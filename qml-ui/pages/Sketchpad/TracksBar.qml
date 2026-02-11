@@ -1741,9 +1741,9 @@ ZUI.SectionPanel {
                                                         anchors {
                                                             left: parent.left
                                                             verticalCenter: parent.verticalCenter
-                                                            leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                            leftMargin: Kirigami.Units.smallSpacing
                                                         }
-                                                        height: parent.height - Kirigami.Units.smallSpacing
+                                                        height: 16
                                                         width: height
                                                         color: clipDelegate.color
                                                         // Visible if we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
@@ -1756,9 +1756,9 @@ ZUI.SectionPanel {
                                                         anchors {
                                                             left: parent.left
                                                             verticalCenter: parent.verticalCenter
-                                                            leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                            leftMargin: Kirigami.Units.smallSpacing
                                                         }
-                                                        height: parent.height - Kirigami.Units.smallSpacing
+                                                        height: 16
                                                         width: height
                                                         // Visible if we are running playback, the clip is playing, and we are going to stop the clip at the top of the next bar
                                                         visible: Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.StoppedState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0

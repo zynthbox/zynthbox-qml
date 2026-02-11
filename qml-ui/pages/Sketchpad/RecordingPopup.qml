@@ -230,10 +230,7 @@ ZUI.Popup {
     closePolicy: zynqtgui.sketchpad.isRecording ? QQC2.Popup.NoAutoClose : (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside)
     width: parent.width * 0.99
     height: parent.height * 0.97
-    leftPadding: 0
-    rightPadding: 0
-    topPadding: 0
-    bottomPadding: 0
+    
     onSelectedChannelChanged: {
         if (root.selectedChannel.trackType === "external") {
             zynqtgui.sketchpad.recordingSource = "external"
@@ -322,7 +319,6 @@ ZUI.Popup {
         zynqtgui.recordingPopupActive = false
     }
     contentItem: ColumnLayout {
-        anchors.fill: parent
         spacing: root.spacing
 
         Kirigami.Heading {
@@ -824,84 +820,103 @@ ZUI.Popup {
                             }
                         }
                         ColumnLayout {
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                                    text: qsTr("Midi Source:")
-                                }
-                                ZUI.ComboBox {
-                                    id: midiSourceCombo
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    currentIndex: 0
-                                    model: Zynthbox.MidiRouter.model.midiInSources
-                                    textRole: "text"
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Button {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.midiSoloTrack === false
-                                    text: qsTr("Play All Enabled Tracks")
-                                    onClicked: {
-                                        _private.midiSoloTrack = false;
-                                    }
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.midiSoloTrack === true
-                                    text: root.selectedChannel ? qsTr("Solo Track %1").arg(root.selectedChannel.name) : ""
-                                    onClicked: {
-                                        _private.midiSoloTrack = true;
-                                    }
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Button {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.armRecording === false
-                                    text: qsTr("Record Immediately")
-                                    onClicked: {
-                                        _private.armRecording = false;
-                                    }
-                                    opacity: 0 // TODO Implement arm-to-record
-                                    enabled: false
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.armRecording === true
-                                    text: qsTr("Wait For First Note")
-                                    onClicked: {
-                                        _private.armRecording = true;
-                                    }
-                                    opacity: 0 // TODO Implement arm-to-record
-                                    enabled: false
-                                }
-                            }
-                            RowLayout {
+                            spacing: ZUI.Theme.sectionSpacing
+                            ZUI.SectionGroup {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight
                                 RowLayout {
-                                    Layout.fillWidth: true
-                                    ZUI.PlayGridButton {
+                                    anchors.fill:parent
+                                    spacing: ZUI.Theme.spacing
+                                    QQC2.Label {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                                        text: qsTr("Midi Source:")
+                                    }
+                                    ZUI.ComboBox {
+                                        id: midiSourceCombo
                                         Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                        Layout.preferredHeight: _private.preferredRowHeight
+                                        currentIndex: 0
+                                        model: Zynthbox.MidiRouter.model.midiInSources
+                                        textRole: "text"
+                                    }
+                                }
+                            }
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                RowLayout {
+                                    anchors.fill:parent
+                                    spacing: ZUI.Theme.spacing
+                                    ZUI.SectionButton {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                                        Layout.preferredHeight: _private.preferredRowHeight
+                                        Layout.minimumHeight: Layout.preferredHeight
+                                        checked: _private.midiSoloTrack === false
+                                        text: qsTr("Play All Enabled Tracks")
+                                        onClicked: {
+                                            _private.midiSoloTrack = false;
+                                        }
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                                        Layout.preferredHeight: _private.preferredRowHeight
+                                        Layout.minimumHeight: Layout.preferredHeight
+                                        checked: _private.midiSoloTrack === true
+                                        text: root.selectedChannel ? qsTr("Solo Track %1").arg(root.selectedChannel.name) : ""
+                                        onClicked: {
+                                            _private.midiSoloTrack = true;
+                                        }
+                                    }
+                                }
+                            }
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                RowLayout {
+                                    anchors.fill:parent
+                                    spacing: ZUI.Theme.spacing
+                                    ZUI.SectionButton {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.preferredHeight: _private.preferredRowHeight
+                                        Layout.minimumHeight: Layout.preferredHeight
+                                        checked: _private.armRecording === false
+                                        text: qsTr("Record Immediately")
+                                        onClicked: {
+                                            _private.armRecording = false;
+                                        }
+                                        opacity: 0 // TODO Implement arm-to-record
+                                        enabled: false
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.preferredHeight: _private.preferredRowHeight
+                                        Layout.minimumHeight: Layout.preferredHeight
+                                        checked: _private.armRecording === true
+                                        text: qsTr("Wait For First Note")
+                                        onClicked: {
+                                            _private.armRecording = true;
+                                        }
+                                        opacity: 0 // TODO Implement arm-to-record
+                                        enabled: false
+                                    }
+                                }
+                            }
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                RowLayout {
+                                    anchors.fill:parent
+                                    spacing: ZUI.Theme.spacing
+                                    ZUI.SectionButton {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-remove-symbolic"
                                         icon.width: 24
@@ -914,13 +929,15 @@ ZUI.Popup {
                                     QQC2.Label {
                                         id:noteLengthLabel
                                         Layout.fillWidth: true
+                                        Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignHCenter
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         horizontalAlignment: Text.AlignHCenter
                                         text: _private.selectedPattern ? qsTr("Step Length: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.stepLength)) : ""
                                     }
-                                    ZUI.PlayGridButton {
+                                    ZUI.SectionButton {
                                         Layout.fillWidth: true
+                                        Layout.fillHeight: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         icon.name: "list-add-symbolic"
                                         icon.width: 24
@@ -936,134 +953,151 @@ ZUI.Popup {
                             RowLayout {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight
-                                RowLayout {
+                                spacing: ZUI.Theme.sectionSpacing
+                                ZUI.SectionGroup {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    ZUI.PlayGridButton {
-                                        Layout.fillWidth: true
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        icon.name: "list-remove-symbolic"
-                                        icon.width: 24
-                                        icon.height: 24
-                                        enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount > 0
-                                        onClicked: {
-                                            _private.patternQuantizingAmountDown();
+                                    Layout.fillHeight: true
+                                    RowLayout {
+                                        anchors.fill:parent
+                                        spacing: ZUI.Theme.spacing
+                                        ZUI.SectionButton {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                            icon.name: "list-remove-symbolic"
+                                            icon.width: 24
+                                            icon.height: 24
+                                            enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount > 0
+                                            onClicked: {
+                                                _private.patternQuantizingAmountDown();
+                                            }
                                         }
-                                    }
-                                    QQC2.Label {
-                                        Layout.fillWidth: true
-                                        Layout.alignment: Qt.AlignHCenter
-                                        Layout.preferredHeight: noteLengthLabel.height
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                        horizontalAlignment: Text.AlignHCenter
-                                        fontSizeMode: Text.Fit
-                                        minimumPointSize: 6
-                                        wrapMode: Text.NoWrap
-                                        text: _private.selectedPattern
-                                            ? _private.selectedPattern.liveRecordingQuantizingAmount === 0
-                                                ? qsTr("Quantize To Step")
-                                                : qsTr("Quantize To: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.liveRecordingQuantizingAmount))
-                                            : ""
-                                        MultiPointTouchArea {
-                                            anchors.fill: parent
-                                            touchPoints: [
-                                                TouchPoint {
-                                                    id: patternQuantizingAmountSlidePoint;
-                                                    property double increment: 1
-                                                    property double slideIncrement: 0.1
-                                                    property double upperBound: 1536
-                                                    property double lowerBound: 0
-                                                    property var currentValue: undefined
-                                                    onPressedChanged: {
-                                                        if (pressed) {
-                                                            currentValue = _private.selectedPattern.liveRecordingQuantizingAmount;
+                                        QQC2.Label {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            Layout.alignment: Qt.AlignHCenter
+                                            Layout.preferredHeight: noteLengthLabel.height
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                            horizontalAlignment: Text.AlignHCenter
+                                            fontSizeMode: Text.Fit
+                                            minimumPointSize: 6
+                                            wrapMode: Text.NoWrap
+                                            text: _private.selectedPattern
+                                                ? _private.selectedPattern.liveRecordingQuantizingAmount === 0
+                                                    ? qsTr("Quantize To Step")
+                                                    : qsTr("Quantize To: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.liveRecordingQuantizingAmount))
+                                                : ""
+                                            MultiPointTouchArea {
+                                                anchors.fill: parent
+                                                touchPoints: [
+                                                    TouchPoint {
+                                                        id: patternQuantizingAmountSlidePoint;
+                                                        property double increment: 1
+                                                        property double slideIncrement: 0.1
+                                                        property double upperBound: 1536
+                                                        property double lowerBound: 0
+                                                        property var currentValue: undefined
+                                                        onPressedChanged: {
+                                                            if (pressed) {
+                                                                currentValue = _private.selectedPattern.liveRecordingQuantizingAmount;
+                                                            }
+                                                        }
+                                                        onYChanged: {
+                                                            if (pressed && currentValue !== undefined) {
+                                                                var delta = (patternQuantizingAmountSlidePoint.x - patternQuantizingAmountSlidePoint.startX) * patternQuantizingAmountSlidePoint.slideIncrement;
+                                                                _private.selectedPattern.liveRecordingQuantizingAmount = Math.min(Math.max(currentValue + delta, patternQuantizingAmountSlidePoint.lowerBound), patternQuantizingAmountSlidePoint.upperBound);
+                                                            }
                                                         }
                                                     }
-                                                    onYChanged: {
-                                                        if (pressed && currentValue !== undefined) {
-                                                            var delta = (patternQuantizingAmountSlidePoint.x - patternQuantizingAmountSlidePoint.startX) * patternQuantizingAmountSlidePoint.slideIncrement;
-                                                            _private.selectedPattern.liveRecordingQuantizingAmount = Math.min(Math.max(currentValue + delta, patternQuantizingAmountSlidePoint.lowerBound), patternQuantizingAmountSlidePoint.upperBound);
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                                ]
+                                            }
                                         }
-                                    }
-                                    ZUI.PlayGridButton {
-                                        Layout.fillWidth: true
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        icon.name: "list-add-symbolic"
-                                        icon.width: 24
-                                        icon.height: 24
-                                        enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount < 1536
-                                        onClicked: {
-                                            _private.patternQuantizingAmountUp();
+                                        ZUI.SectionButton {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                            icon.name: "list-add-symbolic"
+                                            icon.width: 24
+                                            icon.height: 24
+                                            enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount < 1536
+                                            onClicked: {
+                                                _private.patternQuantizingAmountUp();
+                                            }
                                         }
                                     }
                                 }
-                                RowLayout {
+                                ZUI.SectionGroup {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                                    ZUI.PlayGridButton {
-                                        Layout.fillWidth: true
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        icon.name: "list-remove-symbolic"
-                                        icon.width: 24
-                                        icon.height: 24
-                                        enabled: _private.selectedPattern && _private.selectedPattern.patternLength > _private.selectedPattern.width
-                                        onClicked: {
-                                            _private.patternLengthDown();
+                                    Layout.fillHeight: true
+                                    RowLayout {
+                                        anchors.fill:parent
+                                        spacing: ZUI.Theme.spacing
+                                        ZUI.SectionButton {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                            icon.name: "list-remove-symbolic"
+                                            icon.width: 24
+                                            icon.height: 24
+                                            enabled: _private.selectedPattern && _private.selectedPattern.patternLength > _private.selectedPattern.width
+                                            onClicked: {
+                                                _private.patternLengthDown();
+                                            }
                                         }
-                                    }
-                                    QQC2.Label {
-                                        Layout.fillWidth: true
-                                        Layout.alignment: Qt.AlignHCenter
-                                        Layout.preferredHeight: noteLengthLabel.height
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                        horizontalAlignment: Text.AlignHCenter
-                                        fontSizeMode: Text.Fit
-                                        minimumPointSize: 6
-                                        wrapMode: Text.NoWrap
-                                        text: _private.selectedPattern
-                                              ? _private.selectedPattern.availableBars * _private.selectedPattern.width === _private.selectedPattern.patternLength
-                                                ? qsTr("Pattern Length: %1 Bars").arg(_private.selectedPattern.availableBars)
-                                                : qsTr("Pattern Length: %1.%2 Bars").arg(_private.selectedPattern.availableBars - 1).arg(_private.selectedPattern.patternLength - ((_private.selectedPattern.availableBars - 1) * _private.selectedPattern.width))
-                                        : ""
-                                        MultiPointTouchArea {
-                                            anchors.fill: parent
-                                            touchPoints: [
-                                                TouchPoint {
-                                                    id: patternLengthSlidePoint;
-                                                    property double increment: 1
-                                                    property double slideIncrement: 0.2
-                                                    property double upperBound: _private.selectedPattern ? _private.selectedPattern.bankLength * _private.selectedPattern.width : 128
-                                                    property double lowerBound: 1
-                                                    property var currentValue: undefined
-                                                    onPressedChanged: {
-                                                        if (pressed) {
-                                                            currentValue = _private.selectedPattern.patternLength;
+                                        QQC2.Label {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            Layout.alignment: Qt.AlignHCenter
+                                            Layout.preferredHeight: noteLengthLabel.height
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                            horizontalAlignment: Text.AlignHCenter
+                                            fontSizeMode: Text.Fit
+                                            minimumPointSize: 6
+                                            wrapMode: Text.NoWrap
+                                            text: _private.selectedPattern
+                                                ? _private.selectedPattern.availableBars * _private.selectedPattern.width === _private.selectedPattern.patternLength
+                                                    ? qsTr("Pattern Length: %1 Bars").arg(_private.selectedPattern.availableBars)
+                                                    : qsTr("Pattern Length: %1.%2 Bars").arg(_private.selectedPattern.availableBars - 1).arg(_private.selectedPattern.patternLength - ((_private.selectedPattern.availableBars - 1) * _private.selectedPattern.width))
+                                            : ""
+                                            MultiPointTouchArea {
+                                                anchors.fill: parent
+                                                touchPoints: [
+                                                    TouchPoint {
+                                                        id: patternLengthSlidePoint;
+                                                        property double increment: 1
+                                                        property double slideIncrement: 0.2
+                                                        property double upperBound: _private.selectedPattern ? _private.selectedPattern.bankLength * _private.selectedPattern.width : 128
+                                                        property double lowerBound: 1
+                                                        property var currentValue: undefined
+                                                        onPressedChanged: {
+                                                            if (pressed) {
+                                                                currentValue = _private.selectedPattern.patternLength;
+                                                            }
+                                                        }
+                                                        onYChanged: {
+                                                            if (pressed && currentValue !== undefined) {
+                                                                var delta = (patternLengthSlidePoint.x - patternLengthSlidePoint.startX) * patternLengthSlidePoint.slideIncrement;
+                                                                _private.selectedPattern.patternLength = Math.min(Math.max(currentValue + delta, patternLengthSlidePoint.lowerBound), patternLengthSlidePoint.upperBound);
+                                                            }
                                                         }
                                                     }
-                                                    onYChanged: {
-                                                        if (pressed && currentValue !== undefined) {
-                                                            var delta = (patternLengthSlidePoint.x - patternLengthSlidePoint.startX) * patternLengthSlidePoint.slideIncrement;
-                                                            _private.selectedPattern.patternLength = Math.min(Math.max(currentValue + delta, patternLengthSlidePoint.lowerBound), patternLengthSlidePoint.upperBound);
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                                ]
+                                            }
                                         }
-                                    }
 
-                                    ZUI.PlayGridButton {
-                                        Layout.fillWidth: true
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        icon.name: "list-add-symbolic"
-                                        icon.width: 24
-                                        icon.height: 24
-                                        enabled: _private.selectedPattern && _private.selectedPattern.patternLength < (_private.selectedPattern.bankLength * _private.selectedPattern.width)
-                                        onClicked: {
-                                            _private.patternLengthUp();
+                                        ZUI.SectionButton {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                            icon.name: "list-add-symbolic"
+                                            icon.width: 24
+                                            icon.height: 24
+                                            enabled: _private.selectedPattern && _private.selectedPattern.patternLength < (_private.selectedPattern.bankLength * _private.selectedPattern.width)
+                                            onClicked: {
+                                                _private.patternLengthUp();
+                                            }
                                         }
                                     }
                                 }

@@ -448,210 +448,216 @@ ZUI.Popup {
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: ZUI.Theme.sectionSpacing
 
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.leftMargin: root.spacing
+                spacing: ZUI.Theme.sectionSpacing
 
-                RowLayout { // Common Settings Section
+                ZUI.SectionGroup {
+                    
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
                     Layout.maximumHeight: Layout.preferredHeight
                     Layout.minimumHeight: Layout.preferredHeight
                     enabled: zynqtgui.sketchpad.isRecording === false
-
-                    ZUI.Card {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        contentItem: Item {
-                            ZUI.KnobIndicator {
-                                anchors {
-                                    right: parent.right
-                                    bottom: parent.bottom
-                                }
-                                height: Kirigami.Units.gridUnit * 1.3
-                                width: height
-                                knobId: 0
-                            }
-                            ColumnLayout {
-                                anchors.fill: parent
-                                QQC2.Switch {
-                                    Layout.fillHeight: true
-                                    Layout.alignment: Qt.AlignCenter
-                                    // Explicitly set indicator implicitWidth otherwise the switch size is too small
-                                    indicator.implicitWidth: Kirigami.Units.gridUnit * 3
-                                    checked: zynqtgui.sketchpad.metronomeEnabled
-                                    onToggled: {
-                                        zynqtgui.sketchpad.metronomeEnabled = checked
+                    RowLayout { // Common Settings Section
+                        
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.sectionSpacing
+                        ZUI.Card {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                            contentItem: Item {
+                                ZUI.KnobIndicator {
+                                    anchors {
+                                        right: parent.right
+                                        bottom: parent.bottom
                                     }
+                                    height: Kirigami.Units.gridUnit * 1.3
+                                    width: height
+                                    knobId: 0
                                 }
-                                QQC2.Label {
-                                    Layout.fillWidth: true
-                                    Layout.alignment: Qt.AlignBottom
-                                    wrapMode: QQC2.Label.WordWrap
-                                    horizontalAlignment: QQC2.Label.AlignHCenter
-                                    text: "Metronome"
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    QQC2.Switch {
+                                        Layout.fillHeight: true
+                                        Layout.alignment: Qt.AlignCenter
+                                        // Explicitly set indicator implicitWidth otherwise the switch size is too small
+                                        indicator.implicitWidth: Kirigami.Units.gridUnit * 3
+                                        checked: zynqtgui.sketchpad.metronomeEnabled
+                                        onToggled: {
+                                            zynqtgui.sketchpad.metronomeEnabled = checked
+                                        }
+                                    }
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignBottom
+                                        wrapMode: QQC2.Label.WordWrap
+                                        horizontalAlignment: QQC2.Label.AlignHCenter
+                                        text: "Metronome"
+                                    }
                                 }
                             }
                         }
-                    }
-                    ZUI.Card {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        contentItem: Item {
-                            ZUI.KnobIndicator {
-                                anchors {
-                                    right: parent.right
-                                    bottom: parent.bottom
+                        ZUI.Card {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                            contentItem: Item {
+                                ZUI.KnobIndicator {
+                                    anchors {
+                                        right: parent.right
+                                        bottom: parent.bottom
+                                    }
+                                    height: Kirigami.Units.gridUnit * 1.3
+                                    width: height
+                                    knobId: 1
                                 }
-                                height: Kirigami.Units.gridUnit * 1.3
-                                width: height
-                                knobId: 1
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    RowLayout {
+                                        id: countIn
+                                        property int from: 0
+                                        property int to: 4
+                                        property int value: zynqtgui.sketchpad.countInBars
+
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignCenter
+                                        onValueChanged: {
+                                            if (zynqtgui.sketchpad.countInBars != countIn.value) {
+                                                zynqtgui.sketchpad.countInBars = countIn.value;
+                                            }
+                                        }
+
+                                        QQC2.Button {
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                            Layout.preferredHeight: width
+                                            icon.name: "list-remove-symbolic"
+                                            enabled: countIn.value > countIn.from
+                                            onClicked: {
+                                                countIn.value = ZUI.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
+                                            }
+                                        }
+                                        Rectangle {
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                            color: Kirigami.Theme.backgroundColor
+                                            border.color: "#ff999999"
+                                            border.width: 1
+                                            radius: 4
+
+                                            QQC2.Label {
+                                                anchors.centerIn: parent
+                                                text: countIn.value == 0
+                                                    ? qsTr("Off")
+                                                    : countIn.value == 1
+                                                        ? qsTr("1 bar")
+                                                        : qsTr("%1 Bars").arg(countIn.value)
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                            Layout.preferredHeight: width
+                                            icon.name: "list-add-symbolic"
+                                            enabled: countIn.value < countIn.to
+                                            onClicked: {
+                                                countIn.value = ZUI.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
+                                            }
+                                        }
+                                    }
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignBottom
+                                        wrapMode: QQC2.Label.WordWrap
+                                        horizontalAlignment: QQC2.Label.AlignHCenter
+                                        text: "Count In (Bars)"
+                                    }
+                                }
                             }
-                            ColumnLayout {
-                                anchors.fill: parent
+                        }
+                        ZUI.Card {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                            contentItem: Item {
+                                ZUI.KnobIndicator {
+                                    anchors {
+                                        right: parent.right
+                                        bottom: parent.bottom
+                                    }
+                                    height: Kirigami.Units.gridUnit * 1.3
+                                    width: height
+                                    knobId: 2
+                                }
                                 RowLayout {
-                                    id: countIn
-                                    property int from: 0
-                                    property int to: 4
-                                    property int value: zynqtgui.sketchpad.countInBars
-
-                                    Layout.fillWidth: true
-                                    Layout.alignment: Qt.AlignCenter
-                                    onValueChanged: {
-                                        if (zynqtgui.sketchpad.countInBars != countIn.value) {
-                                            zynqtgui.sketchpad.countInBars = countIn.value;
+                                    anchors.fill: parent
+                                    Item { Layout.fillHeight: true; Layout.fillWidth: true; }
+                                    QQC2.Label {
+                                        Layout.fillHeight: true
+                                        Layout.fillWidth: true
+                                        horizontalAlignment: Text.AlignRight
+                                        verticalAlignment: Text.AlignVCenter
+                                        text: qsTr("Master\nVolume")
+                                    }
+                                    ZUI.SketchpadDial {
+                                        property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
+                                        Layout.fillHeight: true
+                                        controlObj: gainHandler
+                                        controlProperty: "gainDb"
+                                        valueString: qsTr("%1 dB").arg(dial.value.toFixed(2))
+                                        fineTuneButtonsVisible: false
+                                        onDoubleClicked: gainHandler.gainDb = zynqtgui.initialMasterVolume
+                                        dial {
+                                            stepSize: 0.5
+                                            from: gainHandler.minimumDecibel
+                                            to: gainHandler.maximumDecibel
                                         }
                                     }
-
-                                    QQC2.Button {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                        Layout.preferredHeight: width
-                                        icon.name: "list-remove-symbolic"
-                                        enabled: countIn.value > countIn.from
-                                        onClicked: {
-                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
-                                        }
-                                    }
-                                    Rectangle {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                        Kirigami.Theme.inherit: false
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                        color: Kirigami.Theme.backgroundColor
-                                        border.color: "#ff999999"
-                                        border.width: 1
-                                        radius: 4
-
-                                        QQC2.Label {
-                                            anchors.centerIn: parent
-                                            text: countIn.value == 0
-                                                ? qsTr("Off")
-                                                : countIn.value == 1
-                                                    ? qsTr("1 bar")
-                                                    : qsTr("%1 Bars").arg(countIn.value)
-                                        }
-                                    }
-                                    QQC2.Button {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                        Layout.preferredHeight: width
-                                        icon.name: "list-add-symbolic"
-                                        enabled: countIn.value < countIn.to
-                                        onClicked: {
-                                            countIn.value = ZUI.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
-                                        }
-                                    }
-                                }
-                                QQC2.Label {
-                                    Layout.fillWidth: true
-                                    Layout.alignment: Qt.AlignBottom
-                                    wrapMode: QQC2.Label.WordWrap
-                                    horizontalAlignment: QQC2.Label.AlignHCenter
-                                    text: "Count In (Bars)"
+                                    Item { Layout.fillHeight: true; Layout.fillWidth: true; }
                                 }
                             }
                         }
-                    }
-                    ZUI.Card {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        contentItem: Item {
-                            ZUI.KnobIndicator {
-                                anchors {
-                                    right: parent.right
-                                    bottom: parent.bottom
-                                }
-                                height: Kirigami.Units.gridUnit * 1.3
-                                width: height
-                                knobId: 2
-                            }
-                            RowLayout {
-                                anchors.fill: parent
-                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
-                                QQC2.Label {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    horizontalAlignment: Text.AlignRight
-                                    verticalAlignment: Text.AlignVCenter
-                                    text: qsTr("Master\nVolume")
-                                }
-                                ZUI.SketchpadDial {
-                                    property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
-                                    Layout.fillHeight: true
-                                    controlObj: gainHandler
-                                    controlProperty: "gainDb"
-                                    valueString: qsTr("%1 dB").arg(dial.value.toFixed(2))
-                                    fineTuneButtonsVisible: false
-                                    onDoubleClicked: gainHandler.gainDb = zynqtgui.initialMasterVolume
-                                    dial {
-                                        stepSize: 0.5
-                                        from: gainHandler.minimumDecibel
-                                        to: gainHandler.maximumDecibel
+                        ZUI.Card {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                            contentItem: Item {
+                                ZUI.KnobIndicator {
+                                    anchors {
+                                        right: parent.right
+                                        bottom: parent.bottom
                                     }
+                                    height: Kirigami.Units.gridUnit * 1.3
+                                    width: height
+                                    knobId: 3
                                 }
-                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
-                            }
-                        }
-                    }
-                    ZUI.Card {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        contentItem: Item {
-                            ZUI.KnobIndicator {
-                                anchors {
-                                    right: parent.right
-                                    bottom: parent.bottom
-                                }
-                                height: Kirigami.Units.gridUnit * 1.3
-                                width: height
-                                knobId: 3
-                            }
-                            RowLayout {
-                                anchors.fill: parent
-                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
-                                QQC2.Label {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    horizontalAlignment: Text.AlignRight
-                                    text: qsTr("BPM")
-                                }
-                                ZUI.SketchpadDial {
-                                    Layout.fillHeight: true
-                                    controlObj: Zynthbox.SyncTimer
-                                    controlProperty: "bpm"
-                                    fineTuneButtonsVisible: false
-                                    dial {
-                                        stepSize: 1
-                                        from: 50
-                                        to: 200
+                                RowLayout {
+                                    anchors.fill: parent
+                                    Item { Layout.fillHeight: true; Layout.fillWidth: true; }
+                                    QQC2.Label {
+                                        Layout.fillHeight: true
+                                        Layout.fillWidth: true
+                                        horizontalAlignment: Text.AlignRight
+                                        text: qsTr("BPM")
                                     }
+                                    ZUI.SketchpadDial {
+                                        Layout.fillHeight: true
+                                        controlObj: Zynthbox.SyncTimer
+                                        controlProperty: "bpm"
+                                        fineTuneButtonsVisible: false
+                                        dial {
+                                            stepSize: 1
+                                            from: 50
+                                            to: 200
+                                        }
+                                    }
+                                    Item { Layout.fillHeight: true; Layout.fillWidth: true; }
                                 }
-                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
                             }
                         }
                     }
@@ -660,7 +666,6 @@ ZUI.Popup {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 10
-                    Layout.topMargin: root.spacing
                     enabled: zynqtgui.sketchpad.isRecording === false
 
                     // RowLayout {
@@ -1105,209 +1110,185 @@ ZUI.Popup {
                         }
                     }
                 }
-                RowLayout { // Post Recording Preview section
+
+                ZUI.SectionGroup { 
                     id: recordingSectionLayout
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     Layout.maximumHeight: Layout.preferredHeight
                     Layout.minimumHeight: Layout.preferredHeight
-                    spacing: root.spacing
+                    RowLayout { // Post Recording Preview section
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.spacing
 
-                    QQC2.Control {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        // Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                        padding: 1
-
-                        background: Item {
-
-                            Rectangle {
-                                visible: !svgBg2.fromCurrentTheme
-                                anchors.fill: parent
+                        ZUI.SectionGroup {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            mask: true
+                            fallbackPadding: ZUI.Theme.padding
+                            fallbackBackground:  Rectangle {
                                 border.width: 1
                                 border.color: "#ff999999"
-                                radius: 4
+                                radius: ZUI.Theme.radius
                                 color: "#222222"
                             }
-
-                            PlasmaCore.FrameSvgItem {
-                                id: svgBg2
+                            Item {
+                                id: patternVisualiserItem
                                 anchors.fill: parent
-                                readonly property bool highlighted: false
-
-                                imagePath: "widgets/statusinfo_background"
-                                colorGroup: PlasmaCore.Theme.ViewColorGroup
-                                prefix: svgBg2.highlighted ? ["focus", ""] : ""
-                            }
-                        }
-
-                        contentItem: Item {
-                            id: patternVisualiserItem
-
-                            clip: true
-
-                            layer.enabled: true
-                            layer.effect: OpacityMask
-                            {
-                                maskSource: Rectangle
-                                {
-                                    width: patternVisualiserItem.width
-                                    height: patternVisualiserItem.height
-                                    radius: 4
-                                }
-                            }
-                            Zynthbox.WaveFormItem {
-                                anchors.fill: parent
-                                color: Kirigami.Theme.textColor
-                                visible: recordingTypeSettingsStack.currentIndex === 0
-                                start: 0
-                                end: length
-                                source: {
-                                    if (zynqtgui.sketchpad.isRecording) {
-                                        return "audioLevelsChannel:/ports"
-                                    } else if (_private.selectedClip != null && !_private.selectedClip.isEmpty) {
-                                        return _private.selectedClip.path
-                                    } else {
-                                        return ""
+                                Zynthbox.WaveFormItem {
+                                    anchors.fill: parent
+                                    color: Kirigami.Theme.textColor
+                                    visible: recordingTypeSettingsStack.currentIndex === 0
+                                    start: 0
+                                    end: length
+                                    source: {
+                                        if (zynqtgui.sketchpad.isRecording) {
+                                            return "audioLevelsChannel:/ports"
+                                        } else if (_private.selectedClip != null && !_private.selectedClip.isEmpty) {
+                                            return _private.selectedClip.path
+                                        } else {
+                                            return ""
+                                        }
                                     }
                                 }
-                            }
-                            Zynthbox.PatternModelVisualiserItem {
-                                id: patternVisualiser
+                                Zynthbox.PatternModelVisualiserItem {
+                                    id: patternVisualiser
+                                    anchors.fill: parent
+                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                    Kirigami.Theme.inherit: false
+                                    backgroundColor: Kirigami.Theme.backgroundColor
+                                    foregroundColor: Kirigami.Theme.textColor
+                                    fillColor: "transparent"
+                                    visible: _private.selectedPattern !== null && recordingTypeSettingsStack.currentIndex === 1
 
-                                visible: _private.selectedPattern !== null && recordingTypeSettingsStack.currentIndex === 1
+                                    Timer {
+                                        id: patternVisualiserThumbnailUpdater
+                                        interval: 10; repeat: false; running: false;
+                                        onTriggered: {
+                                            patternVisualiser.patternModel = _private.selectedPattern;
+                                        }
+                                    }
+                                    Connections {
+                                        target: _private.selectedPattern
+                                        onThumbnailUrlChanged: {
+                                            patternVisualiserThumbnailUpdater.restart();
+                                        }
+                                    }
+                                    Connections {
+                                        target: _private
+                                        onSelectedPatternChanged: {
+                                            patternVisualiserThumbnailUpdater.restart();
+                                        }
+                                    }
+                                    Rectangle { // Progress
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        visible: patternVisualiser.visible && _private.selectedPattern ? _private.selectedPattern.isPlaying : false
+                                        color: Kirigami.Theme.highlightColor
+                                        width: Math.max(1, Math.floor(widthFactor)) // this way the progress rect is the same width as a step
+                                        property double widthFactor: visible ? parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength) : 1
+                                        x: visible ? _private.selectedPattern.bankPlaybackPosition * widthFactor : 0
+                                    }
+                                    QQC2.Label {
+                                        anchors {
+                                            top: parent.top
+                                            right: parent.right
+                                            margins: Kirigami.Units.smallSpacing
+                                            rightMargin: patternVisualiser.visible ? parent.width - (_private.selectedPattern.patternLength * (parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength))) : 0
+                                        }
+                                        text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.patternLength, _private.selectedPattern.stepLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
+                                        function patternBarsToSeconds(patternSteps, noteLength, bpm) {
+                                            // Set up the loop points in the new recording
+                                            let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
+                                            // Reset this to beats (rather than pattern subbeats)
+                                            let patternDurationInBeats = patternSteps * noteLength / patternSubbeatToTickMultiplier;
+                                            let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
+                                            return patternDurationInSeconds;
+                                        }
+                                    }
+                                }
 
-                                anchors {
-                                    fill: parent
-                                    // margins: Kirigami.Units.smallSpacing
-                                }
-                                Timer {
-                                    id: patternVisualiserThumbnailUpdater
-                                    interval: 10; repeat: false; running: false;
-                                    onTriggered: {
-                                        patternVisualiser.patternModel = _private.selectedPattern;
-                                    }
-                                }
-                                Connections {
-                                    target: _private.selectedPattern
-                                    onThumbnailUrlChanged: {
-                                        patternVisualiserThumbnailUpdater.restart();
-                                    }
-                                }
-                                Connections {
-                                    target: _private
-                                    onSelectedPatternChanged: {
-                                        patternVisualiserThumbnailUpdater.restart();
-                                    }
-                                }
-                                Rectangle { // Progress
-                                    anchors {
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                    }
-                                    visible: patternVisualiser.visible && _private.selectedPattern ? _private.selectedPattern.isPlaying : false
-                                    color: Kirigami.Theme.highlightColor
-                                    width: Math.max(1, Math.floor(widthFactor)) // this way the progress rect is the same width as a step
-                                    property double widthFactor: visible ? parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength) : 1
-                                    x: visible ? _private.selectedPattern.bankPlaybackPosition * widthFactor : 0
-                                }
-                                QQC2.Label {
-                                    anchors {
-                                        top: parent.top
-                                        right: parent.right
-                                        margins: Kirigami.Units.smallSpacing
-                                        rightMargin: patternVisualiser.visible ? parent.width - (_private.selectedPattern.patternLength * (parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength))) : 0
-                                    }
-                                    text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.patternLength, _private.selectedPattern.stepLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
-                                    function patternBarsToSeconds(patternSteps, noteLength, bpm) {
-                                        // Set up the loop points in the new recording
-                                        let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
-                                        // Reset this to beats (rather than pattern subbeats)
-                                        let patternDurationInBeats = patternSteps * noteLength / patternSubbeatToTickMultiplier;
-                                        let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
-                                        return patternDurationInSeconds;
-                                    }
-                                }
-                            }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: Kirigami.Units.largeSpacing
+                                    spacing: Kirigami.Units.largeSpacing
+                                    opacity: 0.7
 
-                            ColumnLayout {
-                                anchors.fill: parent
-                                anchors.margins: Kirigami.Units.largeSpacing
-                                spacing: Kirigami.Units.largeSpacing
-                                opacity: 0.7
-
-                                Rectangle {
-                                    property real audioLevel: {
-                                        if (root.visible && root.selectedChannel != null) {
-                                            if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
-                                                return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                            } else if (zynqtgui.sketchpad.recordingSource === "external") {
-                                                return Zynthbox.AudioLevels.captureA
+                                    Rectangle {
+                                        property real audioLevel: {
+                                            if (root.visible && root.selectedChannel != null) {
+                                                if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
+                                                    return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                                } else if (zynqtgui.sketchpad.recordingSource === "external") {
+                                                    return Zynthbox.AudioLevels.captureA
+                                                } else {
+                                                    return -100
+                                                }
                                             } else {
                                                 return -100
                                             }
-                                        } else {
-                                            return -100
                                         }
+                                        Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                        Layout.minimumWidth: Layout.preferredWidth
+                                        Layout.maximumWidth: Layout.preferredWidth
+                                        Layout.fillHeight: true
+                                        color: Kirigami.Theme.highlightColor
+                                        radius: 100
                                     }
-                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
-                                    Layout.minimumWidth: Layout.preferredWidth
-                                    Layout.maximumWidth: Layout.preferredWidth
-                                    Layout.fillHeight: true
-                                    color: Kirigami.Theme.highlightColor
-                                    radius: 100
-                                }
-                                Rectangle {
-                                    property real audioLevel: {
-                                        if (root.visible && root.selectedChannel != null) {
-                                            if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
-                                                return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                            } else if (zynqtgui.sketchpad.recordingSource === "external") {
-                                                return Zynthbox.AudioLevels.captureB
+                                    Rectangle {
+                                        property real audioLevel: {
+                                            if (root.visible && root.selectedChannel != null) {
+                                                if (zynqtgui.sketchpad.recordingSource.startsWith("internal")) {
+                                                    return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                                } else if (zynqtgui.sketchpad.recordingSource === "external") {
+                                                    return Zynthbox.AudioLevels.captureB
+                                                } else {
+                                                    return -100
+                                                }
                                             } else {
                                                 return -100
                                             }
-                                        } else {
-                                            return -100
                                         }
+                                        Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                        Layout.minimumWidth: Layout.preferredWidth
+                                        Layout.maximumWidth: Layout.preferredWidth
+                                        Layout.fillHeight: true
+                                        color: Kirigami.Theme.highlightColor
+                                        radius: 100
                                     }
-                                    Layout.preferredWidth: parent.width * ZUI.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
-                                    Layout.minimumWidth: Layout.preferredWidth
-                                    Layout.maximumWidth: Layout.preferredWidth
-                                    Layout.fillHeight: true
-                                    color: Kirigami.Theme.highlightColor
-                                    radius: 100
                                 }
                             }
                         }
-                    }
 
-                    QQC2.Button {
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: height
-                        icon.name: "edit-clear-symbolic"
-                        icon.color: Kirigami.Theme.textColor
-                        // Always allow clearing when recording midi (for easy retakes, and clearing specific notes)
-                        enabled: (zynqtgui.sketchpad.recordingType === "midi" && _private.selectedPattern && _private.selectedPattern.hasNotes) || (zynqtgui.sketchpad.recordingType === "audio" && zynqtgui.sketchpad.isRecording === false)
-                        onClicked: {
-                            switch(recordingTypeSettingsStack.currentIndex) {
-                            case 0: // Audio Recording
-                                applicationWindow().confirmClearClip(_private.selectedClip);
-                                if (_private.selectedClip.path == null) {
-                                    _private.mostRecentlyRecordedClip = null;
+                        ZUI.SectionButton {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: height
+                            icon.name: "edit-clear-symbolic"
+                            icon.color: Kirigami.Theme.textColor
+                            // Always allow clearing when recording midi (for easy retakes, and clearing specific notes)
+                            enabled: (zynqtgui.sketchpad.recordingType === "midi" && _private.selectedPattern && _private.selectedPattern.hasNotes) || (zynqtgui.sketchpad.recordingType === "audio" && zynqtgui.sketchpad.isRecording === false)
+                            onClicked: {
+                                switch(recordingTypeSettingsStack.currentIndex) {
+                                case 0: // Audio Recording
+                                    applicationWindow().confirmClearClip(_private.selectedClip);
+                                    if (_private.selectedClip.path == null) {
+                                        _private.mostRecentlyRecordedClip = null;
+                                    }
+                                    break;
+                                case 1: // MIDI Recording
+                                    if (_private.selectedPattern.hasNotes) {
+                                        applicationWindow().confirmClearPattern(root.selectedChannel, _private.selectedPattern);
+                                    }
+                                    break;
+                                default:
+                                    // Audio Recording has three options:
+                                    // - Clear slot and delete recording
+                                    // - Clear slot and leave recording
+                                    // - Don't clear
+                                    break;
                                 }
-                                break;
-                            case 1: // MIDI Recording
-                                if (_private.selectedPattern.hasNotes) {
-                                    applicationWindow().confirmClearPattern(root.selectedChannel, _private.selectedPattern);
-                                }
-                                break;
-                            default:
-                                // Audio Recording has three options:
-                                // - Clear slot and delete recording
-                                // - Clear slot and leave recording
-                                // - Don't clear
-                                break;
                             }
                         }
                     }
@@ -1318,43 +1299,48 @@ ZUI.Popup {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                 Layout.minimumWidth: Layout.preferredWidth
-                Layout.rightMargin: root.spacing
-                spacing: root.spacing
-                QQC2.Button {
+                spacing: ZUI.Theme.sectionSpacing
+
+                ZUI.SectionGroup {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 18
-                    icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
-                    icon.width: 64
-                    icon.height: 64
-                    icon.color: "red"
-                    onPressedChanged: {
-                        if (pressed) {
-                            zynqtgui.callable_ui_action_simple("SWITCH_RECORD_PRESSED");
-                        } else {
-                            zynqtgui.callable_ui_action_simple("SWITCH_RECORD_RELEASED");
+                    ZUI.SectionButton {
+                        anchors.fill: parent
+                        icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        icon.width: 64
+                        icon.height: 64
+                        icon.color: "red"
+                        onPressedChanged: {
+                            if (pressed) {
+                                zynqtgui.callable_ui_action_simple("SWITCH_RECORD_PRESSED");
+                            } else {
+                                zynqtgui.callable_ui_action_simple("SWITCH_RECORD_RELEASED");
+                            }
+                        }
+                        onClicked: {
                         }
                     }
-                    onClicked: {
-                    }
                 }
-                QQC2.Button {
+                ZUI.SectionGroup {
                     Layout.fillWidth: true
                     Layout.minimumHeight: recordingSectionLayout.height
                     Layout.maximumHeight: recordingSectionLayout.height
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                    icon.name: "view-grid-symbolic"
-                    icon.width: 22
-                    icon.height: 22
-                    onClicked: {
-                        zynqtgui.callable_ui_action_simple("SHOW_KEYBOARD");
+                    ZUI.SectionButton {
+                        anchors.fill: parent
+                        icon.name: "view-grid-symbolic"
+                        icon.width: 22
+                        icon.height: 22
+                        onClicked: {
+                            zynqtgui.callable_ui_action_simple("SHOW_KEYBOARD");
+                        }
                     }
                 }
             }
         }
         QQC2.Button {
             Layout.fillWidth: true
-            Layout.margins: Kirigami.Units.smallSpacing
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             text: qsTr("Close")
             onClicked: {

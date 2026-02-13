@@ -252,7 +252,7 @@ ZUI.ScreenPage {
                                         : ""
                                 }
                                 readonly property QtObject fxPassthroughClient: root.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
-                                barVisible: true
+                                barVisible: fxPassthroughClient != null && root.selectedChannel != null && root.selectedChannel.chainedFx[index] != null
                                 barValue: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? ZUI.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                             }
                             

@@ -52,15 +52,33 @@ ZUI.ScreenPage {
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
 
     onSelectedChannelChanged: {
-        layerChangeThrottle.restart();
+        _syncTimer.restart();
     }
+    // Timer {
+    //     id: layerChangeThrottle
+    //     interval: 10; running: false; repeat: false;
+    //     onTriggered: {
+    //         zynqtgui.layers_for_channel.activate_index(0)
+    //     }
+    // }
+
+    //Hacky way to force update the banks views to the current selected bank
+    // readonly property int trackId : applicationWindow().selectedChannel.id
+    // onTrackIdChanged: {
+    //     _syncTimer.restart()
+    // }
     Timer {
-        id: layerChangeThrottle
-        interval: 10; running: false; repeat: false;
+        id: _syncTimer
+        repeat: false
+        interval: 10
         onTriggered: {
-            zynqtgui.layers_for_channel.activate_index(0)
+            zynqtgui.layers_for_channel.activate_index(layersView.selector.current_index)
+            // console.log("Update Selected synth")
+            layersView.selector.current_index = layersView.selector.current_index;
+            layersView.selector.activate_index(layersView.selector.current_index);
         }
     }
+    //end of the Hacky update
 
     backAction: Kirigami.Action {
         text: qsTr("Back")
@@ -367,23 +385,6 @@ ZUI.ScreenPage {
                         autoActivateIndexOnChange: true
                         view.spacing: ZUI.Theme.spacing
 
-                        //Hacky way to force update the banks views to the current selected bank
-                        readonly property int trackId : applicationWindow().selectedChannel.id
-                        onTrackIdChanged: {
-                            _syncTimer.restart()
-                        }
-
-                        Timer {
-                            id: _syncTimer
-                            repeat: false
-                            interval: 1000
-                            onTriggered: {
-                                console.log("Update Selected synth")
-                                layersView.selector.current_index = layersView.selector.current_index;
-                                layersView.selector.activate_index(layersView.selector.current_index);
-                            }
-                        }
-                        //end of the Hacky update
 
                         onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                         onItemActivated: {
@@ -392,7 +393,7 @@ ZUI.ScreenPage {
                             } else {
                                 pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index);
                             }
-                            // root.itemActivated(screenId, index);
+                            root.itemActivated(screenId, index);
                         }
                         onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
 
@@ -402,8 +403,6 @@ ZUI.ScreenPage {
                         delegate: QQC2.ItemDelegate {
                             id: delegate
                             width: ListView.view.width
-                            // height: layersView.view.height/5
-
                             padding: 2
 
                             readonly property int ownIndex: index
@@ -412,15 +411,19 @@ ZUI.ScreenPage {
                             highlighted: index === layersView.selector.current_index
                             checked: highlighted
 
-                            onClicked: {                                    
+                            onClicked: {    
+                                let oldCurrent_screen_id = zynqtgui.current_screen_id;                                
                                 layersView.selector.current_index = index;
                                 layersView.selector.activate_index(index);
                                 layersView.itemActivated(layersView.screenId, index)
-                                // if (!zynqtgui.fixed_layers.current_index_valid) {
-                                //     // layerSetupDialog.open();
-                                //     layersView.selector.activate_index(index);
-                                // }
-                                
+                                if (!zynqtgui.fixed_layers.current_index_valid) {
+                                    // layerSetupDialog.open();
+                                    layersView.selector.activate_index(index);
+                                }
+
+                                if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
+                                    layersView.currentScreenIdRequested(layersView.screenId)
+                                }
                             }
                             function toggleCloned() {
                                 if (model.metadata.midi_cloned) {
@@ -434,172 +437,111 @@ ZUI.ScreenPage {
                             }                                                
                             background: ZUI.DelegateBackground {
                                     visible : delegate.highlighted
-                            }  
-
-                            // background: Rectangle {
-                            //     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            //     Kirigami.Theme.inherit: false
-                            //     color: delegate.highlighted ?  Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
-                            //     radius: ZUI.Theme.radius
-                            // } //TOTHEME
-
-                            contentItem: ColumnLayout {
-
-                                Item {                                        
-                                    Layout.fillWidth: true
-                                    implicitHeight: Kirigami.Units.gridUnit * 2
-                                    
-                                    ColumnLayout {
-                                        anchors.fill: parent
-                                        anchors.margins: 2
-                                        spacing: ZUI.Theme.spacing
-
-                                        Item {
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            RowLayout {
-                                                anchors.fill: parent
-                                                QQC2.Label {
-                                                    id: mainLabel
-                                                    Layout.fillWidth: true
-                                                    Layout.fillHeight: true
-                                                    padding: 2
-                                                    elide: Text.ElideRight
-                                                    background: Rectangle {
-                                                        visible: ZUI.Theme.altVolume
-                                                        opacity: delegate.isEmpty || delegate.highlighted ? 0 : 1
-
-                                                        color: delegate.isEmpty  ? "#181918" : "#1f2022"
-                                                        radius: 2
-                                                    }
-                                                    Binding { // Optimization
-                                                        target: mainLabel
-                                                        property: "text"
-                                                        delayed: true
-                                                        value: mainLabel.visible
-                                                            ? (model.metadata ? "%1 - %2".arg(index + 1).arg(model.display) : "")
-                                                            : ""
-                                                    }                                                    
-                                                }
-                                                // QQC2.Label {
-                                                //     function constructText() {
-                                                //         let text = "";
-                                                //         if (model.metadata && model.metadata.note_high < 60) {
-                                                //             text = "L";
-                                                //         } else if (model.metadata && model.metadata.note_low >= 60) {
-                                                //             text = "H";
-                                                //         }
-                                                //         if (model.metadata && model.metadata.octave_transpose !== 0) {
-                                                //             if (model.metadata.octave_transpose > 0) {
-                                                //                 text += "+"
-                                                //             }
-                                                //             text += model.metadata.octave_transpose;
-                                                //         }
-                                                //         return text;
-                                                //     }
-                                                //     text: zynqtgui.isBootingComplete && root.isVisible ? constructText() : ""
-                                                // }
-                                                // QQC2.Button {
-                                                //     icon.name: "configure"
-                                                //     // visible: model.display != "-"
-                                                //     visible: false // Hide configure button for now
-                                                //     onClicked: {
-                                                //         //delegate.clicked();
-                                                //         optionsMenu.open();
-                                                //     }
-                                                //     QQC2.Menu {
-                                                //         id: optionsMenu
-                                                //         y: parent.height
-                                                //         modal: true
-                                                //         dim: false
-                                                //         QQC2.MenuItem {
-                                                //             width: parent.width
-                                                //             text: qsTr("Change Synth...")
-                                                //             onClicked: {
-                                                //                 optionsMenu.close();
-                                                //                 delegate.clicked();
-                                                //                 zynqtgui.layer.select_engine(model.metadata.midi_channel);
-                                                //             }
-                                                //         }
-                                                //         QQC2.MenuItem {
-                                                //             width: parent.width
-                                                //             text: qsTr("Range && Transpose...")
-                                                //             onClicked: {
-                                                //                 optionsMenu.close();
-                                                //                 delegate.clicked();
-                                                //                 zynqtgui.current_modal_screen_id = "midi_key_range";
-                                                //             }
-                                                //         }
-                                                //         QQC2.MenuItem {
-                                                //             width: parent.width
-                                                //             text: qsTr("Add Audio FX...")
-                                                //             onClicked: {
-                                                //                 optionsMenu.close();
-                                                //                 delegate.clicked();
-                                                //                 zynqtgui.layer_options.show();
-                                                //                 zynqtgui.current_screen_id = "layer_effects";
-                                                //             }
-                                                //         }
-                                                //         QQC2.MenuItem {
-                                                //             width: parent.width
-                                                //             text: qsTr("Add Midi FX...")
-                                                //             onClicked: {
-                                                //                 optionsMenu.close();
-                                                //                 delegate.clicked();
-                                                //                 zynqtgui.layer_options.show();
-                                                //                 zynqtgui.current_screen_id = "layer_midi_effects";
-                                                //             }
-                                                //         }
-                                                //         QQC2.MenuItem {
-                                                //             width: parent.width
-                                                //             text: qsTr("Layer Options...")
-                                                //             onClicked: {
-                                                //                 optionsMenu.close();
-                                                //                 delegate.clicked();
-                                                //                 let oldCurrent_screen_id = zynqtgui.current_screen_id;
-                                                //                 delegate.selector.current_index = delegate.ownIndex;
-                                                //                 delegate.selector.activate_index_secondary(delegate.ownIndex);
-                                                //                 delegate.itemActivatedSecondary(delegate.screenId, delegate.ownIndex);
-                                                //                 if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
-                                                //                     delegate.currentScreenIdRequested(screenId);
-                                                //                 }
-                                                //             }
-                                                //         }
-                                                //     }
-                                                // }
-                                            }
-                                        }
-                                        Rectangle {
-                                            Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryGainHandler.gainAbsolute
-                                            Layout.preferredHeight: 6
-                                            visible: root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel)
-                                            color: ZUI.Theme.monoColorHandles ? Kirigami.Theme.textColor : Kirigami.Theme.highlightColor
-                                            opacity: 0.8
-                                            radius: ZUI.Theme.radius
-                                        }
-                                    }     
-                                }
-                                
-                                // RowLayout {
-                                //     id: fxLayout
-                                //     Layout.fillWidth: true
-                                //     // Layout.fillHeight: true
-                                //     /* QQC2.Label {
-                                //         text: "|"
-                                //         opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
-                                //     }*/
-                                //     QQC2.Label {
-                                //         Layout.fillWidth: true
-                                //         font.pointSize: mainLabel.font.pointSize * 0.9
-                                //         Binding {
-                                //             property: "text"
-                                //             value: model.metadata && model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
-                                //             delayed: true
-                                //         }
-                                //         elide: Text.ElideRight
-                                //     }
-                                // }                                  
                             }
+                            
+                            contentItem: ZUI.SlotControl {
+                                id: slotControl
+                                implicitHeight: Kirigami.Units.gridUnit * 2
+                                barVisible: root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel) 
+                                barValue: Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryGainHandler.gainAbsolute
+                                onClicked: delegate.clicked()
+                                Binding { // Optimization
+                                    target: slotControl
+                                    property: "text"
+                                    delayed: true
+                                    value: slotControl.visible
+                                        ? (model.metadata ? "%1 - %2".arg(index + 1).arg(model.display) : "")
+                                        : ""
+                                } 
+                                
+                                // QQC2.Label {
+                                //     function constructText() {
+                                //         let text = "";
+                                //         if (model.metadata && model.metadata.note_high < 60) {
+                                //             text = "L";
+                                //         } else if (model.metadata && model.metadata.note_low >= 60) {
+                                //             text = "H";
+                                //         }
+                                //         if (model.metadata && model.metadata.octave_transpose !== 0) {
+                                //             if (model.metadata.octave_transpose > 0) {
+                                //                 text += "+"
+                                //             }
+                                //             text += model.metadata.octave_transpose;
+                                //         }
+                                //         return text;
+                                //     }
+                                //     text: zynqtgui.isBootingComplete && root.isVisible ? constructText() : ""
+                                // }
+                                // QQC2.Button {
+                                //     icon.name: "configure"
+                                //     // visible: model.display != "-"
+                                //     visible: false // Hide configure button for now
+                                //     onClicked: {
+                                //         //delegate.clicked();
+                                //         optionsMenu.open();
+                                //     }
+                                //     QQC2.Menu {
+                                //         id: optionsMenu
+                                //         y: parent.height
+                                //         modal: true
+                                //         dim: false
+                                //         QQC2.MenuItem {
+                                //             width: parent.width
+                                //             text: qsTr("Change Synth...")
+                                //             onClicked: {
+                                //                 optionsMenu.close();
+                                //                 delegate.clicked();
+                                //                 zynqtgui.layer.select_engine(model.metadata.midi_channel);
+                                //             }
+                                //         }
+                                //         QQC2.MenuItem {
+                                //             width: parent.width
+                                //             text: qsTr("Range && Transpose...")
+                                //             onClicked: {
+                                //                 optionsMenu.close();
+                                //                 delegate.clicked();
+                                //                 zynqtgui.current_modal_screen_id = "midi_key_range";
+                                //             }
+                                //         }
+                                //         QQC2.MenuItem {
+                                //             width: parent.width
+                                //             text: qsTr("Add Audio FX...")
+                                //             onClicked: {
+                                //                 optionsMenu.close();
+                                //                 delegate.clicked();
+                                //                 zynqtgui.layer_options.show();
+                                //                 zynqtgui.current_screen_id = "layer_effects";
+                                //             }
+                                //         }
+                                //         QQC2.MenuItem {
+                                //             width: parent.width
+                                //             text: qsTr("Add Midi FX...")
+                                //             onClicked: {
+                                //                 optionsMenu.close();
+                                //                 delegate.clicked();
+                                //                 zynqtgui.layer_options.show();
+                                //                 zynqtgui.current_screen_id = "layer_midi_effects";
+                                //             }
+                                //         }
+                                //         QQC2.MenuItem {
+                                //             width: parent.width
+                                //             text: qsTr("Layer Options...")
+                                //             onClicked: {
+                                //                 optionsMenu.close();
+                                //                 delegate.clicked();
+                                //                 let oldCurrent_screen_id = zynqtgui.current_screen_id;
+                                //                 delegate.selector.current_index = delegate.ownIndex;
+                                //                 delegate.selector.activate_index_secondary(delegate.ownIndex);
+                                //                 delegate.itemActivatedSecondary(delegate.screenId, delegate.ownIndex);
+                                //                 if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
+                                //                     delegate.currentScreenIdRequested(screenId);
+                                //                 }
+                                //             }
+                                //         }
+                                //     }
+                                // }
+                                }                                
+                            
                         }
                     }
                 }
@@ -671,7 +613,7 @@ ZUI.ScreenPage {
 
                             // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                             active: zynqtgui.isBootingComplete
-                            onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                            // onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId) // this causes the view to be reloaded
                             onItemActivated: root.itemActivated(screenId, index)
                             onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                             Component.onCompleted: {
@@ -692,9 +634,14 @@ ZUI.ScreenPage {
                                     visible : bankDelegate.highlighted
                                 }
                                 onClicked: {
-                                    console.log("Delegate clicked", parent.text, index)
+                                    let oldCurrent_screen_id = zynqtgui.current_screen_id;
                                     bankView.selector.current_index = index;
                                     bankView.selector.activate_index(index);
+                                    bankView.itemActivated(bankView.screenId, index);
+
+                                    if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
+                                        bankView.currentScreenIdRequested(bankView.screenId)
+                                    }
                                 } 
                             }
                         }

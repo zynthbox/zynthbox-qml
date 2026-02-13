@@ -186,6 +186,7 @@ ZUI.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         screenId: root.screenIds[0]
+                        view.spacing: ZUI.Theme.spacing
                         onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                         onItemActivated: {
                             if (root.selectedChannel.selectedSlot.value === index) {
@@ -210,49 +211,51 @@ ZUI.ScreenPage {
                         Component.onCompleted: {
                             fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                         }
-                        delegate: ZUI.SelectorDelegate {
+                        delegate: QQC2.ItemDelegate {
                             id: delegate
-                            screenId: fixedEffectsView.screenId
-                            selector: fixedEffectsView.selector
-                            highlighted: zynqtgui.current_screen_id === fixedEffectsView.screenId
-                            onCurrentScreenIdRequested: fixedEffectsView.currentScreenIdRequested(screenId)
-                            onItemActivated: fixedEffectsView.itemActivated(screenId, index)
-                            onItemActivatedSecondary: fixedEffectsView.itemActivatedSecondary(screenId, index)
-                            height: fixedEffectsView.view.height/5
+                            width: ListView.view.width
+                            padding: 2
+
+                            highlighted: index === fixedEffectsView.selector.current_index
+                            checked: highlighted
+                            // onCurrentScreenIdRequested: fixedEffectsView.currentScreenIdRequested(screenId)
+                            // onItemActivated: fixedEffectsView.itemActivated(screenId, index)
+                            // onItemActivatedSecondary: fixedEffectsView.itemActivatedSecondary(screenId, index)
                             onClicked: {
+                                let oldCurrent_screen_id = zynqtgui.current_screen_id;
+                                fixedEffectsView.selector.current_index = index;
+                                fixedEffectsView.selector.activate_index(index);
+                                fixedEffectsView.itemActivated(fixedEffectsView.screenId, index);
+
                                 if (!zynqtgui.effects_for_channel.current_index_valid) {
-                                    delegate.selector.activate_index(index);
+                                    fixedEffectsView.selector.activate_index(index);
+                                }
+
+                                if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
+                                    fixedEffectsView.currentScreenIdRequested(fixedEffectsView.screenId)
                                 }
                             }
-                            contentItem: ColumnLayout {
-                                RowLayout {
-                                    QQC2.Label {
-                                        id: mainLabel
-                                        Layout.fillWidth: true
-                                        Binding { // Optimization
-                                            target: mainLabel
-                                            property: "text"
-                                            delayed: true
-                                            value: mainLabel.visible
-                                                ? model.display
-                                                : ""
-                                        }
-                                        elide: Text.ElideRight
-                                    }
-                                }
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                }
-                                Rectangle {
-                                    property QtObject fxPassthroughClient: root.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
-                                    Layout.preferredWidth: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * ZUI.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                                    visible: fxPassthroughClient != null && root.selectedChannel != null && root.selectedChannel.chainedFx[index] != null
-                                    color: Kirigami.Theme.highlightColor
-                                    opacity: 0.7
-                                }
+
+                            background: ZUI.DelegateBackground {
+                                visible : delegate.highlighted
                             }
+                            contentItem: ZUI.SlotControl {
+                                id: slotControl
+                                onClicked: delegate.clicked()
+                                implicitHeight: Kirigami.Units.gridUnit * 2
+                                Binding { // Optimization
+                                    target: slotControl
+                                    property: "text"
+                                    delayed: true
+                                    value: slotControl.visible
+                                        ? model.display
+                                        : ""
+                                }
+                                readonly property QtObject fxPassthroughClient: root.selectedChannel != null && Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
+                                barVisible: true
+                                barValue: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? ZUI.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                            }
+                            
                         }
                     }
                 }
@@ -281,6 +284,7 @@ ZUI.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         model: []
+                        view.spacing: ZUI.Theme.spacing
                     }
                 }
             }
@@ -323,6 +327,7 @@ ZUI.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         screenId: root.screenIds[1]
+                        view.spacing: ZUI.Theme.spacing
                         onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                         onItemActivated: {
                             if (zynqtgui.current_screen_id != "effect_preset") {

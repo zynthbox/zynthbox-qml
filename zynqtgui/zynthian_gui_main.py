@@ -179,7 +179,9 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.__current_module_recordingports_left__ = self.list_metadata[i]["recording_ports_left"]
             self.__current_module_recordingports_right__ = self.list_metadata[i]["recording_ports_right"]
             self.currentModuleChanged.emit()
-            Popen(shlex.split(self.list_data[i][1]))
+            # The appimages have the path to Apprun as the Exec field value. Hence we can skip using shlex to split the arguments
+            # FIXME : If the Exec contains arguments, this will fail to start the appimage. Find a solution that handles spaces in the Exec command and also handles arguments properly
+            Popen(self.list_data[i][1])
 
             # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page
             QTimer.singleShot(1000, lambda: self.zynqtgui.show_modal("sketchpad"))
@@ -441,6 +443,21 @@ class zynthian_gui_main(zynthian_gui_selector):
                 config.write(f, space_around_delimiters=False)
             self.fill_list()
             QTimer.singleShot(0, self.zynqtgui.end_long_task)
+
+            # Step 4 : Fix Apprun.env having unquoted $APPDIR causing appimages to fail to start.
+            # This is a bug in the AppImage build process and should ideally be fixed there,
+            # but we can patch it here as well to fix existing appimages and any new ones until they fix it in their build process
+            apprun_env_path = appdir / "AppRun.env"
+            if apprun_env_path.exists():
+                apprun_env_data = apprun_env_path.read_text()
+                # Check if `APPDIR_EXEC_ARGS` has unquoted $APPDIR env variable
+                if not re.match(r'APPDIR_EXEC_ARGS="', apprun_env_data):
+                    # Patch the AppRun.env file
+                    match = re.search(r'APPDIR_EXEC_ARGS=(.*)', apprun_env_data)
+                    if match is not None:
+                        logging.info(f"Patching {str(apprun_env_path)} APPDIR_EXEC_ARGS field")
+                        apprun_env_data = re.sub(r'APPDIR_EXEC_ARGS=.*', f'APPDIR_EXEC_ARGS="{match.group(1)}"', apprun_env_data)
+                        apprun_env_path.write_text(apprun_env_data)
 
         self.zynqtgui.do_long_task(task, f"Optimizing App")
 

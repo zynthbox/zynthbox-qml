@@ -250,11 +250,12 @@ GridLayout {
                     enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || realIndex === 2))
                     visible: enabled
                     isEmpty: text.trim().length == 0
+                    muted: !slotMakesSound
                     dragEnabled: control.dragEnabled
                     doubleClickEnabled: control.doubleClickEnabled
                     clickAndHoldEnabled: control.clickAndHoldEnabled
 
-                    opacity: slotMakesSound ? 1 : 0.3   
+                    // opacity: slotMakesSound ? 1 : 0.3   
                     checked: slotDelegate.isClipEnabled || (control.channel.selectedSlot.className == _private.className && control.channel.selectedSlot.value === realIndex)
                     highlighted: zynqtgui.sketchpad.lastSelectedObj != null &&
                                             zynqtgui.sketchpad.lastSelectedObj.track == control.channel &&
@@ -454,8 +455,7 @@ GridLayout {
                         control.slotClicked(slotDelegate.slotIndex);
                     }
 
-                    onDoubleClicked: {
-                        // Double press has happened. Toggle mute/bypass state the slot
+                    function mute() {
                         switch (control.slotType) {
                             case "synth":
                                 if (slotDelegate.synthPassthroughClient) {
@@ -475,7 +475,14 @@ GridLayout {
                         }
                     }
 
+                    onDoubleClicked: mute()
+
                     onClicked: {
+                        if(zynqtgui.sketchpad.muteModeActive)
+                        {
+                            mute()
+                            return
+                        }
                         slotDelegate.switchToThisSlot();
                     }
 

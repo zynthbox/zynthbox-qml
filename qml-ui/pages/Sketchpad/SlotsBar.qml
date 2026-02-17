@@ -311,337 +311,314 @@ ZUI.SectionPanel {
     //// END INVISIBLE BUTTONS
 
 
-    contentItem: Item {
+    contentItem: ZUI.ThreeColumnView {
         
-        RowLayout {
-            anchors.fill: parent
-            spacing: ZUI.Theme.sectionSpacing
+        leftTab: BottomStackTabs {}
 
-            BottomStackTabs {
-                id: buttonsColumn
-                Layout.fillWidth: false
-                Layout.fillHeight: true
-                Layout.minimumWidth: Kirigami.Units.gridUnit * 6
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                // Layout.column: ZUI.Theme.altTabs ? 1: 0                
-            }
+        middleTab: ZUI.SectionGroup {
+            
+            fallbackBackground: Rectangle {
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.View
+                color: Kirigami.Theme.backgroundColor
+                opacity: 0.1
+            } 
 
-            ZUI.SectionGroup {
+            Item {
+                id: slotsContainer
+                anchors.fill: parent
 
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                // mask: true
-                
-                fallbackBackground: Rectangle {
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    color: Kirigami.Theme.backgroundColor
-                    opacity: 0.1
-                } 
-
-                Item {
-                    id: slotsContainer
+                RowLayout {
+                    id: channelsSlotsRow
                     anchors.fill: parent
+                    property int currentIndex: 0
 
-                    RowLayout {
-                        id: channelsSlotsRow
-                        anchors.fill: parent
-                        property int currentIndex: 0
+                    spacing: 1
 
-                        spacing: 1
+                    Repeater {
+                        model: root.song.channelsModel
 
-                        Repeater {
-                            model: root.song.channelsModel
+                        delegate: QQC2.Control {
+                            id: channelDelegate
+                            property bool highlighted: false
+                            //                            property int selectedRow: 0
+                            property int channelIndex: index
+                            property QtObject channel: model.channel
 
-                            delegate: QQC2.Control {
-                                id: channelDelegate
-                                property bool highlighted: false
-                                //                            property int selectedRow: 0
-                                property int channelIndex: index
-                                property QtObject channel: model.channel
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
 
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-
-                                padding: Kirigami.Units.smallSpacing
-                                background: Item {
-                                    // Kirigami.Separator {
-                                    //     height: parent.height
-                                    //     anchors.left: parent.left
-                                    //     visible: channelDelegate.channelIndex !== 0
-                                    //     width: 1
-                                    //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
-                                    // }
-                                    Rectangle {
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.Window
-                                        Kirigami.Theme.inherit: false
-                                        visible: !svgBg2.visible
-                                        anchors.fill: parent
-                                        color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
-                                        border.width: 1
-                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                                    }
-                                    PlasmaCore.FrameSvgItem {
-                                        id: svgBg2
-                                        visible: fromCurrentTheme 
-                                        anchors.fill: parent
-
-                                        readonly property real leftPadding: fixedMargins.left
-                                        readonly property real rightPadding: fixedMargins.right
-                                        readonly property real topPadding: fixedMargins.top
-                                        readonly property real bottomPadding: fixedMargins.bottom
-
-                                        imagePath: "widgets/column-delegate-background"
-                                        prefix: channelDelegate.highlighted ? ["focus", ""] : ""
-                                        colorGroup: PlasmaCore.Theme.ViewColorGroup
-                                    }
+                            padding: Kirigami.Units.smallSpacing
+                            background: Item {
+                                // Kirigami.Separator {
+                                //     height: parent.height
+                                //     anchors.left: parent.left
+                                //     visible: channelDelegate.channelIndex !== 0
+                                //     width: 1
+                                //     color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                                // }
+                                Rectangle {
+                                    Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                                    Kirigami.Theme.inherit: false
+                                    visible: !svgBg2.visible
+                                    anchors.fill: parent
+                                    color: highlighted ? "#22ffffff" : Kirigami.Theme.backgroundColor
+                                    border.width: 1
+                                    border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                 }
+                                PlasmaCore.FrameSvgItem {
+                                    id: svgBg2
+                                    visible: fromCurrentTheme 
+                                    anchors.fill: parent
 
-                                Timer {
-                                    id: channelHighlightedThrottle
-                                    interval: 1; running: false; repeat: false;
-                                    onTriggered: {
-                                        channelDelegate.highlighted = (index === zynqtgui.sketchpad.selectedTrackId);
-                                        if (channelDelegate.highlighted) {
-                                            root.selectedSlotRowItem = channelDelegate;
-                                        }
-                                    }
-                                }
-                                Connections {
-                                    target: zynqtgui.sketchpad
-                                    onSelected_track_id_changed: channelHighlightedThrottle.restart()
-                                }
-                                // Make sure to highlight first column correctly after booting is complete
-                                Connections {
-                                    target: zynqtgui
-                                    onIsBootingCompleteChanged: channelHighlightedThrottle.restart()
-                                }
-                                // And once the song has completed loading
-                                Connections {
-                                    target: zynqtgui.sketchpad.song
-                                    onIsLoadingChanged: channelHighlightedThrottle.restart()
-                                }
-                                // And once the component is completed (which happens when loading sketchpads)
-                                Component.onCompleted: {
-                                    channelHighlightedThrottle.restart();
-                                }
+                                    readonly property real leftPadding: fixedMargins.left
+                                    readonly property real rightPadding: fixedMargins.right
+                                    readonly property real topPadding: fixedMargins.top
+                                    readonly property real bottomPadding: fixedMargins.bottom
 
-                                onHighlightedChanged: {
-                                    if (highlighted) {
+                                    imagePath: "widgets/column-delegate-background"
+                                    prefix: channelDelegate.highlighted ? ["focus", ""] : ""
+                                    colorGroup: PlasmaCore.Theme.ViewColorGroup
+                                }
+                            }
+
+                            Timer {
+                                id: channelHighlightedThrottle
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    channelDelegate.highlighted = (index === zynqtgui.sketchpad.selectedTrackId);
+                                    if (channelDelegate.highlighted) {
                                         root.selectedSlotRowItem = channelDelegate;
                                     }
                                 }
+                            }
+                            Connections {
+                                target: zynqtgui.sketchpad
+                                onSelected_track_id_changed: channelHighlightedThrottle.restart()
+                            }
+                            // Make sure to highlight first column correctly after booting is complete
+                            Connections {
+                                target: zynqtgui
+                                onIsBootingCompleteChanged: channelHighlightedThrottle.restart()
+                            }
+                            // And once the song has completed loading
+                            Connections {
+                                target: zynqtgui.sketchpad.song
+                                onIsLoadingChanged: channelHighlightedThrottle.restart()
+                            }
+                            // And once the component is completed (which happens when loading sketchpads)
+                            Component.onCompleted: {
+                                channelHighlightedThrottle.restart();
+                            }
 
-                                contentItem: TrackSlotsData {
-                                    id: synthsRow
-                                    columnSpacing: Kirigami.Units.gridUnit * 0.7
-                                    channel: channelDelegate.channel
-                                    slotData: {
-                                        if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                                            return channelDelegate.channel.synthSlotsData
-                                        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
-                                            return channelDelegate.channel.sampleSlotsData
-                                        } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
-                                            return channelDelegate.channel.fxSlotsData
-                                        } else {
-                                            return channelDelegate.channel.synthSlotsData // Fallback to synths when none of the tab buttons are checked
-                                        }
+                            onHighlightedChanged: {
+                                if (highlighted) {
+                                    root.selectedSlotRowItem = channelDelegate;
+                                }
+                            }
+
+                            contentItem: TrackSlotsData {
+                                id: synthsRow
+                                columnSpacing: Kirigami.Units.gridUnit * 0.7
+                                channel: channelDelegate.channel
+                                slotData: {
+                                    if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
+                                        return channelDelegate.channel.synthSlotsData
+                                    } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
+                                        return channelDelegate.channel.sampleSlotsData
+                                    } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
+                                        return channelDelegate.channel.fxSlotsData
+                                    } else {
+                                        return channelDelegate.channel.synthSlotsData // Fallback to synths when none of the tab buttons are checked
                                     }
-                                    slotType: {
-                                        if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                                            return "synth"
-                                        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
-                                            return "sample-trig"
-                                        } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
-                                            return "fx"
-                                        } else {
-                                            return "synth" // Fallback to synths when none of the tab buttons are checked
-                                        }
+                                }
+                                slotType: {
+                                    if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
+                                        return "synth"
+                                    } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
+                                        return "sample-trig"
+                                    } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
+                                        return "fx"
+                                    } else {
+                                        return "synth" // Fallback to synths when none of the tab buttons are checked
                                     }
-                                    orientation: Qt.Vertical
-                                    showSlotTypeLabel: false
-                                    dragEnabled: false
-                                    singleClickEnabled: true
-                                    doubleClickEnabled: false
-                                    clickAndHoldEnabled: false
-                                    onSlotClicked: {
-                                        zynqtgui.sketchpad.selectedTrackId = channel.id
-                                    }
+                                }
+                                orientation: Qt.Vertical
+                                showSlotTypeLabel: false
+                                dragEnabled: false
+                                singleClickEnabled: true
+                                doubleClickEnabled: false
+                                clickAndHoldEnabled: false
+                                onSlotClicked: {
+                                    zynqtgui.sketchpad.selectedTrackId = channel.id
                                 }
                             }
                         }
                     }
                 }
             }
+        }
 
-            ZUI.SectionGroup {
+        rightTab: ZUI.SectionGroup {
+            
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: ZUI.Theme.spacing
 
-                Layout.fillWidth: false
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                Layout.alignment: Qt.AlignTop
-                
-                ColumnLayout {
-                    anchors.fill: parent
-                    spacing: ZUI.Theme.spacing
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    // Layout.alignment: Qt.AlignHCenter
+                    // font.pointSize: 14
+                    text: qsTr("Ch%1-Slot%2")
+                    .arg(zynqtgui.sketchpad.selectedTrackId + 1)
+                    .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
+                }
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    // Layout.alignment: Qt.AlignHCenter
+                    visible: bottomStack.currentBarView === Main.BarView.SynthsBar
+                    font.pointSize: 10
+                    text: qsTr("Synth")
+                }
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.alignment: Qt.AlignHCenter
+                    font.pointSize: 10
+                    visible: bottomStack.currentBarView === Main.BarView.FXBar
+                    text: qsTr("Fx")
+                }
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.alignment: Qt.AlignHCenter
+                    font.pointSize: 10
+                    visible: bottomStack.currentBarView === Main.BarView.SamplesBar
+                    text: qsTr("Sample")
+                }
 
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        // Layout.alignment: Qt.AlignHCenter
-                        // font.pointSize: 14
-                        text: qsTr("Ch%1-Slot%2")
-                        .arg(zynqtgui.sketchpad.selectedTrackId + 1)
-                        .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        // Layout.alignment: Qt.AlignHCenter
-                        visible: bottomStack.currentBarView === Main.BarView.SynthsBar
-                        font.pointSize: 10
-                        text: qsTr("Synth")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: 10
-                        visible: bottomStack.currentBarView === Main.BarView.FXBar
-                        text: qsTr("Fx")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: 10
-                        visible: bottomStack.currentBarView === Main.BarView.SamplesBar
-                        text: qsTr("Sample")
-                    }
+                QQC2.Control {
+                    clip: true
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: detailsText.height + 20
+                    Layout.alignment: Qt.AlignHCenter
 
-                    QQC2.Control {
-                        clip: true
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: detailsText.height + 20
-                        Layout.alignment: Qt.AlignHCenter
+                    background: Item {
 
-                        background: Item {
+                        Rectangle {
+                            visible: !svgBg3.visible
+                            anchors.fill: parent
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                            color: Kirigami.Theme.backgroundColor
 
-                            Rectangle {
-                                visible: !svgBg3.visible
-                                anchors.fill: parent
-                                Kirigami.Theme.inherit: false
-                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                color: Kirigami.Theme.backgroundColor
-
-                                border.color: "#ff999999"
-                                border.width: 1
-                                radius: 4
-                            }
-
-                            PlasmaCore.FrameSvgItem {
-                                id: svgBg3
-                                anchors.fill: parent
-                                visible: fromCurrentTheme
-                                readonly property bool highlighted: false
-                                readonly property real leftPadding: margins.left
-                                readonly property real rightPadding: margins.right
-                                readonly property real topPadding: margins.top
-                                readonly property real bottomPadding: margins.bottom
-
-                                imagePath: "widgets/slots-delegate-background"
-                                prefix: svgBg3.highlighted ? ["focus", ""] : ""
-                                colorGroup: PlasmaCore.Theme.ButtonColorGroup
-                            }
+                            border.color: "#ff999999"
+                            border.width: 1
+                            radius: 4
                         }
 
-                        contentItem: MouseArea {
-                            QQC2.Label {
-                                id: detailsText
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    left: parent.left
-                                    leftMargin: 10
-                                    right: parent.right
-                                    rightMargin: 10
-                                }
-                                wrapMode: Text.WrapAnywhere
-                                font.pointSize: 8
-                                text: {
-                                    if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                                        return root.selectedChannel.synthSlotsData[root.selectedChannel.selectedSlot.value]
-                                    } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
-                                        return root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].filename
-                                    } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
-                                        return root.selectedChannel.fxSlotsData[root.selectedChannel.selectedSlot.value]
-                                    } else {
-                                        return ""
-                                    }
+                        PlasmaCore.FrameSvgItem {
+                            id: svgBg3
+                            anchors.fill: parent
+                            visible: fromCurrentTheme
+                            readonly property bool highlighted: false
+                            readonly property real leftPadding: margins.left
+                            readonly property real rightPadding: margins.right
+                            readonly property real topPadding: margins.top
+                            readonly property real bottomPadding: margins.bottom
+
+                            imagePath: "widgets/slots-delegate-background"
+                            prefix: svgBg3.highlighted ? ["focus", ""] : ""
+                            colorGroup: PlasmaCore.Theme.ButtonColorGroup
+                        }
+                    }
+
+                    contentItem: MouseArea {
+                        QQC2.Label {
+                            id: detailsText
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                leftMargin: 10
+                                right: parent.right
+                                rightMargin: 10
+                            }
+                            wrapMode: Text.WrapAnywhere
+                            font.pointSize: 8
+                            text: {
+                                if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
+                                    return root.selectedChannel.synthSlotsData[root.selectedChannel.selectedSlot.value]
+                                } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
+                                    return root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].filename
+                                } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
+                                    return root.selectedChannel.fxSlotsData[root.selectedChannel.selectedSlot.value]
+                                } else {
+                                    return ""
                                 }
                             }
-
-                            onClicked: {
-                                handleItemClick()
-                            }
                         }
-                    }
 
-                    QQC2.Slider {
-                        id: volumeSlider
-
-                        property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
-                        property QtObject synthPassthroughClient: chainedSound > -1 ? Zynthbox.Plugin.synthPassthroughClients[chainedSound] : null
-
-                        orientation: Qt.Horizontal
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-
-                        visible: bottomStack.currentBarView === Main.BarView.SynthsBar
-                        enabled: volumeSlider.synthPassthroughClient != null && chainedSound >= 0 && (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
-                        value: volumeSlider.synthPassthroughClient ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
-                        stepSize: 0.01
-                        from: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.minimumDecibel : 0
-                        to: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.maximumDecibel : 0
-                        onMoved: {
-                            volumeSlider.synthPassthroughClient.dryGainHandler.gainDb = volumeSlider.value;
-                        }
-                        Binding {
-                            target: volumeSlider
-                            property: "value"
-                            value: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
-                        }
-                    }
-
-                    ZUI.SectionButton {
-                        Layout.fillWidth: true
-                        implicitHeight: Kirigami.Units.gridUnit*2 
-                        text: qsTr("Swap with...")
                         onClicked: {
-                            let swapType = "unknown";
-                            if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                                swapType = "synth";
-                            } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
-                                swapType = "fx";
-                            } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
-                                swapType = "sample";
-                            }
-                            bottomStack.slotsBar.pickSlotToSwapWith(root.selectedSlotRowItem.channel, swapType, root.selectedSlotRowItem.channel.selectedSlotRow);
+                            handleItemClick()
                         }
                     }
+                }
 
-                    Item{
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                QQC2.Slider {
+                    id: volumeSlider
+
+                    property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
+                    property QtObject synthPassthroughClient: chainedSound > -1 ? Zynthbox.Plugin.synthPassthroughClients[chainedSound] : null
+
+                    orientation: Qt.Horizontal
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+
+                    visible: bottomStack.currentBarView === Main.BarView.SynthsBar
+                    enabled: volumeSlider.synthPassthroughClient != null && chainedSound >= 0 && (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
+                    value: volumeSlider.synthPassthroughClient ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
+                    stepSize: 0.01
+                    from: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.minimumDecibel : 0
+                    to: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.maximumDecibel : 0
+                    onMoved: {
+                        volumeSlider.synthPassthroughClient.dryGainHandler.gainDb = volumeSlider.value;
                     }
-                }                    
-            }
-        }        
-    }
+                    Binding {
+                        target: volumeSlider
+                        property: "value"
+                        value: volumeSlider.synthPassthroughClient != null ? volumeSlider.synthPassthroughClient.dryGainHandler.gainDb : 0
+                    }
+                }
 
+                ZUI.SectionButton {
+                    Layout.fillWidth: true
+                    implicitHeight: Kirigami.Units.gridUnit*2 
+                    text: qsTr("Swap with...")
+                    onClicked: {
+                        let swapType = "unknown";
+                        if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
+                            swapType = "synth";
+                        } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
+                            swapType = "fx";
+                        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
+                            swapType = "sample";
+                        }
+                        bottomStack.slotsBar.pickSlotToSwapWith(root.selectedSlotRowItem.channel, swapType, root.selectedSlotRowItem.channel.selectedSlotRow);
+                    }
+                }
+
+                Item{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+            }                    
+        }                
+    }
 
     IMP.FilePickerDialog {
         id: samplePickerDialog

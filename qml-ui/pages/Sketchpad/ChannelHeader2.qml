@@ -47,16 +47,13 @@ ZUI.CellControl {
     property var subSubTextSize
     property color color: Kirigami.Theme.backgroundColor
     property bool highlightOnFocus: true
-     property bool synthDetailsVisible: true
+    property bool synthDetailsVisible: true
     property bool active: true
 
     highlightColor: Kirigami.Theme.highlightColor
     highlighted: (root.highlightOnFocus && root.activeFocus)   
 
     property alias columnContent: _columnContent.data
-
-    // signal clicked()
-    // signal doubleClicked()    
 
     contentItem: Item {
         opacity: root.active ? 1 : 0.3
@@ -89,9 +86,9 @@ ZUI.CellControl {
         // An overlay for channel muted state
         Rectangle {
             anchors.fill: parent
-            // anchors.margins: ZUI.Theme.padding
             color: Kirigami.Theme.negativeBackgroundColor
             opacity: root.channel.muted ? 0.7 : 0
+            radius: ZUI.Theme.radius
 
             QQC2.Label {
                 anchors.centerIn: parent

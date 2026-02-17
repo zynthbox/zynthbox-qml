@@ -106,22 +106,12 @@ ZUI.SectionPanel {
             ]
         }
 
-        RowLayout {
-            spacing: ZUI.Theme.sectionSpacing
+        ZUI.ThreeColumnView {
             anchors.fill: parent
 
-            BottomStackTabs {
-                id: buttonsColumn
+            leftTab: BottomStackTabs {}
 
-                Layout.fillWidth: false
-                Layout.fillHeight: true
-                Layout.minimumWidth: Kirigami.Units.gridUnit * 6
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-            }
-
-            ZUI.SectionGroup {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            middleTab: ZUI.SectionGroup {
 
                 fallbackBackground: Rectangle {
                     Kirigami.Theme.inherit: false
@@ -206,12 +196,7 @@ ZUI.SectionPanel {
             }
 
             // Clip details colume, visible when not in song mode
-            ZUI.SectionGroup {
-                Layout.fillWidth: false
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                Layout.alignment: Qt.AlignTop
-
+            rightTab: ZUI.SectionGroup {
                 Item {
                     anchors.fill: parent
                     ColumnLayout {
@@ -284,9 +269,6 @@ ZUI.SectionPanel {
                 }
 
             }
-
         }
-
     }
-
 }

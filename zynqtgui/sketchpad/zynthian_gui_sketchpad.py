@@ -76,6 +76,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__count_in_bars__ = 1
         self.__global_fx_knob_value__ = 50
         self.__display_scene_buttons = False
+        self.__mute_mode_active = False
         self.__recording_source = "internal-track"
         self.__recording_channel = "*"
         self.__recording_type = "audio"
@@ -249,6 +250,20 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     displaySceneButtons = Property(bool, get_displaySceneButtons, set_displaySceneButtons, notify=displaySceneButtonsChanged)
     ### END Property displaySceneButtons
+
+    ### Property muteModeActive
+    def get_muteModeActive(self):
+        return self.__mute_mode_active
+
+    def set_muteModeActive(self, value):
+        if self.__mute_mode_active != value:
+            self.__mute_mode_active = value
+            self.muteModeActiveChanged.emit()
+
+    muteModeActiveChanged = Signal()
+
+    muteModeActive = Property(bool, get_muteModeActive, set_muteModeActive, notify=muteModeActiveChanged)
+    ### END Property muteModeActive
 
     ### Property recordingSource
     def get_recordingSource(self):

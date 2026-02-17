@@ -1656,60 +1656,60 @@ ZUI.SectionPanel {
                                 // color: "yellow"
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                ColumnLayout {
-                                    id: patternContainer
+                                id: patternContainer
 
-                                    property bool showPattern: root.selectedChannel != null && (root.selectedChannel.trackType === "synth" || root.selectedChannel.trackType === "external")
+                                property bool showPattern: root.selectedChannel != null && (root.selectedChannel.trackType === "synth" || root.selectedChannel.trackType === "external")
 
-                                    anchors.fill: parent
-                                    opacity: patternContainer.showPattern ? 1 : 0
+                                opacity: patternContainer.showPattern ? 1 : 0
 
-                                    Connections {
-                                        target: root
-                                        function onSelectedChannelChanged() {
-                                            if (root.selectedChannel != null) {
-                                                if (clipBar.count > 0) {
-                                                    for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
-                                                        let clipDelegate = clipBar.itemAt(clipIndex);
-                                                        if (clipDelegate) {
-                                                            let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, root.selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
-                                                            if (clipDelegate.nextBarState != newPlaystate) {
-                                                                clipDelegate.nextBarState = newPlaystate;
-                                                            }
+                                Connections {
+                                    target: root
+                                    function onSelectedChannelChanged() {
+                                        if (root.selectedChannel != null) {
+                                            if (clipBar.count > 0) {
+                                                for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                                                    let clipDelegate = clipBar.itemAt(clipIndex);
+                                                    if (clipDelegate) {
+                                                        let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, root.selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                                                        if (clipDelegate.nextBarState != newPlaystate) {
+                                                            clipDelegate.nextBarState = newPlaystate;
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                    Connections {
-                                        target: Zynthbox.PlayfieldManager
-                                        function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
-                                            if (root.selectedChannel) {
-                                                if (sketchpadTrack === root.selectedChannel.id && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
-                                                    let clipDelegate = clipBar.itemAt(clipIndex);
-                                                    if (clipDelegate.nextBarState != newPlaystate) {
-                                                        clipDelegate.nextBarState = newPlaystate;
-                                                    }
+                                }
+                                Connections {
+                                    target: Zynthbox.PlayfieldManager
+                                    function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
+                                        if (root.selectedChannel) {
+                                            if (sketchpadTrack === root.selectedChannel.id && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                                                let clipDelegate = clipBar.itemAt(clipIndex);
+                                                if (clipDelegate.nextBarState != newPlaystate) {
+                                                    clipDelegate.nextBarState = newPlaystate;
                                                 }
                                             }
                                         }
                                     }
+                                }
 
-                                    ZUI.SectionGroup {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        implicitHeight: Kirigami.Units.gridUnit * 2
-                                        RowLayout {
-                                           anchors.fill: parent
-                                           spacing: ZUI.Theme.spacing
-                                            Repeater {
-                                                id: clipBar
-                                                model: Zynthbox.Plugin.sketchpadSlotCount
-                                                delegate: ZUI.SectionButton {
+                                ZUI.SectionGroup {
+                                    anchors.fill: parent
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        spacing: ZUI.Theme.spacing
+                                        Repeater {
+                                            id: clipBar
+                                            model: Zynthbox.Plugin.sketchpadSlotCount
+                                            delegate: ColumnLayout {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                spacing: ZUI.Theme.sectionSpacing
+                                                ZUI.SectionButton {
                                                     id: clipDelegate
                                                     Layout.fillWidth: true
-                                                    Layout.fillHeight: true
+                                                    implicitHeight: Kirigami.Units.gridUnit * 2
                                                     // Layout.preferredWidth: Kirigami.Units.gridUnit
                                                     text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
                                                     // highlighted: clipDelegate.clip.enabled && clipDelegate.patternHasNotes
@@ -1765,61 +1765,55 @@ ZUI.SectionPanel {
                                                         source: "media-playback-stop-symbolic"
                                                     }
                                                 }
-                                            }
-                                        }
-                                    }
 
-                                    ZUI.SectionGroup {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        mask: true
-                                        fallbackPadding: ZUI.Theme.padding
-                                        fallbackBackground:  Rectangle {
-                                            border.width: 1
-                                            border.color: "#ff999999"
-                                            radius: ZUI.Theme.radius
-                                            color: "#222222"
-                                        }
-
-                                        Item {
-                                            id: patternVisualiserItem
-                                            anchors.fill: parent
-                                            clip: true
-
-                                            visible: root.pattern != null
-
-                                            Zynthbox.PatternModelVisualiserItem {
-                                                id: patternVisualiser
-                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                Kirigami.Theme.inherit: false
-                                                visible: !root.pattern.isEmpty
-                                                anchors.fill: parent
-                                                patternModel: root.pattern
-                                                backgroundColor: Kirigami.Theme.backgroundColor
-                                                foregroundColor: Kirigami.Theme.textColor
-                                                fillColor: "transparent"
-                                                Rectangle { // Progress
-                                                    anchors {
-                                                        top: parent.top
-                                                        bottom: parent.bottom
+                                                ZUI.SectionGroup {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    mask: true
+                                                    fallbackPadding: ZUI.Theme.padding
+                                                    fallbackBackground:  Rectangle {
+                                                        border.width: 1
+                                                        border.color: "#ff999999"
+                                                        radius: ZUI.Theme.radius
+                                                        color: "#222222"
                                                     }
-                                                    visible: root.visible &&
-                                                            root.sequence &&
-                                                            root.sequence.isPlaying &&
-                                                            root.pattern &&
-                                                            root.pattern.enabled
-                                                    color: Kirigami.Theme.highlightColor
-                                                    width: widthFactor // this way the progress rect is the same width as a step
-                                                    property double widthFactor: visible && root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
-                                                    x: visible && root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
-                                                }
-                                                MouseArea {
-                                                    anchors.fill:parent
-                                                    onClicked: {
-                                                        if (patternContainer.showPattern) {
-                                                            zynqtgui.current_modal_screen_id = "playgrid";
-                                                            zynqtgui.forced_screen_back = "sketchpad";
-                                                            Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", Zynthbox.PlayGridManager.sequenceEditorIndex);
+
+                                                    Zynthbox.PatternModelVisualiserItem {
+                                                        id: visualiser
+                                                        property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByClipId(root.selectedChannel.id, index) : null
+
+                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                        Kirigami.Theme.inherit: false
+                                                        visible: !pattern.isEmpty
+                                                        anchors.fill: parent
+                                                        patternModel: pattern
+                                                        backgroundColor: "black"
+                                                        foregroundColor: Kirigami.Theme.textColor
+                                                        fillColor: Kirigami.Theme.backgroundColor
+                                                        Rectangle { // Progress
+                                                            anchors {
+                                                                top: parent.top
+                                                                bottom: parent.bottom
+                                                            }
+                                                            visible: root.visible &&
+                                                                    root.sequence &&
+                                                                    root.sequence.isPlaying &&
+                                                                    visualiser.pattern &&
+                                                                    visualiser.pattern.enabled
+                                                            color: Kirigami.Theme.highlightColor
+                                                            width: widthFactor // this way the progress rect is the same width as a step
+                                                            property double widthFactor: visible && visualiser.pattern ? parent.width / (visualiser.pattern.width * visualiser.pattern.bankLength) : 1
+                                                            x: visible && visualiser.pattern ? visualiser.pattern.bankPlaybackPosition * widthFactor : 0
+                                                        }
+                                                        MouseArea {
+                                                            anchors.fill:parent
+                                                            onClicked: {
+                                                                if (patternContainer.showPattern) {
+                                                                    zynqtgui.current_modal_screen_id = "playgrid";
+                                                                    zynqtgui.forced_screen_back = "sketchpad";
+                                                                    Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", Zynthbox.PlayGridManager.sequenceEditorIndex);
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -1827,6 +1821,7 @@ ZUI.SectionPanel {
                                         }
                                     }
                                 }
+                                
                             }
                         }
                     }

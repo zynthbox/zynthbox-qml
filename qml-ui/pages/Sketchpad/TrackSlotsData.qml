@@ -312,7 +312,7 @@ GridLayout {
                     }
 
                     meterValue: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? slotDelegate.cppClipObject.playbackPositions.peakGainLeft : 0
-                    // meterValue: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? slotDelegate.cppClipObject.playbackPositions.peakGainRight : 0
+                    meterValue2: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? slotDelegate.cppClipObject.playbackPositions.peakGainRight : 0
 
                     readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
 

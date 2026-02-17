@@ -318,7 +318,7 @@ GridLayout {
                     readonly property bool isSelectedSlot: control.channel != null && control.channel.selectedSlot.className === _private.className && control.channel.selectedSlot.value === slotDelegate.slotIndex
 
                     property int realIndex : index/2
-                    property int slotIndex: realIndex
+                    readonly property int slotIndex: realIndex
                     property bool isSketchpadClip: control.slotData && control.slotData[realIndex] != null && control.slotData[realIndex].hasOwnProperty("className") && control.slotData[realIndex].className == "sketchpad_clip"
                     property QtObject clip: isSketchpadClip ? control.slotData[realIndex] : null
                     property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[realIndex].cppObjId) : null
@@ -354,7 +354,7 @@ GridLayout {
                     // This property will be used to determine if a slot makes sound
                     // For synth slots, this will be true if not muted
                     // For fx slots, this will be true if not bypassed
-                    property bool slotMakesSound: {
+                    readonly property bool slotMakesSound: {
                         if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_synthslot" && slotDelegate.synthPassthroughClient != null) {
                             return !slotDelegate.synthPassthroughClient.muted
                         } else if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_fxslot" && slotDelegate.fxPassthroughClient != null) {
@@ -455,7 +455,27 @@ GridLayout {
                         control.slotClicked(slotDelegate.slotIndex);
                     }
 
-                    function mute() {
+                    function mute(value) {
+                        switch (control.slotType) {
+                            case "synth":
+                                if (slotDelegate.synthPassthroughClient) {
+                                    slotDelegate.synthPassthroughClient.muted = value;
+                                }
+                                break;
+                            case "sample-trig":
+                                if (slotDelegate.cppClipObject) {
+                                    slotDelegate.cppClipObject.rootSlice.gainHandler.muted = value;
+                                }
+                                break;
+                            case "fx":
+                                if (slotDelegate.fxPassthroughClient) {
+                                    slotDelegate.fxPassthroughClient.bypass = value;
+                                }
+                                break;
+                        }
+                    }
+
+                    function toggleMute() {
                         switch (control.slotType) {
                             case "synth":
                                 if (slotDelegate.synthPassthroughClient) {
@@ -475,12 +495,18 @@ GridLayout {
                         }
                     }
 
-                    onDoubleClicked: mute()
+                    Connections {
+                        target: zynqtgui.sketchpad
+                        onUnmuteAll: slotDelegate.mute(false)
+                        onUnmuteAllSlots: slotDelegate.mute(false)
+                    }
+
+                    onDoubleClicked: slotDelegate.toggleMute()
 
                     onClicked: {
                         if(zynqtgui.sketchpad.muteModeActive)
                         {
-                            mute()
+                            slotDelegate.toggleMute()
                             return
                         }
                         slotDelegate.switchToThisSlot();

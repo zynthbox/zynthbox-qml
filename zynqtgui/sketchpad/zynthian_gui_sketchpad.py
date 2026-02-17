@@ -251,7 +251,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     displaySceneButtons = Property(bool, get_displaySceneButtons, set_displaySceneButtons, notify=displaySceneButtonsChanged)
     ### END Property displaySceneButtons
 
-    ### Property muteModeActive
+    ### Property muteModeActive and unmuteAll unmuteAllTracks unmuteAllSlots
     def get_muteModeActive(self):
         return self.__mute_mode_active
 
@@ -260,7 +260,19 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.__mute_mode_active = value
             self.muteModeActiveChanged.emit()
 
+    def unmuteAll(self):
+        self.unmuteAll.emit()
+    
+    def unmuteAllTracks(self):
+        self.unmuteAllTracks.emit()
+    
+    def unmuteAllSlots(self):
+        self.unmuteAllSlots.emit()
+    
     muteModeActiveChanged = Signal()
+    unmuteAll = Signal()
+    unmuteAllTracks = Signal()
+    unmuteAllSlots = Signal()
 
     muteModeActive = Property(bool, get_muteModeActive, set_muteModeActive, notify=muteModeActiveChanged)
     ### END Property muteModeActive

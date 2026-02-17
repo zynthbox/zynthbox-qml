@@ -1297,12 +1297,15 @@ ZUI.ScreenPage {
                                             actions: [
                                                 Kirigami.Action {
                                                     text: "Unmute All"
+                                                    onTriggered: zynqtgui.sketchpad.unmuteAll()
                                                 },
                                                 Kirigami.Action {
                                                     text: "Unmute All Tracks"
+                                                    onTriggered: zynqtgui.sketchpad.unmuteAllTracks()
                                                 },
                                                 Kirigami.Action {
                                                     text: "Umute All Slots"
+                                                    onTriggered: zynqtgui.sketchpad.unmuteAllSlots()
                                                 },
                                                 Kirigami.Action {
                                                     text: "Solo Mode"
@@ -1427,13 +1430,25 @@ ZUI.ScreenPage {
                                             onClicked: {
                                                 if(zynqtgui.sketchpad.muteModeActive)
                                                 {
-                                                    channelHeaderDelegate.channel.muted = !channelHeaderDelegate.channel.muted;
+                                                    channelHeaderDelegate.toggleMute()
                                                     return
                                                 }
                                                 headerDelegate.switchToThisChannel();
                                             }
-                                            onDoubleClicked: {
+                                            onDoubleClicked: channelHeaderDelegate.toggleMute()
+
+                                            function mute(value) {
+                                                channelHeaderDelegate.channel.muted = value
+                                            }
+
+                                            function toggleMute() {
                                                 channelHeaderDelegate.channel.muted = !channelHeaderDelegate.channel.muted;
+                                            }
+
+                                            Connections {
+                                                target: zynqtgui.sketchpad
+                                                onUnmuteAll: channelHeaderDelegate.mute(false)
+                                                onUnmuteAllTracks: channelHeaderDelegate.mute(false)
                                             }
 
                                             Binding {

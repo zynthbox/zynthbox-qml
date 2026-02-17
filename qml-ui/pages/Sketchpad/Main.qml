@@ -1284,31 +1284,53 @@ ZUI.ScreenPage {
                                     anchors.fill: parent
                                     spacing: ZUI.Theme.spacing
                                     ZUI.SectionButton {
+                                        id: _muteButton
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        text: "Mute"
-                                        checked: zynqtgui.sketchpad.muteModeActive
-                                        onClicked: zynqtgui.sketchpad.muteModeActive = !zynqtgui.sketchpad.muteModeActive
+                                        text: currentMode === "muteMode" ? "Mute" : "Solo"
+                                        checked: zynqtgui.sketchpad.muteModeActive || zynqtgui.sketchpad.soloModeActive
+                                        onClicked: {
+                                            if(_muteButton.currentMode === "soloMode")
+                                                zynqtgui.sketchpad.soloModeActive = !zynqtgui.sketchpad.soloModeActive
+                                            else
+                                                zynqtgui.sketchpad.muteModeActive = !zynqtgui.sketchpad.muteModeActive
+                                        }
                                         onPressAndHold: muteModeActions.open()
+
+                                        property string currentMode : "muteMode"
 
                                         ZUI.ActionPickerPopup {
                                             id: muteModeActions
 
                                             actions: [
                                                 Kirigami.Action {
+                                                    // enabled: _muteButton.currentMode === "muteMode"
                                                     text: "Unmute All"
-                                                    onTriggered: zynqtgui.sketchpad.unmuteAll()
+                                                    onTriggered: zynqtgui.sketchpad.muteAll(false)
                                                 },
                                                 Kirigami.Action {
+                                                    // enabled: _muteButton.currentMode === "muteMode"
                                                     text: "Unmute All Tracks"
-                                                    onTriggered: zynqtgui.sketchpad.unmuteAllTracks()
+                                                    onTriggered: zynqtgui.sketchpad.muteAllTracks(false)
                                                 },
                                                 Kirigami.Action {
+                                                    // enabled: _muteButton.currentMode === "muteMode"
                                                     text: "Umute All Slots"
-                                                    onTriggered: zynqtgui.sketchpad.unmuteAllSlots()
+                                                    onTriggered: zynqtgui.sketchpad.muteAllSlots(false)
                                                 },
                                                 Kirigami.Action {
-                                                    text: "Solo Mode"
+                                                    text: _muteButton.currentMode === "muteMode" ? "Solo Mode" : "Mute Mode"
+                                                    onTriggered: {
+                                                        if(_muteButton.currentMode === "muteMode"){
+                                                            _muteButton.currentMode = "soloMode"
+                                                            zynqtgui.sketchpad.soloModeActive = true
+
+                                                        }else {
+                                                            _muteButton.currentMode = "muteMode"
+                                                            zynqtgui.sketchpad.muteModeActive = true
+                                                        }
+                                                    }
+                                                    
                                                 }
                                             ]
                                         }
@@ -1428,6 +1450,13 @@ ZUI.ScreenPage {
                                             highlightOnFocus: false
                                             highlighted: index === zynqtgui.sketchpad.selectedTrackId // If song mode is not active, highlight if current cell is selected channel
                                             onClicked: {
+                                                if(zynqtgui.sketchpad.soloModeActive)
+                                                {
+                                                    zynqtgui.sketchpad.muteAllTracks(true)
+                                                    channelHeaderDelegate.mute(false)
+                                                    return
+                                                }
+
                                                 if(zynqtgui.sketchpad.muteModeActive)
                                                 {
                                                     channelHeaderDelegate.toggleMute()
@@ -1447,8 +1476,8 @@ ZUI.ScreenPage {
 
                                             Connections {
                                                 target: zynqtgui.sketchpad
-                                                onUnmuteAll: channelHeaderDelegate.mute(false)
-                                                onUnmuteAllTracks: channelHeaderDelegate.mute(false)
+                                                onMuteAll: (value) =>{ channelHeaderDelegate.mute(value)}
+                                                onMuteAllTracks: (value) => {channelHeaderDelegate.mute(value)}
                                             }
 
                                             Binding {

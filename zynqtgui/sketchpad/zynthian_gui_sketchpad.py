@@ -77,6 +77,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__global_fx_knob_value__ = 50
         self.__display_scene_buttons = False
         self.__mute_mode_active = False
+        self.__solo_mode_active = False
         self.__recording_source = "internal-track"
         self.__recording_channel = "*"
         self.__recording_type = "audio"
@@ -251,30 +252,45 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     displaySceneButtons = Property(bool, get_displaySceneButtons, set_displaySceneButtons, notify=displaySceneButtonsChanged)
     ### END Property displaySceneButtons
 
-    ### Property muteModeActive and unmuteAll unmuteAllTracks unmuteAllSlots
+    ### Property muteModeActive and un/muteAll un/muteAllTracks un/muteAllSlots
     def get_muteModeActive(self):
         return self.__mute_mode_active
 
     def set_muteModeActive(self, value):
+        if(value == True):
+            self.set_soloModeActive(False)
         if self.__mute_mode_active != value:
             self.__mute_mode_active = value
             self.muteModeActiveChanged.emit()
 
-    def unmuteAll(self):
-        self.unmuteAll.emit()
+    def get_soloModeActive(self):
+        return self.__solo_mode_active
+
+    def set_soloModeActive(self, value):
+        if(value == True):
+            self.set_muteModeActive(False)
+        if self.__solo_mode_active != value:
+            self.__solo_mode_active = value
+            self.soloModeActiveChanged.emit()
+
+    def muteAll(self, value):
+        self.unmuteAll.emit(value)
     
-    def unmuteAllTracks(self):
-        self.unmuteAllTracks.emit()
+    def muteAllTracks(self, value):
+        self.unmuteAllTracks.emit(value)
     
-    def unmuteAllSlots(self):
-        self.unmuteAllSlots.emit()
+    def muteAllSlots(self, value):
+        self.unmuteAllSlots.emit(value)
     
     muteModeActiveChanged = Signal()
-    unmuteAll = Signal()
-    unmuteAllTracks = Signal()
-    unmuteAllSlots = Signal()
+    soloModeActiveChanged = Signal()
+
+    muteAll = Signal(bool)
+    muteAllTracks = Signal(bool)
+    muteAllSlots = Signal(bool)
 
     muteModeActive = Property(bool, get_muteModeActive, set_muteModeActive, notify=muteModeActiveChanged)
+    soloModeActive = Property(bool, get_soloModeActive, set_soloModeActive, notify=soloModeActiveChanged)
     ### END Property muteModeActive
 
     ### Property recordingSource

@@ -497,13 +497,20 @@ GridLayout {
 
                     Connections {
                         target: zynqtgui.sketchpad
-                        onUnmuteAll: slotDelegate.mute(false)
-                        onUnmuteAllSlots: slotDelegate.mute(false)
+                        onMuteAll: (value) =>{ slotDelegate.mute(value)}
+                        onMuteAllSlots: (value) => {slotDelegate.mute(value)}
                     }
 
                     onDoubleClicked: slotDelegate.toggleMute()
 
                     onClicked: {
+                        if(zynqtgui.sketchpad.soloModeActive)
+                        {
+                            zynqtgui.sketchpad.muteAllSlots(true)
+                            slotDelegate.mute(false)
+                            return
+                        }
+
                         if(zynqtgui.sketchpad.muteModeActive)
                         {
                             slotDelegate.toggleMute()

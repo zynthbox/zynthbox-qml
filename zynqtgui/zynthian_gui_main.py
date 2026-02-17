@@ -467,16 +467,23 @@ class zynthian_gui_main(zynthian_gui_selector):
             # AppImage startup time on rpi is very slow probably due to decompression overhead
             # After an AppImage is downloaded, the appimage is extracted to make the startup time faster. Cleanup all the extracted files
 
-            # Step 1 : Remove the extracted AppDir from `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
             appimage_path = Path(path)
-            appdir = appimage_path.parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
-            if appdir.exists():
-                shutil.rmtree(appdir, ignore_errors=True)
-            # Step 2 : Unregister appimage from system.
-            Zynthbox.AppImageHelper.instance().unregisterAppImage(path)
-            if appimage_path.exists():
-                appimage_path.unlink(missing_ok=True)
-            self.fill_list()
+            # FIXME : This function is getting called multiple times when "Remove" action button is clicked from store page
+            # logging.debug(f"Process Appimage Removal : {appimage_path} isfile:{appimage_path.is_file()} exists:{appimage_path.exists()} suffix:{appimage_path.suffix.lower() == '.appimage'}")
+            if appimage_path.suffix.lower() == ".appimage":
+                appdir = appimage_path.parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
+                # Step 1 : Remove the extracted AppDir from `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
+                if appdir.exists():
+                    logging.info(f"Removing extracted AppDir : {appdir}")
+                    shutil.rmtree(appdir, ignore_errors=True)
+                # Step 2 : Unregister appimage from system
+                logging.info(f"Unregistering appimage : {path}")
+                Zynthbox.AppImageHelper.instance().unregisterAppImage(path)
+                # Step 3 : Remove the appimage from system
+                if appimage_path.exists():
+                    logging.info(f"Removing appimage : {appimage_path}")
+                    appimage_path.unlink(missing_ok=True)
+                self.fill_list()
             QTimer.singleShot(1000, self.zynqtgui.end_long_task)
         self.zynqtgui.do_long_task(task, f"Removing App")
 

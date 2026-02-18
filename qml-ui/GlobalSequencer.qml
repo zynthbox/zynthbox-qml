@@ -3205,7 +3205,7 @@ Item {
     }
     Connections {
         target: Zynthbox.MidiRouter
-        enabled: zynqtgui.ui_settings.hardwareSequencer
+        enabled: zynqtgui.ui_settings.hardwareSequencer && _private.pattern
         onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
             // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.pattern.sketchpadTrack, "listening on port", listenToPort);
             let targetTrack = Zynthbox.MidiRouter.sketchpadTrackTargetTrack(_private.pattern.sketchpadTrack);

@@ -366,14 +366,14 @@ GridLayout {
                             return !slotDelegate.synthPassthroughClient.muted
                         } else if (slotDelegate.zynthianLayer != null && _private.className == "TracksBar_fxslot" && slotDelegate.fxPassthroughClient != null) {
                             return !slotDelegate.fxPassthroughClient.bypass
-                        } else if (_private.className == "TracksBar_sampleslot" && slotDelegate.cppClipObject != null) {
+                        } else if (["TracksBar_sampleslot", "TracksBar_sampleslot2"].includes(_private.className) && slotDelegate.cppClipObject != null) {
                             return !slotDelegate.cppClipObject.rootSlice.gainHandler.muted
                         } else {
                             // For all other cases, default value is true
                             return true
                         }
                     }
-                        
+
                     function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
                         if (control.performSlotInteractions) {
                             if (!control.singleClickEnabled) {
@@ -475,6 +475,7 @@ GridLayout {
                                 }
                                 break;
                             case "sample-trig":
+                            case "sample-trig2":
                                 if (slotDelegate.cppClipObject) {
                                     slotDelegate.cppClipObject.rootSlice.gainHandler.muted = value;
                                 }

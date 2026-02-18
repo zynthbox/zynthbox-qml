@@ -164,6 +164,8 @@ class last_selected_obj_dto(QObject):
                     result = "Synth"
                 case "TracksBar_sampleslot":
                     result = "Sample"
+                case "TracksBar_sampleslot2":
+                    result = "Sample"
                 case "TracksBar_sketchslot":
                     result = "Sketch"
                 case "TracksBar_fxslot":
@@ -192,6 +194,8 @@ class last_selected_obj_dto(QObject):
                     result = f"Synth Slot {self.value + 1}"
                 case "TracksBar_sampleslot":
                     result = f"Sample Slot {self.value + 1}"
+                case "TracksBar_sampleslot2":
+                    result = f"Sample Slot {self.value + Zynthbox.Plugin.instance().sketchpadSlotCount() + 1}"
                 case "TracksBar_sketchslot":
                     result = f"Sketch Slot {self.value + 1}"
                 case "TracksBar_fxslot":
@@ -223,6 +227,9 @@ class last_selected_obj_dto(QObject):
             case "TracksBar_sampleslot":
                 if self.track is not None:
                     result = self.track.samples[self.value].isEmpty
+            case "TracksBar_sampleslot2":
+                if self.track is not None:
+                    result = self.track.samples[self.value + Zynthbox.Plugin.instance().sketchpadSlotCount()].isEmpty
             case "TracksBar_sketchslot":
                 # TODO
                 pass
@@ -254,6 +261,9 @@ class last_selected_obj_dto(QObject):
             case "TracksBar_sampleslot":
                 selected_track.copySlot("sample-trig", sourceObject.track, sourceObject.value, self.value)
                 result = True
+            case "TracksBar_sampleslot2":
+                selected_track.copySlot("sample-trig", sourceObject.track, sourceObject.value, self.value + Zynthbox.Plugin.instance().sketchpadSlotCount())
+                result = True
             case "TracksBar_fxslot":
                 selected_track.copySlot("fx", sourceObject.track, sourceObject.value, self.value)
                 result = True
@@ -283,6 +293,9 @@ class last_selected_obj_dto(QObject):
                 result = True
             case "TracksBar_sampleslot":
                 selected_track.clearSlot("sample-trig", self.value)
+                result = True
+            case "TracksBar_sampleslot2":
+                selected_track.clearSlot("sample-trig", self.value + Zynthbox.Plugin.instance().sketchpadSlotCount())
                 result = True
             case "TracksBar_fxslot":
                 selected_track.clearSlot("fx", self.value)
@@ -543,13 +556,14 @@ class sketchpad_channel(QObject):
         self.zynqtgui.layer.layerPresetChanged.connect(self.layerPresetChangedHandler)
         self.zynqtgui.layer.layer_created.connect(self.layerCreatedHandler)
 
-        # Create 5 clip objects for 5 samples per channel
-        for i in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-            newSample = sketchpad_clip(self.id, i, i, self.__song__, self, True)
-            # Explicitly set channel as it is a channelSample
-            newSample.channel = self
-            newSample.path_changed.connect(self.samples_changed.emit)
-            self.__samples__.append(newSample)
+        # Create 10 clip objects for 10 samples per channel (that is, 5 for each of 2 rows of samples)
+        for slotRow in range(0, Zynthbox.Plugin.instance().sketchpadSampleSlotRowCount()):
+            for i in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                newSample = sketchpad_clip(self.id, i, i, self.__song__, self, True, slotRow)
+                # Explicitly set channel as it is a channelSample
+                newSample.channel = self
+                newSample.path_changed.connect(self.samples_changed.emit)
+                self.__samples__.append(newSample)
 
         # All tracks should be multiclip by default
         self.__allowMulticlip__ = True
@@ -1057,11 +1071,6 @@ class sketchpad_channel(QObject):
                 else:
                     self.set_allowMulticlip(False, True)
 
-                if "trackStyle" in obj:
-                    self.set_trackStyle(obj["trackStyle"])
-                else:
-                    self.set_trackStyle("everything")
-
                 # TODO : `channelAudioType` key is deprecated and has been renamed to `trackType`. Remove this fallback later
                 if "channelAudioType" in obj:
                     warnings.warn("`channelAudioType` key is deprecated (will be removed soon) and has been renamed to `trackType`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
@@ -1163,10 +1172,11 @@ class sketchpad_channel(QObject):
                     (Path(self.bankDir) / "sample-bank.json").unlink(missing_ok=True)
                 if not load_settings_only and "samples" in obj:
                     bank_dir = Path(self.bankDir)
+                    for slotRow in range(0, Zynthbox.Plugin.instance().sketchpadSampleSlotRowCount()):
+                        for i in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                            self.__samples__[(slotRow * Zynthbox.Plugin.instance().sketchpadSlotCount()) + i].clear();
                     for i, clip in enumerate(obj["samples"]):
-                        if clip is None:
-                            self.__samples__[i].clear()
-                        else:
+                        if clip is not None:
                             self.__samples__[i].deserialize(clip)
                     self.samples_changed.emit()
                 if not load_settings_only and "clips" in obj:
@@ -1216,7 +1226,10 @@ class sketchpad_channel(QObject):
                 if pickedASlot == False:
                     for slotIndex, sample in enumerate(self.__samples__):
                         if sample.path is not None and len(sample.path) > 0:
-                            self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None, self)
+                            if slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+                                self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None, self)
+                            else:
+                                self.__selected_slot_obj.setTo("TracksBar_sampleslot2", slotIndex, None, self)
                             pickedASlot = True
                             break
                 if pickedASlot == False:
@@ -1382,6 +1395,7 @@ class sketchpad_channel(QObject):
 
                     self.clearSlot("synth", slotIndex, showLoadingScreen=False)
                     self.clearSlot("sample-trig", slotIndex, showLoadingScreen=False)
+                    self.clearSlot("sample-trig2", slotIndex, showLoadingScreen=False)
                     self.clearSlot("fx", slotIndex, showLoadingScreen=False)
                 self.zynqtgui.end_long_task()
             self.zynqtgui.do_long_task(task, f"Clearing Track {self.name}")
@@ -1541,6 +1555,7 @@ class sketchpad_channel(QObject):
 
                 self.copySlot("synth", source, slotIndex, slotIndex, showLoadingScreen=False)
                 self.copySlot("sample-trig", source, slotIndex, slotIndex, showLoadingScreen=False)
+                self.copySlot("sample-trig2", source, slotIndex, slotIndex, showLoadingScreen=False)
                 self.copySlot("fx", source, slotIndex, slotIndex, showLoadingScreen=False)
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, f"Copying Track {source.name} into Track {self.name}")
@@ -2103,7 +2118,7 @@ class sketchpad_channel(QObject):
     ### END Property allowMulticlip
 
     ### BEGIN Property trackStyle
-    # Possible values: "everything", "one-to-one", "drums", "2-low-3-high", "manual"
+    # Possible values: "everything", "one-to-one", "drums", "2-low-3-high", "10-split", "manual"
     # Default value: "everything"
     # Only everything and one-to-one are currently exposed in the UI, done as a simple toggle
     # Intent notes:
@@ -2129,6 +2144,10 @@ class sketchpad_channel(QObject):
             self.set_samplePickingStyle("all")
             self.set_track_routing_style("standard")
             self.set_keyZoneMode("2-low-3-high")
+        elif self.__trackStyle__ == "10-split":
+            self.set_samplePickingStyle("all")
+            self.set_track_routing_style("standard")
+            self.set_keyZoneMode("10-split")
 
     def get_trackStyle(self):
         return self.__trackStyle__
@@ -2149,6 +2168,11 @@ class sketchpad_channel(QObject):
     ### BEGIN Property trackType
     # Possible values : "synth", "sample-loop", "sample-trig", "external"
     # For simplicity, trackType is string in the format "sample-xxxx" or "synth" or "external"
+    # The modes are:
+    # "synth": the default, five slots of synths and five slots of samples
+    # "sample-loop": currently unused, but is for loops, five slots of looping audio matched to the clip
+    # "sample-trig": ten slots of samples (in two rows)
+    # "external": no internal audio sources
     # TODO : Later implement it properly with model and enums
     def get_track_type(self):
         return self.__track_type__
@@ -2186,10 +2210,6 @@ class sketchpad_channel(QObject):
 
             self.__track_type__ = type
             self.track_type_changed.emit()
-
-            # Set keyZoneMode to "Off"(all-full) state when type is changed to trig
-            if type == "sample-trig":
-                self.keyZoneMode = "all-full"
 
             for songId in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
                 for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
@@ -2375,15 +2395,17 @@ class sketchpad_channel(QObject):
     # manual will not apply any automatic stuff
     # all-full will set all samples to full width, c4 at 60
     # split-full will spread samples across the note range, in the order 4, 2, 1, 3, 5, starting at note 0, 24 for each, with c4 on the 12th note inside the sample's range
-    # split-narrow will set the samples to play only on the white keys from note 60 and up, with that note as root
+    # split-narrow will set the samples to play on the notes from note 60 and up, with that note as root
     # 2-low-3-high will set the slots to be split at the 2 first slots playing from 0 through c4, and the 3 last slots playing from c#4 and up, with no transposition
+    # 10-split spreads the slots evenly across the full octave range, using the F in that octave as the sample's root note (useful for multisampled instruments)
 
     @Slot()
     def updateKeyZones(self):
         # This should be called whenever one of the things it depends on changes:
-        # - keyzoneMode
-        # - synth engines (chained_sounds)
-        # - sample setup (samples)
+        # - keyzoneMode (that is, when it is changed by the user, not while loading)
+        # - and also change this for *specific* slots when a new thing is added (also not while loading)
+        #   - synth engines (chained_sounds)
+        #   - sample setup (samples)
         slotSettings = None
         if self.__keyzone_mode__ == "all-full":
             slotSettings = [
@@ -2391,9 +2413,15 @@ class sketchpad_channel(QObject):
                 [0, 127, 0],
                 [0, 127, 0],
                 [0, 127, 0],
+                [0, 127, 0],
+                [0, 127, 0],
+                [0, 127, 0],
+                [0, 127, 0],
+                [0, 127, 0],
                 [0, 127, 0]
             ]
         elif self.__keyzone_mode__ == "split-full":
+            # Split-full operates per-column
             # auto-split keyzones: SLOT 4 c-1 - b1, SLOT 2 c1-b3, SLOT 1 c3-b5, SLOT 3 c5-b7, SLOT 5 c7-c9
             # root key transpose in semtitones: +48, +24 ,0 , -24, -48
             slotSettings = [
@@ -2401,25 +2429,56 @@ class sketchpad_channel(QObject):
                 [24, 47, -24], # slot 2
                 [72, 95, 24],  # slot 3
                 [0, 23, -48],  # slot 4
-                [96, 119, 48]  # slot 5
+                [96, 119, 48],  # slot 5
+                [48, 71, 0],   # slot 6
+                [24, 47, -24], # slot 7
+                [72, 95, 24],  # slot 8
+                [0, 23, -48],  # slot 9
+                [96, 119, 48]  # slot 10
             ]
         elif self.__keyzone_mode__ == "split-narrow":
-            # Narrow split puts the samples on the keys C4, D4, E4, F4, G4, and plays them as C4 on those notes
+            # Narrow split puts the samples on the keys C4, C#4, D4, D#4, E4, F4, F#4, G4, G#4, A4 and plays them as C4  on those notes
             slotSettings = [
                 [60, 60, 0], # slot 1
-                [62, 62, 2], # slot 2
-                [64, 64, 4], # slot 3
-                [65, 65, 5], # slot 4
-                [67, 67, 7]  # slot 5
+                [61, 61, 1], # slot 2
+                [62, 62, 2], # slot 3
+                [63, 63, 3], # slot 4
+                [64, 64, 4], # slot 5
+                [65, 65, 5], # slot 6
+                [66, 66, 6], # slot 7
+                [67, 67, 7], # slot 8
+                [68, 68, 8]  # slot 9
+                [69, 69, 9]  # slot 10
             ]
         # TODO We probably want to ensure that we use the track's split point here, instead of a hardcoded one... ;)
         elif self.__keyzone_mode__ == "2-low-3-high":
+            # The 2-low-3-high split puts the 2 leftmost columns on the lowermost part of the keyboard, and the 3 rightmost columns on the uppermost part of the keyboard
+            # Further, we transpose the notes so they are moved to have a four octave overlap in the middle
             slotSettings = [
-                [0, 59, 0],
-                [0, 59, 0],
-                [60, 127, 0],
-                [60, 127, 0],
-                [60, 127, 0]
+                [0, 59, -24],
+                [0, 59, -24],
+                [60, 127, 24],
+                [60, 127, 24],
+                [60, 127, 24],
+                [0, 59, -24],
+                [0, 59, -24],
+                [60, 127, 24],
+                [60, 127, 24],
+                [60, 127, 24]
+            ]
+        elif self.__keyzone_mode__ == "10-split":
+            # 10-split gives each slot an octave, and puts their root note on the F note in that octave (and also just gives the final note all the remaining space on the note range)
+            slotSettings = [
+                [0, 11, -54],
+                [12, 23, -42],
+                [24, 35, -30],
+                [36, 35, -18],
+                [48, 59, -6],
+                [60, 71, 6],
+                [72, 83, 18],
+                [84, 95, 30],
+                [96, 107, 42],
+                [108, 127, 54],
             ]
 
         if slotSettings is not None:
@@ -2430,13 +2489,14 @@ class sketchpad_channel(QObject):
                 keyzoneData.keyZoneEnd = slotSettings[i][1]
                 keyzoneData.rootNote = 60 + slotSettings[i][2]
                 # Sample slots
-                sample = self.__samples__[i]
-                clip = Zynthbox.PlayGridManager.instance().getClipById(sample.cppObjId)
-                if clip:
-                    clip.rootSlice().setKeyZoneStart(slotSettings[i][0])
-                    clip.rootSlice().setKeyZoneEnd(slotSettings[i][1])
-                    # This one's awkward - we really want to be able to just let this one happen (otherwise we can't set sample root pitch by transposing... and we may very well also want this for synth slots as well, because otherwise we can't transpose those either)
-                    # clip.rootSlice().setRootNote(60 + slotSettings[i][2])
+                for j in range(0, Zynthbox.Plugin.instance().sketchpadSampleSlotRowCount()):
+                    sampleIndex = i + (Zynthbox.Plugin.instance().sketchpadSlotCount() * j)
+                    sample = self.__samples__[sampleIndex]
+                    clip = Zynthbox.PlayGridManager.instance().getClipById(sample.cppObjId)
+                    if clip:
+                        clip.rootSlice().setKeyZoneStart(slotSettings[sampleIndex][0])
+                        clip.rootSlice().setKeyZoneEnd(slotSettings[sampleIndex][1])
+                        clip.rootSlice().setRootNote(60 + slotSettings[sampleIndex][2])
 
     def get_keyZoneMode(self):
         return self.__keyzone_mode__
@@ -3518,8 +3578,8 @@ class sketchpad_channel(QObject):
         def task():
             snapshot_obj = json.loads(snapshot)
             for index, key in enumerate(snapshot_obj):
-                if index > 4:
-                    logging.error("For some reason we have more than five elements in the encoded sample data, what happened?!")
+                if index > 9:
+                    logging.error("For some reason we have more than ten elements in the encoded sample data, what happened?!")
                     break;
                 filename = snapshot_obj[key]["filename"]
                 # Clear out the existing sample, whether or not there's a new sample to go into that spot
@@ -3546,7 +3606,7 @@ class sketchpad_channel(QObject):
 
     @Slot(str, int, int)
     def setChannelSampleFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int, showLoadingScreen=True):
-        if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+        if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < 2 * Zynthbox.Plugin.instance().sketchpadSlotCount():
             sampleClip = self.__samples__[slotIndex]
             self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sampleClip, showLoadingScreen)
 
@@ -3598,8 +3658,7 @@ class sketchpad_channel(QObject):
     @Slot(None, result=str)
     def getChannelSampleSnapshot(self):
         encodedSampleData = {};
-        for index in range(0, 5):
-            sample = self.__samples__[index]
+        for index, sample in enumerate(self.__samples):
             thisSample = {
                 "filename": "",
                 "metadata": "",
@@ -3795,7 +3854,7 @@ class sketchpad_channel(QObject):
             self.zynqtgui.set_curlayer(self.chainedSketchFx[self.selectedSlot.value])
         elif type == "loop" or type == "sample-loop" or type == "TracksBar_sketchslot":
             self.zynqtgui.set_curlayer(None)
-        elif type == "sample" or type == "sample-trig" or type == "TracksBar_sampleslot":
+        elif type == "sample" or type == "sample-trig" or type == "TracksBar_sampleslot" or type == "TracksBar_sampleslot2":
             self.zynqtgui.set_curlayer(None)
         elif type == "external" or type == "TracksBar_externalslot":
             self.zynqtgui.set_curlayer(None)
@@ -3847,6 +3906,7 @@ class sketchpad_channel(QObject):
             new_order_samples = [self.samples[index] for index in newOrder]
             for index, sample in enumerate(new_order_samples):
                 sample.id = index
+                sample.sampleSlotRow = 0 if index < 5 else 1
                 sample.set_lane(index)
             self.__samples__ = new_order_samples
             self.samples_changed.emit()
@@ -3955,7 +4015,7 @@ class sketchpad_channel(QObject):
                 case "synth" | "TracksBar_synthslot":
                     snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
                     self.setChannelSoundFromSnapshotSlot(snapshot, "synth", destinationSlot, sourceSlot, showLoadingScreen=False)
-                case "sample-trig" | "TracksBar_sampleslot":
+                case "sample-trig" | "TracksBar_sampleslot" | "TracksBar_sampleslot2":
                     snapshot = sourceTrack.getChannelSampleSnapshot()
                     self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot, showLoadingScreen=False)
                 case "fx" | "TracksBar_fxslot":
@@ -3979,6 +4039,8 @@ class sketchpad_channel(QObject):
                     self.remove_and_unchain_sound(self.chainedSounds[slotIndex], None, showLoadingScreen=False)
                 case "sample-trig" | "TracksBar_sampleslot":
                     self.samples[slotIndex].clear()
+                case "TracksBar_sampleslot2":
+                    self.samples[slotIndex + Zynthbox.Plugin.sketchpadSlotCount].clear()
                 case "fx" | "TracksBar_fxslot":
                     self.removeFxFromChain(slotIndex, showLoadingScreen=False)
             if showLoadingScreen:

@@ -86,6 +86,14 @@ ZUI.SectionPanel {
 
     Layout.fillWidth: true
 
+    enum View {
+        Main,
+        PAT,
+        SYN,
+        SMP,
+        FX
+    }  
+
     function pickNextSlot(onlySelectSlot=false) {
         switch (root.selectedChannel.selectedSlot.className) {
         case "TracksBar_synthslot":
@@ -748,26 +756,76 @@ ZUI.SectionPanel {
     SamplePickingStyleSelector {
         id: samplePickingStyleSelector
     }
-
-    QQC2.ButtonGroup {
-        buttons: tabButtons.children
-    }
     
     contentItem: ZUI.ThreeColumnView {
         
         leftTab: BottomStackTabs {}
 
+        rightTab: ZUI.SectionGroup {
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: ZUI.Theme.spacing
+
+                ZUI.SectionButton{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "Main"
+                    checked: highlighted
+                    highlighted: _tracksBarStack.currentView === TracksBar.View.Main
+                    onClicked: _tracksBarStack.setView(TracksBar.View.Main)
+                }
+
+                ZUI.SectionButton{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "PAT"
+                    checked: highlighted
+                    highlighted: _tracksBarStack.currentView === TracksBar.View.PAT
+                    onClicked: _tracksBarStack.setView(TracksBar.View.PAT)
+                }
+
+                ZUI.SectionButton{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "SYN"
+                    checked: highlighted
+                    highlighted: _tracksBarStack.currentView === TracksBar.View.SYN
+                    onClicked: _tracksBarStack.setView(TracksBar.View.SYN)
+                }
+
+                ZUI.SectionButton{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "SMP"
+                    checked: highlighted
+                    highlighted: _tracksBarStack.currentView === TracksBar.View.SMP
+                    onClicked: _tracksBarStack.setView(TracksBar.View.SMP)
+                }
+
+                 ZUI.SectionButton{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "FX"
+                    checked: highlighted
+                    highlighted: _tracksBarStack.currentView === TracksBar.View.FX
+                    onClicked: _tracksBarStack.setView(TracksBar.View.FX)
+                }
+            }
+        }
+
         middleTab: QQC2.Pane {
 
-            contentItem: Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.margins: Kirigami.Units.gridUnit / 2
+            contentItem: StackLayout {
+                id: _tracksBarStack
+                property int currentView: TracksBar.View.Main
+                currentIndex : currentView
 
+                function setView(view) {
+                    _tracksBarStack.currentView = view
+                    _tracksBarStack.currentIndex = _tracksBarStack.currentView
+                }
+               
                 ColumnLayout {
-                    id: contentColumn
-                    anchors.fill: parent
-
                     RowLayout {
                         spacing: ZUI.Theme.sectionSpacing
                         Layout.fillWidth: true
@@ -796,6 +854,10 @@ ZUI.SectionPanel {
 
                         ZUI.SectionGroup {
                             Layout.fillHeight: true
+
+                            QQC2.ButtonGroup {
+                                buttons: tabButtons.children
+                            }
 
                             RowLayout {
                                 id: tabButtons
@@ -1812,9 +1874,12 @@ ZUI.SectionPanel {
                         }
                     }
                 }
-            }
-        }
 
-        rightTab: Item {}        
+                Item {}
+                Item {}
+                Item {}
+                Item {}
+            }
+        }      
     }
 }

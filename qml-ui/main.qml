@@ -1756,6 +1756,29 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    // Column {
+    //     id: _ruler
+    //     parent: root.contentItem.parent
+    //     z: 99999
+    //     anchors.right: parent.right
+    //     height: parent.height
+    //     width: Kirigami.Units.gridUnit
+
+    //     Repeater {
+    //         model: Math.round(_ruler.height / Kirigami.Units.gridUnit)
+    //         delegate: Rectangle {
+    //             width: Kirigami.Units.gridUnit
+    //             height: Kirigami.Units.gridUnit
+    //             color: index%2 === 0 ? "blue" : "magenta"
+    //             Text {
+    //                 text: index
+    //                 color: "white"
+    //                 font.bold: true
+    //             }
+    //         }
+    //     }
+    // }
+
     Rectangle {
         id: countInOverlay
         parent: root.contentItem.parent

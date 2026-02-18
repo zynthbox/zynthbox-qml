@@ -433,7 +433,7 @@ ZUI.ScreenPage {
                         autoActivateIndexOnChange: true
                         qmlSelector: ZUI.SelectorWrapper {
                             selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? 2 * Zynthbox.Plugin.sketchpadSlotCount : Zynthbox.Plugin.sketchpadSlotCount
-                            current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? component.selectedChannel.selectedSlot.value : -1
+                            current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? (component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? component.selectedChannel.selectedSlot.value : component.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
                         }
                         onCurrentItemChanged: {
                             if (currentItem && currentItem.clip.metadata.originalPath != "") {

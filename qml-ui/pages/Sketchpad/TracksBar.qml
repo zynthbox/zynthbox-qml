@@ -206,8 +206,11 @@ ZUI.SectionPanel {
             if (slotIndex < Zynthbox.Plugin.sketchpadSlotCount) {
                 samplesRow.switchToSlot(slotIndex);
             } else {
-                samples2Row.switchToSlot(slotIndex);
+                samples2Row.switchToSlot(slotIndex - Zynthbox.Plugin.sketchpadSlotCount);
             }
+            break;
+        case "TracksBar_sampleslot2":
+            samples2Row.switchToSlot(slotIndex);
             break;
         case "sketch":
         case "TracksBar_sketchslot":
@@ -243,8 +246,11 @@ ZUI.SectionPanel {
             if (slotIndex < Zynthbox.Plugin.sketchpadSlotCount) {
                 samplesRow.switchToSlot(slotIndex, true, onlySelectSlot);
             } else {
-                samples2Row.switchToSlot(slotIndex, true, onlySelectSlot);
+                samples2Row.switchToSlot(slotIndex - Zynthbox.Plugin.sketchpadSlotCount, true, onlySelectSlot);
             }
+            break;
+        case "TracksBar_sampleslot2":
+            samples2Row.switchToSlot(slotIndex, true, onlySelectSlot);
             break;
         case "sketch":
         case "TracksBar_sketchslot":
@@ -282,6 +288,11 @@ ZUI.SectionPanel {
                 slotHasContents = root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].cppObjId > -1;
                 if (switchIfEmpty && slotHasContents === false) {
                     samplesRow.switchToSlot(0, true, onlySelectSlot);
+                }
+            } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot2") {
+                slotHasContents = root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount].cppObjId > -1;
+                if (switchIfEmpty && slotHasContents === false) {
+                    samples2Row.switchToSlot(0, true, onlySelectSlot);
                 }
             } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchslot") {
                 slotHasContents = root.selectedChannel.sketchSlotsData[root.selectedChannel.selectedSlot.value].cppObjId > -1;
@@ -355,7 +366,11 @@ ZUI.SectionPanel {
             // If we have reached this point and still have nothing selected, make sure we select the whatever was previously selected (or default to the first sound slot)
             if (slotHasContents === false) {
                 if (initialSlotType === 0) {
-                    synthsRow.switchToSlot(initialSlotIndex, true, onlySelectSlot);
+                    if (root.selectedChannel.trackType === "sample-trig") {
+                        samples2Row.switchToSlot(initialSlotIndex, true, onlySelectSlot);
+                    } else {
+                        synthsRow.switchToSlot(initialSlotIndex, true, onlySelectSlot);
+                    }
                 } else if (initialSlotType === 1) {
                     fxRow.switchToSlot(initialSlotIndex, true, onlySelectSlot);
                 } else if (initialSlotType === 2) {
@@ -902,11 +917,14 @@ ZUI.SectionPanel {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                     Layout.fillHeight: true
                                     checked: highlighted
-                                    highlighted: root.selectedChannel != null && root.selectedChannel.trackType === "synth"
+                                    highlighted: root.selectedChannel != null && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
                                     text: qsTr("Sketch")
                                     onClicked: {
-                                        root.selectedChannel.trackType = "synth";
-                                        synthsRow.switchToSlot(0, true);
+                                        if (["synth", "sample-trig"].includes(root.selectedChannel.trackType) == false) {
+                                            // Don't switch (or do slot selection type things) if we're already there
+                                            root.selectedChannel.trackType = "synth";
+                                            synthsRow.switchToSlot(0, true);
+                                        }
                                     }
                                     QQC2.Button {
                                         anchors {
@@ -939,7 +957,7 @@ ZUI.SectionPanel {
                                             textHorizontalAlignment: Text.AlignLeft
                                         }
                                     }
-                                    }
+                                }
 
                                 ZUI.SectionButton {
                                     // TODO Return for 1.1

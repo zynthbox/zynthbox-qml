@@ -203,7 +203,11 @@ ZUI.SectionPanel {
             break;
         case "sample":
         case "TracksBar_sampleslot":
-            samplesRow.switchToSlot(slotIndex);
+            if (slotIndex < Zynthbox.Plugin.sketchpadSlotCount) {
+                samplesRow.switchToSlot(slotIndex);
+            } else {
+                samples2Row.switchToSlot(slotIndex);
+            }
             break;
         case "sketch":
         case "TracksBar_sketchslot":
@@ -236,7 +240,11 @@ ZUI.SectionPanel {
             break;
         case "sample":
         case "TracksBar_sampleslot":
-            samplesRow.switchToSlot(slotIndex, true, onlySelectSlot);
+            if (slotIndex < Zynthbox.Plugin.sketchpadSlotCount) {
+                samplesRow.switchToSlot(slotIndex, true, onlySelectSlot);
+            } else {
+                samples2Row.switchToSlot(slotIndex, true, onlySelectSlot);
+            }
             break;
         case "sketch":
         case "TracksBar_sketchslot":
@@ -303,6 +311,8 @@ ZUI.SectionPanel {
                 // Select the first and best option for the given TracksBar layout
                 if (root.selectedChannel.trackType === "synth") {
                     synthsRow.switchToSlot(0, true, onlySelectSlot);
+                } else if (root.selectedChannel.trackType === "sample-trig") {
+                    samplesRow.switchToSlot(0, true, onlySelectSlot);
                 } else if (root.selectedChannel.trackType === "sample-loop") {
                     sketchesRow.switchToSlot(0, true, onlySelectSlot);
                 } else if (root.selectedChannel.trackType === "external") {
@@ -313,7 +323,7 @@ ZUI.SectionPanel {
         }
         let initialSlotIndex = 0;
         let initialSlotType = 0;
-        if (["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sketchslot", "TracksBar_externalslot"].includes(root.selectedChannel.selectedSlot.className)) {
+        if (["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sampleslot2", "TracksBar_sketchslot", "TracksBar_externalslot"].includes(root.selectedChannel.selectedSlot.className)) {
             initialSlotIndex = root.selectedChannel.selectedSlot.value;
         } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
             initialSlotType = 1;
@@ -327,7 +337,7 @@ ZUI.SectionPanel {
             // Define the total number of slots to test. This is really more of a "the number of slots to check" thing than a direct slot index
             // root.pickNextSlot() will actually select the next slot based on what's currently selected
             let numSlotsToTest = Zynthbox.Plugin.sketchpadSlotCount;
-            if (root.selectedChannel.trackType == "synth") {
+            if (root.selectedChannel.trackType == "synth" || root.selectedChannel.trackType == "sample-trig") {
                 // Track type Sound has 3 sets of 5 slots
                 numSlotsToTest = Zynthbox.Plugin.sketchpadSlotCount * 3;
             } else if (root.selectedChannel.trackType == "sample-loop") {

@@ -668,7 +668,7 @@ def audio_autoconnect(force=False):
     # TODO We are only connecting the first pair of ports here (since the global channels don't really have advanced routing anyway).
     # TODO Maybe we could actually get away with only using the one global samplersynth, and instead use the two first lanes to perform the same job? (no effect for lane 0, effects for lane 1, no connection for the other three)
     # BEGIN Connect SamplerSynth's global effected to the global effects passthrough
-    for laneType in ["lane", "sketch"]:
+    for laneType in ["sample", "sketch"]:
         samplerSynthEffectedPorts = jclient.get_ports(f"SamplerSynth:global-{laneType}2-", is_audio=True, is_output=True)
         for port in zip(samplerSynthEffectedPorts, globalFx1InputPorts):
             zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
@@ -749,22 +749,24 @@ def audio_autoconnect(force=False):
                                 except: pass
                         # END Handle external inputs for external mode channels
                         # BEGIN Handle sample slots
-                        samplerOutputPorts = [f"SamplerSynth:channel_{channelId + 1}-lane{laneId + 1}-left", f"SamplerSynth:channel_{channelId + 1}-lane{laneId + 1}-right"]
-                        sample = channel.samples[laneId]
-                        if sample.audioSource is not None:
-                            # Connect sampler ports if there's a sample in the given slot
-                            if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
-                            # logging.info(f"Connecting {samplerOutputPorts} to {laneInputs}")
-                            for port in zip(samplerOutputPorts, laneInputs):
-                                # Make sure this is the only connection we've got
-                                for connectedTo in zbjack.getAllConnections(get_jack_port_name(port[0])):
-                                    if connectedTo.endswith("-sidechainInputLeft") or connectedTo.endswith("-sidechainInputRight"):
-                                        # Don't disconnect the sidechain ports, though...
-                                        pass
-                                    else:
-                                        zbjack.disconnectPorts(get_jack_port_name(port[0]), connectedTo)
-                                # logging.info(f"Connecting {port[0]} to {port[1]}")
-                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+                        for sampleSlotRow in range(0, Zynthbox.Plugin.instance().sketchpadSampleSlotRowCount()):
+                            sampleIndex = (sampleSlotRow * 5) + laneId
+                            samplerOutputPorts = [f"SamplerSynth:channel_{channelId + 1}-sample{sampleIndex + 1}-left", f"SamplerSynth:channel_{channelId + 1}-sample{sampleIndex + 1}-right"]
+                            sample = channel.samples[sampleIndex]
+                            if sample.audioSource is not None:
+                                # Connect sampler ports if there's a sample in the given slot
+                                if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
+                                # logging.info(f"Connecting {samplerOutputPorts} to {laneInputs}")
+                                for port in zip(samplerOutputPorts, laneInputs):
+                                    # Make sure this is the only connection we've got
+                                    for connectedTo in zbjack.getAllConnections(get_jack_port_name(port[0])):
+                                        if connectedTo.endswith("-sidechainInputLeft") or connectedTo.endswith("-sidechainInputRight"):
+                                            # Don't disconnect the sidechain ports, though...
+                                            pass
+                                        else:
+                                            zbjack.disconnectPorts(get_jack_port_name(port[0]), connectedTo)
+                                    # logging.info(f"Connecting {port[0]} to {port[1]}")
+                                    zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Handle sample slots
                         # BEGIN Handle sketch slots
                         samplerOutputPorts = [f"SamplerSynth:channel_{channelId + 1}-sketch{laneId + 1}-left", f"SamplerSynth:channel_{channelId + 1}-sketch{laneId + 1}-right"]
@@ -848,7 +850,7 @@ def audio_autoconnect(force=False):
                                                 if inputSource.port.startswith("synthSlot:"):
                                                     portRootName = f"TrackPassthrough:Channel{theTrack}-lane{theLane}"
                                                 elif inputSource.port.startswith("sampleSlot:"):
-                                                    portRootName = f"SamplerSynth:channel_{theTrack}-lane{theLane}"
+                                                    portRootName = f"SamplerSynth:channel_{theTrack}-sample{theLane}"
                                                 else:
                                                     portRootName = f"FXPassthrough-lane{theLane}:Channel{theTrack}"
                                                 if inputSource.port.startswith("sampleSlot:"):
@@ -1168,7 +1170,7 @@ def audio_autoconnect(force=False):
     ### END Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on TrackPassthrough and FXPassthrough
 
     ### BEGIN Connect Samplersynth uneffected ports to GlobalPlayback client
-    for laneType in ["lane", "sketch"]:
+    for laneType in ["sample", "sketch"]:
         # Most of the time we can do these with known lists, but since these sometimes get created dynamically, we need to make sure they're there to avoid zbjack's wrath
         for port in zip(jclient.get_ports(f"SamplerSynth:global-{laneType}1-", is_audio=True, is_output=True), globalPlaybackInputPorts):
             zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))

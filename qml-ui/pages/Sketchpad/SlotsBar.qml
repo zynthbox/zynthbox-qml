@@ -38,21 +38,17 @@ import io.zynthbox.ui 1.0 as ZUI
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.SectionPanel {
+AbstractSketchpadPage {
     id: root
+    selectedChannel: applicationWindow().selectedChannel
 
     property alias bottomBarButton: bottomBarButton
     property alias soundCombinatorButton: soundCombinatorButton
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
 
-    readonly property QtObject song: zynqtgui.sketchpad.song
-    readonly property QtObject selectedChannel: applicationWindow().selectedChannel
-
     // FIXME : Sample picker dialog was having issues when selecting sample for channel T6-T10
     //         Find a proper solution and see if selectedChannel can be used for all cases instead of this
     property QtObject selectedSlotRowItem
-
-    Layout.fillWidth: true
     
     function cuiaCallback(cuia) {
         var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
@@ -133,32 +129,32 @@ ZUI.SectionPanel {
 
         case "KNOB0_UP":
             if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
+                root.sketchpadView.updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
             }
             return true;
         case "KNOB0_DOWN":
             if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
+                root.sketchpadView.updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
             }
             return true;
         case "KNOB1_UP":
             if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1)
+                root.sketchpadView.updateSelectedChannelSlotLayerCutoff(1)
             }
             return true;
         case "KNOB1_DOWN":
             if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1)
+                root.sketchpadView.updateSelectedChannelSlotLayerCutoff(-1)
             }
             return true;
         case "KNOB2_UP":
             if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1)
+                root.sketchpadView.updateSelectedChannelSlotLayerResonance(1)
             }
             return true;
         case "KNOB2_DOWN":
             if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1)
+                root.sketchpadView.updateSelectedChannelSlotLayerResonance(-1)
             }
             return true;
         }

@@ -39,11 +39,9 @@ import io.zynthbox.ui 1.0 as ZUI
 
 import io.zynthbox.components 1.0 as Zynthbox
 
-ZUI.SectionPanel {
+AbstractSketchpadPage {
     id: root
-
-    readonly property QtObject song: zynqtgui.sketchpad.song
-    property QtObject selectedChannel: null
+    
     Timer {
         id: selectedChannelThrottle
         interval: 1; running: false; repeat: false;
@@ -83,8 +81,6 @@ ZUI.SectionPanel {
 
     property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
-
-    Layout.fillWidth: true
 
     enum View {
         Main,
@@ -445,18 +441,18 @@ ZUI.SectionPanel {
                 returnValue = true;
                 switch (zynqtgui.sketchpad.lastSelectedObj.className) {
                 case "TracksBar_synthslot":
-                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
+                    root.sketchpadView.updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
                     break;
                 case "TracksBar_sampleslot":
-                    pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 case "TracksBar_sketchslot":
-                    pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 case "TracksBar_externalslot":
                     break;
                 case "TracksBar_fxslot":
-                    pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedFxLayerVolume(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 default:
                     returnValue = false;
@@ -488,18 +484,18 @@ ZUI.SectionPanel {
             returnValue = true;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 1)
+                root.sketchpadView.updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 1)
                 break;
             case "TracksBar_sampleslot":
-                pageManager.getPage("sketchpad").updateSelectedSampleGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedSampleGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sketchslot":
-                pageManager.getPage("sketchpad").updateSelectedSketchGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedSketchGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_externalslot":
                 break;
             case "TracksBar_fxslot":
-                pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedFxLayerVolume(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -511,18 +507,18 @@ ZUI.SectionPanel {
             returnValue = false;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], -1)
+                root.sketchpadView.updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], -1)
                 break;
             case "TracksBar_sampleslot":
-                pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedSampleGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sketchslot":
-                pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedSketchGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_externalslot":
                 break;
             case "TracksBar_fxslot":
-                pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedFxLayerVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -535,7 +531,7 @@ ZUI.SectionPanel {
                 returnValue = true;
                 switch (zynqtgui.sketchpad.lastSelectedObj.className) {
                 case "TracksBar_synthslot":
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 case "TracksBar_sampleslot":
                     break;
@@ -544,10 +540,10 @@ ZUI.SectionPanel {
                 case "TracksBar_externalslot":
                     break;
                 case "TracksBar_fxslot":
-                    pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedChannelFxLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 case "TracksBar_sketchfxslot":
-                    pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedChannelSketchFxLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 default:
                     returnValue = false;
@@ -579,7 +575,7 @@ ZUI.SectionPanel {
             returnValue = true;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sampleslot":
                 break;
@@ -588,10 +584,10 @@ ZUI.SectionPanel {
             case "TracksBar_externalslot":
                 break;
             case "TracksBar_fxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelFxLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sketchfxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSketchFxLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -603,7 +599,7 @@ ZUI.SectionPanel {
             returnValue = true;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sampleslot":
                 break;
@@ -612,10 +608,10 @@ ZUI.SectionPanel {
             case "TracksBar_externalslot":
                 break;
             case "TracksBar_fxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelFxLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sketchfxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSketchFxLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -628,7 +624,7 @@ ZUI.SectionPanel {
                 returnValue = true;
                 switch (zynqtgui.sketchpad.lastSelectedObj.className) {
                 case "TracksBar_synthslot":
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 case "TracksBar_sampleslot":
                     break;
@@ -637,10 +633,10 @@ ZUI.SectionPanel {
                 case "TracksBar_externalslot":
                     break;
                 case "TracksBar_fxslot":
-                    pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedChannelFxLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 case "TracksBar_sketchfxslot":
-                    pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateSelectedChannelSketchFxLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
                     break;
                 default:
                     returnValue = false;
@@ -672,7 +668,7 @@ ZUI.SectionPanel {
             returnValue = true;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sampleslot":
                 break;
@@ -681,10 +677,10 @@ ZUI.SectionPanel {
             case "TracksBar_externalslot":
                 break;
             case "TracksBar_fxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelFxLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sketchfxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSketchFxLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -696,7 +692,7 @@ ZUI.SectionPanel {
             returnValue = true;
             switch (zynqtgui.sketchpad.lastSelectedObj.className) {
             case "TracksBar_synthslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sampleslot":
                 break;
@@ -705,10 +701,10 @@ ZUI.SectionPanel {
             case "TracksBar_externalslot":
                 break;
             case "TracksBar_fxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelFxLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_sketchfxslot":
-                pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateSelectedChannelSketchFxLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -1871,7 +1867,7 @@ ZUI.SectionPanel {
                                                 //     clipDelegate.clip.enabled = true;
                                                 // }
 
-                                                pageManager.getPage("sketchpad").bottomStack.clipsBar.handleItemClick(root.selectedChannel.id, clipDelegate.clipIndex);
+                                                root.sketchpadView.bottomStack.clipsBar.handleItemClick(root.selectedChannel.id, clipDelegate.clipIndex);
                                             }
                                             Kirigami.Icon {
                                                 anchors {
@@ -1901,11 +1897,17 @@ ZUI.SectionPanel {
                                                 source: "media-playback-stop-symbolic"
                                             }
 
+                                            padding: 1
+                                            leftPadding: padding
+                                            topPadding: padding
+                                            rightPadding: padding
+                                            bottomPadding: padding
                                             contentItem : ColumnLayout {
                                                 spacing: ZUI.Theme.spacing
                                                 QQC2.Label {
+                                                    Layout.margins: 4
                                                     Layout.fillWidth: true
-                                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
                                                     font: clipDelegate.font
                                                     text: clipDelegate.text
                                                     color: clipDelegate.color
@@ -1915,7 +1917,7 @@ ZUI.SectionPanel {
                                                 ZUI.SectionGroup {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
-                                                    mask: true
+                                                    mask: false
                                                     background: null 
                                                     padding: 0
 

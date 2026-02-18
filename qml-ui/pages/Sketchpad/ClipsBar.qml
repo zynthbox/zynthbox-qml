@@ -35,16 +35,15 @@ import io.zynthbox.components 1.0 as Zynthbox
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
-// GridLayout so TabbedControlView knows how to navigate it
-ZUI.SectionPanel {
+AbstractSketchpadPage {
     id: root
 
-    property QtObject bottomBar: null
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
     property QtObject selectedClipChannel
     property QtObject selectedClipObject
     property QtObject selectedClipPattern
     property QtObject selectedComponent
+
+    selectedChannel: applicationWindow().selectedChannel
 
     signal clicked()
     signal pressAndHold()
@@ -75,8 +74,6 @@ ZUI.SectionPanel {
         console.log("Handle clip cell click event", channelId, clipId)
         clipDelegateRepeater.itemAt(channelId).handleItemClick(clipId)
     }
-
-    Layout.fillWidth: true
     
     contentItem: Item {
         ZUI.ActionPickerPopup {

@@ -36,13 +36,10 @@ import io.zynthbox.components 1.0 as Zynthbox
 
 import io.zynthbox.ui 1.0 as ZUI
 
-ZUI.SectionPanel {
+AbstractSketchpadPage {
     id: root
 
-    readonly property QtObject song: zynqtgui.sketchpad.song
-    readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
-    property Item mainView : null
-    Layout.fillWidth: true
+    selectedChannel: applicationWindow().selectedChannel
     
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -100,7 +97,7 @@ ZUI.SectionPanel {
         case "KNOB1_UP":
             switch(zynqtgui.sketchpad.lastSelectedObj.className) {
             case "MixerBar_item":
-                pageManager.getPage("sketchpad").updateChannelPan(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateChannelPan(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 return true;
             case "MixerBar_master":
                 applicationWindow().updateGlobalPlaybackPan(1);
@@ -111,7 +108,7 @@ ZUI.SectionPanel {
         case "KNOB1_DOWN":
             switch(zynqtgui.sketchpad.lastSelectedObj.className) {
             case "MixerBar_item":
-                pageManager.getPage("sketchpad").updateChannelPan(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                root.sketchpadView.updateChannelPan(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 return true;
             case "MixerBar_master":
                 applicationWindow().updateGlobalPlaybackPan(-1);
@@ -134,53 +131,28 @@ ZUI.SectionPanel {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
-                    text: "Sends"
-                    checked: highlighted
-                    highlighted: root.mainView.showMixerEqualiser === false
-                    showIndicator: true
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            if (parent.checked)
-                                sendsActions.open();
-                            else
-                                root.mainView.showMixerEqualiser = false;
-                        }
-                    }
-
-                    ZUI.ActionPickerPopup {
-                        id: sendsActions
-
-                        actions: [
-                            Kirigami.Action {
-                                text: "Bleep"
-                            },
-                            Kirigami.Action {
-                                text: "Bloop"
-                            }
-                        ]
-                    }
+                    text: "Reverb"
                 }
 
                 ZUI.SectionButton {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
-                    text: "EQ/Comp"
-                    checked: highlighted
-                    highlighted: root.mainView.showMixerEqualiser === true
-                    showIndicator: true
+                    text: "Delay"
+                }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            if (parent.checked)
-                                pageManager.getPage("sketchpad").bottomStack.slotsBar.requestSlotEqualizer(applicationWindow().channels[applicationWindow().selectedChannel.id], "mixer", -1);
-                            else
-                               root.mainView.showMixerEqualiser = true;
-                        }
-                    }
+                ZUI.SectionButton {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
+                    text: "EQ"
+                }
+
+                ZUI.SectionButton {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
+                    text: "Comp"
                 }
 
                 Item{
@@ -188,19 +160,6 @@ ZUI.SectionPanel {
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
                 }
-
-                Item{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                }
-
-                Item{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                }
-
             }
         }
 
@@ -716,5 +675,4 @@ ZUI.SectionPanel {
             }
         }
     }
-
 }

@@ -634,7 +634,6 @@ ZUI.ScreenPage {
         ClipsBar,
         SynthsBar,
         SamplesBar,
-        Samples2Bar,
         FXBar
     } 
 
@@ -705,11 +704,7 @@ ZUI.ScreenPage {
                                 bottomStack.setView(Main.BarView.BottomBar);
                                 bottomStack.bottomBar.channelWaveEditorAction.trigger();
                             } else {
-                                if (root.channel.selectedSlot.className === "TracksBar_sampleslot") {
-                                    bottomStack.slotsBar.handleItemClick("sample-trig");
-                                } else {
-                                    bottomStack.slotsBar.handleItemClick("sample-trig2");
-                                }
+                                bottomStack.slotsBar.handleItemClick("sample-trig");
                             }
                         }
                         returnValue = true;
@@ -1278,13 +1273,74 @@ ZUI.ScreenPage {
                                     }
                                 }
                             }
+                            
+                            Item {                                
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                visible: bottomStack.currentBarView === Main.BarView.MixerBar
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
+
+                                    ZUI.SectionButton {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        text: "Sends"
+                                        checked: highlighted
+                                        highlighted: root.showMixerEqualiser === false
+                                        showIndicator: true
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (parent.checked)
+                                                    sendsActions.open();
+                                                else
+                                                    root.showMixerEqualiser = false;
+                                            }
+                                        }
+
+                                        ZUI.ActionPickerPopup {
+                                            id: sendsActions
+
+                                            actions: [
+                                                Kirigami.Action {
+                                                    text: "Bleep"
+                                                },
+                                                Kirigami.Action {
+                                                    text: "Bloop"
+                                                }
+                                            ]
+                                        }
+                                    }
+
+                                    ZUI.SectionButton {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        text: "EQ/Comp"
+                                        checked: highlighted
+                                        highlighted: root.showMixerEqualiser === true
+                                        showIndicator: true
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (parent.checked)
+                                                    root.bottomStack.slotsBar.requestSlotEqualizer(applicationWindow().channels[root.selectedChannel.id], "mixer", -1);
+                                                else
+                                                    root.showMixerEqualiser = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
                             // Placeholder item of same size to have 2 rows in here
                             Item {                              
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-
+                                visible: bottomStack.currentBarView !== Main.BarView.MixerBar
                                 ColumnLayout {
                                     anchors.fill: parent
                                     spacing: ZUI.Theme.spacing
@@ -2099,28 +2155,28 @@ ZUI.ScreenPage {
 
                         MixerBar {
                             id: mixerBar
-                            mainView: root
+                            sketchpadView: root
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                         }
 
                         SlotsBar {
                             id: slotsBar
-
+                            sketchpadView: root
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                         }
 
                         TracksBar {
                             id: tracksBar
-
+                            sketchpadView: root
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                         }
 
                         ClipsBar {
                             id: clipsBar
-
+                            sketchpadView: root
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             onClicked: {

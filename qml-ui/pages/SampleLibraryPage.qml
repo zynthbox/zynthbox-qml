@@ -250,7 +250,7 @@ ZUI.ScreenPage {
             QQC2.Action {
                 property int slotIndex: 0
                 text: sampleSlotAssigner.opened
-                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || (component.selectedChannel.trackType !== "sample-loop" && component.selectedChannel.samples[slotIndex].isEmpty)
                         ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
                         : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
                     : ""
@@ -265,7 +265,7 @@ ZUI.ScreenPage {
             QQC2.Action {
                 property int slotIndex: 1
                 text: sampleSlotAssigner.opened
-                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || (component.selectedChannel.trackType !== "sample-loop" && component.selectedChannel.samples[slotIndex].isEmpty)
                         ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
                         : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
                     : ""
@@ -280,7 +280,7 @@ ZUI.ScreenPage {
             QQC2.Action {
                 property int slotIndex: 2
                 text: sampleSlotAssigner.opened
-                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || (component.selectedChannel.trackType !== "sample-loop" && component.selectedChannel.samples[slotIndex].isEmpty)
                         ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
                         : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
                     : ""
@@ -295,7 +295,7 @@ ZUI.ScreenPage {
             QQC2.Action {
                 property int slotIndex: 3
                 text: sampleSlotAssigner.opened
-                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || (component.selectedChannel.trackType !== "sample-loop" && component.selectedChannel.samples[slotIndex].isEmpty)
                         ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
                         : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
                     : ""
@@ -310,7 +310,87 @@ ZUI.ScreenPage {
             QQC2.Action {
                 property int slotIndex: 4
                 text: sampleSlotAssigner.opened
-                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || (component.selectedChannel.trackType !== "sample-loop" && component.selectedChannel.samples[slotIndex].isEmpty)
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            Kirigami.Action {
+                property int slotIndex: 5
+                visible: component.selectedChannel && component.selectedChannel.trackType === "sample-trig"
+                text: sampleSlotAssigner.opened
+                    ? component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            Kirigami.Action {
+                property int slotIndex: 6
+                visible: component.selectedChannel && component.selectedChannel.trackType === "sample-trig"
+                text: sampleSlotAssigner.opened
+                    ? component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            Kirigami.Action {
+                property int slotIndex: 7
+                visible: component.selectedChannel && component.selectedChannel.trackType === "sample-trig"
+                text: sampleSlotAssigner.opened
+                    ? component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            Kirigami.Action {
+                property int slotIndex: 8
+                visible: component.selectedChannel && component.selectedChannel.trackType === "sample-trig"
+                text: sampleSlotAssigner.opened
+                    ? component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            Kirigami.Action {
+                property int slotIndex: 9
+                visible: component.selectedChannel && component.selectedChannel.trackType === "sample-trig"
+                text: sampleSlotAssigner.opened
+                    ? component.selectedChannel.samples[slotIndex].isEmpty
                         ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
                         : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
                     : ""
@@ -352,7 +432,7 @@ ZUI.ScreenPage {
                         active: zynqtgui.isBootingComplete
                         autoActivateIndexOnChange: true
                         qmlSelector: ZUI.SelectorWrapper {
-                            selector_list: Zynthbox.Plugin.sketchpadSlotCount
+                            selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? 2 * Zynthbox.Plugin.sketchpadSlotCount : Zynthbox.Plugin.sketchpadSlotCount
                             current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? component.selectedChannel.selectedSlot.value : -1
                         }
                         onCurrentItemChanged: {
@@ -381,7 +461,7 @@ ZUI.ScreenPage {
                         }
                         delegate: ZUI.SelectorDelegate {
                             id: clipDelegate
-                            height: clipsListView.view.height/5
+                            height: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? clipsListView.view.height/10 : clipsListView.view.height/5
                             enabled: true
                             // highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
                             property QtObject clip: component.selectedChannel

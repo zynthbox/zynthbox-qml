@@ -55,7 +55,7 @@ ZUI.DialogQuestion {
                 zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
             }
             // If the selected slot is not either a synth or sample slot, fix that
-            if (["TracksBar_synthslot", "TracksBar_sampleslot"].includes(component.selectedChannel.selectedSlot.className) == false) {
+            if (["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sampleslot2"].includes(component.selectedChannel.selectedSlot.className) == false) {
                 let tracksBar = pageManager.getPage("sketchpad").bottomStack.tracksBar;
                 tracksBar.switchToSlot("synth", 0, true);
                 tracksBar.pickFirstAndBestSlot(true);
@@ -185,7 +185,13 @@ ZUI.DialogQuestion {
             id: currentSlotControls
             Layout.fillWidth: true
             property int index: component.selectedChannel ? component.selectedChannel.selectedSlot.value : 0
-            property var channelSample: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? component.selectedChannel.samples && component.selectedChannel.samples[index] : null
+            property var channelSample: component.selectedChannel && component.selectedChannel.samples
+                ? component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot"
+                    ? component.selectedChannel.samples[index]
+                    : component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot2"
+                        ? component.selectedChannel.samples[index + Zynthbox.Plugin.sketchpadSlotCount]
+                        : null
+                : null
             property int engineMidiChannel: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot" ? component.selectedChannel.chainedSounds[index] : -1
             property QtObject clipObj: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
                 ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
@@ -338,12 +344,20 @@ ZUI.DialogQuestion {
                 model: 2
                 Repeater {
                     id: slotRepeater
-                    readonly property string slotType: index === 0 ? "TracksBar_synthslot" : "TracksBar_sampleslot"
+                    // The basic concept here is that we have a "window" of two sets of slots that need displayed at the same time, depending on track type
+                    readonly property var slotTypes: ["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sampleslot2"]
+                    readonly property string slotType: slotTypes[component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? index + 1 : index]
                     readonly property int slotTypeIndex: index
                     model: 5
                     delegate: Item {
                         id: sampleKeyzoneDelegate
-                        property var channelSample: component.selectedChannel && slotRepeater.slotType === "TracksBar_sampleslot" ? component.selectedChannel.samples && component.selectedChannel.samples[index] : null
+                        property var channelSample: component.selectedChannel && component.selectedChannel.samples
+                            ? slotRepeater.slotType === "TracksBar_sampleslot"
+                                ? component.selectedChannel.samples[index]
+                                : slotRepeater.slotType === "TracksBar_sampleslot2"
+                                    ? component.selectedChannel.samples[index + Zynthbox.Plugin.sketchpadSlotCount]
+                                    : null
+                            : null
                         property int engineMidiChannel: component.selectedChannel && slotRepeater.slotType === "TracksBar_synthslot" ? component.selectedChannel.chainedSounds[index] : -1
                         property QtObject clipObj: component.selectedChannel && slotRepeater.slotType === "TracksBar_synthslot"
                             ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null

@@ -153,7 +153,7 @@ ZUI.ScreenPage {
             case "SCREEN_PRESET":
                 // Switch to Library page when sound page is open and F2 is pressed again
                 if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset","sample_library"].includes(zynqtgui.current_screen_id) === false) {
-                    if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
+                    if (["TracksBar_sampleslot", "TracksBar_sampleslot2", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                         // Then we are selecting samples and sketches, show the sample library
                         zynqtgui.show_screen("sample_library");
                     } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
@@ -647,6 +647,7 @@ ZUI.ScreenPage {
             Sketchpad.TrackSlotsData {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                visible: root.selectedChannel.trackType === "synth"
                 slotData: soundDetails.displaySelectedSoundData
                             ? soundButtonGroup.checkedButton.soundObj.synthSlotsData
                             : root.selectedChannel.synthSlotsData
@@ -683,6 +684,29 @@ ZUI.ScreenPage {
                 onSlotClicked: {
                     if (soundDetails.displaySelectedSoundData && soundButtonGroup.checkedButton.soundObj.sampleSlotsData[index] !== "") {
                         slotsActionPicker.slotType = "sample";
+                        slotsActionPicker.slotIndex = index;
+                        slotsActionPicker.open();
+                    }
+                }
+            }
+
+            Sketchpad.TrackSlotsData {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                visible: root.selectedChannel.trackType === "sample-trig"
+                slotData: soundDetails.displaySelectedSoundData
+                            ? soundButtonGroup.checkedButton.soundObj.sampleSlotsData
+                            : root.selectedChannel.sampleSlotsData
+                slotType: soundDetails.displaySelectedSoundData
+                            ? "text"
+                            : "sample-trig2"
+                showSlotTypeLabel: true
+                slotTypeLabel: "Samples :"
+                performSlotInteractions: !soundDetails.displaySelectedSoundData
+                highlightCurrentlySelectedSlot: !soundDetails.displaySelectedSoundData
+                onSlotClicked: {
+                    if (soundDetails.displaySelectedSoundData && soundButtonGroup.checkedButton.soundObj.sampleSlotsData[index] !== "") {
+                        slotsActionPicker.slotType = "sample2";
                         slotsActionPicker.slotIndex = index;
                         slotsActionPicker.open();
                     }

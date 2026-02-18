@@ -24,7 +24,7 @@ GridLayout {
       * Type of data that needs to be displayed. It should be "synth" for synthSlotsData, "sample-trig" for sampleSlotsData
       * "sample-loop" for sketchSlotsData, "external" for externalSlotsData, "fx" for fxSlotsData "sketch-fx" for sketchFxSlotsData.
       * For displaying simple text in slot data use "text" as slot Type
-      * Allowed values : "synth", "sample-trig", "sample-loop", "external", "text", "sketch-fx"
+      * Allowed values : "synth", "sample-trig", "sample-trig2", "sample-loop", "external", "text", "sketch-fx"
       */
     property string slotType
     /**
@@ -132,6 +132,8 @@ GridLayout {
                     return "synth";
                 case "TracksBar_sampleslot":
                     return "sample-trig";
+                case "TracksBar_sampleslot2":
+                    return "sample-trig2";
                 case "TracksBar_sketchslot":
                     return "sample-loop";
                 case "TracksBar_fxslot":
@@ -150,6 +152,8 @@ GridLayout {
                     return "TracksBar_synthslot";
                 case "sample-trig":
                     return "TracksBar_sampleslot";
+                case "sample-trig2":
+                    return "TracksBar_sampleslot2";
                 case "sample-loop":
                     return "TracksBar_sketchslot";
                 case "fx":
@@ -185,7 +189,9 @@ GridLayout {
                         case "synth":
                             return qsTr("Synths :")
                         case "sample-trig":
-                            return qsTr("Samples :")
+                            return control.channel && control.channel.trackType == "sample-trig" ? qsTr("Samples 1:") : qsTr("Samples :")
+                        case "sample-trig2":
+                            return qsTr("Samples 2:")
                         case "sample-loop":
                             return qsTr("Sketches :")
                         case "external":
@@ -292,7 +298,7 @@ GridLayout {
                             return ""
                         }
                     }
-                    elide: control.slotType === "sample-trig" && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
+                    elide: ["sample-trig", "sample-trig2"].includes(control.slotType) && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
                     color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                     barValue: {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
@@ -386,6 +392,9 @@ GridLayout {
                                     case "sample-trig":
                                         className = "TracksBar_sampleslot";
                                         break;
+                                    case "sample-trig2":
+                                        className = "TracksBar_sampleslot2";
+                                        break;
                                     case "sample-loop":
                                         className = "TracksBar_sketchslot";
                                         break;
@@ -437,6 +446,8 @@ GridLayout {
                                     control.channel.setCurlayerByType("synth")
                                 } else if (control.slotType == "sample-trig") {
                                     control.channel.setCurlayerByType("sample")
+                                } else if (control.slotType == "sample-trig2") {
+                                    control.channel.setCurlayerByType("sample")
                                 } else if (control.slotType == "sample-loop") {
                                     control.channel.setCurlayerByType("loop")
                                 } else if (control.slotType == "external") {
@@ -483,6 +494,7 @@ GridLayout {
                                 }
                                 break;
                             case "sample-trig":
+                            case "sample-trig2":
                                 if (slotDelegate.cppClipObject) {
                                     slotDelegate.cppClipObject.rootSlice.gainHandler.muted = !slotDelegate.cppClipObject.rootSlice.gainHandler.muted;
                                 }
@@ -531,8 +543,10 @@ GridLayout {
                             
                             let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel]
                             synthPassthroughClient.dryGainHandler.gainAbsolute = value;
-                        } else if (control.slotType == "sample-trig" && control.slotData[realIndex] != null) {
-                            slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = value;
+                        } else if (["sample-trig", "sample-trig2"].includes(control.slotType) && control.slotData[realIndex] != null) {
+                            if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.rootSlice) {
+                                slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = value;
+                            }
                         } else if (control.slotType == "fx" && control.slotData[realIndex] != null && control.slotData[realIndex].length > 0 ) {
                             // dryWetMixAmount ranges from 0 to 2. Interpolate value to range from 0 to 1 to 0 to 2
                             control.channel.set_passthroughValue("fxPassthrough", realIndex, "dryWetMixAmount", ZUI.CommonUtils.interp(value, 0, 1, 0, 2));

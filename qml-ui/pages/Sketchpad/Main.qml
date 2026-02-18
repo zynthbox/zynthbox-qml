@@ -634,6 +634,7 @@ ZUI.ScreenPage {
         ClipsBar,
         SynthsBar,
         SamplesBar,
+        Samples2Bar,
         FXBar
     } 
 
@@ -704,7 +705,11 @@ ZUI.ScreenPage {
                                 bottomStack.setView(Main.BarView.BottomBar);
                                 bottomStack.bottomBar.channelWaveEditorAction.trigger();
                             } else {
-                                bottomStack.slotsBar.handleItemClick("sample-trig");
+                                if (root.channel.selectedSlot.className === "TracksBar_sampleslot") {
+                                    bottomStack.slotsBar.handleItemClick("sample-trig");
+                                } else {
+                                    bottomStack.slotsBar.handleItemClick("sample-trig2");
+                                }
                             }
                         }
                         returnValue = true;

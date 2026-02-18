@@ -726,6 +726,9 @@ ZUI.SectionPanel {
             case "TracksBar_sampleslot":
                 bottomStack.slotsBar.handleItemClick("sample-trig")
                 break;
+            case "TracksBar_sampleslot2":
+                bottomStack.slotsBar.handleItemClick("sample-trig2")
+                break;
             case "TracksBar_sketchslot":
                 bottomStack.slotsBar.handleItemClick("sample-loop")
                 break;
@@ -756,7 +759,11 @@ ZUI.SectionPanel {
     SamplePickingStyleSelector {
         id: samplePickingStyleSelector
     }
-    
+
+    TrackStyleSelector {
+        id: trackStyleSelector
+    }
+
     contentItem: ZUI.ThreeColumnView {
         
         leftTab: BottomStackTabs {}
@@ -960,14 +967,48 @@ ZUI.SectionPanel {
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+                            visible: root.selectedChannel != null && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+                                ZUI.SectionButton {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    Layout.fillHeight: true
+                                    checked: highlighted
+                                    highlighted: root.selectedChannel != null && root.selectedChannel.trackType === "synth"
+                                    text: qsTr("Synthrack")
+                                    onClicked: {
+                                        if (root.selectedChannel.trackType != "synth") {
+                                            root.selectedChannel.trackType = "synth";
+                                            synthsRow.switchToSlot(0, true);
+                                        }
+                                    }
+                                }
+                                ZUI.SectionButton {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    Layout.fillHeight: true
+                                    checked: highlighted
+                                    highlighted: root.selectedChannel != null && root.selectedChannel.trackType === "sample-trig"
+                                    text: qsTr("Samplerack")
+                                    onClicked: {
+                                        if (root.selectedChannel.trackType != "sample-trig") {
+                                            root.selectedChannel.trackType = "sample-trig";
+                                            samplesRow.switchToSlot(0, true);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         Item {
                             Layout.fillWidth: true
                         }
 
                         ZUI.SectionGroup {
-                                    
                             Layout.fillHeight: true
-                            visible: root.selectedChannel != null && root.selectedChannel.trackType == "synth"
+                            visible: root.selectedChannel != null && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
 
                             RowLayout {
                                 anchors.fill: parent
@@ -976,23 +1017,9 @@ ZUI.SectionPanel {
                                 QQC2.Switch {
                                     Layout.fillHeight: true
                                     padding: 4
+                                    visible: root.selectedChannel ? root.selectedChannel.trackType === "synth" : false
                                     checked: root.selectedChannel && root.selectedChannel.trackStyle === "one-to-one"
-                                    text: qsTr("1:1")
-                                    // text: root.selectedChannel ? trackStyleName(root.selectedChannel.trackStyle) : ""
-                                    function trackStyleName(trackStyle) {
-                                        switch (trackStyle) {
-                                        case "everything":
-                                            return qsTr("Everything");
-                                        case "one-to-one":
-                                            return qsTr("1:1");
-                                        case "drums":
-                                            return qsTr("Drums");
-                                        case "2-low-3-high":
-                                            return qsTr("2 low/3 high");
-                                        default:
-                                            return qsTr("Manual");
-                                        }
-                                    }
+                                    text: qsTr("5 Columns")
                                     onToggled: {
                                         if (root.selectedChannel.trackStyle === "everything") {
                                             root.selectedChannel.trackStyle = "one-to-one";
@@ -1007,6 +1034,30 @@ ZUI.SectionPanel {
                                         opacity: parent.checked ? 0.5 : 1
                                         color: parent.checked ? "#181918" : "#1f2022"
                                         radius: 2
+                                    }
+                                }
+                                QQC2.Button {
+                                    Layout.fillHeight: true
+                                    visible: root.selectedChannel ? root.selectedChannel.trackType === "sample-trig" : false
+                                    text: root.selectedChannel ? qsTr("Style: %1").arg(trackStyleName(root.selectedChannel.trackStyle)) : ""
+                                    function trackStyleName(trackStyle) {
+                                        switch (trackStyle) {
+                                        case "everything":
+                                            return qsTr("Everything");
+                                        case "one-to-one":
+                                            return qsTr("5 Columns");
+                                        case "drums":
+                                            return qsTr("Drumrack");
+                                        case "2-low-3-high":
+                                            return qsTr("Upper/Lower");
+                                        case "10-split":
+                                            return qsTr("10 Split");
+                                        default:
+                                            return qsTr("Manual");
+                                        }
+                                    }
+                                    onClicked: {
+                                        trackStyleSelector.pickTrackStyle(root.selectedChannel);
                                     }
                                 }
 
@@ -1090,6 +1141,7 @@ ZUI.SectionPanel {
                             Layout.fillWidth: true
                             // Layout.fillHeight: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                            visible: root.selectedChannel != null && ["synth", "sample-loop", "external"].includes(root.selectedChannel.trackType)
 
                             TrackSlotsData {
                                 id: synthsRow
@@ -1126,7 +1178,7 @@ ZUI.SectionPanel {
                                 slotData: root.selectedChannel != null ? root.selectedChannel.sampleSlotsData : []
                                 slotType: "sample-trig"
                                 showSlotTypeLabel: true
-                                visible: root.selectedChannel != null && root.selectedChannel.trackType == "synth"
+                                visible: root.selectedChannel != null && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
                             }
                             TrackSlotsData {
                                 id: sketchFxRow
@@ -1139,6 +1191,18 @@ ZUI.SectionPanel {
                         }
                         Item {
                             Layout.fillWidth: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                            visible: root.selectedChannel != null && root.selectedChannel.trackType == "sample-trig"
+                            TrackSlotsData {
+                                id: samples2Row
+                                anchors.fill: parent
+                                slotData: root.selectedChannel != null ? root.selectedChannel.sampleSlotsData : []
+                                slotType: "sample-trig2"
+                                showSlotTypeLabel: true
+                            }
+                        }
+                        Item {
+                            Layout.fillWidth: true
                             // Layout.fillHeight: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                             TrackSlotsData {
@@ -1147,7 +1211,7 @@ ZUI.SectionPanel {
                                 slotData: root.selectedChannel != null ? root.selectedChannel.fxSlotsData : []
                                 slotType: "fx"
                                 showSlotTypeLabel: true
-                                visible: root.selectedChannel != null && (root.selectedChannel.trackType == "synth" || (root.selectedChannel.trackType == "external" && root.selectedChannel.externalSettings && root.selectedChannel.externalSettings.audioSource != ""))
+                                visible: root.selectedChannel != null && (["synth", "sample-trig"].includes(root.selectedChannel.trackType) || (root.selectedChannel.trackType == "external" && root.selectedChannel.externalSettings && root.selectedChannel.externalSettings.audioSource != ""))
                             }
                         }
                     }
@@ -1174,13 +1238,15 @@ ZUI.SectionPanel {
                                 let selectedSlot = root.selectedChannel.selectedSlot;
                                 if (selectedSlot.className === "TracksBar_sampleslot") {
                                     waveformContainer.clip = root.selectedChannel.samples[selectedSlot.value];
+                                } else if (selectedSlot.className === "TracksBar_sampleslot2") {
+                                    waveformContainer.clip = root.selectedChannel.samples[selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount];
                                 } else if (selectedSlot.className === "TracksBar_sketchslot") {
                                     waveformContainer.clip = root.selectedChannel.getClipsModelById(selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                 } else {
                                     waveformContainer.clip = null;
                                 }
                                 // We show the waveform container for all selected slots where there is a sample associated
-                                waveformContainer.showWaveform = ["TracksBar_sampleslot", "TracksBar_sketchslot"].indexOf(root.selectedChannel.selectedSlot.className) >= 0
+                                waveformContainer.showWaveform = ["TracksBar_sampleslot", "TracksBar_sampleslot2", "TracksBar_sketchslot"].indexOf(root.selectedChannel.selectedSlot.className) >= 0
                             }
                         }
                         Connections {
@@ -1354,6 +1420,11 @@ ZUI.SectionPanel {
                                                                 root.selectedChannel.samples[root.selectedChannel.selectedSlot.value].play()
                                                             }
                                                             break;
+                                                        case "TracksBar_sampleslot2":
+                                                            if (!root.selectedChannel.selectedSlot.isEmpty()) {
+                                                                root.selectedChannel.samples[root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount].play()
+                                                            }
+                                                            break;
                                                         case "TracksBar_synthslot":
                                                             zynqtgui.current_screen_id = "preset";
                                                             break;
@@ -1407,6 +1478,7 @@ ZUI.SectionPanel {
                                                 switch (root.selectedChannel.selectedSlot.className) {
                                                     case "TracksBar_synthslot":
                                                     case "TracksBar_sampleslot":
+                                                    case "TracksBar_sampleslot2":
                                                     case "TracksBar_fxslot":
                                                         if (!root.selectedChannel.selectedSlot.isEmpty()) {
                                                             zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
@@ -1652,7 +1724,7 @@ ZUI.SectionPanel {
                                                 id: dotFetcher
                                                 interval: 1; repeat: false; running: false;
                                                 onTriggered: {
-                                                    progressDots.playbackPositions = root.visible && root.selectedChannel.trackType === "synth" && progressDots.cppClipObject
+                                                    progressDots.playbackPositions = root.visible && ["synth", "sample-trig"].includes(root.selectedChannel.trackType) && progressDots.cppClipObject
                                                             ? progressDots.cppClipObject.playbackPositions
                                                             : null
                                                 }
@@ -1702,7 +1774,7 @@ ZUI.SectionPanel {
                             Layout.fillHeight: true
                             id: patternContainer
 
-                            property bool showPattern: root.selectedChannel != null && (root.selectedChannel.trackType === "synth" || root.selectedChannel.trackType === "external")
+                            property bool showPattern: root.selectedChannel != null && ["synth", "sample-trig", "external"].includes(root.selectedChannel.trackType)
 
                             opacity: patternContainer.showPattern ? 1 : 0
 

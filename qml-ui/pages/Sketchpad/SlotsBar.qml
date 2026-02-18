@@ -238,13 +238,13 @@ ZUI.SectionPanel {
             } else {
                 fxSetupDialog.open()
             }
-        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar || type === "sample-trig") {
+        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar || type === "sample-trig" || type === "sample-trig2") {
             // Clicked entry is samples
             console.log("handleItemClick : Samples")
 
             if (zynqtgui.backButtonPressed) {
                 // Back is pressed. Clear Slot
-                root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].clear()
+                root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow + (type === "sample-trig" ? 0 : Zynthbox.Plugin.sketchpadSlotCount)].clear()
             } else {
                 samplePickerPopup.open()
             }
@@ -426,6 +426,8 @@ ZUI.SectionPanel {
                                         return channelDelegate.channel.synthSlotsData
                                     } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
                                         return channelDelegate.channel.sampleSlotsData
+                                        } else if (bottomStack.currentBarView === Main.BarView.SamplesBar2) {
+                                            return channelDelegate.channel.sampleSlotsData
                                     } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
                                         return channelDelegate.channel.fxSlotsData
                                     } else {
@@ -437,6 +439,8 @@ ZUI.SectionPanel {
                                         return "synth"
                                     } else if (bottomStack.currentBarView === Main.BarView.SamplesBar) {
                                         return "sample-trig"
+                                    } else if (bottomStack.currentBarView === Main.BarView.SamplesBar2) {
+                                        return "sample-trig2"
                                     } else if (bottomStack.currentBarView === Main.BarView.FXBar) {
                                         return "fx"
                                     } else {
@@ -827,7 +831,13 @@ ZUI.SectionPanel {
     ZUI.ActionPickerPopup {
         id: samplePickerPopup
         objectName: "samplePickerPopup"
-        property QtObject sketch: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.samples[root.selectedChannel.selectedSlot.value] : null
+        property QtObject sketch: root.selectedChannel
+            ? root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot"
+                ? root.selectedChannel.samples[root.selectedChannel.selectedSlot.value]
+                : root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot2"
+                    ? root.selectedChannel.samples[root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount]
+                    : null
+            : null
         columns: 3
         rows: 3
         actions: [

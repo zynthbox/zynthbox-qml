@@ -65,10 +65,18 @@ ZUI.ScreenPage {
 //    Component.onCompleted: {
 //        selectedChannelThrottle.restart()
 //    }
+    readonly property int selectedSampleIndex: component.selectedChannel && component.selectedChannel.selectedSlot
+        ? component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot2"
+            ? component.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount
+            : component.selectedChannel.selectedSlot.value
+        : 0
+    onSelectedSampleIndexChanged: {
+        console.log("Selected sample index is now", selectedSampleIndex)
+    }
     property QtObject selectedClip: component.selectedChannel
                                     ? component.selectedChannel.trackType === "sample-loop"
-                                        ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                        : component.selectedChannel.samples[component.selectedChannel.selectedSlotRow]
+                                        ? component.selectedChannel.getClipsModelById(selectedSampleIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                        : component.selectedChannel.samples[selectedSampleIndex]
                                     : null
     property QtObject cppClipObject: component.selectedClip && component.selectedClip.hasOwnProperty("cppObjId")
                                         ? Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
@@ -740,7 +748,7 @@ ZUI.ScreenPage {
                     internalMargin: 1
                     controlObj: component.selectedClip
                     controlType: component.selectedChannel
-                                ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
+                                ? ["synth", "sample-trig", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
                                     ? "bottombar-controltype-clip"
                                     : "bottombar-controltype-channel"
                                 : ""
@@ -789,7 +797,7 @@ ZUI.ScreenPage {
                         }
                     }
                     controlType: component.selectedChannel
-                                ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
+                                ? ["synth", "sample-trig", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
                                     ? "bottombar-controltype-clip"
                                     : "bottombar-controltype-channel"
                                 : ""
@@ -879,7 +887,7 @@ ZUI.ScreenPage {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
             Repeater {
-                model: component.selectedChannel ? 5 : 0
+                model: component.selectedChannel ? (component.selectedChannel.trackType === "sample-trig" ? 10 : 5) : 0
                 delegate: Rectangle {
                     id: clipDelegate
 
@@ -896,7 +904,7 @@ ZUI.ScreenPage {
                     Layout.fillHeight: true
                     color: "#000000"
                     border{
-                        color: index === component.selectedChannel.selectedSlotRow ? Kirigami.Theme.highlightColor : "transparent"
+                        color: index === component.selectedSampleIndex ? Kirigami.Theme.highlightColor : "transparent"
                         width: 1
                     }
                     Zynthbox.WaveFormItem {
@@ -927,7 +935,7 @@ ZUI.ScreenPage {
                             id: dotFetcher
                             interval: 1; repeat: false; running: false;
                             onTriggered: {
-                                progressDots.playbackPositions = component.visible && component.selectedChannel.trackType === "synth" && clipDelegate.cppClipObject
+                                progressDots.playbackPositions = component.visible && ["synth", "sample-trig"].includes(component.selectedChannel.trackType) && clipDelegate.cppClipObject
                                     ? clipDelegate.cppClipObject.playbackPositions
                                     : null
                             }
@@ -1016,10 +1024,18 @@ ZUI.ScreenPage {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            if ("sample-loop" === component.selectedChannel.trackType) {
-                                component.selectedChannel.selectedClip = index;
+                            if (component.selectedSampleIndex === index) {
+                                if (component.selectedChannel.trackType === "sample-loop") {
+                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", index);
+                                } else {
+                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", index);
+                                }
                             } else {
-                                component.selectedChannel.selectedSlotRow = index;
+                                if (component.selectedChannel.trackType === "sample-loop") {
+                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", index, false);
+                                } else {
+                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
+                                }
                             }
                         }
                     }

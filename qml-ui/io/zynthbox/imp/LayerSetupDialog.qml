@@ -119,7 +119,7 @@ ZUI.ActionPickerPopup {
             text: qsTr("Edit Sound...")
             onTriggered: {
                 root.close();
-                zynqtgui.show_modal("control")
+                zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL")
             }
         },
         Kirigami.Action {

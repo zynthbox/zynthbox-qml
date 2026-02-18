@@ -431,7 +431,7 @@ GridLayout {
                                             if(control.channel.selectedSlot.isEmpty())
                                                 pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(control.slotType);
                                             else
-                                                zynqtgui.show_modal("control")
+                                                zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL")
                                         }
                                     }
                                 }

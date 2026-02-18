@@ -173,10 +173,10 @@ class sketchpad_clips_model(QAbstractListModel):
     @Slot(None)
     def updateSamplesFromChannel(self):
         if self.__channel__ is not None:
-            if self.__channel__.trackType == "sample-trig" and self.__channel__.keyZoneMode == "all-full":
-                self.__samples__ = [self.__clipIndex__] # A little odd seeming perhaps, but the indices line up (five clips, five samples, we want the sample for trig/full to match the clip)
-            else:
-                self.__samples__ = [0, 1, 2, 3, 4]
+            # if self.__channel__.trackType == "sample-trig" and self.__channel__.keyZoneMode == "all-full":
+                # self.__samples__ = [self.__clipIndex__] # A little odd seeming perhaps, but the indices line up (five clips, five samples, we want the sample for trig/full to match the clip)
+            # else:
+            self.__samples__ = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
             self.samples_changed.emit()
     samples = Property('QVariantList', get_samples, set_samples, notify=samples_changed)
     ### END Property samples

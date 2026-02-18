@@ -88,10 +88,10 @@ ZUI.SectionPanel {
 
     enum View {
         Main,
-        PAT,
         SYN,
         SMP,
-        FX
+        FX,
+        Layers
     }  
 
     function pickNextSlot(onlySelectSlot=false) {
@@ -795,15 +795,6 @@ ZUI.SectionPanel {
                 ZUI.SectionButton{
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    text: "PAT"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.PAT
-                    onClicked: _tracksBarStack.setView(TracksBar.View.PAT)
-                }
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
                     text: "SYN"
                     checked: highlighted
                     highlighted: _tracksBarStack.currentView === TracksBar.View.SYN
@@ -826,6 +817,15 @@ ZUI.SectionPanel {
                     checked: highlighted
                     highlighted: _tracksBarStack.currentView === TracksBar.View.FX
                     onClicked: _tracksBarStack.setView(TracksBar.View.FX)
+                }
+
+                ZUI.SectionButton{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "Layers"
+                    checked: highlighted
+                    highlighted: _tracksBarStack.currentView === TracksBar.View.PAT
+                    onClicked: _tracksBarStack.setView(TracksBar.View.PAT)
                 }
             }
         }
@@ -1286,8 +1286,7 @@ ZUI.SectionPanel {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
-                            ColumnLayout {
-                                
+                            ColumnLayout {                                
                                 anchors.fill: parent
 
                                 ZUI.SectionGroup {
@@ -1779,12 +1778,11 @@ ZUI.SectionPanel {
 
                         // Take remaining available width
                         Item {
-                            // color: "yellow"
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             id: patternContainer
 
-                            property bool showPattern: root.selectedChannel != null && ["synth", "sample-trig", "external"].includes(root.selectedChannel.trackType)
+                            readonly property bool showPattern: root.selectedChannel != null && ["synth", "sample-trig", "external"].includes(root.selectedChannel.trackType)
 
                             opacity: patternContainer.showPattern ? 1 : 0
 
@@ -1840,12 +1838,12 @@ ZUI.SectionPanel {
                                             property int clipIndex: model.index
                                             readonly property bool patternHasNotes: root.sequence.getByClipId(root.selectedChannel.id, index).hasNotes
 
-                                            property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
-                                            property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
-                                            property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
-                                            property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
-                                            property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
-                                            property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
+                                            readonly property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
+                                            readonly property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
+                                            readonly property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
+                                            readonly property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
+                                            readonly property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
+                                            readonly property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
 
                                             onClicked: {
                                                 // if (root.selectedChannel.selectedClip === clipDelegate.clipIndex) {
@@ -1886,7 +1884,7 @@ ZUI.SectionPanel {
                                             }
 
                                             contentItem : ColumnLayout {
-                                                spacing: ZUI.Theme.sectionSpacing
+                                                spacing: ZUI.Theme.spacing
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -1900,26 +1898,21 @@ ZUI.SectionPanel {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     mask: true
-                                                    fallbackPadding: ZUI.Theme.padding
-                                                    fallbackBackground:  Rectangle {
-                                                        border.width: 1
-                                                        border.color: "#ff999999"
-                                                        radius: ZUI.Theme.radius
-                                                        color: "#222222"
-                                                    }
+                                                    background: null 
+                                                    padding: 0
 
                                                     Zynthbox.PatternModelVisualiserItem {
                                                         id: visualiser
                                                         property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByClipId(root.selectedChannel.id, index) : null
 
-                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                        Kirigami.Theme.colorSet: Kirigami.Theme.View
                                                         Kirigami.Theme.inherit: false
                                                         visible: !pattern.isEmpty
                                                         anchors.fill: parent
                                                         patternModel: pattern
-                                                        backgroundColor: "black"
+                                                        backgroundColor: Kirigami.Theme.backgroundColor
                                                         foregroundColor: Kirigami.Theme.textColor
-                                                        fillColor: Kirigami.Theme.backgroundColor
+                                                        fillColor: "black"
                                                         Rectangle { // Progress
                                                             anchors {
                                                                 top: parent.top

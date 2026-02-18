@@ -133,6 +133,7 @@ ZUI.SectionPanel {
                 ZUI.SectionButton {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
                     text: "Sends"
                     checked: highlighted
                     highlighted: root.mainView.showMixerEqualiser === false
@@ -165,6 +166,7 @@ ZUI.SectionPanel {
                 ZUI.SectionButton {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
                     text: "EQ/Comp"
                     checked: highlighted
                     highlighted: root.mainView.showMixerEqualiser === true

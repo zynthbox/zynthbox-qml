@@ -153,8 +153,10 @@ ColumnLayout {
         ? "%1 (auto)".arg(component.patternModel.stepLengthName(component.patternModel.stepLength))
         : ""
     property string defaultDurationName: component.patternModel
-        ? "%1 (default)".arg(component.patternModel.stepLengthName(component.patternModel.defaultNoteDuration))
-        : ""
+        ? component.patternModel.defaultNoteDuration === 0
+            ? "%1 (default)".arg(component.patternModel.stepLengthName(component.patternModel.stepLength))
+            : "%1 (default)".arg(component.patternModel.stepLengthName(component.patternModel.defaultNoteDuration))
+    : ""
 
     readonly property int currentParameterPageIndex: applicationWindow().globalSequencer.parameterPage
 

@@ -1217,7 +1217,7 @@ class sketchpad_channel(QObject):
     def selectFirstAndBestSlot(self):
         if not self.__song__.__to_be_deleted__:
             pickedASlot = False
-            if self.trackType == "synth" or self.trackType == "sample-trig":
+            if self.trackType == "synth":
                 for slotIndex, chainedSound in enumerate(self.__chained_sounds__):
                     if chainedSound > -1:
                         self.__selected_slot_obj.setTo("TracksBar_synthslot", slotIndex, None, self)
@@ -1228,10 +1228,28 @@ class sketchpad_channel(QObject):
                         if sample.path is not None and len(sample.path) > 0:
                             if slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
                                 self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None, self)
+                                pickedASlot = True
                             else:
-                                self.__selected_slot_obj.setTo("TracksBar_sampleslot2", slotIndex, None, self)
+                                # In synth mode, we don't look past the first five samples, or we'll end up selecting the latter slots
+                                pass
+                            break
+                if pickedASlot == False:
+                    for slotIndex, fx in enumerate(self.__chained_fx):
+                        if fx is not None:
+                            self.__selected_slot_obj.setTo("TracksBar_fxslot", slotIndex, None, self)
                             pickedASlot = True
                             break
+                if pickedASlot == False:
+                    self.__selected_slot_obj.setTo("TracksBar_synthslot", 0, None, self)
+            if self.trackType == "sample-trig":
+                for slotIndex, sample in enumerate(self.__samples__):
+                    if sample.path is not None and len(sample.path) > 0:
+                        if slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+                            self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None, self)
+                        else:
+                            self.__selected_slot_obj.setTo("TracksBar_sampleslot2", slotIndex, None, self)
+                        pickedASlot = True
+                        break
                 if pickedASlot == False:
                     for slotIndex, fx in enumerate(self.__chained_fx):
                         if fx is not None:

@@ -270,14 +270,14 @@ GridLayout {
                                             zynqtgui.sketchpad.lastSelectedObj.component == slotDelegate
 
                     text: {
-                        if (control.slotData && control.slotData[realIndex] != null) {
+                        if (control.slotData && control.slotData[control.slotType === "sample-trig2" ? sampleIndex : realIndex] != null) {
                             if (control.slotType === "synth") {
                                 return control.slotData[realIndex]
-                            } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop")) {
+                            } else if (["sample-trig", "sample-trig2", "sample-loop"].includes(control.slotType)) {
                                 if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false) {
-                                    return "Missing: %1".arg(control.slotData[realIndex].title ? control.slotData[realIndex].title : "");
+                                    return "Missing: %1".arg(control.slotData[sampleIndex].title ? control.slotData[sampleIndex].title : "");
                                 } else {
-                                    return control.slotData[realIndex].title ? control.slotData[realIndex].title : ""
+                                    return control.slotData[sampleIndex].title ? control.slotData[sampleIndex].title : ""
                                 }
                             } else if (control.slotType === "external") {
                                 return realIndex < 3 ? control.slotData[realIndex] : ""
@@ -298,7 +298,7 @@ GridLayout {
                             return ""
                         }
                     }
-                    elide: ["sample-trig", "sample-trig2"].includes(control.slotType) && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
+                    elide: ["sample-trig", "sample-trig2", "sample-loop"].includes(control.slotType) && slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? Text.ElideLeft : Text.ElideRight
                     color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                     barValue: {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
@@ -327,9 +327,10 @@ GridLayout {
                     readonly property int slotIndex: realIndex
                     property bool isSketchpadClip: control.slotData && control.slotData[realIndex] != null && control.slotData[realIndex].hasOwnProperty("className") && control.slotData[realIndex].className == "sketchpad_clip"
                     property QtObject clip: isSketchpadClip ? control.slotData[realIndex] : null
-                    property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[realIndex].cppObjId) : null
+                    readonly property int sampleIndex: control.slotType === "sample-trig2" ? realIndex + Zynthbox.Plugin.sketchpadSlotCount : realIndex
+                    property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[sampleIndex].cppObjId) : null
                     // A property to determine if slot is a sample-loop and is enabled
-                    property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[realIndex] && control.slotData[realIndex].enabled
+                    property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[sampleIndex] && control.slotData[sampleIndex].enabled
                     property int midiChannel: control.channel != null ? control.channel.chainedSounds[realIndex] : -1
                     property QtObject synthPassthroughClient: control.channel != null && Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
                     property QtObject fxPassthroughClient: control.channel != null && Zynthbox.Plugin.fxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.channel.id][realIndex] : null

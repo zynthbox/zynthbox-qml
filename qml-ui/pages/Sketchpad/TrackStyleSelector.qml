@@ -256,7 +256,7 @@ ZUI.DialogQuestion {
                 if (_private.newTrackStyle === "everything") {
                     return qsTr("All slots are played by every note which arrives, as those notes arrive. No key-splitting is set up or enforced for the slots, and all clips play into all slots.");
                 } else if (_private.newTrackStyle === "one-to-one") {
-                    return qsTr("Clips will play notes as they arrive to the slot column which matches their number. That is, Clip 1 will play into the slots in the first column, and those sounds are played into the fx in that column. For external controllers, their notes are sent to the current Clip's column.");
+                    return qsTr("Clips will play notes as they arrive to the slot column which matches their number. That is, Clip A will play into the slots in the first column, and those sounds are played into the fx in that column. For external controllers, their notes are sent to the current Clip's column.");
                 } else if (_private.newTrackStyle === "drums") {
                     return qsTr("Slots each take precise one note, laid out sequentially from C4 (MIDI note 60), which also will be used as the sample's root note. The note assignment is enforced when samples are first loaded into a slot, but should you wish to, you can later edit these assignments.");
                 } else if (_private.newTrackStyle === "2-low-3-high") {

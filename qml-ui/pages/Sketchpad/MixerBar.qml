@@ -41,7 +41,7 @@ ZUI.SectionPanel {
 
     readonly property QtObject song: zynqtgui.sketchpad.song
     readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
-
+    property Item mainView : null
     Layout.fillWidth: true
     
     function cuiaCallback(cuia) {
@@ -124,7 +124,83 @@ ZUI.SectionPanel {
     }
 
     contentItem: ZUI.ThreeColumnView {
-        leftTab: Item {}
+        altTabs: false
+        leftTab: ZUI.SectionGroup {
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: ZUI.Theme.spacing
+
+                ZUI.SectionButton {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "Sends"
+                    checked: highlighted
+                    highlighted: root.mainView.showMixerEqualiser === false
+                    showIndicator: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (parent.checked)
+                                sendsActions.open();
+                            else
+                                root.mainView.showMixerEqualiser = false;
+                        }
+                    }
+
+                    ZUI.ActionPickerPopup {
+                        id: sendsActions
+
+                        actions: [
+                            Kirigami.Action {
+                                text: "Bleep"
+                            },
+                            Kirigami.Action {
+                                text: "Bloop"
+                            }
+                        ]
+                    }
+                }
+
+                ZUI.SectionButton {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: "EQ/Comp"
+                    checked: highlighted
+                    highlighted: root.mainView.showMixerEqualiser === true
+                    showIndicator: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (parent.checked)
+                                pageManager.getPage("sketchpad").bottomStack.slotsBar.requestSlotEqualizer(applicationWindow().channels[applicationWindow().selectedChannel.id], "mixer", -1);
+                            else
+                               root.mainView.showMixerEqualiser = true;
+                        }
+                    }
+                }
+
+                Item{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
+                }
+
+                Item{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
+                }
+
+                Item{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
+                }
+
+            }
+        }
 
         middleTab: ZUI.SectionGroup {
             id: mixerContainer
@@ -577,10 +653,6 @@ ZUI.SectionPanel {
 
         id: panSlider
         implicitHeight: Kirigami.Units.gridUnit
-        // Rectangle {
-        //     color: "yellow"
-        //     anchors.fill: parent
-        // }
 
         background: Item {
 

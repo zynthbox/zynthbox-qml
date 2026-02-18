@@ -2466,7 +2466,7 @@ class zynthian_gui(QObject):
                 if self.__test_wave_clip is None:
                     if testWaveFile:
                         if Path(str(testWaveFile)).exists():
-                            self.__test_wave_clip = Zynthbox.ClipAudioSource(str(testWaveFile), -1, 0, False, False, self)
+                            self.__test_wave_clip = Zynthbox.ClipAudioSource(str(testWaveFile), -1, 0, 0, False, False, self)
                             self.__test_wave_clip.setLaneAffinity(1)
                         else:
                             logging.error(f"Could not play the wave file '{str(testWaveFile)}' as it does not exist")

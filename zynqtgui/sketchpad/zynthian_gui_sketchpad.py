@@ -103,8 +103,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__fixed_layers_fill_list_timer = None
         self.__update_channel_sounds_timer = None
 
-        self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", -1, 0, False, False, self)
-        self.metronome_clip_tock = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tock.wav", -1, 0, False, False, self)
+        self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", -1, 0, 0, False, False, self)
+        self.metronome_clip_tock = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tock.wav", -1, 0, 0, False, False, self)
         # The gain we expose is the slider position, so fetch our default of that out of the newly created thing just to make it simple (the default level being no adjustment)
         self.__metronomeVolume = self.metronome_clip_tick.rootSlice().gainHandler().gainAbsolute()
         Zynthbox.SyncTimer.instance().setMetronomeTicks(self.metronome_clip_tick, self.metronome_clip_tock)

@@ -147,7 +147,7 @@ ColumnLayout {
                 QQC2.Label {
                     anchors.centerIn: parent
                     font.pointSize: 12
-                    visible: ["sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
+                    visible: ["synth", "sample-trig", "external"].indexOf(root.channel.trackType) >= 0
                     color:  clipDelegate.highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                     font.bold: clipDelegate.highlighted
                     opacity: clipDelegate.pattern && clipDelegate.pattern.hasNotes ? ( clipDelegate.highlighted ? 1 : 0.4) : 0
@@ -165,7 +165,7 @@ ColumnLayout {
                     verticalAlignment: Text.AlignBottom
                     horizontalAlignment: Text.AlignHCenter
                     font.pointSize: 8
-                    visible: root.songMode === true && ["sample-loop", "sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
+                    visible: root.songMode === true && ["synth", "sample-loop", "sample-trig", "external"].indexOf(root.channel.trackType) >= 0
                     text: visible
                           ? root.channel.trackType == "sample-loop"
                             ? clipDelegate.cppClipObject && clipDelegate.cppClipObject.durationSeconds > 0

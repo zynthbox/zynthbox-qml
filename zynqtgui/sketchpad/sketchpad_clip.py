@@ -584,7 +584,7 @@ class sketchpad_clip_metadata(QObject):
 
 
 class sketchpad_clip(QObject):
-    def __init__(self, row_index: int, col_index: int, id: int, song: QObject, parent=None, is_channel_sample=False):
+    def __init__(self, row_index: int, col_index: int, id: int, song: QObject, parent=None, is_channel_sample=False, sample_slot_row = 0):
         super(sketchpad_clip, self).__init__(parent)
         self.zynqtgui = zynthian_gui_config.zynqtgui
 
@@ -592,6 +592,7 @@ class sketchpad_clip(QObject):
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__id__ = id
+        self.__sampleSlotRow__ = sample_slot_row
         self.__title__ = ""
         self.__path__ = None
         self.__filename__ = ""
@@ -714,6 +715,19 @@ class sketchpad_clip(QObject):
         return self.__initial_gain__
     initialGain = Property(float, get_initial_gain, constant=True)
     ### END Property initialGain
+
+    ### BEGIN Property sampleSlotRow
+    def get_sampleSlotRow(self):
+        return self.__sampleSlotRow__
+    def set_sampleSlotRow(self, newValue):
+        if self.__sampleSlotRow__ != newValue:
+            self.__sampleSlotRow__ = newValue
+            if self.audioSource is not None:
+                self.audioSource.setSketchpadSlotRow(newValue)
+            self.sampleSlotRowChanged.emit()
+    sampleSlotRowChanged = Signal()
+    sampleSlotRow = Property(int, get_sampleSlotRow, set_sampleSlotRow, notify=sampleSlotRowChanged)
+    ### END Property sampleSlotRow
 
     def serialize(self):
         return {
@@ -992,7 +1006,7 @@ class sketchpad_clip(QObject):
         if self.__path__ is not None:
             sketchpadTrack = -1 if self.clipChannel is None else self.clipChannel.id
             registerForPolyphonicPlayback = True if self.is_channel_sample else False
-            self.audioSource = Zynthbox.ClipAudioSource(self.path, sketchpadTrack, self.id, registerForPolyphonicPlayback, False, self)
+            self.audioSource = Zynthbox.ClipAudioSource(self.path, sketchpadTrack, self.id, self.__sampleSlotRow__, registerForPolyphonicPlayback, False, self)
             self.audioSource.rootSlice().lengthChanged.connect(self.sec_per_beat_changed.emit)
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)

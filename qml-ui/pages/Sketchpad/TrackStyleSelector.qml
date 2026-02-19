@@ -115,10 +115,17 @@ ZUI.DialogQuestion {
         RowLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+            ZUI.KnobIndicator {
+                Layout.fillHeight: true
+                Layout.minimumWidth: height
+                Layout.maximumWidth: height
+                knobId: 0
+            }
             QQC2.Button {
                 id: styleButtonEverything
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Everything")
                 checked: _private.newTrackStyle === "everything"
@@ -130,21 +137,11 @@ ZUI.DialogQuestion {
                     _private.newTrackStyle = "everything";
                 }
                 ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
-                ZUI.KnobIndicator {
-                    anchors {
-                        left: parent.left
-                        bottom: parent.bottom
-                        margins: 2
-                    }
-                    height: parent.height * 0.5
-                    width: height
-                    knobId: 0
-                    visible: parent.checked
-                }
             }
             QQC2.Button {
                 id: styleButtonOneToOne
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("5 Columns")
                 checked: _private.newTrackStyle === "one-to-one"
@@ -156,21 +153,11 @@ ZUI.DialogQuestion {
                     _private.newTrackStyle = "one-to-one";
                 }
                 ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
-                ZUI.KnobIndicator {
-                    anchors {
-                        left: parent.left
-                        bottom: parent.bottom
-                        margins: 2
-                    }
-                    height: parent.height * 0.5
-                    width: height
-                    knobId: 0
-                    visible: parent.checked
-                }
             }
             QQC2.Button {
                 id: styleButtonDrums
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Drumrack")
                 checked: _private.newTrackStyle === "drums"
@@ -182,21 +169,11 @@ ZUI.DialogQuestion {
                     _private.newTrackStyle = "drums";
                 }
                 ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
-                ZUI.KnobIndicator {
-                    anchors {
-                        left: parent.left
-                        bottom: parent.bottom
-                        margins: 2
-                    }
-                    height: parent.height * 0.5
-                    width: height
-                    knobId: 0
-                    visible: parent.checked
-                }
             }
             QQC2.Button {
                 id: styleButton2low3high
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Upper/Lower")
                 checked: _private.newTrackStyle === "2-low-3-high"
@@ -208,21 +185,11 @@ ZUI.DialogQuestion {
                     _private.newTrackStyle = "2-low-3-high";
                 }
                 ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
-                ZUI.KnobIndicator {
-                    anchors {
-                        left: parent.left
-                        bottom: parent.bottom
-                        margins: 2
-                    }
-                    height: parent.height * 0.5
-                    width: height
-                    knobId: 0
-                    visible: parent.checked
-                }
             }
             QQC2.Button {
                 id: styleButton10Split
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("10 Split")
                 checked: _private.newTrackStyle === "10-split"
@@ -234,17 +201,6 @@ ZUI.DialogQuestion {
                     _private.newTrackStyle = "10-split";
                 }
                 ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
-                ZUI.KnobIndicator {
-                    anchors {
-                        left: parent.left
-                        bottom: parent.bottom
-                        margins: 2
-                    }
-                    height: parent.height * 0.5
-                    width: height
-                    knobId: 0
-                    visible: parent.checked
-                }
             }
         }
         QQC2.Label {

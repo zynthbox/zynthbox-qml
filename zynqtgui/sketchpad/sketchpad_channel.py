@@ -1085,6 +1085,11 @@ class sketchpad_channel(QObject):
                     self.__track_type__ = obj["trackType"]
                     self.set_track_type(self.__track_type__, True)
 
+                if "trackStyle" in obj:
+                    self.set_trackStyle(obj["trackStyle"])
+                else:
+                    self.set_trackStyle("everything")
+
                 _audioTypeSettings = self.defaultAudioTypeSettings()
                 if "audioTypeSettings" in obj:
                     _audioTypeSettings.update(obj["audioTypeSettings"])
@@ -2160,8 +2165,8 @@ class sketchpad_channel(QObject):
             self.set_track_routing_style("one-to-one")
             self.set_keyZoneMode("all-full")
         elif self.__trackStyle__ == "drums":
-            self.set_samplePickingStyle("same")
-            self.set_track_routing_style("one-to-one")
+            self.set_samplePickingStyle("all")
+            self.set_track_routing_style("standard")
             self.set_keyZoneMode("split-narrow")
         elif self.__trackStyle__ == "2-low-3-high":
             self.set_samplePickingStyle("all")

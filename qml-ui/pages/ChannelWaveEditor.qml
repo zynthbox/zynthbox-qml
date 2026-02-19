@@ -70,9 +70,6 @@ ZUI.ScreenPage {
             ? component.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount
             : component.selectedChannel.selectedSlot.value
         : 0
-    onSelectedSampleIndexChanged: {
-        console.log("Selected sample index is now", selectedSampleIndex)
-    }
     property QtObject selectedClip: component.selectedChannel
                                     ? component.selectedChannel.trackType === "sample-loop"
                                         ? component.selectedChannel.getClipsModelById(selectedSampleIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)

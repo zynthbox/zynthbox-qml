@@ -120,6 +120,14 @@ AbstractSketchpadPage {
         return false;
     }
 
+    enum View {
+        Main,
+        Reverb,
+        Delay,
+        EQ,
+        Comp
+    }  
+
     contentItem: ZUI.ThreeColumnView {
         altTabs: false
         leftTab: ZUI.SectionGroup {
@@ -131,7 +139,20 @@ AbstractSketchpadPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
+                    text: "Main"
+                    checked: highlighted
+                    highlighted: _mixerBarStack.currentView === MixerBar.View.Main
+                    onClicked: _mixerBarStack.setView(MixerBar.View.Main)                
+                }
+
+                ZUI.SectionButton {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: Kirigami.Units.gridUnit
                     text: "Reverb"
+                    checked: highlighted
+                    highlighted: _mixerBarStack.currentView === MixerBar.View.Reverb
+                    onClicked: _mixerBarStack.setView(MixerBar.View.Reverb)  
                 }
 
                 ZUI.SectionButton {
@@ -139,6 +160,9 @@ AbstractSketchpadPage {
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
                     text: "Delay"
+                    checked: highlighted
+                    highlighted: _mixerBarStack.currentView === MixerBar.View.Delay
+                    onClicked: _mixerBarStack.setView(MixerBar.View.Delay)  
                 }
 
                 ZUI.SectionButton {
@@ -146,6 +170,9 @@ AbstractSketchpadPage {
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
                     text: "EQ"
+                    checked: highlighted
+                    highlighted: _mixerBarStack.currentView === MixerBar.View.EQ
+                    onClicked: _mixerBarStack.setView(MixerBar.View.EQ)  
                 }
 
                 ZUI.SectionButton {
@@ -153,311 +180,500 @@ AbstractSketchpadPage {
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
                     text: "Comp"
-                }
-
-                Item{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
+                    checked: highlighted
+                    highlighted: _mixerBarStack.currentView === MixerBar.View.Comp
+                    onClicked: _mixerBarStack.setView(MixerBar.View.Comp)  
                 }
             }
         }
 
-        middleTab: ZUI.SectionGroup {
-            id: mixerContainer
+        middleTab: StackLayout {
+            id: _mixerBarStack
+            property int currentView: MixerBar.View.Main
+            currentIndex : currentView
 
-            fallbackBackground: Rectangle {
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
-                color: Kirigami.Theme.backgroundColor
-                opacity: 0.1
-            }  
-            
-            RowLayout {
-                id: channelsVolumeRow
-                function handleClick(channel) {
-                    zynqtgui.sketchpad.selectedTrackId = channel.id;
-                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                    zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-                    zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
-                }
+            function setView(view) {
+                _mixerBarStack.currentView = view
+                _mixerBarStack.currentIndex = _mixerBarStack.currentView
+            }
 
-                anchors.fill: parent
-                spacing: ZUI.Theme.cellSpacing
+            ZUI.SectionGroup {
 
-                Repeater {
-                    id: mixerItemsRepeater
-                    model: root.song.channelsModel
+                fallbackBackground: Rectangle {
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    color: Kirigami.Theme.backgroundColor
+                    opacity: 0.1
+                }  
+                
+                RowLayout {
+                    id: channelsVolumeRow
+                    function handleClick(channel) {
+                        zynqtgui.sketchpad.selectedTrackId = channel.id;
+                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                        zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
+                    }
 
-                    delegate: ZUI.CellControl {
-                        id: mixerColumnDelegate
-                        highlighted: index === zynqtgui.sketchpad.selectedTrackId
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                    anchors.fill: parent
+                    spacing: ZUI.Theme.cellSpacing
 
-                        contentItem: Item {
-                            ColumnLayout {
-                                anchors.fill: parent
-                                spacing: Kirigami.Units.smallSpacing
+                    Repeater {
+                        id: mixerItemsRepeater
+                        model: root.song.channelsModel
 
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
+                        delegate: ZUI.CellControl {
+                            id: mixerColumnDelegate
+                            highlighted: index === zynqtgui.sketchpad.selectedTrackId
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onPressed: volumeControl.mouseArea.handlePressed(mouse)
-                                        onReleased: volumeControl.mouseArea.released(mouse)
-                                        onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
-                                        onClicked: volumeControl.mouseArea.clicked(mouse)
-                                        onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
-                                        onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
-                                    }
+                            contentItem: Item {
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: Kirigami.Units.smallSpacing
 
-                                    VolumeControl {
-                                        id: volumeControl
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
 
-                                        anchors.fill: parent
-
-                                        // Disable when muted or channel is not being played in solo mode
-                                        enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
-                                        inputAudioLeveldB: visible && !model.channel.muted ? Zynthbox.AudioLevels.channels[model.channel.id] : -40
-                                        onAudioLeveldBChanged: {
-                                            // console.log("Channel audio level changed to", audioLeveldB)
-                                        }
-                                        inputAudioLevelVisible: true
-
-                                        onValueChanged: {
-                                            model.channel.gainHandler.gainDb = slider.value
-                                        }
-                                        slider {
-                                            from: model.channel.gainHandler.minimumDecibel
-                                            to: model.channel.gainHandler.maximumDecibel
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onPressed: volumeControl.mouseArea.handlePressed(mouse)
+                                            onReleased: volumeControl.mouseArea.released(mouse)
+                                            onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                            onClicked: volumeControl.mouseArea.clicked(mouse)
+                                            onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                            onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
                                         }
 
-                                        onClicked: {
-                                            channelsVolumeRow.handleClick(channel);
-                                        }
-                                        onDoubleClicked: {
-                                            model.channel.gainHandler.gainDb = model.channel.initialVolume;
-                                        }
+                                        VolumeControl {
+                                            id: volumeControl
 
-                                        Binding {
-                                            target: volumeControl.slider
-                                            property: "value"
-                                            value: model.channel.gainHandler.gainDb
-                                        }
-                                    }
+                                            anchors.fill: parent
 
-                                    Rectangle {
-                                        width: volumeControl.slider.height
-                                        height: soundLabel.height*1.5
-
-                                        anchors.left: parent.right
-                                        anchors.bottom: parent.bottom
-                                        anchors.leftMargin: -soundLabel.height*2
-                                        anchors.bottomMargin: -(soundLabel.height/2)
-
-                                        transform: Rotation {
-                                            origin.x: 0
-                                            origin.y: 0
-                                            angle: -90
-                                        }
-
-                                        Kirigami.Theme.inherit: false
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                        color: "transparent"
-
-                                        border.color: "transparent"
-                                        border.width: 1
-                                        radius: 4
-
-                                        QQC2.Label {
-                                            id: soundLabel
-
-                                            anchors.left: parent.left
-                                            anchors.right: parent.right
-                                            //                                            anchors.leftMargin: Kirigami.Units.gridUnit*0.5
-                                            //                                            anchors.rightMargin: Kirigami.Units.gridUnit*0.5
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            elide: Text.ElideRight
-
-                                            font.pointSize: 8
-
-                                            Timer {
-                                                id: soundnameUpdater;
-                                                repeat: false; running: false; interval: 1;
-                                                onTriggered: soundLabel.updateSoundName();
+                                            // Disable when muted or channel is not being played in solo mode
+                                            enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
+                                            inputAudioLeveldB: visible && !model.channel.muted ? Zynthbox.AudioLevels.channels[model.channel.id] : -40
+                                            onAudioLeveldBChanged: {
+                                                // console.log("Channel audio level changed to", audioLeveldB)
                                             }
-                                            Component.onCompleted: soundLabel.updateSoundName();
-                                            Connections {
-                                                target: zynqtgui.fixed_layers
-                                                onList_updated: soundnameUpdater.restart();
+                                            inputAudioLevelVisible: true
+
+                                            onValueChanged: {
+                                                model.channel.gainHandler.gainDb = slider.value
+                                            }
+                                            slider {
+                                                from: model.channel.gainHandler.minimumDecibel
+                                                to: model.channel.gainHandler.maximumDecibel
                                             }
 
-                                            Connections {
-                                                target: model.channel
-                                                onChainedSoundsChanged: model.channel.trackType === "synth" ? soundnameUpdater.restart() : false
-                                                onSamplesChanged: model.channel.trackType === "synth" ? soundnameUpdater.restart() : false
-                                                onTrackTypeChanged: soundnameUpdater.restart()
-                                                onSceneClipChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
-                                                onSelectedSlotRowChanged: ["synth", "external"].indexOf(model.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
+                                            onClicked: {
+                                                channelsVolumeRow.handleClick(channel);
+                                            }
+                                            onDoubleClicked: {
+                                                model.channel.gainHandler.gainDb = model.channel.initialVolume;
                                             }
 
-                                            Connections {
-                                                target: model.channel.sceneClip
-                                                onPathChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
+                                            Binding {
+                                                target: volumeControl.slider
+                                                property: "value"
+                                                value: model.channel.gainHandler.gainDb
                                             }
-                                            Connections {
-                                                target: root
-                                                onVisibleChanged: root.visible ? soundLabel.updateSoundName() : false
+                                        }
+
+                                        Item {
+                                            width: volumeControl.slider.height
+                                            height: soundLabel.height*1.5
+
+                                            anchors.left: parent.right
+                                            anchors.bottom: parent.bottom
+                                            anchors.leftMargin: -soundLabel.height*2
+                                            anchors.bottomMargin: -(soundLabel.height/2)
+
+                                            transform: Rotation {
+                                                origin.x: 0
+                                                origin.y: 0
+                                                angle: -90
                                             }
 
-                                            function updateSoundName() {
-                                                if (root.visible) {
-                                                    var text = "";
+                                            QQC2.Label {
+                                                id: soundLabel
 
-                                                    if (model.channel.trackType === "synth") {
-                                                        for (var id in model.channel.chainedSounds) {
-                                                            if (model.channel.chainedSounds[id] >= 0 &&
-                                                                    model.channel.checkIfLayerExists(model.channel.chainedSounds[id])) {
-                                                                var soundName = zynqtgui.fixed_layers.selector_list.getDisplayValue(model.channel.chainedSounds[id]).split(">");
-                                                                text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
-                                                                break;
+                                                anchors.left: parent.left
+                                                anchors.right: parent.right
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                elide: Text.ElideRight
+
+                                                font.pointSize: 8
+
+                                                Timer {
+                                                    id: soundnameUpdater;
+                                                    repeat: false; running: false; interval: 1;
+                                                    onTriggered: soundLabel.updateSoundName();
+                                                }
+                                                Component.onCompleted: soundLabel.updateSoundName();
+                                                Connections {
+                                                    target: zynqtgui.fixed_layers
+                                                    onList_updated: soundnameUpdater.restart();
+                                                }
+
+                                                Connections {
+                                                    target: model.channel
+                                                    onChainedSoundsChanged: model.channel.trackType === "synth" ? soundnameUpdater.restart() : false
+                                                    onSamplesChanged: model.channel.trackType === "synth" ? soundnameUpdater.restart() : false
+                                                    onTrackTypeChanged: soundnameUpdater.restart()
+                                                    onSceneClipChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                    onSelectedSlotRowChanged: ["synth", "external"].indexOf(model.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
+                                                }
+
+                                                Connections {
+                                                    target: model.channel.sceneClip
+                                                    onPathChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                }
+                                                Connections {
+                                                    target: root
+                                                    onVisibleChanged: root.visible ? soundLabel.updateSoundName() : false
+                                                }
+
+                                                function updateSoundName() {
+                                                    if (root.visible) {
+                                                        var text = "";
+
+                                                        if (model.channel.trackType === "synth") {
+                                                            for (var id in model.channel.chainedSounds) {
+                                                                if (model.channel.chainedSounds[id] >= 0 &&
+                                                                        model.channel.checkIfLayerExists(model.channel.chainedSounds[id])) {
+                                                                    var soundName = zynqtgui.fixed_layers.selector_list.getDisplayValue(model.channel.chainedSounds[id]).split(">");
+                                                                    text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
+                                                                    break;
+                                                                }
                                                             }
-                                                        }
-                                                        if (text === "") {
+                                                            if (text === "") {
+                                                                try {
+                                                                    text = model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                                                } catch (e) {}
+                                                            }
+                                                        } else if (model.channel.trackType === "sample-loop") {
                                                             try {
-                                                                text = model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                                                text = model.channel.sceneClip.path.split("/").pop()
                                                             } catch (e) {}
                                                         }
-                                                    } else if (model.channel.trackType === "sample-loop") {
-                                                        try {
-                                                            text = model.channel.sceneClip.path.split("/").pop()
-                                                        } catch (e) {}
+
+                                                        soundLabel.text = text;
                                                     }
+                                                }
+                                            }
+                                        }
+                                    }
 
-                                                    soundLabel.text = text;
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                                        Layout.leftMargin: Kirigami.Units.smallSpacing
+                                        Layout.rightMargin: Kirigami.Units.smallSpacing
+                                        PanSlider {
+                                            anchors.fill: parent
+                                            orientation: Qt.Horizontal
+                                            from: -1.0
+                                            to: 1.0
+                                            controlObj: model.channel
+                                            controlProp: "pan"
+                                            initialValue: model.channel.initialPan
+                                            onClicked: {
+                                                channelsVolumeRow.handleClick(channel);
+                                            }
+                                        }
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.alignment: Qt.AlignCenter
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        Layout.margins: 4
+                                        horizontalAlignment: Text.AlignHCenter
+                                        elide: Text.ElideRight
+                                        text: model.channel.name
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                channelsVolumeRow.handleClick(channel);
+                                            }
+                                        }
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.alignment: Qt.AlignCenter
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        horizontalAlignment: Text.AlignHCenter
+                                        elide: Text.ElideRight
+                                        text: qsTr("%1 dB").arg(model.channel.gainHandler.gainDb.toFixed(2))
+                                        font.pointSize: 9
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                channelsVolumeRow.handleClick(channel);
+                                            }
+                                        }
+                                    }
+
+                                    ZUI.SectionGroup {
+
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                        Layout.margins: 2
+
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            spacing: ZUI.Theme.spacing
+
+                                            QQC2.RoundButton {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                Layout.preferredWidth: (parent.width-parent.spacing)/2
+                                                radius: 2
+                                                font.pointSize: 8
+                                                checked: root.song.playChannelSolo === model.channel.id
+                                                text: qsTr("S")
+                                                contentItem: QQC2.Label {
+                                                    text: parent.text
+                                                    font: parent.font
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                }
+                                                background: Rectangle {
+                                                    radius: parent.radius
+                                                    border.width: 1
+                                                    border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                    color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                }
+                                                onClicked: {
+                                                    if (root.song.playChannelSolo == model.channel.id) {
+                                                        root.song.playChannelSolo = -1
+                                                    } else {
+                                                        root.song.playChannelSolo = model.channel.id
+                                                    }
+                                                }
+                                            }
+                                            QQC2.RoundButton {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                Layout.preferredWidth: (parent.width-parent.spacing)/2
+                                                radius: 2
+                                                font.pointSize: 8
+                                                checked: model.channel.muted
+                                                text: qsTr("M")
+                                                contentItem: QQC2.Label {
+                                                    text: parent.text
+                                                    font: parent.font
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                }
+                                                background: Rectangle {
+                                                    radius: parent.radius
+                                                    border.width: 1
+                                                    border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                    color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                }
+                                                onClicked: {
+                                                    model.channel.muted = !model.channel.muted
                                                 }
                                             }
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+                
+            }
 
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit
-                                    Layout.leftMargin: Kirigami.Units.smallSpacing
-                                    Layout.rightMargin: Kirigami.Units.smallSpacing
-                                    // color: "pink"
-                                    PanSlider {
-                                        anchors.fill: parent
-                                        orientation: Qt.Horizontal
-                                        from: -1.0
-                                        to: 1.0
-                                        controlObj: model.channel
-                                        controlProp: "pan"
-                                        initialValue: model.channel.initialPan
-                                        onClicked: {
-                                            channelsVolumeRow.handleClick(channel);
+            ZUI.SectionGroup {
+                fallbackBackground: Rectangle {
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    color: Kirigami.Theme.backgroundColor
+                    opacity: 0.1
+                }  
+                
+                RowLayout {
+                    id: channelsReverbRow
+                    function handleClick(channel) { //TODO
+                        // zynqtgui.sketchpad.selectedTrackId = channel.id;
+                        // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                        // zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                        // zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
+                    }
+
+                    anchors.fill: parent
+                    spacing: ZUI.Theme.cellSpacing
+
+                    Repeater {
+                        id: mixerReverbRepeater
+                        model: root.song.channelsModel
+
+                        delegate: ZUI.CellControl {
+                            id: reverbColumnDelegate
+                            highlighted: index === zynqtgui.sketchpad.selectedTrackId
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            contentItem: Item {
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
+
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onPressed: reverbControl.mouseArea.handlePressed(mouse)
+                                            onReleased: reverbControl.mouseArea.released(mouse)
+                                            onPressAndHold: reverbControl.mouseArea.pressAndHold(mouse)
+                                            onClicked: reverbControl.mouseArea.clicked(mouse)
+                                            onMouseXChanged: reverbControl.mouseArea.mouseXChanged(mouse)
+                                            onMouseYChanged: reverbControl.mouseArea.mouseYChanged(mouse)
                                         }
-                                    }
-                                }
 
-                                QQC2.Label {
-                                    Layout.alignment: Qt.AlignCenter
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.margins: 4
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                    text: model.channel.name
+                                        VolumeControl {
+                                            id: reverbControl
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            channelsVolumeRow.handleClick(channel);
-                                        }
-                                    }
-                                }
+                                            anchors.fill: parent
 
-                                QQC2.Label {
-                                    Layout.alignment: Qt.AlignCenter
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                    text: qsTr("%1 dB").arg(model.channel.gainHandler.gainDb.toFixed(2))
-                                    font.pointSize: 9
+                                            // Disable when muted or channel is not being played in solo mode
+                                            enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
+                                            inputAudioLeveldB: visible && !model.channel.muted ? Zynthbox.AudioLevels.channels[model.channel.id] : -40
+                                            
+                                            inputAudioLevelVisible: true
+                                            audioGaugeItem.minimumValue: 0
+                                            audioGaugeItem.maximumValue: 100
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            channelsVolumeRow.handleClick(channel);
-                                        }
-                                    }
-                                }
-
-                                ZUI.SectionGroup {
-
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                                    Layout.margins: 2
-
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        spacing: ZUI.Theme.spacing
-
-                                        QQC2.RoundButton {
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            Layout.preferredWidth: (parent.width-parent.spacing)/2
-                                            radius: 2
-                                            font.pointSize: 8
-                                            checked: root.song.playChannelSolo === model.channel.id
-                                            text: qsTr("S")
-                                            contentItem: QQC2.Label {
-                                                text: parent.text
-                                                font: parent.font
-                                                horizontalAlignment: Text.AlignHCenter
+                                            onValueChanged: {
+                                                model.channel.reverbAmount = slider.value/100
                                             }
-                                            background: Rectangle {
-                                                radius: parent.radius
-                                                border.width: 1
-                                                border.color: Qt.rgba(50, 50, 50, 0.1)
-                                                color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                            slider {
+                                                from: 0
+                                                to: 100
                                             }
+
                                             onClicked: {
-                                                if (root.song.playChannelSolo == model.channel.id) {
-                                                    root.song.playChannelSolo = -1
-                                                } else {
-                                                    root.song.playChannelSolo = model.channel.id
+                                                channelsReverbRow.handleClick(channel);
+                                            }
+
+                                            onDoubleClicked: {
+                                                model.channel.reverbAmount = 0.5;
+                                            }
+
+                                            Binding {
+                                                target: reverbControl.slider
+                                                property: "value"
+                                                value: model.channel.reverbAmount*100
+                                            }
+                                        }
+
+                                        Item {
+                                            width: reverbControl.slider.height
+                                            height: soundLabel2.height*1.5
+
+                                            anchors.left: parent.right
+                                            anchors.bottom: parent.bottom
+                                            anchors.leftMargin: -soundLabel2.height*2
+                                            anchors.bottomMargin: -(soundLabel2.height/2)
+
+                                            transform: Rotation {
+                                                origin.x: 0
+                                                origin.y: 0
+                                                angle: -90
+                                            }
+
+                                            QQC2.Label {
+                                                id: soundLabel2
+
+                                                anchors.left: parent.left
+                                                anchors.right: parent.right
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                elide: Text.ElideRight
+
+                                                font.pointSize: 8
+
+                                                Timer {
+                                                    id: soundnameUpdater2;
+                                                    repeat: false; running: false; interval: 1;
+                                                    onTriggered: soundLabel2.updateSoundName();
+                                                }
+                                                Component.onCompleted: soundLabel2.updateSoundName();
+                                                Connections {
+                                                    target: zynqtgui.fixed_layers
+                                                    onList_updated: soundnameUpdater2.restart();
+                                                }
+
+                                                Connections {
+                                                    target: model.channel
+                                                    onChainedSoundsChanged: model.channel.trackType === "synth" ? soundnameUpdater2.restart() : false
+                                                    onSamplesChanged: model.channel.trackType === "synth" ? soundnameUpdater2.restart() : false
+                                                    onTrackTypeChanged: soundnameUpdater2.restart()
+                                                    onSceneClipChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater2.restart() : false
+                                                    onSelectedSlotRowChanged: ["synth", "external"].indexOf(model.channel.trackType) >= 0 ? soundnameUpdater2.restart() : false
+                                                }
+
+                                                Connections {
+                                                    target: model.channel.sceneClip
+                                                    onPathChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater2.restart() : false
+                                                }
+                                                Connections {
+                                                    target: root
+                                                    onVisibleChanged: root.visible ? soundLabel2.updateSoundName() : false
+                                                }
+
+                                                function updateSoundName() {
+                                                    if (root.visible) {
+                                                        var text = "";
+
+                                                        if (model.channel.trackType === "synth") {
+                                                            for (var id in model.channel.chainedSounds) {
+                                                                if (model.channel.chainedSounds[id] >= 0 &&
+                                                                        model.channel.checkIfLayerExists(model.channel.chainedSounds[id])) {
+                                                                    var soundName = zynqtgui.fixed_layers.selector_list.getDisplayValue(model.channel.chainedSounds[id]).split(">");
+                                                                    text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (text === "") {
+                                                                try {
+                                                                    text = model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                                                } catch (e) {}
+                                                            }
+                                                        } else if (model.channel.trackType === "sample-loop") {
+                                                            try {
+                                                                text = model.channel.sceneClip.path.split("/").pop()
+                                                            } catch (e) {}
+                                                        }
+
+                                                        soundLabel2.text = text;
+                                                    }
                                                 }
                                             }
                                         }
-                                        QQC2.RoundButton {
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            Layout.preferredWidth: (parent.width-parent.spacing)/2
-                                            radius: 2
-                                            font.pointSize: 8
-                                            checked: model.channel.muted
-                                            text: qsTr("M")
-                                            contentItem: QQC2.Label {
-                                                text: parent.text
-                                                font: parent.font
-                                                horizontalAlignment: Text.AlignHCenter
-                                            }
-                                            background: Rectangle {
-                                                radius: parent.radius
-                                                border.width: 1
-                                                border.color: Qt.rgba(50, 50, 50, 0.1)
-                                                color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
-                                            }
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.alignment: Qt.AlignCenter
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        Layout.margins: 4
+                                        horizontalAlignment: Text.AlignHCenter
+                                        elide: Text.ElideRight
+                                        text: model.channel.name
+
+                                        MouseArea {
+                                            anchors.fill: parent
                                             onClicked: {
-                                                model.channel.muted = !model.channel.muted
+                                                channelsReverbRow.handleClick(channel);
                                             }
                                         }
                                     }
@@ -467,7 +683,10 @@ AbstractSketchpadPage {
                     }
                 }
             }
-            
+
+            Item {}
+            Item {}
+            Item {}
         }
 
         rightTab: ZUI.SectionGroup {

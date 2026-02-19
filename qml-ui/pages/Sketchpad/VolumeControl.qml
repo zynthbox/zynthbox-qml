@@ -14,6 +14,7 @@ Rectangle {
     property alias headerTextVisible: headerLabel.visible
     property alias footerText: footerLabel.text
     property alias audioLeveldB: audioGauge.value
+    property alias audioGaugeItem: audioGauge
     property var inputAudioLeveldB: null
     property alias inputAudioLevelVisible: inputAudioLevelGauge.visible
     property alias slider: slider
@@ -107,16 +108,23 @@ Rectangle {
                     }
                     tickmarkLabel: QQC2.Label {
                         text: {
-                            switch (styleData.value) {
-                            case -40:
-                                return "-40"
-                            case 0:
-                                return "0"
-                            case 20:
-                                return "+20"
-                            default:
-                                return ""
+
+                            if(styleData.value == "0")
+                                return styleData.value
+
+                            if(styleData.value == audioGauge.maximumValue || styleData.value == audioGauge.minimumValue)
+                            {
+                                var prefix = (styleData.value > 0 ? "+" : "-")
+                                return  prefix + styleData.value
                             }
+
+                            if(styleData.value == (audioGauge.maximumValue+ audioGauge.minimumValue)/2)
+                            {
+                                var prefix = (styleData.value > 0 ? "+" : "-")
+                                return  prefix + styleData.value
+                            }
+
+                            return  ""
                         }
 
                         font: audioGauge.font

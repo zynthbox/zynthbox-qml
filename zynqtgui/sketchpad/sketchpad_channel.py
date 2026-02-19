@@ -513,6 +513,8 @@ class sketchpad_channel(QObject):
         self.dryAmountChanged.connect(self.handleDryAmountChanged)
         self.wetFx1AmountChanged.connect(self.handleWetFx1AmountChanged)
         self.wetFx2AmountChanged.connect(self.handleWetFx2AmountChanged)
+        self.reverbAmountChanged.connect(self.handleReverbAmountChanged)
+        self.delayAmountChanged.connect(self.handleDelayAmountChanged)
         self.synthPassthroughMixingChanged.connect(self.handleSynthPassthroughMixingChanged)
         self.fxPassthroughMixingChanged.connect(self.handleFxPassthroughMixingChanged)
         self.sketchFxPassthroughMixingChanged.connect(self.handleSketchFxPassthroughMixingChanged)
@@ -526,6 +528,9 @@ class sketchpad_channel(QObject):
         self.zynaddubfx_heuristic_connect_timer.setSingleShot(True)
         self.zynaddubfx_heuristic_connect_timer.setInterval(2000)
         self.zynaddubfx_heuristic_connect_timer.timeout.connect(self.zynaddubfx_heuristic_connect)
+        #TODO
+        self.__reverbAmount = 0.5
+        self.__delayAmount = 0.5
 
         self.__filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
@@ -2966,6 +2971,46 @@ class sketchpad_channel(QObject):
     """
     wetFx2Amount = Property(float, get_wetFx2Amount, set_wetFx2Amount, notify=wetFx2AmountChanged)
     ### END Property wetFx2Amount
+
+    ### BEGIN Property reverbAmount
+    def get_reverbAmount(self):
+        #TODO
+        return self.__reverbAmount
+
+    def set_reverbAmount(self, value, force_set=False):
+        self.__reverbAmount = value
+        self.reverbAmountChanged.emit()
+        #TODO
+
+    reverbAmountChanged = Signal()
+
+    @Slot(None)
+    def handleReverbAmountChanged(self):
+        #TODO
+        return
+
+    reverbAmount = Property(float, get_reverbAmount, set_reverbAmount, notify=reverbAmountChanged)
+    ### END Property reverbAmount
+
+    ### BEGIN Property delayAmount
+    def get_delayAmount(self):
+        #TODO
+        return self.__delayAmount 
+
+    def set_delayAmount(self, value, force_set=False):
+        self.__delayAmount = value
+        self.delayAmountChanged.emit()
+        #TODO
+
+    delayAmountChanged = Signal()
+
+    @Slot(None)
+    def handleDelayAmountChanged(self):
+        #TODO
+        return
+
+    delayAmount = Property(float, get_delayAmount, set_delayAmount, notify=delayAmountChanged)
+    ### END Property reverbAmount
 
     ### BEGIN Passthrough properties
     @Slot(str, int, str, float)

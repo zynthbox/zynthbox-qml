@@ -1852,12 +1852,12 @@ AbstractSketchpadPage {
                                             property int clipIndex: model.index
                                             readonly property bool patternHasNotes: root.sequence.getByClipId(root.selectedChannel.id, index).hasNotes
 
-                                            readonly property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
+                                            property QtObject clip: root.selectedChannel != null ? zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex) : null
                                             readonly property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
                                             readonly property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
                                             readonly property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
                                             readonly property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
-                                            readonly property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
+                                            property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
 
                                             onClicked: {
                                                 // if (root.selectedChannel.selectedClip === clipDelegate.clipIndex) {

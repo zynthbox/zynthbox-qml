@@ -1613,7 +1613,6 @@ ZUI.ScreenPage {
                                     }
 
                                 }
-
                             }
 
                             RowLayout {
@@ -1755,10 +1754,6 @@ ZUI.ScreenPage {
                                             Item {
                                                 anchors.fill: parent
                                                 visible: root.showMixerEqualiser === true
-
-
-                                                // Layout.leftMargin: Kirigami.Units.smallSpacing
-                                                // Layout.rightMargin: Kirigami.Units.smallSpacing
                                                 MultiPointTouchArea {
                                                     id: graphTouchArea
 
@@ -2002,7 +1997,6 @@ ZUI.ScreenPage {
 
                                 }
                             }
-
                         }
                     }
 

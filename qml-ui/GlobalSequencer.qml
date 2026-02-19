@@ -510,7 +510,7 @@ Item {
     }
     function testForSlot(slotIndex, buttonDown) {
         if (buttonDown) {
-            if (slotIndex < 5) {
+            if (component.selectedChannel.trackType === "synth" && slotIndex < 5) {
                 // Select the appropriate synth slot
                 pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", slotIndex);
                 // Test fire only this slot, if there's a synth in it
@@ -523,15 +523,15 @@ Item {
                 }
             } else if (slotIndex < 10) {
                 // Select the appropriate sample slot
-                let sampleIndex = slotIndex - 5;
-                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", sampleIndex);
+                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", slotIndex);
                 // Test fire only this slot, if there's a sample in it
-                let sampleClip = component.selectedChannel.sampleSlotsData[sampleIndex];
+                let sampleClip = component.selectedChannel.samples[slotIndex];
                 if (sampleClip.cppObjId > -1) {
                     let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
                     let sliceObject = sampleObject.selectedSliceObject;
+                    // TODO use whatever note will play the slice at even pitch (so *not* the pattern's pitch), and then also set that as the currently heard note, with the star velocity
                     let sampleTestNoteInfo = {"sliceObject": sliceObject, "midiNote": Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey)};
-                    _private.testSamplesSlicesActive[sampleIndex] = sampleTestNoteInfo;
+                    _private.testSamplesSlicesActive[slotIndex] = sampleTestNoteInfo;
                     sliceObject.play(sampleTestNoteInfo.midiNote, _private.starVelocity);
                 }
             } else if (slotIndex < 15) {
@@ -549,19 +549,21 @@ Item {
                 if (synthTestNoteInfo !== null) {
                     Zynthbox.MidiRouter.sendMidiMessageToZynthianSynth(synthTestNoteInfo.midiChannel, 3, 128, synthTestNoteInfo.midiNote, _private.starVelocity);
                 }
-            } else if (slotIndex < 10) {
+            }
+            // This might all look a bit weird, but we want to *release* any slices that might be playing, whatever else might now be happening...
+            if (slotIndex < 10) {
                 // Stop the given slice, if it's ongoing
-                let sampleIndex = slotIndex - 5;
-                let sampleTestNoteInfo = _private.testSamplesSlicesActive[sampleIndex];
-                _private.testSamplesSlicesActive[sampleIndex] = null;
+                let sampleTestNoteInfo = _private.testSamplesSlicesActive[slotIndex];
+                _private.testSamplesSlicesActive[slotIndex] = null;
                 if (sampleTestNoteInfo) {
                     let sliceObject = sampleTestNoteInfo.sliceObject;
-                    if (sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.OneshotPlaybackStyle) {
+                    if (sliceObject.effectivePlaybackStyle !== Zynthbox.ClipAudioSource.OneshotPlaybackStyle) {
                         // Don't stop a one-shot (this should be done by the slice, really... remember to also stop any existing playback when changing playback style for a slice)
                         sliceObject.stop(sampleTestNoteInfo.midiNote);
                     }
                 }
-            } else if (slotIndex < 15) {
+            }
+            if (slotIndex == 14) {
                 // Don't do anything on release here
             } else if (slotIndex === 15) {
                 _private.testEnabledForSlots = !_private.testEnabledForSlots;
@@ -2755,18 +2757,31 @@ Item {
         function updateSlotPassthroughClients() {
             for (let slotIndex = 0; slotIndex < 15; ++slotIndex) {
                 let slotPassthroughClient = null;
-                if (slotIndex < 5) {
+                if  (component.selectedChannel.trackType === "synth" && slotIndex < 5) {
                     // The five synth slots
                     let midiChannel = component.selectedChannel.chainedSounds[slotIndex];
                     if (midiChannel > -1) {
                         slotPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel];
                     }
+                } else if (component.selectedChannel.trackType === "external" && slotIndex < 10) {
+                    // There's not really anything to do here, so... just leave it for now
+                } else if (component.selectedChannel.trackType === "sample-loop" && slotIndex < 5) {
+                    // TODO (we don't have this mode currently anyway, so no need to do that just yet)
                 } else if (slotIndex < 10) {
-                    // The five sample slots
-                    let sampleClip = component.selectedChannel.sampleSlotsData[slotIndex - 5];
-                    if (sampleClip.cppObjId > -1) {
-                        let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
-                        slotPassthroughClient = sampleObject.selectedSliceObject;
+                    if (component.selectedChannel.trackType === "sample-trig") {
+                        // The ten sample slots in sampleracks
+                        let sampleClip = component.selectedChannel.sampleSlotsData[slotIndex];
+                        if (sampleClip.cppObjId > -1) {
+                            let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
+                            slotPassthroughClient = sampleObject.selectedSliceObject;
+                        }
+                    } else {
+                        // The five sample slots in synthracks
+                        let sampleClip = component.selectedChannel.sampleSlotsData[slotIndex - 5];
+                        if (sampleClip.cppObjId > -1) {
+                            let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
+                            slotPassthroughClient = sampleObject.selectedSliceObject;
+                        }
                     }
                 } else if (slotIndex < 15) {
                     // The five fx slots
@@ -2781,7 +2796,8 @@ Item {
         }
         property bool testEnabledForSlots: true
         property var testSynthsActive: [null, null, null, null, null]
-        property var testSamplesSlicesActive: [null, null, null, null, null]
+        // Always put test slices into the *activated* slot, not their "true" slot, so release can be handled generically and properly (that is, for a synthrack, put the first sample into testSamplesSlicesActive[5], which will then be released correctly)
+        property var testSamplesSlicesActive: [null, null, null, null, null, null, null, null, null, null]
         onTestEnabledForSlotsChanged: {
             if (testEnabledForSlots) {
                 applicationWindow().showPassiveNotification("Tap Slot Button To Test: Enabled", 1500);
@@ -2863,14 +2879,14 @@ Item {
                         let slotGain = 0.0;
                         let slotPassthroughClient = _private.slotPassthroughClients[stepIndex];
                         let slotFilled = slotPassthroughClient != null;
-                        if (stepIndex < 5) {
+                        if (component.selectedChannel.trackType === "synth" && stepIndex < 5) {
                             // The five synth slots
                             if (slotPassthroughClient) {
                                 slotMuted = slotPassthroughClient.muted;
                                 slotGain = slotPassthroughClient.dryGainHandler.gainAbsolute;
                             }
                         } else if (stepIndex < 10) {
-                            // The five sample slots
+                            // The five sample slots (or ten in the case of sampleracks)
                             if (slotPassthroughClient) {
                                 slotMuted = slotPassthroughClient.gainHandler.muted;
                                 slotGain = slotPassthroughClient.gainHandler.gainAbsolute;
@@ -3140,11 +3156,21 @@ Item {
         model: 5
         Item {
             Connections {
-                target: _private.slotPassthroughClients[index] ? _private.slotPassthroughClients[index].dryGainHandler : null
+                target: component.selectedChannel.trackType === "synth"  && _private.slotPassthroughClients[index] ? _private.slotPassthroughClients[index].dryGainHandler : null
                 onGainChanged: _private.updateLedColors()
             }
             Connections {
-                target: _private.slotPassthroughClients[index]
+                target: component.selectedChannel.trackType === "synth" ? _private.slotPassthroughClients[index] : null
+                onMutedChanged: _private.updateLedColors()
+            }
+        }
+    }
+    Repeater {
+        model: 5
+        Item {
+            Connections {
+                target: component.selectedChannel.trackType === "sample-trig" && _private.slotPassthroughClients[index] ? _private.slotPassthroughClients[index].gainHandler : null
+                onGainChanged: _private.updateLedColors()
                 onMutedChanged: _private.updateLedColors()
             }
         }
@@ -3185,6 +3211,7 @@ Item {
         onSamples_changed: _private.updateSlotPassthroughClients()
         onChainedSoundsNamesChanged: _private.updateSlotPassthroughClients()
         onChainedFxNamesChanged: _private.updateSlotPassthroughClients()
+        onTrack_type_changed: _private.updateSlotPassthroughClients()
     }
     Connections {
         target: _private.pattern

@@ -528,7 +528,7 @@ class sketchpad_clip_metadata(QObject):
             self.clip.audioSource.rootSlice().setGrainTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
             self.set_timeStretchStyle(str(self.getMetadataProperty("ZYNTHBOX_TIMESTRETCHSTYLE", "")), -1)
             self.clip.audioSource.rootSlice().setPitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)))
-            self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "LoopingPlaybackStyle")), -1)
+            self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", self.clip.channel.playbackStyleForTrackStyle())), -1)
             self.clip.audioSource.rootSlice().setLoopCrossfadeAmount(float(self.getMetadataProperty("ZYNTHBOX_LOOP_CROSSFADE_AMOUNT", 0)))
             self.set_loopStartCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)
             self.set_stopCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_STOP_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)

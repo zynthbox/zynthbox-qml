@@ -2172,6 +2172,14 @@ class sketchpad_channel(QObject):
             self.set_track_routing_style("standard")
             self.set_keyZoneMode("10-split")
 
+    # Certain track styles want a special playback style to go with it, which is only set on first load of a sample without metadata
+    # In particular, the drums style calls for one-shots
+    def playbackStyleForTrackStyle(self):
+        if self.__trackStyle__ == "drums":
+            return "OneshotPlaybackStyle"
+        else:
+            return "LoopingPlaybackStyle"
+
     def get_trackStyle(self):
         return self.__trackStyle__
 

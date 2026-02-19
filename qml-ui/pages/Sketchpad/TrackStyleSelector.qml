@@ -89,9 +89,11 @@ ZUI.DialogQuestion {
             case "SWITCH_BACK_RELEASED":
                 component.reject();
                 break;
-            case "SWITCH_KNOB3_RELEASED":
             case "SWITCH_SELECT_RELEASED":
-                if (component.selectedButton.enabled) {
+                component.accept();
+                break;
+            case "SWITCH_KNOB3_RELEASED":
+                if (component.selectedButton && component.selectedButton.enabled) {
                     component.selectedButton.clicked();
                 }
                 break;

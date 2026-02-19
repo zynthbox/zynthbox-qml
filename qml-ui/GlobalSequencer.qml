@@ -529,10 +529,13 @@ Item {
                 if (sampleClip.cppObjId > -1) {
                     let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
                     let sliceObject = sampleObject.selectedSliceObject;
-                    // TODO use whatever note will play the slice at even pitch (so *not* the pattern's pitch), and then also set that as the currently heard note, with the star velocity
-                    let sampleTestNoteInfo = {"sliceObject": sliceObject, "midiNote": Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey)};
+                    // Use the slice's root note, so we play back the sample at even pitch (so *not* the pattern's pitch), and then also set that as the currently heard note, with the star velocity
+                    let sampleTestNoteInfo = {"sliceObject": sliceObject, "midiNote": sliceObject.rootNote};
                     _private.testSamplesSlicesActive[slotIndex] = sampleTestNoteInfo;
                     sliceObject.play(sampleTestNoteInfo.midiNote, _private.starVelocity);
+                    _private.heardNotes = [sliceObject.rootNote];
+                    _private.heardVelocities = [_private.starVelocity];
+                    // console.log("Testing the current slice of sample at index", slotIndex, "using its root note", sliceObject.rootNote, "aka", Zynthbox.KeyScales.midiNoteName(sliceObject.rootNote));
                 }
             } else if (slotIndex < 15) {
                 // Select the appropriate fx slot (no test fire here, doesn't really make much sense)

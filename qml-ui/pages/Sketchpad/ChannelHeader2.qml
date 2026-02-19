@@ -185,10 +185,10 @@ ZUI.CellControl {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
-                        visible: root.channel.trackType == "synth"
+                        visible: ["synth", "sample-trig"].includes(root.channel.trackType)
 
                         Repeater {
-                            model: root.channel && root.channel.occupiedSampleSlots
+                            model: Zynthbox.Plugin.sketchpadSlotCount
 
                             Item {
                                 Layout.fillWidth: true
@@ -196,7 +196,7 @@ ZUI.CellControl {
 
                                 TrackHeaderSlotIndicator {
                                     anchors.centerIn: parent
-                                    highlighted: modelData
+                                    highlighted: root.channel ? root.channel.samples[index].cppObjId > -1 : false
                                     width: parent.width
                                     height: 2
                                 }
@@ -207,7 +207,29 @@ ZUI.CellControl {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
-                        visible: root.channel.trackType == "synth"
+                        visible: root.channel.trackType === "sample-trig"
+
+                        Repeater {
+                            model: Zynthbox.Plugin.sketchpadSlotCount
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                TrackHeaderSlotIndicator {
+                                    anchors.centerIn: parent
+                                    highlighted: root.channel ? root.channel.samples[index + Zynthbox.Plugin.sketchpadSlotCount].cppObjId > -1 : false
+                                    width: parent.width
+                                    height: 2
+                                }
+                            }
+                        }
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.smallSpacing
+                        visible: ["synth", "sample-trig"].includes(root.channel.trackType)
 
                         Repeater {
                             model: root.channel && root.channel.occupiedFxSlots

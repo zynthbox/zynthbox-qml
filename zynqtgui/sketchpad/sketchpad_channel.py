@@ -2478,7 +2478,7 @@ class sketchpad_channel(QObject):
                 [65, 65, 5], # slot 6
                 [66, 66, 6], # slot 7
                 [67, 67, 7], # slot 8
-                [68, 68, 8]  # slot 9
+                [68, 68, 8], # slot 9
                 [69, 69, 9]  # slot 10
             ]
         # TODO We probably want to ensure that we use the track's split point here, instead of a hardcoded one... ;)

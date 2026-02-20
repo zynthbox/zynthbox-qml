@@ -109,7 +109,7 @@ if command -v kwin_x11 &> /dev/null; then
     # If control reaches here it means the application exited.
     # Application should never exit by itself and should always be running.
     # Restart application
-    systemctl restart jack2 mod-ttymidi zynthbox-qml
+    systemctl restart mod-ttymidi zynthbox-qml
 else
     echo "ERROR: kwin was not installed. Exiting."
     exit 1

@@ -30,6 +30,8 @@ Rectangle {
     color: "transparent"
     radius: 2
 
+    property var tickLabelSet : ({"-40":"-40", "0":"0", "20":"+20"})
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Kirigami.Units.smallSpacing
@@ -53,6 +55,8 @@ Rectangle {
                 anchors.centerIn: parent
                 anchors.horizontalCenterOffset: -8
                 height: parent.height
+
+                property var tickLabelSet : control.tickLabelSet
 
                 //Layout.fillHeight: true
                 //Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
@@ -107,26 +111,10 @@ Rectangle {
                         }
                     }
                     tickmarkLabel: QQC2.Label {
+                        id: _tickLabel
                         text: {
-
-                            if(styleData.value == "0")
-                                return styleData.value
-
-                            if(styleData.value == audioGauge.maximumValue || styleData.value == audioGauge.minimumValue)
-                            {
-                                var prefix = (styleData.value > 0 ? "+" : "-")
-                                return  prefix + styleData.value
-                            }
-
-                            if(styleData.value == (audioGauge.maximumValue+ audioGauge.minimumValue)/2)
-                            {
-                                var prefix = (styleData.value > 0 ? "+" : "-")
-                                return  prefix + styleData.value
-                            }
-
-                            return  ""
+                            return  audioGauge.tickLabelSet[styleData.value]
                         }
-
                         font: audioGauge.font
                     }
                 }

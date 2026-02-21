@@ -20,11 +20,11 @@ Rectangle {
     property alias slider: slider
     property bool enabled: true
     property alias mouseArea: mouseArea
+    property alias value : slider.value
 
     signal clicked();
     signal doubleClicked();
-    signal valueChanged();
-
+    
     border.color: Kirigami.Theme.highlightColor
     border.width: highlight ? 1 : 0
     color: "transparent"
@@ -58,34 +58,45 @@ Rectangle {
 
                 property var tickLabelSet : control.tickLabelSet
 
-                //Layout.fillHeight: true
-                //Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                //Layout.leftMargin: 4
-                minimumValue: -40
-                maximumValue: 20
+                minimumValue: slider.from
+                maximumValue: slider.to
                 value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
-
-                // Rectangle {
-                //     anchors.fill: parent
-                //     color: "blue"
-                // }
 
                 font.pointSize: 8
                 style: GaugeStyle {
-                    valueBar: PlasmaCore.FrameSvgItem {
-                        visible: audioGauge.value > audioGauge.minimumValue
-                        id: grooveFill
-                        imagePath: "widgets/bar_meter_vertical"
-                        prefix: "bar-active"
-                        colorGroup: PlasmaCore.ColorScope.colorGroup
+                    valueBar: Item {
                         implicitWidth: 8
+
+                        Rectangle {
+                            color: Kirigami.Theme.highlightColor
+                            radius: ZUI.Theme.radius    
+                            anchors.fill: parent
+                            anchors.margins: 1                    
+                        }
                     }
 
-                    background: PlasmaCore.FrameSvgItem {
-                        id: svgBg
-                        // visible: fromCurrentTheme
-                        imagePath: "widgets/bar_meter_vertical"
-                        prefix: "bar-inactive"
+                    foreground: Item {}
+
+                    background: Item {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        Rectangle{
+                            anchors.fill: parent
+                            radius: ZUI.Theme.radius
+                            color: Kirigami.Theme.backgroundColor
+                            border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
+
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                anchors.margins: 1
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                radius: ZUI.Theme.radius
+                                color: Kirigami.Theme.textColor 
+                                opacity: 0.2
+                                height: slider.position*parent.height 
+                            }
+                        }
                     }
 
                     minorTickmark: Item {
@@ -93,7 +104,8 @@ Rectangle {
                         implicitHeight: 1
 
                         Rectangle {
-                            color: "#cccccc"
+                            color: Kirigami.Theme.textColor
+                            opacity: 0.2
                             anchors.fill: parent
                             anchors.leftMargin: 2
                             anchors.rightMargin: 4
@@ -104,7 +116,8 @@ Rectangle {
                         implicitHeight: 1
 
                         Rectangle {
-                            color: "#dfdfdf"
+                            color: Kirigami.Theme.textColor
+                            opacity: 0.5
                             anchors.fill: parent
                             anchors.leftMargin: 3
                             anchors.rightMargin: 3
@@ -144,15 +157,6 @@ Rectangle {
                         height: slider.availableHeight * slider.position
                         width: 2
                         anchors.bottom: parent.bottom
-                        // color: "yellow"
-
-                        // Rectangle {
-                        //     height: 5
-                        //     width: height
-                        //     color: "orange"
-                        //     anchors.top: parent.top
-                        //     anchors.horizontalCenter: parent.horizontalCenter
-                        // }
 
                         Kirigami.Icon {
                             anchors.verticalCenter: parent.top
@@ -164,61 +168,6 @@ Rectangle {
                         }
                     }
                 }
-
-                // background: Item {
-                //     visible: false
-                //     implicitWidth: svgBg.implicitWidth
-                //     implicitHeight: svgBg.implicitHeight
-
-                //     PlasmaCore.FrameSvgItem {
-                //         id: svgBg
-                //         // visible: fromCurrentTheme
-                //         imagePath: "widgets/slider"
-                //         prefix: "groove"
-                //         anchors.horizontalCenter: parent.horizontalCenter
-                //         colorGroup: PlasmaCore.ColorScope.colorGroup
-                //         implicitWidth: slider.horizontal ? PlasmaCore.Units.gridUnit * 12 : fixedMargins.left + fixedMargins.right
-                //         implicitHeight: slider.vertical ? PlasmaCore.Units.gridUnit * 12 : fixedMargins.top + fixedMargins.bottom
-
-                //         width: slider.horizontal ? Math.max(fixedMargins.left + fixedMargins.right, slider.availableWidth) : implicitWidth
-                //         height: slider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, slider.availableHeight) : implicitHeight
-                //         x: slider.leftPadding + (slider.horizontal ? 0 : Math.round((slider.availableWidth - width) / 2))
-                //         y: slider.topPadding + (slider.vertical ? 0 : Math.round((slider.availableHeight - height) / 2))
-
-                //         Extras.Gauge {
-                //             id: inputAudioLevelGauge
-                //             anchors.bottom: parent.bottom
-                //             anchors.left: parent.left
-                //             anchors.right: parent.right
-                //             width: parent.width
-                //             visible: control.inputAudioLeveldB != null
-
-                //             minimumValue: -40
-                //             maximumValue: 20
-                //             // value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
-
-                //             font.pointSize: 8
-
-                //             style: GaugeStyle {
-                //                 valueBar: Item {
-                //                     // color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                //                     PlasmaCore.FrameSvgItem {
-
-                //                         imagePath: "widgets/slider"
-                //                         prefix: "groove-highlight"
-                //                         colorGroup: PlasmaCore.ColorScope.colorGroup
-                //                         anchors.fill: parent
-                //                     }
-                //                 }
-                //                 minorTickmark: null
-                //                 tickmark: null
-                //                 tickmarkLabel: null
-                //             }
-                //         }
-                //     }
-
-
-                // }
 
                 MouseArea {
                     id: mouseArea
@@ -247,7 +196,6 @@ Rectangle {
                             var newVal = ZUI.CommonUtils.clamp((mouseArea.height - mouse.y) / mouseArea.height, 0, 1)
                             mouseArea.dragHappened = true
                             slider.value = ZUI.CommonUtils.interp(newVal * (slider.to - slider.from), 0, (slider.to - slider.from), slider.from, slider.to)
-                            control.valueChanged()
                         }
                     }
                     Timer {

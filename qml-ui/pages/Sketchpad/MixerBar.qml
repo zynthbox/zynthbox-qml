@@ -236,43 +236,18 @@ AbstractSketchpadPage {
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
                                 inputAudioLeveldB: visible && !model.channel.muted ? Zynthbox.AudioLevels.channels[model.channel.id] : -40
-                                onAudioLeveldBChanged: {
-                                    // console.log("Channel audio level changed to", audioLeveldB)
-                                }
+                                value: model.channel.gainHandler.gainDb 
                                 inputAudioLevelVisible: true
 
-                                onValueChanged: {
-                                    model.channel.gainHandler.gainDb = slider.value
-                                }
+                                onValueChanged: model.channel.gainHandler.gainDb = slider.value
+                                
                                 slider {
                                     from: model.channel.gainHandler.minimumDecibel
                                     to: model.channel.gainHandler.maximumDecibel
                                 }
 
-                                onClicked: {
-                                    channelsVolumeRow.handleClick(channel);
-                                }
-                                onDoubleClicked: {
-                                    model.channel.gainHandler.gainDb = model.channel.initialVolume;
-                                }
-
-                                Binding {
-                                    target: volumeControl.slider
-                                    property: "value"
-                                    value: model.channel.gainHandler.gainDb
-                                }
-                                // tickmarkLabel : QQC2.Label {
-                                //     text: switch (styleData.value) {
-                                //     case -40:
-                                //         return "-40"
-                                //     case 0:
-                                //         return "0"
-                                //     case 20:
-                                //         return "+20"
-                                //     default:
-                                //         return ""
-                                //     }
-                                // }
+                                onClicked: channelsVolumeRow.handleClick(channel)                                
+                                onDoubleClicked: model.channel.gainHandler.gainDb = model.channel.initialVolume                                
                             }
 
                             panControl: PanSlider {
@@ -282,9 +257,7 @@ AbstractSketchpadPage {
                                 controlObj: model.channel
                                 controlProp: "pan"
                                 initialValue: model.channel.initialPan
-                                onClicked: {
-                                    channelsVolumeRow.handleClick(channel);
-                                }
+                                onClicked: channelsVolumeRow.handleClick(channel)                                
                             }
 
                             ZUI.SectionGroup {
@@ -343,9 +316,7 @@ AbstractSketchpadPage {
                                             border.color: Qt.rgba(50, 50, 50, 0.1)
                                             color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                         }
-                                        onClicked: {
-                                            model.channel.muted = !model.channel.muted
-                                        }
+                                        onClicked: model.channel.muted = !model.channel.muted                                        
                                     }
                                 }
                             }
@@ -384,39 +355,24 @@ AbstractSketchpadPage {
                             Layout.fillHeight: true
                             control: channelsReverbRow
                             controller: model
-                            text2: controller.channel.wetFx2Amount+"%"
+                            text2: controller.channel.wetFx2Amount.toFixed(0)+"%"
                             volumeControl: VolumeControl {
                                 id: reverbControl
-
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
+                                value: controller.channel.wetFx2Amount
+                                onValueChanged: controller.channel.wetFx2Amount = slider.value
                                 
-                                audioGaugeItem.minimumValue: 0
-                                audioGaugeItem.maximumValue: 100
-
-                                onValueChanged: {
-                                    controller.channel.wetFx2Amount = slider.value
-                                }
                                 slider {
                                     from: 0
                                     to: 100
                                     stepSize: 1
                                 }
 
-                                onClicked: {
-                                    channelsReverbRow.handleClick(channel);
-                                }
-
-                                onDoubleClicked: {
-                                   controller.channel.wetFx1Amount = 50;
-                                }
-
-                                Binding {
-                                    target: reverbControl.slider
-                                    property: "value"
-                                    value: controller.channel.wetFx2Amount
-                                }
+                                onClicked: channelsReverbRow.handleClick(channel)
+                                onDoubleClicked: controller.channel.wetFx1Amount = 50                                
                                 tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
+                                
                             }
                             panControl: null
                         }
@@ -453,38 +409,22 @@ AbstractSketchpadPage {
                             Layout.fillHeight: true
                             control: channelsDelayRow
                             controller: model
-                            text2: controller.channel.wetFx1Amount+"%"
+                            text2: controller.channel.wetFx1Amount.toFixed(0)+"%"
                             volumeControl: VolumeControl {
                                 id: reverbControl
-
+                                value: controller.channel.wetFx1Amount
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
+                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
+                                onValueChanged: controller.channel.wetFx1Amount = slider.value
                                 
-                                audioGaugeItem.minimumValue: 0
-                                audioGaugeItem.maximumValue: 100
-
-                                onValueChanged: {
-                                    controller.channel.wetFx1Amount = slider.value
-                                }
                                 slider {
                                     from: 0
                                     to: 100
                                 }
 
-                                onClicked: {
-                                    channelsDelayRow.handleClick(channel);
-                                }
-
-                                onDoubleClicked: {
-                                   controller.channel.wetFx1Amount = 50;
-                                }
-
-                                Binding {
-                                    target: reverbControl.slider
-                                    property: "value"
-                                    value: controller.channel.wetFx1Amount
-                                }
-                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
+                                onClicked: channelsDelayRow.handleClick(channel)
+                                onDoubleClicked: controller.channel.wetFx1Amount = 50     
                             }
                             panControl: null
                         }
@@ -643,63 +583,55 @@ AbstractSketchpadPage {
         implicitHeight: Kirigami.Units.gridUnit
 
         background: Item {
+            
+            Kirigami.Theme.inherit: false
+            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+            Rectangle{   
+                id:_bg             
+                anchors.fill: parent
+                color: Kirigami.Theme.backgroundColor
+                border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
+                radius: ZUI.Theme.radius
 
-            PlasmaCore.FrameSvgItem {
-                id: panSvgBg
-                // visible: fromCurrentTheme
-                imagePath: "widgets/slider"
-                prefix:  "groove"
-                anchors.horizontalCenter: parent.horizontalCenter
-                colorGroup: PlasmaCore.ColorScope.colorGroup
-               anchors.fill: parent
-                width: panSlider.horizontal ? Math.max(fixedMargins.left + fixedMargins.right, panSlider.availableWidth) : implicitWidth
-                height: panSlider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, panSlider.availableHeight) : 20
-                x: panSlider.leftPadding + (panSlider.horizontal ? 0 : Math.round((panSlider.availableWidth - width) / 2))
-                y: panSlider.topPadding + (panSlider.vertical ? 0 : Math.round((panSlider.availableHeight - height) / 2))
-
-                PlasmaCore.FrameSvgItem {
-                    id: grooveFill
+                Rectangle {
                     visible: panSlider.value !== 0
-                    imagePath: "widgets/slider"
-                    prefix: "groove-highlight"
-                    colorGroup: PlasmaCore.ColorScope.colorGroup
+                    color: Kirigami.Theme.highlightColor
+                    radius: ZUI.Theme.radius 
 
                     anchors {
                         left: (panSlider.value > 0 ? parent.horizontalCenter : undefined)
                         right: (panSlider.value <= 0 ? parent.horizontalCenter : undefined)
-                        verticalCenter: parent.verticalCenter
+                        top: parent.top
+                        bottom: parent.bottom
+                        margins: 2
                     }
+                    width: Math.abs(panSlider.value) * (Math.floor(_bg.width / 2) - 2)
+                }
 
-                    // The general idea is to extend the groove at least up to the middle of a handle, but don't overextend it at the end.
-                    width: Math.abs(panSlider.value) * (panSlider.availableWidth / 2)
-                    height: panSlider.vertical ? Math.max(fixedMargins.top + fixedMargins.bottom, Math.round(panSlider.position * (panSlider.availableHeight - panSlider.handle.height / 2) + (panSlider.handle.height / 2))) : parent.height
+                Rectangle {
+                    color: Kirigami.Theme.textColor
+                    height: 6
+                    width: 1
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
 
-            Rectangle {
-                color: Kirigami.Theme.textColor
-                height: 6
-                width: 1
-                anchors.left: parent.left
+            Item {
+                height: 16
+                width: 16
                 anchors.top: parent.bottom
-            }
+                x: (parent.width * panSlider.position) - width/2
 
-            Rectangle {
-                color: Kirigami.Theme.textColor
-                height: 6
-                width: 1
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.bottom
-
-            }
-
-            Rectangle {
-                color: Kirigami.Theme.textColor
-                height: 6
-                width: 1
-                anchors.right: parent.right
-                anchors.top: parent.bottom
-            }
+                Kirigami.Icon {
+                    anchors.verticalCenter: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    implicitHeight: 16
+                    implicitWidth: 16
+                    source: Qt.resolvedUrl("../../../img/arrow-up.svg")
+                    color: Kirigami.Theme.textColor
+                }
+            }    
         }
     }
 

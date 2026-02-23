@@ -708,7 +708,6 @@ IMP.BasePlayGrid {
             id: drumsGridContainer
             anchors.margins: 5
             objectName: "drumsGrid"
-
             ColumnLayout {
                 id:gridColumnLayout
                 spacing: 0
@@ -1066,6 +1065,7 @@ IMP.BasePlayGrid {
 
                 // notes grid
                 Item {
+                    visible: !(_private.associatedChannel && _private.associatedChannel.trackStyle === "drums")
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     DrumsGrid {
@@ -1101,7 +1101,8 @@ IMP.BasePlayGrid {
 
                 // sequencer
                 Rectangle {
-                    id:drumPad
+                    id: drumPad
+                    visible: !(_private.associatedChannel && _private.associatedChannel.trackStyle === "drums")
                     property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
                     Layout.fillWidth: true;
                     Layout.minimumHeight: parent.height / 5;
@@ -1813,6 +1814,14 @@ IMP.BasePlayGrid {
                     }
                 }
 
+                // per-note style drum sequencer
+                DrumSequencer {
+                    visible: _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
+                    patternModel: _private.workingPatternModel
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                }
+
                 // pad & sequencer settings
                 Rectangle {
                     id:padSettings
@@ -2209,6 +2218,7 @@ IMP.BasePlayGrid {
                     }
                 }
             }
+
             ZUI.Popup {
                 id: noteSettingsPopup
                 parent: QQC2.Overlay.overlay

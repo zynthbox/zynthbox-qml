@@ -310,7 +310,7 @@ ZUI.Popup {
         }            
     }
 
-     Rectangle {
+    Rectangle {
         anchors.fill: parent
 
         color: "transparent"

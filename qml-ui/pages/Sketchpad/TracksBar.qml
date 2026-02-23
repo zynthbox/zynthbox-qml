@@ -1971,7 +1971,94 @@ AbstractSketchpadPage {
                 }
 
                 Item {}
-                Item {}
+
+                ZUI.SectionGroup {
+                    fallbackBackground: Rectangle {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        color: Kirigami.Theme.backgroundColor
+                        opacity: 0.1
+                    }  
+                    
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.sectionSpacing
+
+                        Item {
+                            Layout.fillWidth: true
+                            implicitHeight: Kirigami.Units.gridUnit *  2
+
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionGroup {
+                                    Layout.fillHeight: true
+
+                                    contentItem: Row {
+                                        spacing: ZUI.Theme.spacing
+                                        ZUI.SectionButton {
+                                            text: "Start End"
+                                        }
+                                        ZUI.SectionButton {
+                                            text: "Loop"
+                                        }
+                                    }
+                                }
+
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                }
+
+                                ZUI.SectionGroup {
+                                    Layout.fillHeight: true
+
+                                    contentItem: Row {
+                                        spacing: ZUI.Theme.spacing
+                                        ZUI.SectionButton {
+                                            text: "All"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        RowLayout {
+                            id: samplesRowTrack
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            spacing: ZUI.Theme.cellSpacing
+
+                            function handleClick(channel) { //TODO
+                                // zynqtgui.sketchpad.selectedTrackId = channel.id;
+                                // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                // zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                                // zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
+                            }
+
+                            Repeater {
+                                model: root.song.channelsModel
+                                delegate: ZUI.CellControl {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    highlighted: index === zynqtgui.sketchpad.selectedTrackId
+
+                                    contentItem : Item {
+                                        ColumnLayout {
+                                            anchors.fill: parent
+                                            QQC2.RangeSlider {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true  
+                                                orientation: Qt.Vertical                                        
+                                            }    
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 Item {}
                 Item {}
             }

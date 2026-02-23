@@ -125,6 +125,7 @@ Rectangle {
                     }
                     tickmarkLabel: QQC2.Label {
                         id: _tickLabel
+                        opacity: 0.5
                         text: {
                             return  audioGauge.tickLabelSet[styleData.value]
                         }

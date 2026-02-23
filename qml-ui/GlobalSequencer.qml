@@ -533,7 +533,7 @@ Item {
                     let sampleTestNoteInfo = {"sliceObject": sliceObject, "midiNote": sliceObject.rootNote};
                     _private.testSamplesSlicesActive[slotIndex] = sampleTestNoteInfo;
                     sliceObject.play(sampleTestNoteInfo.midiNote, _private.starVelocity);
-                    _private.heardNotes = [sliceObject.rootNote];
+                    _private.heardNotes = [Zynthbox.PlayGridManager.getNote(sliceObject.rootNote, _private.pattern.sketchpadTrack)];
                     _private.heardVelocities = [_private.starVelocity];
                     // console.log("Testing the current slice of sample at index", slotIndex, "using its root note", sliceObject.rootNote, "aka", Zynthbox.KeyScales.midiNoteName(sliceObject.rootNote));
                 }

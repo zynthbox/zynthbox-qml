@@ -43,6 +43,49 @@ Item {
     }
 
     /**
+     * \brief Explicitly set what has been heard
+     * This data will be vetted and only applied where what is given makes sense (if it does not make sense, we will reset to the default)
+     */
+    function setHeardData(heardNotes, heardVelocities) {
+        let givenIsValid = false;
+        if (Array.isArray(heardNotes) && Array.isArray(heardVelocities) && heardNotes.length > 0 && heardNotes.length == heardVelocities.length) {
+            let newHeard = [];
+            let newVelocities = [];
+            givenIsValid = true;
+            for (let i = 0; i < heardNotes.length; ++i) {
+                let newNote = heardNotes[i];
+                if (Number.isInteger(newNote)) {
+                    newHeard.push(Zynthbox.PlayGridManager.getNote(ZUI.CommonUtils.clamp(newNote, 0, 127), _private.pattern.sketchpadTrack));
+                } else if (typeof(newNote) == "Note") {
+                    newHeard.push(newNote);
+                } else {
+                    givenIsValid = false;
+                    break;
+                }
+                if (Number.isInteger(heardVelocities[i])) {
+                    newVelocities.push(ZUI.CommonUtils.clamp(heardVelocities[i], 1, 127));
+                } else {
+                    givenIsValid = false;
+                    break;
+                }
+            }
+            if (givenIsValid) {
+                _private.heardNotes = newHeard;
+                _private.heardVelocities = newVelocities;
+            }
+        } else if (Number.isInteger(heardNotes) && Number.isInteger(heardVelocities)) {
+            _private.heardNotes = [Zynthbox.PlayGridManager.getNote(ZUI.CommonUtils.clamp(heardNotes, 0, 127), _private.pattern.sketchpadTrack)];
+            _private.heardVelocities = [ZUI.CommonUtils.clamp(heardVelocities, 1, 127)];
+            givenIsValid = true;
+        }
+        if (givenIsValid == false) {
+            let keyNote = Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey);
+            _private.heardNotes = [Zynthbox.PlayGridManager.getNote(keyNote, _private.pattern.sketchpadTrack)];
+            _private.heardVelocities = [_private.pattern.defaultVelocity];
+        }
+    }
+
+    /**
      * Update the velocity of all matching subnotes on the given step
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
      * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the velocity for

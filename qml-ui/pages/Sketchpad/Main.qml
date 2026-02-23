@@ -1599,19 +1599,29 @@ ZUI.ScreenPage {
                                                     minorTickmark: null
                                                     tickmark: null
                                                     tickmarkLabel: null
-
-                                                    valueBar: Rectangle {
-                                                        color: Kirigami.Theme.highlightColor
-                                                        implicitWidth: 6
+                                                    foreground: null
+                                                    background: Item {
+                                                        Kirigami.Theme.inherit: false
+                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                        Rectangle{
+                                                            anchors.fill: parent
+                                                            // radius: ZUI.Theme.radius
+                                                            color: Kirigami.Theme.backgroundColor
+                                                            // border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
+                                                        }
                                                     }
 
+                                                    valueBar: Rectangle {
+                                                        Kirigami.Theme.inherit: false
+                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                        color: Kirigami.Theme.textColor
+                                                        opacity: 0.3
+                                                        implicitWidth: 6
+                                                    }
                                                 }
-
                                             }
                                         }
-
                                     }
-
                                 }
                             }
 

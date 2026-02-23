@@ -139,7 +139,7 @@ AbstractSketchpadPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     implicitHeight: Kirigami.Units.gridUnit
-                    text: "Main"
+                    text: "Volume"
                     checked: highlighted
                     highlighted: _mixerBarStack.currentView === MixerBar.View.Main
                     onClicked: _mixerBarStack.setView(MixerBar.View.Main)                
@@ -591,47 +591,36 @@ AbstractSketchpadPage {
                 anchors.fill: parent
                 color: Kirigami.Theme.backgroundColor
                 border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
-                radius: ZUI.Theme.radius
+                radius: 0
 
                 Rectangle {
                     visible: panSlider.value !== 0
-                    color: Kirigami.Theme.highlightColor
-                    radius: ZUI.Theme.radius 
+                    color: Kirigami.Theme.textColor 
+                    opacity: 0.2
+                    radius: parent.radius
 
                     anchors {
                         left: (panSlider.value > 0 ? parent.horizontalCenter : undefined)
                         right: (panSlider.value <= 0 ? parent.horizontalCenter : undefined)
                         top: parent.top
                         bottom: parent.bottom
-                        margins: 2
+                        topMargin: 1
+                        bottomMargin: 1
                     }
-                    width: Math.abs(panSlider.value) * (Math.floor(_bg.width / 2) - 2)
+                    width: Math.abs(panSlider.value) * (Math.floor(_bg.width / 2) - 1)
                 }
 
                 Rectangle {
                     color: Kirigami.Theme.textColor
-                    height: 6
+                    opacity: 0.2
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 1
                     width: 1
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            Item {
-                height: 16
-                width: 16
-                anchors.top: parent.bottom
-                x: (parent.width * panSlider.position) - width/2
-
-                Kirigami.Icon {
-                    anchors.verticalCenter: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    implicitHeight: 16
-                    implicitWidth: 16
-                    source: Qt.resolvedUrl("../../../img/arrow-up.svg")
-                    color: Kirigami.Theme.textColor
-                }
-            }    
+                }  
+            }  
         }
     }
 
@@ -694,6 +683,7 @@ AbstractSketchpadPage {
                             anchors.verticalCenter: parent.verticalCenter
                             elide: Text.ElideRight
                             text: mixerColumnDelegate.text
+                            opacity: 0.5
 
                             font.pointSize: 8
 

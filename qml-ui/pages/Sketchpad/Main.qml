@@ -93,6 +93,12 @@ ZUI.ScreenPage {
      */
     function updateSelectedChannelLayerVolume(midiChannel, sign) {
         function valueSetter(value) {
+            var cutoff = root.selectedChannel.filterCutoffControllers[root.selectedChannel.selectedSlotRow]
+            var res = root.selectedChannel.filterResonanceControllers[root.selectedChannel.selectedSlotRow]
+            zynqtgui.osd.setAuxValue1(qsTr("%1 Filter Cutoff").arg(synthName), qsTr("%1%").arg(cutoff.value), cutoff.value, cutoff.value_min, cutoff.value_max, 1)
+            zynqtgui.osd.setAuxValue2(qsTr("%1 Filter Resonance").arg(synthName), qsTr("%1%").arg(res.value), res.value, res.value_min, res.value_max, 2)
+            zynqtgui.osd.setKnobPositionIndex(0)
+
             synthPassthroughClient.dryGainHandler.gainAbsolute = ZUI.CommonUtils.clamp(value, 0, 1);
             applicationWindow().showOsd({
                 "parameterName": "layer_volume",
@@ -255,8 +261,15 @@ ZUI.ScreenPage {
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
     function updateSelectedChannelSlotLayerCutoff(sign, slot = -1) {
-        function valueSetter(value) {
+        function valueSetter(value) {            
             if (controller != null && controller.controlsCount > 0) {
+
+                var vol = Zynthbox.Plugin.synthPassthroughClients[root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]]
+                var res = root.selectedChannel.filterResonanceControllers[root.selectedChannel.selectedSlotRow]
+                zynqtgui.osd.setAuxValue1(qsTr("%1 Volume").arg(synthName), qsTr("%1 dB").arg(vol.dryGainHandler.gainDb.toFixed(2)), vol.dryGainHandler.gainAbsolute, 0, 1, 0)
+                zynqtgui.osd.setAuxValue2(qsTr("%1 Filter Resonance").arg(synthName), qsTr("%1%").arg(res.value), res.value, res.value_min, res.value_max, 2)
+                zynqtgui.osd.setKnobPositionIndex(1)
+
                 controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max);
                 applicationWindow().showOsd({
                     "parameterName": "layer_filter_cutoff",
@@ -299,6 +312,13 @@ ZUI.ScreenPage {
     function updateSelectedChannelSlotLayerResonance(sign, slot = -1) {
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
+
+                var vol = Zynthbox.Plugin.synthPassthroughClients[root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]]
+                var cutoff = root.selectedChannel.filterCutoffControllers[root.selectedChannel.selectedSlotRow]
+                zynqtgui.osd.setAuxValue1(qsTr("%1 Volume").arg(synthName), qsTr("%1 dB").arg(vol.dryGainHandler.gainDb.toFixed(2)), vol.dryGainHandler.gainAbsolute, 0, 1, 0)
+                zynqtgui.osd.setAuxValue2(qsTr("%1 Filter Cutoff").arg(synthName), String("%1%").arg(cutoff.value), cutoff.value, cutoff.value_min, cutoff.value_max, 1)
+                zynqtgui.osd.setKnobPositionIndex(2)
+
                 controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max);
                 applicationWindow().showOsd({
                     "parameterName": "layer_filter_resonance",

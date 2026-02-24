@@ -334,7 +334,7 @@ Kirigami.AbstractApplicationWindow {
             case "SCREEN_PRESET":
                 recordingPopup.close();
                 if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset", "effects_for_channel", "effect_preset", "sketch_effects_for_channel", "sketch_effect_preset", "sample_library"].includes(zynqtgui.current_screen_id) === false) {
-                    if (["TracksBar_sampleslot", "TracksBar_sampleslot2", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
+                    if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                         // Then we are selecting samples and sketches, show the sample library
                         zynqtgui.show_screen("sample_library");
                     } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
@@ -365,8 +365,6 @@ Kirigami.AbstractApplicationWindow {
                         applicationWindow().showMessageDialog(qsTr("Cannot open edit page: All slots are empty"), 2000);
                     }
                 } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot") {
-                    zynqtgui.show_modal("channel_wave_editor");
-                } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot2") {
                     zynqtgui.show_modal("channel_wave_editor");
                 } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchslot") {
                     zynqtgui.show_modal("channel_wave_editor");
@@ -683,9 +681,12 @@ Kirigami.AbstractApplicationWindow {
      * Update volume of channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateChannelVolume(sign, channelId, showOsd=true) {
+    function updateChannelVolume(sign, channelId, showOsd=true) {    
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
+            zynqtgui.osd.setAuxValue1(qsTr("%1 Reverb").arg(selectedChannel.name),String("%1%").arg( selectedChannel.wetFx2Amount), selectedChannel.wetFx2Amount, 0, 100, 2)
+            zynqtgui.osd.setAuxValue2(qsTr("%1 Delay").arg(selectedChannel.name),String("%1%").arg( selectedChannel.wetFx1Amount), selectedChannel.wetFx1Amount, 0, 100, 1)
+            zynqtgui.osd.setKnobPositionIndex(0)
             selectedChannel.gainHandler.gainDb = ZUI.CommonUtils.clamp(value, selectedChannel.gainHandler.minimumDecibel, selectedChannel.gainHandler.maximumDecibel)
             if (showOsd) {
                 applicationWindow().showOsd({
@@ -723,6 +724,10 @@ Kirigami.AbstractApplicationWindow {
     function updateChannelDelaySend(sign, channelId) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
+            zynqtgui.osd.setAuxValue1(qsTr("%1 Volume").arg(selectedChannel.name), qsTr("%1 dB").arg(selectedChannel.gainHandler.gainDb.toFixed(2)), parseFloat(selectedChannel.gainHandler.gainAbsolute), 0, 1, 0)
+            zynqtgui.osd.setAuxValue2(qsTr("%1 Reverb").arg(selectedChannel.name), String("%1%").arg( selectedChannel.wetFx2Amount), selectedChannel.wetFx2Amount, 0, 100, 2)
+            zynqtgui.osd.setKnobPositionIndex(1)
+
             selectedChannel.wetFx1Amount = ZUI.CommonUtils.clamp(value, 0, 100)
             applicationWindow().showOsd({
                                             parameterName: "channel_delay_send",
@@ -756,6 +761,10 @@ Kirigami.AbstractApplicationWindow {
     function updateChannelReverbSend(sign, channelId) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
+            zynqtgui.osd.setAuxValue1(qsTr("%1 Volume").arg(selectedChannel.name), qsTr("%1 dB").arg(selectedChannel.gainHandler.gainDb.toFixed(2)), parseFloat(selectedChannel.gainHandler.gainAbsolute),0, 1, 0)
+            zynqtgui.osd.setAuxValue2(qsTr("%1 Delay").arg(selectedChannel.name), String("%1%").arg( selectedChannel.wetFx1Amount), selectedChannel.wetFx1Amount, 0, 100, 1)
+            zynqtgui.osd.setKnobPositionIndex(2)
+
             selectedChannel.wetFx2Amount = ZUI.CommonUtils.clamp(value, 0, 100)
             applicationWindow().showOsd({
                                             parameterName: "channel_reverb_send",

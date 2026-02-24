@@ -90,11 +90,11 @@ ZUI.Popup {
 
     component BarControl : QQC2.Pane {
         id: _barControl
-        width: discret ? Kirigami.Units.gridUnit * 8 : parent.width
+        width: discret ? implicitWidth: parent.width
         height: Kirigami.Units.gridUnit * 6
         x: discret ? component.width-width : 0
         
-        padding: 2
+        padding: 10
         rightPadding: 20
 
         property alias text : _label1.text
@@ -102,6 +102,7 @@ ZUI.Popup {
         property alias maxVal: _label3.text
         property alias val: _label4.text
         // property alias slider: _slider
+        property alias dial : _dial
 
         property bool discret : true
 
@@ -111,25 +112,22 @@ ZUI.Popup {
         }
 
         contentItem: ColumnLayout {
-            spacing : 0
+            spacing : ZUI.Theme.sectionSpacing
 
-            Item {
+            QQC2.Label {
+                id: _label1
                 Layout.fillWidth: true
-                implicitHeight: Kirigami.Units.gridUnit * 2
-                QQC2.Label {
-                    id: _label1
-                    text: "Volume"
-                    anchors.fill: parent
-                   
-                    horizontalAlignment: Qt.AlignHCenter
-                    font.bold: true
-                }
+                text: "Volume"
+                horizontalAlignment: Qt.AlignHCenter
+                font.bold: true
             }
 
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                implicitWidth: Kirigami.Units.gridUnit * 8 
                 QQC2.Dial {
+                    id: _dial
                     visible: _barControl.discret
                     height: parent.height
                     width: height
@@ -139,131 +137,152 @@ ZUI.Popup {
                     value : 0.5
                     handle: null
                 }
-
-                Item {
-                    id: sliderItem
+                RowLayout {
+                    spacing: ZUI.Theme.sectionSpacing
+                    height: Kirigami.Units.gridUnit*1.5
+                    width: parent.width
+                    anchors.centerIn: parent
                     visible: !_barControl.discret
-                    anchors.fill: parent
-                    MultiPointTouchArea {
-                        anchors {
-                            fill: parent
-                            topMargin: -sliderItem.height // Let's allow for some sloppy interaction here, why not
-                        }
-                        touchPoints: [
-                            TouchPoint {
-                                id: slidePoint;
-                                property var currentValue: undefined
-                                onPressedChanged: {
-                                    if (pressed) {
-                                        currentValue = zynqtgui.osd.value;
-                                        hideTimer.pressed();
-                                    } else {
-                                        currentValue = undefined;
-                                        hideTimer.released();
-                                    }
-                                }
-                                onXChanged: {
-                                    if (pressed && currentValue !== undefined) {
-                                        var delta = (zynqtgui.osd.stop - zynqtgui.osd.start) * ((slidePoint.x - slidePoint.startX) / sliderItem.width);
-                                        if (component.invertedScale) {
-                                            zynqtgui.osd.setValue(zynqtgui.osd.name, Math.min(Math.max(currentValue + delta, zynqtgui.osd.stop), zynqtgui.osd.start));
+                    Item {
+                        id: sliderItem
+                       
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        Layout.alignment: Qt.AlignVCenter
+                        
+                        MultiPointTouchArea {
+                            anchors {
+                                fill: parent
+                                topMargin: -sliderItem.height // Let's allow for some sloppy interaction here, why not
+                            }
+                            touchPoints: [
+                                TouchPoint {
+                                    id: slidePoint;
+                                    property var currentValue: undefined
+                                    onPressedChanged: {
+                                        if (pressed) {
+                                            currentValue = zynqtgui.osd.value;
+                                            hideTimer.pressed();
                                         } else {
-                                            zynqtgui.osd.setValue(zynqtgui.osd.name, Math.min(Math.max(currentValue + delta, zynqtgui.osd.start), zynqtgui.osd.stop));
+                                            currentValue = undefined;
+                                            hideTimer.released();
+                                        }
+                                    }
+                                    onXChanged: {
+                                        if (pressed && currentValue !== undefined) {
+                                            var delta = (zynqtgui.osd.stop - zynqtgui.osd.start) * ((slidePoint.x - slidePoint.startX) / sliderItem.width);
+                                            if (component.invertedScale) {
+                                                zynqtgui.osd.setValue(zynqtgui.osd.name, Math.min(Math.max(currentValue + delta, zynqtgui.osd.stop), zynqtgui.osd.start));
+                                            } else {
+                                                zynqtgui.osd.setValue(zynqtgui.osd.name, Math.min(Math.max(currentValue + delta, zynqtgui.osd.start), zynqtgui.osd.stop));
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        ]
-                    }
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Kirigami.Theme.backgroundColor
-                        border {
-                            width: 2
-                            color: Kirigami.Theme.textColor
+                            ]
                         }
-                        radius: height / 2
-                    }
-                    Item {
-                        id: barContainer
-                        anchors {
-                            fill: parent
-                            margins: 4
-                            leftMargin: (height / 2) + 4
-                            rightMargin: (height / 2) + 3 // This is uneven, but otherwise the visual ends up weird
-                        }
-                        property double zeroOffset: (zynqtgui.osd.visualZero - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)
                         Rectangle {
-                            anchors {
-                                left: parent.left
-                                leftMargin: parent.width * barContainer.zeroOffset
-                                top: parent.top
-                                bottom: parent.bottom
+                            anchors.fill: parent
+                            color: Kirigami.Theme.backgroundColor
+                            border {
+                                width: 2
+                                color: Kirigami.Theme.textColor
                             }
-                            color: Kirigami.Theme.textColor
-                            width: (component.invertedScale ? zynqtgui.osd.value < zynqtgui.osd.visualZero : zynqtgui.osd.value > zynqtgui.osd.visualZero) ? parent.width * ((zynqtgui.osd.value - zynqtgui.osd.visualZero) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
+                            radius: height / 2
+                        }
+                        Item {
+                            id: barContainer
+                            anchors {
+                                fill: parent
+                                margins: 4
+                                leftMargin: (height / 2) + 4
+                                rightMargin: (height / 2) + 3 // This is uneven, but otherwise the visual ends up weird
+                            }
+                            property double zeroOffset: (zynqtgui.osd.visualZero - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)
                             Rectangle {
                                 anchors {
+                                    left: parent.left
+                                    leftMargin: parent.width * barContainer.zeroOffset
                                     top: parent.top
                                     bottom: parent.bottom
-                                    horizontalCenter: parent.right
                                 }
-                                radius: (height - 1)  / 2
-                                width: height
-                                color: "magenta"
+                                color: Kirigami.Theme.textColor
+                                width: (component.invertedScale ? zynqtgui.osd.value < zynqtgui.osd.visualZero : zynqtgui.osd.value > zynqtgui.osd.visualZero) ? parent.width * ((zynqtgui.osd.value - zynqtgui.osd.visualZero) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
+                                Rectangle {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.right
+                                    }
+                                    radius: (height - 1)  / 2
+                                    width: height
+                                    color: Kirigami.Theme.textColor
+                                }
                             }
-                        }
-                        Rectangle {
-                            anchors {
-                                left: parent.left
-                                leftMargin: parent.width * barContainer.zeroOffset
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-                            width: 1
-                            color: Kirigami.Theme.textColor
-                        }
-                        Rectangle {
-                            anchors {
-                                right: parent.left
-                                rightMargin: -parent.width * barContainer.zeroOffset
-                                top: parent.top
-                                bottom: parent.bottom
-                            }
-                            color: "yellow"
-                            width: (component.invertedScale ? zynqtgui.osd.value > zynqtgui.osd.visualZero : zynqtgui.osd.value < zynqtgui.osd.visualZero) ? (parent.width * barContainer.zeroOffset) - parent.width * ((zynqtgui.osd.value - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
                             Rectangle {
                                 anchors {
+                                    left: parent.left
+                                    leftMargin: parent.width * barContainer.zeroOffset
                                     top: parent.top
                                     bottom: parent.bottom
-                                    horizontalCenter: parent.left
                                 }
-                                radius: (height - 1) / 2
-                                width: height
-                                color: "blue"
+                                width: 1
+                                color: Kirigami.Theme.textColor
+                            }
+                            Rectangle {
+                                anchors {
+                                    right: parent.left
+                                    rightMargin: -parent.width * barContainer.zeroOffset
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                }
+                                color: Kirigami.Theme.textColor
+                                width: (component.invertedScale ? zynqtgui.osd.value > zynqtgui.osd.visualZero : zynqtgui.osd.value < zynqtgui.osd.visualZero) ? (parent.width * barContainer.zeroOffset) - parent.width * ((zynqtgui.osd.value - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
+                                Rectangle {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        horizontalCenter: parent.left
+                                    }
+                                    radius: (height - 1) / 2
+                                    width: height
+                                    color: Kirigami.Theme.textColor
+                                }
+                            }
+                        }
+                        Item {
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                bottomMargin: -5
+                                left: parent.left
+                                leftMargin: (parent.width * ((zynqtgui.osd.defaultValue - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start))) - 3
+                            }
+                            visible: zynqtgui.osd.showVisualZero
+                            width: 5
+                            clip: true
+                            Rectangle {
+                                anchors {
+                                    verticalCenter: parent.bottom
+                                    horizontalCenter: parent.horizontalCenter
+                                }
+                                height: 3
+                                width: 3
+                                rotation: 45
+                                color: Kirigami.Theme.textColor
                             }
                         }
                     }
-                    Item {
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                            bottomMargin: -5
-                            left: parent.left
-                            leftMargin: (parent.width * ((zynqtgui.osd.defaultValue - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start))) - 3
-                        }
-                        visible: zynqtgui.osd.showVisualZero
-                        width: 5
-                        clip: true
-                        Rectangle {
-                            anchors {
-                                verticalCenter: parent.bottom
-                                horizontalCenter: parent.horizontalCenter
-                            }
-                            height: 3
-                            width: 3
-                            rotation: 45
-                            color: Kirigami.Theme.textColor
+
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        visible: zynqtgui.osd.showResetToDefault
+                        text: qsTr("Reset")
+                        onPressed: hideTimer.pressed();
+                        onReleased: hideTimer.released();
+                        enabled: zynqtgui.osd.value !== zynqtgui.osd.defaultValue
+                        onClicked: {
+                            zynqtgui.osd.setValue(zynqtgui.osd.name, zynqtgui.osd.defaultValue);
                         }
                     }
                 }
@@ -271,43 +290,53 @@ ZUI.Popup {
 
             Item {
                 Layout.fillWidth: true
-                implicitHeight: Kirigami.Units.gridUnit * 2
+                implicitHeight:_rowLabels.implicitHeight
+                implicitWidth: Kirigami.Units.gridUnit * 8 
+
                 RowLayout {
-                   anchors.fill: parent
+                    id: _rowLabels
+                    anchors.fill: parent
                     QQC2.Label {
                         id: _label2
                         visible: !_barControl.discret 
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
                         horizontalAlignment: Qt.AlignLeft
                         text: "-24dB"
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitWidth: 6
                     }
 
                     QQC2.Label {
                         id: _label4
+                        horizontalAlignment: Qt.AlignHCenter
+                    }
+
+                    Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        horizontalAlignment: Qt.AlignHCenter
+                        implicitWidth: 6
                     }
 
                     QQC2.Label {
                         id: _label3
                         visible: !_barControl.discret
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
                         horizontalAlignment: Qt.AlignRight
                         text: "+24dB"
                     }
                 }
             }
-                                    
-
-            // QQC2.Button {
-            //     text: "Reset"
-            //     Layout.alignment: Qt.AlignHCenter
-            //     Layout.fillHeight: true
-            // }
         }            
+    }
+
+    function setAuxKbobPosition(index) {
+        switch(index) {
+            default:
+            case 0: return Kirigami.Units.gridUnit * 6
+            case 1: return Kirigami.Units.gridUnit * 16   
+            case 2: return Kirigami.Units.gridUnit * 26   
+        }
     }
 
     Rectangle {
@@ -316,7 +345,8 @@ ZUI.Popup {
         color: "transparent"
 
         BarControl {
-            y: Kirigami.Units.gridUnit * 6
+            id: _mainKnob
+            y: setAuxKbobPosition(zynqtgui.osd.knobPositionIndex)
             text: zynqtgui.osd.description
             minVal: zynqtgui.osd.startLabel === "" ? zynqtgui.osd.start : zynqtgui.osd.startLabel
             maxVal: zynqtgui.osd.stopLabel === "" ? zynqtgui.osd.stop : zynqtgui.osd.stopLabel
@@ -325,15 +355,29 @@ ZUI.Popup {
         }       
 
         BarControl {
-            y: Kirigami.Units.gridUnit * 16    
-            text: "Filter Cutoff"       
-            val: applicationWindow().selectedChannel.filterCutoffControllers[applicationWindow().selectedChannel.selectedSlotRow].value
+            id: _auxKnob1
+            y: setAuxKbobPosition(zynqtgui.osd.auxValue1.knobPositionIndex)  
+            text: zynqtgui.osd.auxValue1.name   
+            val: zynqtgui.osd.auxValue1.display
+            discret: true
+            dial {
+                from: zynqtgui.osd.auxValue1.from
+                to: zynqtgui.osd.auxValue1.to
+                value: zynqtgui.osd.auxValue1.value
+            }
         }
 
         BarControl{
-            y: Kirigami.Units.gridUnit * 26  
-            text: "Filter Resonance"
-            val: applicationWindow().selectedChannel.filterResonanceControllers[applicationWindow().selectedChannel.selectedSlotRow].value                       
+            id: _auxKnob2
+            y: setAuxKbobPosition(zynqtgui.osd.auxValue2.knobPositionIndex) 
+            text: zynqtgui.osd.auxValue2.name   
+            val: zynqtgui.osd.auxValue2.display
+            discret: true
+            dial {
+                from: zynqtgui.osd.auxValue2.from
+                to: zynqtgui.osd.auxValue2.to
+                value: zynqtgui.osd.auxValue2.value
+            }                      
         }
     }
 

@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.7 as Kirigami
 
+import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -85,6 +86,7 @@ Item {
         onLastModifiedChanged: _private.updateBarNotes()
     }
     onPatternModelChanged: _private.updateBarNotes()
+    readonly property string trackType: applicationWindow().selectedChannel ? applicationWindow().selectedChannel.trackType : ""
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -95,14 +97,34 @@ Item {
                 property int midiNote: component.patternModel ? component.patternModel.gridModelStartNote + index : 60
                 readonly property QtObject note: component.patternModel ? Zynthbox.PlayGridManager.getNote(midiNote, component.patternModel.sketchpadTrack) : null
                 spacing: 0
+                readonly property bool hasClips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["hasClips"]) : false
+                readonly property var clips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["clips"]) : []
+                readonly property QtObject audioSource: clips.length === 1 ? clips[0] : null
+                opacity: hasClips ? 1.0 : 0.5
                 Item {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    IMP.SampleVisualiser {
+                        anchors {
+                            fill: parent
+                            margins: Kirigami.Units.smallSpacing
+                        }
+                        visible: noteRow.audioSource !== null
+                        audioSource: noteRow.audioSource
+                        trackType: component.trackType
+                    }
                     QQC2.Label {
-                        anchors.fill: parent
+                        anchors {
+                            fill: parent
+                            margins: Kirigami.Units.smallSpacing
+                        }
                         verticalAlignment: Text.AlignVCenter
-                        text: noteRow.note ? noteRow.note.name + (noteRow.note.octave - 1) + " (slot gain, sample name)" : ""
+                        elide: Text.ElideLeft
+                        visible: noteRow.audioSource === null
+                        text: noteRow.hasClips
+                            ? qsTr("Multiple Samples")
+                            : noteRow.note ? noteRow.note.name + (noteRow.note.octave - 1) : ""
                     }
                 }
                 Repeater {

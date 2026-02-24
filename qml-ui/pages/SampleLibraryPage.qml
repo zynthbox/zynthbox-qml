@@ -431,6 +431,7 @@ ZUI.ScreenPage {
                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                         active: zynqtgui.isBootingComplete
                         autoActivateIndexOnChange: true
+                        readonly property bool needsTwiceTheSlots: component.selectedChannel && component.selectedChannel.trackType === "sample-trig"
                         qmlSelector: ZUI.SelectorWrapper {
                             selector_list: 2 * Zynthbox.Plugin.sketchpadSlotCount
                             current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? (component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? component.selectedChannel.selectedSlot.value : component.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
@@ -461,8 +462,8 @@ ZUI.ScreenPage {
                         }
                         delegate: ZUI.SelectorDelegate {
                             id: clipDelegate
-                            height: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? clipsListView.view.height/10 : clipsListView.view.height/5
-                            visible: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? true : index < Zynthbox.Plugin.sketchpadSlotCount
+                            height: clipsListView ? clipsListView.view.height/10 : clipsListView.view.height/5
+                            visible: clipsListView ? true : index < Zynthbox.Plugin.sketchpadSlotCount
                             enabled: true
                             // highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
                             property QtObject clip: component.selectedChannel

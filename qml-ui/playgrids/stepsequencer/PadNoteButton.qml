@@ -53,6 +53,7 @@ QQC2.Button {
     readonly property color backgroundColor: Kirigami.Theme.textColor
     readonly property color borderColor: foregroundColor
     readonly property color focusColor: Kirigami.Theme.focusColor
+    readonly property var noteColors: zynqtgui.theme_chooser.noteColors
 
     background: Rectangle {
         id:padNoteRect
@@ -205,7 +206,7 @@ QQC2.Button {
                     }
                     Rectangle {
                         anchors.fill: parent;
-                        color: zynqtgui.theme_chooser.noteColors[subNote.midiNote]
+                        color: component.noteColors[subNote.midiNote]
                         opacity: 0.3
                     }
                     Rectangle {
@@ -215,7 +216,7 @@ QQC2.Button {
                             bottom: parent.bottom
                         }
                         height: padSubNoteRect.height * (actualSubnoteVelocity / 127)
-                        color: zynqtgui.theme_chooser.noteColors[subNote.midiNote]
+                        color: component.noteColors[subNote.midiNote]
                     }
                     QQC2.Label {
                         anchors.fill: parent

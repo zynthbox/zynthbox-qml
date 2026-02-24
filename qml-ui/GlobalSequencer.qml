@@ -1377,13 +1377,15 @@ Item {
                     component.ignoreHeldStepButtonsReleases();
                     if (zynqtgui.starButtonPressed === false) {
                         for (let stepButtonIndex = 0; stepButtonIndex < 16; ++stepButtonIndex) {
-                            if (stepButtonIndex < 10) {
-                                applicationWindow().updateChannelVolume(-1, stepButtonIndex);
-                            } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
-                                // Clip button + k1 adjusts the clip's step length
-                                component.updatePatternProperty(-1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
+                            if (_private.heldStepButtons[stepButtonIndex] !== false) {
+                                if (stepButtonIndex < 10) {
+                                    applicationWindow().updateChannelVolume(-1, stepButtonIndex);
+                                } else if (10 < stepButtonIndex && stepButtonIndex < 16) {
+                                    // Clip button + k1 adjusts the clip's step length
+                                    component.updatePatternProperty(-1, "stepLength", component.selectedChannel.id, stepButtonIndex - 10);
+                                }
+                                returnValue = true;
                             }
-                            returnValue = true;
                         }
                     }
                     break;

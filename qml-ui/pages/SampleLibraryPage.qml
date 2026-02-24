@@ -432,7 +432,7 @@ ZUI.ScreenPage {
                         active: zynqtgui.isBootingComplete
                         autoActivateIndexOnChange: true
                         qmlSelector: ZUI.SelectorWrapper {
-                            selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? 2 * Zynthbox.Plugin.sketchpadSlotCount : Zynthbox.Plugin.sketchpadSlotCount
+                            selector_list: 2 * Zynthbox.Plugin.sketchpadSlotCount
                             current_index: component.selectedChannel && component.selectedChannel.selectedSlot && clipsListView.view.count > 0 ? (component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? component.selectedChannel.selectedSlot.value : component.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
                         }
                         onCurrentItemChanged: {
@@ -462,6 +462,7 @@ ZUI.ScreenPage {
                         delegate: ZUI.SelectorDelegate {
                             id: clipDelegate
                             height: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? clipsListView.view.height/10 : clipsListView.view.height/5
+                            visible: component.selectedChannel && component.selectedChannel.trackType === "sample-trig" ? true : index < Zynthbox.Plugin.sketchpadSlotCount
                             enabled: true
                             // highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
                             property QtObject clip: component.selectedChannel

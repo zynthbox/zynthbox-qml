@@ -884,10 +884,11 @@ ZUI.ScreenPage {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
             Repeater {
-                model: component.selectedChannel ? (component.selectedChannel.trackType === "sample-trig" ? 10 : 5) : 0
+                model: Zynthbox.Plugin.sketchpadSlotCount * 2
                 delegate: Rectangle {
                     id: clipDelegate
 
+                    visible: (index < Zynthbox.Plugin.sketchpadSlotCount) || (component.selectedChannel && component.selectedChannel.trackType === "sample-trig")
                     property QtObject clip: component.selectedChannel.trackType === "sample-loop"
                                                         ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                                         : component.selectedChannel.samples[index]

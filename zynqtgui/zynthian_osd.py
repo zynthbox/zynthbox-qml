@@ -48,6 +48,9 @@ class zynthian_osd(QObject):
         self.__showValueLabel = True
         self.__showResetToDefault = True
         self.__showVisualZero = True
+        self.__auxValue1 = {"name": "Test", "value": 0, "from":0, "to": 100, "knobPositionIndex": 1, "display": "0%"}
+        self.__auxValue2 = {"name": "Test2", "value": 0, "from":0, "to": 100, "knobPositionIndex": 2, "display": "0%"}
+        self.__knobPositionIndex = 0
 
     @Slot(str, str, float, float, float, float, float, QJSValue, str, str, str, bool, float, bool, bool)
     def updateOsd(self, parameterName, description, start, stop, step, defaultValue, currentValue, setValueFunction, startLabel = "", stopLabel = "", valueLabel = "", showValueLabel = True, visualZero = None, showResetToDefault = True, showVisualZero = True):
@@ -147,3 +150,37 @@ class zynthian_osd(QObject):
                 self.__setValueFunction.call([newValue])
             else:
                 logging.error(f"Cannot call invalid setValueFunction : {self.__setValueFunction}. It is neither a python callable object or qt callable object.")
+
+    @Property('QVariant', notify=update)
+    def auxValue1(self):
+        return self.__auxValue1
+
+    @Property('QVariant', notify=update)
+    def auxValue2(self):
+        return self.__auxValue2
+
+    @Slot(str, str, float, float, float, int)
+    def setAuxValue1(self, parameterName, valueLabel, newValue, fromValue, toValue, index): 
+        self.__auxValue1["name"] = parameterName
+        self.__auxValue1["display"] = valueLabel
+        self.__auxValue1["value"] = newValue 
+        self.__auxValue1["from"] = fromValue 
+        self.__auxValue1["to"] = toValue 
+        self.__auxValue1["knobPositionIndex"] = index
+
+    @Slot(str, str, float, float, float, int)
+    def setAuxValue2(self, parameterName, valueLabel, newValue, fromValue, toValue, index): 
+        self.__auxValue2["name"] = parameterName
+        self.__auxValue2["display"] = valueLabel
+        self.__auxValue2["value"] = newValue
+        self.__auxValue2["from"] = fromValue 
+        self.__auxValue2["to"] = toValue
+        self.__auxValue2["knobPositionIndex"] = index
+
+    @Property(int, notify=update)
+    def knobPositionIndex(self):
+        return self.__knobPositionIndex
+
+    @Slot(int)
+    def setKnobPositionIndex(self, index): 
+        self.__knobPositionIndex = index

@@ -612,6 +612,7 @@ AbstractSketchpadPage {
 
                 Rectangle {
                     color: Kirigami.Theme.textColor
+                    visible: panSlider.value == 0
                     opacity: 0.2
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom

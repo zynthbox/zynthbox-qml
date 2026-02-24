@@ -2410,6 +2410,27 @@ Item {
                     _private.heldTemporaryActionBlockButtons[9] = false;
                     returnValue = true;
                     break;
+                case "KNOB0_TOUCHED":
+                case "KNOB0_RELEASED":
+                case "KNOB0_UP":
+                case "KNOB0_DOWN":
+                case "KNOB1_TOUCHED":
+                case "KNOB1_RELEASED":
+                case "KNOB1_UP":
+                case "KNOB1_DOWN":
+                case "KNOB2_TOUCHED":
+                case "KNOB2_RELEASED":
+                case "KNOB2_UP":
+                case "KNOB2_DOWN":
+                case "KNOB3_TOUCHED":
+                case "KNOB3_RELEASED":
+                case "KNOB3_UP":
+                case "KNOB3_DOWN":
+                    // Don't consume the knobs explicitly, but *do* ensure we treat their use as a desire to not actually switch to the next mode
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                    }
+                    break;
             }
             if (zynqtgui.modeButtonPressed && returnValue) {
                 zynqtgui.ignoreNextModeButtonPress = true;
@@ -3109,14 +3130,14 @@ Item {
                 let slotGain = 0.0;
                 let slotPassthroughClient = _private.slotPassthroughClients[stepIndex];
                 let slotFilled = slotPassthroughClient != null;
-                if (stepIndex < 5) {
+                if (component.selectedChannel.trackType === "synth" && stepIndex < 5) {
                     // The five synth slots
                     if (slotPassthroughClient) {
                         slotMuted = slotPassthroughClient.muted;
                         slotGain = slotPassthroughClient.dryGainHandler.gainAbsolute;
                     }
                 } else if (stepIndex < 10) {
-                    // The five sample slots
+                    // The five sample slots (or ten for tracks in sample trig mode)
                     if (slotPassthroughClient) {
                         slotMuted = slotPassthroughClient.gainHandler.muted;
                         slotGain = slotPassthroughClient.gainHandler.gainAbsolute;

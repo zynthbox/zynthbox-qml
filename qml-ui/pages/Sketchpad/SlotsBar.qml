@@ -417,6 +417,7 @@ AbstractSketchpadPage {
                                 id: synthsRow
                                 columnSpacing: Kirigami.Units.gridUnit * 0.7
                                 channel: channelDelegate.channel
+                                channelIndex: channelDelegate.channelIndex
                                 slotData: {
                                     if (bottomStack.currentBarView === Main.BarView.SynthsBar) {
                                         return channelDelegate.channel.synthSlotsData

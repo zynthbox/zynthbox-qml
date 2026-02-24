@@ -58,6 +58,10 @@ GridLayout {
      */
     property QtObject channel: applicationWindow().selectedChannel
     /**
+     * \brief Set the index of the track to operate on (used for static data like passthrough clients)
+     */
+    property int channelIndex: zynqtgui.sketchpad.selectedTrackId
+    /**
      * \brief Set to true if single click action should happen after focus
      */
     property bool singleClickEnabled: true
@@ -332,9 +336,9 @@ GridLayout {
                     // A property to determine if slot is a sample-loop and is enabled
                     property bool isClipEnabled: control.slotType === "sample-loop" && control.slotData[sampleIndex] && control.slotData[sampleIndex].enabled
                     property int midiChannel: control.channel != null ? control.channel.chainedSounds[realIndex] : -1
-                    property QtObject synthPassthroughClient: control.channel != null && Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] != null ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
-                    property QtObject fxPassthroughClient: control.channel != null && Zynthbox.Plugin.fxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.fxPassthroughClients[control.channel.id][realIndex] : null
-                    property QtObject sketchFxPassthroughClient: control.channel != null && Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id] != null ? Zynthbox.Plugin.sketchFxPassthroughClients[control.channel.id][realIndex] : null
+                    property QtObject synthPassthroughClient: slotDelegate.midiChannel > -1 ? Zynthbox.Plugin.synthPassthroughClients[slotDelegate.midiChannel] : null
+                    property QtObject fxPassthroughClient: control.channelIndex > -1 ? Zynthbox.Plugin.fxPassthroughClients[control.channelIndex] : null
+                    property QtObject sketchFxPassthroughClient: control.channelIndex > -1 ? Zynthbox.Plugin.sketchFxPassthroughClients[control.channelIndex][realIndex] : null
                     property QtObject zynthianLayer: {
                         let layer = null;
                         if (control.channel != null) {

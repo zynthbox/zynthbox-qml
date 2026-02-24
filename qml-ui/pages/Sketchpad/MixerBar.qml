@@ -619,7 +619,6 @@ AbstractSketchpadPage {
                     anchors.margins: 1
                     width: 1
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
                 }  
             }  
         }

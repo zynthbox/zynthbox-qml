@@ -17,6 +17,11 @@ Item {
      */
     property QtObject sample: null
     /**
+     * Set to the ClipAudioSource instance you want to see visualisation for
+     * @note this will override the use of the sample above
+     */
+    property QtObject audioSource: null
+    /**
      * This should be set to the channel audio type string for the channel appropriate for the given sample.
      * If you don't set this, you will have no progress reporting
      * If you are visualising an orphaned sample (for example when previewing one for loading), set this to "sample-loop" to have a single progress line, or "synth" for multiple progress dots
@@ -34,6 +39,7 @@ Item {
     QtObject {
         id: _private
         property QtObject sample: null
+        property QtObject audioSource: null
         property int progressStyle: 0 // 0 is no progress, 1 is single progress line, 2 is progress dots
     }
     Binding {
@@ -46,10 +52,18 @@ Item {
     }
     Binding {
         target: _private
+        property: "audioSource"
+        value: component.audioSource
+        when: component.visible
+        delayed: true
+        restoreMode: Binding.RestoreBindingOrValue
+    }
+    Binding {
+        target: _private
         property: "progressStyle"
         value: component.trackType === "sample-loop"
             ? 1
-            : component.trackType === "synth"
+            : ["synth", "sample-trig"].includes(component.trackType)
                 ? 2
                 : 0
     }
@@ -63,7 +77,7 @@ Item {
         readonly property real relativeStart: waveformItem.start / waveformItem.length
         readonly property real relativeEnd: waveformItem.end / waveformItem.length
 
-        visible: component.visible && _private.sample && !_private.sample.isEmpty
+        visible: component.visible && (_private.audioSource || (_private.sample && !_private.sample.isEmpty_))
 
         // Mask for wave part before start
         Rectangle {
@@ -171,7 +185,11 @@ Item {
         }
         Repeater {
             id: progressDots
-            property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(_private.sample.cppObjId) : null;
+            property QtObject cppClipObject: parent.visible
+                ? _private.audioSource
+                    ? _private.audioSource
+                    : Zynthbox.PlayGridManager.getClipById(_private.sample.cppObjId)
+                : null;
             model: Zynthbox.Plugin.clipMaximumPositionCount
             property QtObject playbackPositions: null
             delegate: Item {
@@ -197,6 +215,6 @@ Item {
         anchors.centerIn: parent
         opacity: 0.5
         text: qsTr("No sample data to display")
-        visible: _private.sample && _private.sample.cppObjId === -1
+        visible: _private.sample && _private.sample.cppObjId === -1 && _private.audioSource === null
     }
 }

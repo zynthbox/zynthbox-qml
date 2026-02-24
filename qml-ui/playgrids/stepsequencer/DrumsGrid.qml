@@ -42,6 +42,7 @@ ColumnLayout {
     property Item playgrid
     signal removeNote(QtObject note)
     signal notePressAndHold(QtObject note)
+    readonly property var noteColors: zynqtgui.theme_chooser.noteColors
     Repeater {
         id: rowRepeater
         model: 10 // Arbitrary number is arbitrary. Too many, really, but then we'll have the rows to work with if we want it
@@ -59,7 +60,7 @@ ColumnLayout {
                     note: visible && component.model.lastModified > 0 ? component.model.data(component.model.index(row, index), component.model.roles['note']) : null
                     property var metadata: visible && component.model.lastModified > 0 ? component.model.data(component.model.index(row, index), component.model.roles['metadata']) : undefined
                     text: metadata !== undefined && metadata["displayText"] !== undefined ? metadata["displayText"] : ""
-                    property color noteColor: note ? zynqtgui.theme_chooser.noteColors[note.midiNote] : ""
+                    property color noteColor: note ? component.noteColors[note.midiNote] : ""
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
                     property bool weAreChosen: component.playgrid.noteListeningNotes.length > 0
                         ? component.playgrid.heardNotes.indexOf(note) > -1

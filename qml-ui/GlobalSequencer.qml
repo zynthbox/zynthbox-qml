@@ -2752,6 +2752,7 @@ Item {
             updateLedColors();
         }
 
+        readonly property var noteColors: zynqtgui.theme_chooser.noteColors
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
         property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.7)
         property color stepWithNotes: Qt.rgba(0.5, 0.5, 1)
@@ -2912,7 +2913,7 @@ Item {
                         let brightness = 1.0;
                         if (stepNote) {
                             // Normalise the colours to all be on C8 because even brightness is useful in this case
-                            stepColor = zynqtgui.theme_chooser.noteColors[(stepNote.midiNote % 12) + 108];
+                            stepColor = _private.noteColors[(stepNote.midiNote % 12) + 108];
                             brightness = stepNote.isPlaying ? 1.0 : 0.8;
                         }
                         zynqtgui.led_config.setActionBlockButtonColor(stepIndex, stepColor, brightness);
@@ -3085,7 +3086,7 @@ Item {
                     let brightness = 1.0;
                     if (stepNote) {
                         // Normalise the colours to all be on C8 because even brightness is useful in this case
-                        stepColor = zynqtgui.theme_chooser.noteColors[(stepNote.midiNote % 12) + 108];
+                        stepColor = _private.noteColors[(stepNote.midiNote % 12) + 108];
                         brightness = stepNote.isPlaying ? 1.0 : 0.8;
                     }
                     zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, brightness);
@@ -3191,7 +3192,7 @@ Item {
             _private.updateNumberButtonColors();
             // the star note is a thing when the star button itself is pressed, otherwise we have to test that the pattern's root key is pressed
             if ((_private.starNote && _private.starNote.isPlaying) || (_private.patternKeyNote && _private.patternKeyNote.isPlaying)) {
-                zynqtgui.led_config.setStarButtonColor(zynqtgui.theme_chooser.noteColors[((_private.starNote ? _private.starNote.midiNote : _private.patternKeyNote.midiNote) % 12) + 108]);
+                zynqtgui.led_config.setStarButtonColor(_private.noteColors[((_private.starNote ? _private.starNote.midiNote : _private.patternKeyNote.midiNote) % 12) + 108]);
             } else {
                 zynqtgui.led_config.setStarButtonColor(_private.stepWithNotesDimmed);
             }

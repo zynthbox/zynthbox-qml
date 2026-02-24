@@ -43,17 +43,22 @@ ColumnLayout {
     signal removeNote(QtObject note)
     signal notePressAndHold(QtObject note)
     Repeater {
-        model: visible ? component.model : null
+        id: rowRepeater
+        model: 10 // Arbitrary number is arbitrary. Too many, really, but then we'll have the rows to work with if we want it
         delegate: RowLayout {
+            id: rowLayout
             property var row: index
-            visible: row > 0 || component.showFirstRow
+            visible: (row > 0 || component.showFirstRow) && row < component.model.rowCount()
             Repeater {
-                model: component.model.columnCount(component.model.index(index, 0))
+                id: columnRepeater
+                model: 16 // Arbitrary number is arbitrary, but it will do for us for the moment
+                readonly property int columnCount: component.model.columnCount(component.model.index(index, 0))
                 delegate: ZUI.NotePad {
+                    visible: component.visible && index < columnRepeater.columnCount
                     positionalVelocity: component.positionalVelocity
-                    note: component.model.data(component.model.index(row, index), component.model.roles['note'])
-                    property var metadata: component.model.data(component.model.index(row, index), component.model.roles['metadata'])
-                    text: metadata != undefined && metadata["displayText"] != undefined ? metadata["displayText"] : ""
+                    note: visible && component.model.lastModified > 0 ? component.model.data(component.model.index(row, index), component.model.roles['note']) : null
+                    property var metadata: visible && component.model.lastModified > 0 ? component.model.data(component.model.index(row, index), component.model.roles['metadata']) : undefined
+                    text: metadata !== undefined && metadata["displayText"] !== undefined ? metadata["displayText"] : ""
                     property color noteColor: note ? zynqtgui.theme_chooser.noteColors[note.midiNote] : ""
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
                     property bool weAreChosen: component.playgrid.noteListeningNotes.length > 0

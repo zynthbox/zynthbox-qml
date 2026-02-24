@@ -797,7 +797,7 @@ GridLayout {
             id: beatLineRepeater
             // Count number of beat lines to be shown as per beat and visible width
             model: 1024 // This is more than at all reasonable, but we can safely assume that it'll be an upper limit (and if we end up with crazy high res displays at some point... we can change this again
-            totalLineCount: Math.ceil(wav.width / wav.pixelsPerBeat)
+            readonly property int totalLineCount: Math.ceil(wav.width / wav.pixelsPerBeat)
             delegate: Rectangle {
                 visible: index < beatLineRepeater.totalLineCount
                 anchors {

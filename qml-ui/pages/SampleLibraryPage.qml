@@ -147,10 +147,22 @@ ZUI.ScreenPage {
                 returnValue = clipsListView.cuiaCallback(cuia);
                 break;
             case 1:
-                returnValue = folderListView.cuiaCallback(cuia);
+                if (cuia == "SWITCH_KNOB3_RELEASED") {
+                    // Explicitly move to column 2 when pushing the big knob (we auto-select things for the folders list, so the push is essentially unused)
+                    _private.selectedColumn = 2;
+                    returnValue = true;
+                } else {
+                    returnValue = folderListView.cuiaCallback(cuia);
+                }
                 break;
             case 2:
-                returnValue = filesListView.cuiaCallback(cuia);
+                if (cuia == "SWITCH_BACK_RELEASED") {
+                    // Going "back" when on the file list, move to highlighting the folder list instead
+                    _private.selectedColumn = 1;
+                    returnValue = true;
+                } else {
+                    returnValue = filesListView.cuiaCallback(cuia);
+                }
                 break;
             default:
                 break;

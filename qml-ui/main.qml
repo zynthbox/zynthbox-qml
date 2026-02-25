@@ -964,13 +964,17 @@ Kirigami.AbstractApplicationWindow {
                         }
                     }
                 }
+
                 ZUI.BreadcrumbButton {
+                    id: samplesButton
                     property QtObject selectedSample: null
+                    readonly property QtObject selectedCppSample: selectedSample && selectedSample.cppObjId > -1 ? Zynthbox.Plugin.getClipById(selectedSample.cppObjId) : null
+                    readonly property int selectedSampleIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
                     Timer {
                         id: samplesButtonThrottle
                         interval: 1; running: false; repeat: false;
                         onTriggered: {
-                            root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                            samplesButton.selectedSample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
                         }
                     }
                     Connections {
@@ -983,11 +987,9 @@ Kirigami.AbstractApplicationWindow {
                     }
 
                     icon.color: Kirigami.Theme.textColor
-                    text: qsTr("Sample %1 ˬ %2")
-                    .arg(root.selectedChannel.selectedSlotRow + 1)
-                    .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
+                    text: qsTr("Sample %1 ˬ").arg(samplesButton.selectedSampleIndex + 1)
+                    Layout.fillHeight: true
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 11
-                    rightPadding: Kirigami.Units.largeSpacing*2
                     font.pointSize: 11
                     onClicked: samplesMenu.visible = true
                     visible: root.selectedChannel.trackType == "sample-trig"
@@ -998,18 +1000,45 @@ Kirigami.AbstractApplicationWindow {
                         modal: true
                         dim: false
                         Repeater {
-                            model: 5
+                            model: Zynthbox.Plugin.sketchpadSlotCount * 2
                             delegate: QQC2.MenuItem {
                                 text: qsTr("Sample %1").arg(index + 1)
                                 width: parent.width
                                 onClicked: {
-                                    root.selectedChannel.selectedSlotRow = index
+                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
                                 }
                                 highlighted: root.selectedChannel.selectedSlotRow === index
                             }
                         }
                     }
                 }
+
+                ZUI.BreadcrumbButton {
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("%1").arg(samplesButton.selectedCppSample ? samplesButton.selectedSample.filename : "None")
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
+                    font.pointSize: 11
+                    visible: samplesButton.visible
+                    onClicked: {
+                        zynqtgui.callable_ui_action_simple("SCREEN_PRESET");
+                    }
+                }
+
+                ZUI.BreadcrumbButton {
+                    icon.width: 24
+                    icon.height: 24
+                    icon.color: Kirigami.Theme.textColor
+                    icon.name: "document-edit"
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 2
+                    font.pointSize: 11
+                    visible: samplesButton.visible
+                    onClicked: {
+                        zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                    }
+                }
+
                 ZUI.BreadcrumbButton {
                     id: sampleLoopButton
 
@@ -1318,12 +1347,15 @@ Kirigami.AbstractApplicationWindow {
                 }
 
                 ZUI.SectionButton {
+                    id: samplesButton
                     property QtObject selectedSample: null
+                    readonly property QtObject selectedCppSample: selectedSample && selectedSample.cppObjId > -1 ? Zynthbox.Plugin.getClipById(selectedSample.cppObjId) : null
+                    readonly property int selectedSampleIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
                     Timer {
                         id: samplesButtonThrottle
                         interval: 1; running: false; repeat: false;
                         onTriggered: {
-                            root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                            samplesButton.selectedSample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
                         }
                     }
                     Connections {
@@ -1336,9 +1368,7 @@ Kirigami.AbstractApplicationWindow {
                     }
 
                     icon.color: Kirigami.Theme.textColor
-                    text: qsTr("Sample %1 ˬ %2")
-                    .arg(root.selectedChannel.selectedSlotRow + 1)
-                    .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
+                    text: qsTr("Sample %1").arg(samplesButton.selectedSampleIndex + 1)
                     Layout.fillHeight: true
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 11
                     rightPadding: Kirigami.Units.largeSpacing*2
@@ -1353,16 +1383,46 @@ Kirigami.AbstractApplicationWindow {
                         modal: true
                         dim: false
                         Repeater {
-                            model: 5
+                            model: Zynthbox.Plugin.sketchpadSlotCount * 2
                             delegate: QQC2.MenuItem {
                                 text: qsTr("Sample %1").arg(index + 1)
                                 width: parent.width
                                 onClicked: {
-                                    root.selectedChannel.selectedSlotRow = index
+                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
                                 }
                                 highlighted: root.selectedChannel.selectedSlotRow === index
                             }
                         }
+                    }
+                }
+
+                ZUI.SectionButton {
+                    icon.color: Kirigami.Theme.textColor
+                    text: qsTr("%1").arg(samplesButton.selectedSample && samplesButton.selectedSample.filename ? samplesButton.selectedSample.filename : "")
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+                    font.pointSize: 11
+                    visible: samplesButton.visible
+                    onClicked: {
+                        zynqtgui.callable_ui_action_simple("SCREEN_PRESET");
+                    }
+                }
+
+                ZUI.SectionButton {
+                    icon.width: 24
+                    icon.height: 24
+                    icon.color: Kirigami.Theme.textColor
+                    icon.name: "document-edit"
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
+                    rightPadding: Kirigami.Units.largeSpacing*2
+                    leftPadding: rightPadding 
+                    font.pointSize: 11
+                    visible: samplesButton.visible
+                    onClicked: {
+                        zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
                     }
                 }
 

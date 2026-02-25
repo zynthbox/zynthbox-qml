@@ -721,7 +721,7 @@ Kirigami.AbstractApplicationWindow {
      * Update delay send amount of channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateChannelDelaySend(sign, channelId) {
+    function updateChannelDelaySend(sign, channelId, showOsd=true) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
             zynqtgui.osd.setAuxValue1(qsTr("%1 Volume").arg(selectedChannel.name), qsTr("%1 dB").arg(selectedChannel.gainHandler.gainDb.toFixed(2)), parseFloat(selectedChannel.gainHandler.gainAbsolute), 0, 1, 0)
@@ -729,7 +729,9 @@ Kirigami.AbstractApplicationWindow {
             zynqtgui.osd.setKnobPositionIndex(1)
 
             selectedChannel.wetFx1Amount = ZUI.CommonUtils.clamp(value, 0, 100)
-            applicationWindow().showOsd({
+            if(showOsd)
+            {
+                applicationWindow().showOsd({
                                             parameterName: "channel_delay_send",
                                             description: qsTr("%1 Delay FX Send Amount").arg(selectedChannel.name),
                                             start: 0,
@@ -743,6 +745,7 @@ Kirigami.AbstractApplicationWindow {
                                             showResetToDefault: true,
                                             showVisualZero: true
                                         })
+            }
         }
 
         valueSetter(selectedChannel.wetFx1Amount + sign)
@@ -758,7 +761,7 @@ Kirigami.AbstractApplicationWindow {
      * Update reverb send amount of channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateChannelReverbSend(sign, channelId) {
+    function updateChannelReverbSend(sign, channelId,showOsd=true) {
         let selectedChannel = root.channels[channelId]
         function valueSetter(value) {
             zynqtgui.osd.setAuxValue1(qsTr("%1 Volume").arg(selectedChannel.name), qsTr("%1 dB").arg(selectedChannel.gainHandler.gainDb.toFixed(2)), parseFloat(selectedChannel.gainHandler.gainAbsolute),0, 1, 0)
@@ -766,7 +769,8 @@ Kirigami.AbstractApplicationWindow {
             zynqtgui.osd.setKnobPositionIndex(2)
 
             selectedChannel.wetFx2Amount = ZUI.CommonUtils.clamp(value, 0, 100)
-            applicationWindow().showOsd({
+            if(showOsd) {
+                applicationWindow().showOsd({
                                             parameterName: "channel_reverb_send",
                                             description: qsTr("%1 Reverb FX Send Amount").arg(selectedChannel.name),
                                             start: 0,
@@ -780,6 +784,7 @@ Kirigami.AbstractApplicationWindow {
                                             showResetToDefault: true,
                                             showVisualZero: true
                                         })
+            }
         }
 
         valueSetter(selectedChannel.wetFx2Amount + sign)

@@ -1997,9 +1997,9 @@ AbstractSketchpadPage {
 
                                     contentItem: Row {
                                         spacing: ZUI.Theme.spacing
-                                        ZUI.SectionButton {
-                                            text: "Start End"
-                                        }
+                                        // ZUI.SectionButton {
+                                        //     text: "Start End"
+                                        // }
                                         ZUI.SectionButton {
                                             text: "Loop"
                                         }
@@ -2048,9 +2048,127 @@ AbstractSketchpadPage {
                                         ColumnLayout {
                                             anchors.fill: parent
                                             QQC2.RangeSlider {
+                                                id: _rangeSlider
+                                                Layout.alignment: Qt.AlignHCenter
+                                                
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true  
-                                                orientation: Qt.Vertical                                        
+                                                Layout.margins: ZUI.Theme.padding
+                                                orientation: Qt.Vertical 
+
+                                                background: Item {
+                                                    Rectangle {
+                                                        anchors.horizontalCenter: parent.horizontalCenter
+                                                        height: parent.height
+                                                        width: Kirigami.Units.gridUnit * 0.5
+                                                        Kirigami.Theme.inherit: false
+                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                        implicitWidth: Kirigami.Units.gridUnit
+                                                        radius: ZUI.Theme.radius
+                                                        color: Kirigami.Theme.backgroundColor
+                                                        border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
+                                                        
+                                                        // Highlight range between handles
+                                                        Rectangle {
+                                                            y: _rangeSlider.second.visualPosition * parent.height
+                                                            height: (_rangeSlider.first.visualPosition - _rangeSlider.second.visualPosition) * parent.height
+                                                            anchors.left: parent.left
+                                                            anchors.right: parent.right
+                                                            anchors.margins: 1
+                                                            radius: ZUI.Theme.radius
+                                                            color: Kirigami.Theme.highlightColor 
+                                                            // opacity: 0.2
+                                                        }
+
+                                                        Rectangle {
+                                                            height: 1
+                                                            anchors.left: parent.left
+                                                            anchors.right: parent.right
+                                                            anchors.margins: 1
+                                                            color: Kirigami.Theme.textColor
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                        }
+                                                    }
+                                                }
+
+                                                // // Example handle styling
+                                                first.handle: Item {
+                                                    y: _rangeSlider.first.visualPosition * (_rangeSlider.availableHeight - height)
+                                                    x: _rangeSlider.width/2 - width/2
+                                                    implicitWidth: Kirigami.Units.gridUnit * 0.5
+                                                    implicitHeight: 22  
+
+                                                    Kirigami.Icon {
+                                                        anchors.right: parent.left
+                                                        anchors.verticalCenter: parent.bottom
+                                                        implicitHeight: 22
+                                                        implicitWidth: 22
+                                                        source: Qt.resolvedUrl("../../../img/right-arrow.svg")
+                                                        color: Kirigami.Theme.textColor
+                                                    }
+                                                }
+                                                
+                                                second.handle: Item {
+                                                    y: _rangeSlider.second.visualPosition * (_rangeSlider.availableHeight - height)
+                                                    x: _rangeSlider.width/2 - width/2
+                                                    implicitWidth: Kirigami.Units.gridUnit * 0.5
+                                                    implicitHeight: 22
+
+                                                    Kirigami.Icon {
+                                                        anchors.left: parent.right
+                                                        anchors.verticalCenter: parent.top
+                                                        implicitHeight: 22
+                                                        implicitWidth: 22
+                                                        source: Qt.resolvedUrl("../../../img/left-arrow.svg")
+                                                        color: Kirigami.Theme.textColor
+                                                    }
+                                                }
+
+                                                // first.handle: Rectangle {
+                                                //     x: _rangeSlider.leftPadding + _rangeSlider.first.visualPosition * (_rangeSlider.availableWidth - width)
+                                                //     y: _rangeSlider.topPadding + _rangeSlider.availableHeight / 2 - height / 2
+                                                //     implicitWidth: 20
+                                                //     implicitHeight: 20
+                                                //     radius: 10
+                                                //     color: _rangeSlider.first.pressed ? "#f0f0f0" : "#f6f6f6"
+                                                //     border.color: "#bdbebf"
+                                                // }
+
+                                                // second.handle: Rectangle {
+                                                //     x: _rangeSlider.leftPadding + _rangeSlider.second.visualPosition * (_rangeSlider.availableWidth - width)
+                                                //     y: _rangeSlider.topPadding + _rangeSlider.availableHeight / 2 - height / 2
+                                                //     implicitWidth: 20
+                                                //     implicitHeight: 20
+                                                //     radius: 10
+                                                //     color: _rangeSlider.second.pressed ? "#f0f0f0" : "#f6f6f6"
+                                                //     border.color: "#bdbebf"
+                                                // }
+
+                                                // first.handle : Item {
+                                                //     implicitHeight: 22
+                                                //     implicitWidth: 22
+                                                //     Kirigami.Icon {
+                                                //         anchors.verticalCenter: parent.top
+                                                //         anchors.horizontalCenter: parent.horizontalCenter
+                                                //         implicitHeight: 22
+                                                //         implicitWidth: 22
+                                                //         source: Qt.resolvedUrl("../../../img/left-arrow.svg")
+                                                //         color: Kirigami.Theme.textColor
+                                                //     }
+                                                // }
+
+                                                // second.handle : Item {
+                                                //     implicitHeight: 22
+                                                //     implicitWidth: 22
+                                                //     Kirigami.Icon {
+                                                //         anchors.verticalCenter: parent.top
+                                                //         anchors.horizontalCenter: parent.horizontalCenter
+                                                //         implicitHeight: 22
+                                                //         implicitWidth: 22
+                                                //         source: Qt.resolvedUrl("../../../img/left-arrow.svg")
+                                                //         color: Kirigami.Theme.textColor
+                                                //     }
+                                                // }                                       
                                             }    
                                         }
                                     }

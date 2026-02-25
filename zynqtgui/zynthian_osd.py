@@ -48,8 +48,8 @@ class zynthian_osd(QObject):
         self.__showValueLabel = True
         self.__showResetToDefault = True
         self.__showVisualZero = True
-        self.__auxValue1 = {"name": "Test", "value": 0, "from":0, "to": 100, "knobPositionIndex": 1, "display": "0%"}
-        self.__auxValue2 = {"name": "Test2", "value": 0, "from":0, "to": 100, "knobPositionIndex": 2, "display": "0%"}
+        self.__auxValue1 = {"name": "Test", "value": 0, "from":0, "to": 100, "knobPositionIndex": -1, "display": "0%"}
+        self.__auxValue2 = {"name": "Test2", "value": 0, "from":0, "to": 100, "knobPositionIndex": -1, "display": "0%"}
         self.__knobPositionIndex = 0
 
     @Slot(str, str, float, float, float, float, float, QJSValue, str, str, str, bool, float, bool, bool)

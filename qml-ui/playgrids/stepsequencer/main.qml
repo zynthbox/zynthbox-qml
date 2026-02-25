@@ -1818,6 +1818,7 @@ IMP.BasePlayGrid {
                 DrumSequencer {
                     visible: _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
                     patternModel: _private.workingPatternModel
+                    sequencerPrivate: _private
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                 }

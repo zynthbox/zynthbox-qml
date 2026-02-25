@@ -35,8 +35,12 @@ import io.zynthbox.components 1.0 as Zynthbox
 Item {
     id: component
     property QtObject patternModel
+    property QtObject sequencerPrivate
     QtObject {
         id: _private
+        readonly property int selectedStepGlobal: (sequencerPrivate.workingPatternModel.width * (sequencerPrivate.workingPatternModel.activeBar + sequencerPrivate.workingPatternModel.bankOffset)) + sequencerPrivate.selectedStep
+        readonly property var noteColors: zynqtgui.theme_chooser.noteColors
+        readonly property string trackType: applicationWindow().selectedChannel ? applicationWindow().selectedChannel.trackType : ""
         function enableNoteForStep(midiNote, step) {
             let column = step % component.patternModel.width;
             let row = Math.floor(step / component.patternModel.width);
@@ -86,7 +90,6 @@ Item {
         onLastModifiedChanged: _private.updateBarNotes()
     }
     onPatternModelChanged: _private.updateBarNotes()
-    readonly property string trackType: applicationWindow().selectedChannel ? applicationWindow().selectedChannel.trackType : ""
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -96,6 +99,8 @@ Item {
                 id: noteRow
                 property int midiNote: component.patternModel ? component.patternModel.gridModelStartNote + index : 60
                 readonly property QtObject note: component.patternModel ? Zynthbox.PlayGridManager.getNote(midiNote, component.patternModel.sketchpadTrack) : null
+                readonly property bool noteIsHeard: applicationWindow().globalSequencer.heardNotes.includes(noteRow.note)
+                readonly property color noteColor: _private.noteColors[midiNote]
                 spacing: 0
                 readonly property bool hasClips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["hasClips"]) : false
                 readonly property var clips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["clips"]) : []
@@ -112,7 +117,7 @@ Item {
                         }
                         visible: noteRow.audioSource !== null
                         audioSource: noteRow.audioSource
-                        trackType: component.trackType
+                        trackType: _private.trackType
                     }
                     QQC2.Label {
                         anchors {
@@ -125,6 +130,34 @@ Item {
                         text: noteRow.hasClips
                             ? qsTr("Multiple Samples")
                             : noteRow.note ? noteRow.note.name + (noteRow.note.octave - 1) : ""
+                    }
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        touchPoints: [
+                            TouchPoint {
+                                id: slidePoint
+                                property var currentValue: undefined
+                                property var pressedTime: undefined
+                                onPressedChanged: {
+                                    if (pressed) {
+                                        pressedTime = Date.now();
+                                        currentValue = component.preferInterpretedValue ? component.paramInterpretedDefault : parseInt(component.paramValue);
+                                    } else {
+                                        // Only reset if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                        if (Math.abs(component.paramValue - currentValue) < 1 && (Date.now() - pressedTime) < 300) {
+                                            component.setNewValue(component.paramDefault);
+                                        }
+                                        currentValue = undefined;
+                                    }
+                                }
+                                onXChanged: {
+                                    if (pressed && currentValue !== undefined) {
+                                        var delta = Math.round((slidePoint.x - slidePoint.startX) * (component.scrollWidth / paramLabel.width));
+                                        component.setNewValue(Math.min(Math.max(currentValue + delta, component.paramMin), component.paramMax));
+                                    }
+                                }
+                            }
+                        ]
                     }
                 }
                 Repeater {
@@ -153,6 +186,15 @@ Item {
                         Layout.preferredWidth: Kirigami.Units.gridUnit
                         Rectangle {
                             anchors.fill: parent
+                            color: "transparent"
+                            border {
+                                width: 1
+                                color: "white"
+                            }
+                            visible: component.sequencerPrivate.selectedStep === stepDelegate.delegateIndex && noteRow.noteIsHeard
+                        }
+                        Rectangle {
+                            anchors.fill: parent
                             opacity: stepDelegate.currentlyPlayingStep ? 1 : 0
                             color: component.patternModel && component.patternModel.recordLive ? "red" : "yellow"
                         }
@@ -161,7 +203,17 @@ Item {
                                 fill: parent
                                 margins: Kirigami.Units.smallSpacing
                             }
-                            color: stepDelegate.stepEnabledForNote ? "blue" : "grey"
+                            color: "white"
+                            Rectangle {
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    right: parent.right
+                                    margins: Kirigami.Units.smallSpacing
+                                }
+                                height: Kirigami.Units.largeSpacing
+                                color: stepDelegate.stepEnabledForNote ? noteRow.noteColor : "grey"
+                            }
                         }
                         MouseArea {
                             anchors.fill: parent

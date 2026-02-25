@@ -239,11 +239,12 @@ AbstractSketchpadPage {
                             highlighted: index === zynqtgui.sketchpad.selectedTrackId
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            control: channelsVolumeRow
                             controller: model
                             text2: qsTr("%1 dB").arg(model.channel.gainHandler.gainDb.toFixed(2))
+                            onClicked: channelsVolumeRow.handleClick(controller.channel)
 
-                            volumeControl: VolumeControl {
+
+                            control1: VolumeControl {
                                 id: volumeControl
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
@@ -268,7 +269,7 @@ AbstractSketchpadPage {
                                 onDoubleClicked: model.channel.gainHandler.gainDb = model.channel.initialVolume                                
                             }
 
-                            panControl: PanSlider {
+                            control2: PanSlider {
                                 orientation: Qt.Horizontal
                                 from: -1.0
                                 to: 1.0
@@ -372,10 +373,10 @@ AbstractSketchpadPage {
                             highlighted: index === zynqtgui.sketchpad.selectedTrackId
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            control: channelsReverbRow
                             controller: model
                             text2: controller.channel.wetFx2Amount.toFixed(0)+"%"
-                            volumeControl: VolumeControl {
+                            onClicked: channelsReverbRow.handleClick(controller.channel)
+                            control1: VolumeControl {
                                 id: reverbControl
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
@@ -399,7 +400,6 @@ AbstractSketchpadPage {
                                 tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
                                 
                             }
-                            panControl: null
                         }
                     }
                 }
@@ -433,10 +433,10 @@ AbstractSketchpadPage {
                             highlighted: index === zynqtgui.sketchpad.selectedTrackId
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            control: channelsDelayRow
                             controller: model
                             text2: controller.channel.wetFx1Amount.toFixed(0)+"%"
-                            volumeControl: VolumeControl {
+                            onClicked: channelsDelayRow.handleClick(controller.channel)
+                            control1: VolumeControl {
                                 id: delayControl
                                 value: controller.channel.wetFx1Amount
                                 // Disable when muted or channel is not being played in solo mode
@@ -458,7 +458,6 @@ AbstractSketchpadPage {
                                 onClicked: channelsDelayRow.handleClick(channel)
                                 onDoubleClicked: controller.channel.wetFx1Amount = 50     
                             }
-                            panControl: null
                         }
                     }
                 }
@@ -470,142 +469,86 @@ AbstractSketchpadPage {
         }
 
         rightTab: ZUI.SectionGroup {
-                id: masterControl
-                property bool highlighted : false
-                
-                ZUI.CellControl {
-                    anchors.fill: parent
+            id: masterControl
+            property bool highlighted : false
+            
+            MixerDelegateControl {
+                anchors.fill: parent
 
-                    contentItem: Item {
-                        MouseArea {
-                            anchors.fill: parent
-                            onPressed: masterVolume.mouseArea.handlePressed(mouse)
-                            onReleased: masterVolume.mouseArea.released(mouse)
-                            onPressAndHold: masterVolume.mouseArea.pressAndHold(mouse)
-                            onClicked: masterVolume.mouseArea.clicked(mouse)
-                            onMouseXChanged: masterVolume.mouseArea.mouseXChanged(mouse)
-                            onMouseYChanged: masterVolume.mouseArea.mouseYChanged(mouse)
+                title: "Master"
+                onClicked: zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
+                text2: qsTr("%1 dB").arg(masterVolume.gainHandler.gainDb.toFixed(2))
+                text: ""
+
+                control1: VolumeControl {
+                    id: masterVolume
+                    property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
+
+                    inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
+                    inputAudioLevelVisible: true
+                    enabled: !gainHandler.muted
+
+                    Binding {
+                        target: masterVolume.slider
+                        property: "value"
+                        value: masterVolume.gainHandler.gainDb
+                    }
+
+                    slider {
+                        value: masterVolume.gainHandler.gainDb
+                        from: masterVolume.gainHandler.minimumDecibel
+                        to: masterVolume.gainHandler.maximumDecibel
+                    }
+                    onValueChanged: {
+                        masterVolume.gainHandler.gainDb = masterVolume.slider.value;
+                        zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
+                    }
+                    onClicked: {
+                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
+                    }
+                    onDoubleClicked: {
+                        masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
+                    }
+                }
+
+                control2: PanSlider {
+                    orientation: Qt.Horizontal
+                    from: -1.0
+                    to: 1.0
+                    controlObj: Zynthbox.Plugin.globalPlaybackClient
+                    controlProp: "panAmount"
+                    initialValue: 0
+                }
+
+                ZUI.SectionGroup {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                    Layout.margins: 2
+
+                    QQC2.RoundButton {   
+                        anchors.fill: parent                                
+                        radius: 2
+                        font.pointSize: 8
+                        checked: masterVolume.gainHandler.muted
+                        text: qsTr("M")
+                        contentItem: QQC2.Label {
+                            text: parent.text
+                            font: parent.font
+                            horizontalAlignment: Text.AlignHCenter
                         }
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: Kirigami.Units.smallSpacing
-
-                            VolumeControl {
-                                id: masterVolume
-                                property QtObject gainHandler: Zynthbox.Plugin.globalPlaybackClient.dryGainHandler
-
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                inputAudioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -40
-                                inputAudioLevelVisible: true
-                                enabled: !gainHandler.muted
-
-                                Binding {
-                                    target: masterVolume.slider
-                                    property: "value"
-                                    value: masterVolume.gainHandler.gainDb
-                                }
-
-                                slider {
-                                    value: masterVolume.gainHandler.gainDb
-                                    from: masterVolume.gainHandler.minimumDecibel
-                                    to: masterVolume.gainHandler.maximumDecibel
-                                }
-                                onValueChanged: {
-                                    masterVolume.gainHandler.gainDb = masterVolume.slider.value;
-                                    zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
-                                }
-                                onClicked: {
-                                    zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
-                                }
-                                onDoubleClicked: {
-                                    masterVolume.gainHandler.gainDb = zynqtgui.initialMasterVolume
-                                }
-                            }
-
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit
-                                Layout.leftMargin: Kirigami.Units.smallSpacing
-                                Layout.rightMargin: Kirigami.Units.smallSpacing
-                                // color: "pink"
-                                PanSlider {
-                                    anchors.fill: parent
-                                    orientation: Qt.Horizontal
-                                    from: -1.0
-                                    to: 1.0
-                                    controlObj: Zynthbox.Plugin.globalPlaybackClient
-                                    controlProp: "panAmount"
-                                    initialValue: 0
-                                }
-                            }
-
-                            QQC2.Label {
-                                Layout.alignment: Qt.AlignCenter
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.margins: 4
-                                horizontalAlignment: Text.AlignHCenter
-                                elide: Text.ElideRight
-                                text: "Master"
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
-                                    }
-                                }
-                            }
-
-                            QQC2.Label {
-                                Layout.alignment: Qt.AlignCenter
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                horizontalAlignment: Text.AlignHCenter
-                                elide: Text.ElideRight
-                                text: qsTr("%1 dB").arg(masterVolume.gainHandler.gainDb.toFixed(2))
-                                font.pointSize: 9
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_master", -1, masterControl.contentItem, null)
-                                    }
-                                }
-                            }
-
-                            ZUI.SectionGroup {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                                Layout.margins: 2
-
-                                QQC2.RoundButton {   
-                                    anchors.fill: parent                                
-                                    radius: 2
-                                    font.pointSize: 8
-                                    checked: masterVolume.gainHandler.muted
-                                    text: qsTr("M")
-                                    contentItem: QQC2.Label {
-                                        text: parent.text
-                                        font: parent.font
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    background: Rectangle {
-                                        radius: parent.radius
-                                        border.width: 1
-                                        border.color: Qt.rgba(50, 50, 50, 0.1)
-                                        color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
-                                    }
-                                    onClicked: {
-                                        masterVolume.gainHandler.muted = !masterVolume.gainHandler.muted
-                                    }
-                                }
-                            }
+                        background: Rectangle {
+                            radius: parent.radius
+                            border.width: 1
+                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                            color: parent.down || parent.checked ? Kirigami.Theme.negativeBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                        }
+                        onClicked: {
+                            masterVolume.gainHandler.muted = !masterVolume.gainHandler.muted
                         }
                     }
                 }
+            }
         }    
     }
 
@@ -656,173 +599,90 @@ AbstractSketchpadPage {
         }
     }
 
-    component MixerDelegateControl: ZUI.CellControl {
+    component MixerDelegateControl: AbstractCellLayout {
         id: mixerColumnDelegate
-        property Item control : null
         property var controller : null 
+        title: controller.channel.name
+        control1: VolumeControl {}
 
-        default property alias content: _layout.data
-        property alias text2 : _label2.text
+        underlay: MouseArea {
+            anchors.fill: parent
+            onPressed: control1.mouseArea.handlePressed(mouse)
+            onReleased: control1.mouseArea.released(mouse)
+            onPressAndHold: control1.mouseArea.pressAndHold(mouse)
+            onClicked: control1.mouseArea.clicked(mouse)
+            onMouseXChanged: control1.mouseArea.mouseXChanged(mouse)
+            onMouseYChanged: control1.mouseArea.mouseYChanged(mouse)
+        }
 
-        property VolumeControl volumeControl: VolumeControl {}
-        property PanSlider panControl: null
+        Timer {
+            id: soundnameUpdater;
+            repeat: false; running: false; interval: 1;
+            onTriggered: updateSoundName();
+        }
+        Component.onCompleted: updateSoundName();
 
-        contentItem: Item {
-            ColumnLayout {
-                id: _layout
-                anchors.fill: parent
-                spacing: Kirigami.Units.smallSpacing
+        Connections {
+            target: zynqtgui.fixed_layers
+            onList_updated: soundnameUpdater.restart();
+        }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onPressed: volumeControl.mouseArea.handlePressed(mouse)
-                        onReleased: volumeControl.mouseArea.released(mouse)
-                        onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
-                        onClicked: volumeControl.mouseArea.clicked(mouse)
-                        onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
-                        onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
-                    }
-
-                    StackLayout {
-                        anchors.fill: parent
-                        data: mixerColumnDelegate.volumeControl
-                    }
-
-                    Item {                       
-                        width: volumeControl.slider.height
-                        height: soundLabel.height*1.5
-
-                        anchors.left: parent.right
-                        anchors.bottom: parent.bottom
-                        anchors.leftMargin: -soundLabel.height*2
-                        anchors.bottomMargin: -(soundLabel.height/2)
-
-                        transform: Rotation {
-                            origin.x: 0
-                            origin.y: 0
-                            angle: -90
-                        }
-
-                        QQC2.Label {
-                            id: soundLabel
-
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            elide: Text.ElideRight
-                            text: mixerColumnDelegate.text
-                            opacity: 0.5
-
-                            font.pointSize: 8
-
-                            Timer {
-                                id: soundnameUpdater;
-                                repeat: false; running: false; interval: 1;
-                                onTriggered: soundLabel.updateSoundName();
-                            }
-                            Component.onCompleted: soundLabel.updateSoundName();
-                            Connections {
-                                target: zynqtgui.fixed_layers
-                                onList_updated: soundnameUpdater.restart();
-                            }
-
-                            Connections {
-                                target: controller.channel
-                                onChainedSoundsChanged: controller.channel.trackType === "synth" ? soundnameUpdater.restart() : false
-                                onSamplesChanged: controller.channel.trackType === "synth" ? soundnameUpdater.restart() : false
-                                onTrackTypeChanged: soundnameUpdater.restart()
-                                onSceneClipChanged: controller.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
-                                onSelectedSlotRowChanged: ["synth", "external"].indexOf(controller.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
-                            }
-
-                            Connections {
-                                target: controller.channel.sceneClip
-                                onPathChanged: controller.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
-                            }
-                            Connections {
-                                target: root
-                                onVisibleChanged: root.visible ? soundLabel.updateSoundName() : false
-                            }
-
-                            function updateSoundName() {
-                                if (root.visible) {
-                                    var text = "";
-
-                                    if (controller.channel.trackType === "synth") {
-                                        for (var id in controller.channel.chainedSounds) {
-                                            if (controller.channel.chainedSounds[id] >= 0 &&
-                                                    controller.channel.checkIfLayerExists(controller.channel.chainedSounds[id])) {
-                                                var soundName = zynqtgui.fixed_layers.selector_list.getDisplayValue(controller.channel.chainedSounds[id]).split(">");
-                                                text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
-                                                break;
-                                            }
-                                        }
-                                        if (text === "") {
-                                            try {
-                                                text = controller.channel.samples[controller.channel.selectedSlotRow].path.split("/").pop()
-                                            } catch (e) {}
-                                        }
-                                    } else if (controller.channel.trackType === "sample-loop") {
-                                        try {
-                                            text = controller.channel.sceneClip.path.split("/").pop()
-                                        } catch (e) {}
-                                    }
-
-                                    soundLabel.text = text;
-                                }
-                            }
-                        }
-                    }
+        Loader {
+            active: mixerColumnDelegate.controller
+            sourceComponent: Item {
+                Connections {
+                    ignoreUnknownSignals: true
+                    target: mixerColumnDelegate.controller.channel
+                    onChainedSoundsChanged: mixerColumnDelegate.controller.channel.trackType === "synth" ? soundnameUpdater.restart() : false
+                    onSamplesChanged: mixerColumnDelegate.controller.channel.trackType === "synth" ? soundnameUpdater.restart() : false
+                    onTrackTypeChanged: soundnameUpdater.restart()
+                    onSceneClipChanged: mixerColumnDelegate.controller.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
+                    onSelectedSlotRowChanged: ["synth", "external"].indexOf(mixerColumnDelegate.controller.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
                 }
 
-                StackLayout {
-                    visible: mixerColumnDelegate.panControl
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: visible ? Kirigami.Units.gridUnit : 0
-                    Layout.leftMargin: visible ? Kirigami.Units.smallSpacing : 0
-                    Layout.rightMargin: visible ? Kirigami.Units.smallSpacing : 0
-                    data: mixerColumnDelegate.panControl
+                Connections {
+                    ignoreUnknownSignals: true
+                    enabled: mixerColumnDelegate.controller
+                    target: mixerColumnDelegate.controller.channel.sceneClip
+                    onPathChanged: mixerColumnDelegate.controller.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
                 }
-
-                QQC2.Label {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.margins: 4
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                    text: controller.channel.name
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            mixerColumnDelegate.control.handleClick(controller.channel);
-                        }
-                    }
-                }
-
-                QQC2.Label {
-                    id: _label2
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                    font.pointSize: 9
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            mixerColumnDelegate.control.handleClick(channel);
-                        }
-                    }
+                Connections {
+                    target: root
+                    onVisibleChanged: root.visible ? mixerColumnDelegate.updateSoundName() : false
                 }
             }
         }
+
+        function updateSoundName() {
+            if(!mixerColumnDelegate.controller)
+                return;
+
+            if (root.visible) {
+                var text = "";
+
+                if (controller.channel.trackType === "synth") {
+                    for (var id in controller.channel.chainedSounds) {
+                        if (controller.channel.chainedSounds[id] >= 0 &&
+                                controller.channel.checkIfLayerExists(controller.channel.chainedSounds[id])) {
+                            var soundName = zynqtgui.fixed_layers.selector_list.getDisplayValue(controller.channel.chainedSounds[id]).split(">");
+                            text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
+                            break;
+                        }
+                    }
+                    if (text === "") {
+                        try {
+                            text = controller.channel.samples[controller.channel.selectedSlotRow].path.split("/").pop()
+                        } catch (e) {}
+                    }
+                } else if (controller.channel.trackType === "sample-loop") {
+                    try {
+                        text = controller.channel.sceneClip.path.split("/").pop()
+                    } catch (e) {}
+                }
+
+                mixerColumnDelegate.text = text;
+            }
+        }
+
     }
 }

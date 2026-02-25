@@ -369,6 +369,9 @@ IMP.BasePlayGrid {
         signal activateSelectedItem()
         property bool hasSelection: false
         property int selectedStep: -1
+        onSelectedStepChanged: {
+            applicationWindow().globalSequencer.setMostRecentlyInteractedStep(_private.workingPatternModel.width * (_private.activeBar + _private.bankOffset) + _private.selectedStep);
+        }
         function previousBar() {
             if (sequence.activePatternObject.activeBar > 0) {
                 sequence.activePatternObject.activeBar = sequence.activePatternObject.activeBar - 1;

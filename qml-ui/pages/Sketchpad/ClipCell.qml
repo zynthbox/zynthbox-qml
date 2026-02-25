@@ -111,7 +111,7 @@ ZUI.CellControl {
             property color inactiveColor: Qt.rgba(tColor.r, tColor.g,tColor.b, 0.2)
             anchors.centerIn: parent
             spacing: 0
-            visible: ["synth", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0
+            visible: ["synth", "sample-trig", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0
 
             Repeater {
                 model: root.channel ? 5 : 0
@@ -123,7 +123,7 @@ ZUI.CellControl {
                     
                     color: {
                         let occupied = false;
-                        if (["synth", "external"].indexOf(root.channel.trackType) >= 0 && patternHasNotes && isClipEnabled) {
+                        if (["synth", "sample-trig", "external"].indexOf(root.channel.trackType) >= 0 && patternHasNotes && isClipEnabled) {
                             occupied = true;
                         } else if (root.channel.trackType == "sample-loop" && root.channel.occupiedSketchSlots[index] && isClipEnabled) {
                             occupied = true;
@@ -138,7 +138,7 @@ ZUI.CellControl {
                         }
                     }
                     text: {
-                        if (["synth", "external"].indexOf(root.channel.trackType) >= 0) {
+                        if (["synth", "sample-trig", "external"].indexOf(root.channel.trackType) >= 0) {
                             return String.fromCharCode(index + 65);
                         } else if (root.channel.trackType == "sample-loop") {
                             return index + 1;

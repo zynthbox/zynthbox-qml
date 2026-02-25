@@ -568,6 +568,7 @@ class sketchpad_channel(QObject):
         # All tracks should be multiclip by default
         self.__allowMulticlip__ = True
         self.__track_type__ = "synth"
+        self.__trackRackType__ = Zynthbox.ZynthboxBasics.TrackRackType.SynthRackType
         self.__track_routing_style__ = "standard"
         self.__routingData__ = {
             "sketchfx": [],
@@ -1016,6 +1017,7 @@ class sketchpad_channel(QObject):
                     "chainedSounds": self.__chained_sounds__,
                     "allowMulticlip": self.__allowMulticlip__,
                     "trackStyle": self.__trackStyle__,
+                    "trackRackType": int(self.__trackRackType__),
                     "trackType": self.__track_type__,
                     "trackRoutingStyle": self.__track_routing_style__,
                     "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
@@ -1070,6 +1072,11 @@ class sketchpad_channel(QObject):
                     self.set_allowMulticlip(obj["allowMulticlip"], True)
                 else:
                     self.set_allowMulticlip(False, True)
+
+                if "trackRackType" in obj:
+                    self.set_trackRackType(Zynthbox.ZynthboxBasics.TrackRackType(obj["trackRackType"]))
+                else:
+                    self.set_trackRackType(Zynthbox.ZynthboxBasics.TrackRackType.SynthRackType)
 
                 # TODO : `channelAudioType` key is deprecated and has been renamed to `trackType`. Remove this fallback later
                 if "channelAudioType" in obj:
@@ -2242,6 +2249,12 @@ class sketchpad_channel(QObject):
             self.__track_type__ = type
             self.track_type_changed.emit()
 
+            # If we changed the track to one of the rack types, make sure we update what rack type we're saying that we are
+            if type == "sample-trig":
+                self.trackRackType = Zynthbox.ZynthboxBasics.TrackRackType.SampleRackType
+            elif type == "synth":
+                self.trackRackType = Zynthbox.ZynthboxBasics.TrackRackType.SynthRackType
+
             for songId in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
                 for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     clip = self.__song__.getClipById(self.id, songId, clipId)
@@ -2287,6 +2300,20 @@ class sketchpad_channel(QObject):
     trackTypeKey = Property(str, audioTypeKey, notify=track_type_changed)
     trackType = Property(str, get_track_type, set_track_type, notify=track_type_changed)
     ### END Property trackType
+
+    ### BEGIN Property trackRackType
+    def get_trackRackType(self):
+        return self.__trackRackType__
+
+    def set_trackRackType(self, newValue):
+        if self.__trackRackType__ != newValue:
+            self.__trackRackType__ = newValue
+            self.trackRackTypeChanged.emit()
+
+    trackRackTypeChanged = Signal()
+
+    trackRackType = Property(int, get_trackRackType, set_trackRackType, notify=trackRackTypeChanged)
+    ### END Property trackRackType
 
     ### BEGIN Property trackRoutingStyle
     # Possible values : "standard", "one-to-one"

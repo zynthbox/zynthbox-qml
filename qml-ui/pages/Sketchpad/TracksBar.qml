@@ -917,8 +917,14 @@ AbstractSketchpadPage {
                                     text: qsTr("Sketch")
                                     onClicked: {
                                         if (["synth", "sample-trig"].includes(root.selectedChannel.trackType) == false) {
+                                            if (root.selectedChannel.trackRackType == Zynthbox.ZynthboxBasics.SynthRackType) {
+                                                root.selectedChannel.trackType = "synth";
+                                            } else if (root.selectedChannel.trackRackType == Zynthbox.ZynthboxBasics.SampleRackType) {
+                                                root.selectedChannel.trackType = "sample-trig";
+                                            } else {
+                                                root.selectedChannel.trackType = "synth";
+                                            }
                                             // Don't switch (or do slot selection type things) if we're already there
-                                            root.selectedChannel.trackType = "synth";
                                             synthsRow.switchToSlot(0, true);
                                         }
                                     }

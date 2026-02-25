@@ -3689,7 +3689,7 @@ class sketchpad_channel(QObject):
     @Slot(None, result=str)
     def getChannelSampleSnapshot(self):
         encodedSampleData = {};
-        for index, sample in enumerate(self.__samples):
+        for index, sample in enumerate(self.__samples__):
             thisSample = {
                 "filename": "",
                 "metadata": "",

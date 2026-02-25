@@ -36,6 +36,11 @@ Item {
     readonly property alias sequence: _private.sequence
     readonly property alias pattern: _private.pattern
 
+    readonly property alias mostRecentlyInteractedStep: _private.mostRecentlyInteractedStep
+    function setMostRecentlyInteractedStep(stepIndex) {
+        _private.mostRecentlyInteractedStep = Math.max(0, Math.min(stepIndex, _private.pattern.patternLength - 1));
+    }
+
     property QtObject selectedChannel: null
     readonly property alias parameterPage: _private.parameterPage
     function setParameterPage(parameterPage) {
@@ -2732,6 +2737,7 @@ Item {
 
     QtObject {
         id: _private
+        property int mostRecentlyInteractedStep: 0
         property int parameterPage: 0
         onParameterPageChanged: {
             switch(parameterPage) {
@@ -2753,6 +2759,7 @@ Item {
         property QtObject patternKeyNote: pattern ? Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey), pattern.sketchpadTrack) : null
         // property QtObject clip: component.selectedChannel ? component.selectedChannel.getClipsModelById(component.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
         onPatternChanged: {
+            mostRecentlyInteractedStep = 0;
             updateSlotPassthroughClients();
             handlePatternDataChange();
         }
@@ -3413,22 +3420,22 @@ Item {
         onAltButtonPressedChanged: _private.updateLedColors()
         onModeButtonPressedChanged: _private.updateLedColors()
         onAnyStepButtonPressedChanged: _private.updateLedColors()
-        onStep1_button_pressed_changed: { _private.heldStepButtons[0] = zynqtgui.step1ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep2_button_pressed_changed: { _private.heldStepButtons[1] = zynqtgui.step2ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep3_button_pressed_changed: { _private.heldStepButtons[2] = zynqtgui.step3ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep4_button_pressed_changed: { _private.heldStepButtons[3] = zynqtgui.step4ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep5_button_pressed_changed: { _private.heldStepButtons[4] = zynqtgui.step5ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep6_button_pressed_changed: { _private.heldStepButtons[5] = zynqtgui.step6ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep7_button_pressed_changed: { _private.heldStepButtons[6] = zynqtgui.step7ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep8_button_pressed_changed: { _private.heldStepButtons[7] = zynqtgui.step8ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep9_button_pressed_changed: { _private.heldStepButtons[8] = zynqtgui.step9ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep10_button_pressed_changed: { _private.heldStepButtons[9] = zynqtgui.step10ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep11_button_pressed_changed: { _private.heldStepButtons[10] = zynqtgui.step11ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep12_button_pressed_changed: { _private.heldStepButtons[11] = zynqtgui.step12ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep13_button_pressed_changed: { _private.heldStepButtons[12] = zynqtgui.step13ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep14_button_pressed_changed: { _private.heldStepButtons[13] = zynqtgui.step14ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep15_button_pressed_changed: { _private.heldStepButtons[14] = zynqtgui.step15ButtonPressed ? _private.effectiveInteractionMode : false; }
-        onStep16_button_pressed_changed: { _private.heldStepButtons[15] = zynqtgui.step16ButtonPressed ? _private.effectiveInteractionMode : false; }
+        onStep1_button_pressed_changed: { _private.heldStepButtons[0] = zynqtgui.step1ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 0); }
+        onStep2_button_pressed_changed: { _private.heldStepButtons[1] = zynqtgui.step2ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 1); }
+        onStep3_button_pressed_changed: { _private.heldStepButtons[2] = zynqtgui.step3ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 2); }
+        onStep4_button_pressed_changed: { _private.heldStepButtons[3] = zynqtgui.step4ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 3); }
+        onStep5_button_pressed_changed: { _private.heldStepButtons[4] = zynqtgui.step5ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 4); }
+        onStep6_button_pressed_changed: { _private.heldStepButtons[5] = zynqtgui.step6ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 5); }
+        onStep7_button_pressed_changed: { _private.heldStepButtons[6] = zynqtgui.step7ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 6); }
+        onStep8_button_pressed_changed: { _private.heldStepButtons[7] = zynqtgui.step8ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 7); }
+        onStep9_button_pressed_changed: { _private.heldStepButtons[8] = zynqtgui.step9ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 8); }
+        onStep10_button_pressed_changed: { _private.heldStepButtons[9] = zynqtgui.step10ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 9); }
+        onStep11_button_pressed_changed: { _private.heldStepButtons[10] = zynqtgui.step11ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 10); }
+        onStep12_button_pressed_changed: { _private.heldStepButtons[11] = zynqtgui.step12ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 11); }
+        onStep13_button_pressed_changed: { _private.heldStepButtons[12] = zynqtgui.step13ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 12); }
+        onStep14_button_pressed_changed: { _private.heldStepButtons[13] = zynqtgui.step14ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 13); }
+        onStep15_button_pressed_changed: { _private.heldStepButtons[14] = zynqtgui.step15ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 14); }
+        onStep16_button_pressed_changed: { _private.heldStepButtons[15] = zynqtgui.step16ButtonPressed ? _private.effectiveInteractionMode : false; component.setMostRecentlyInteractedStep((_private.pattern.workingModel.width * (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset)) + 15); }
         onStartRecord_button_pressed_changed: {
             // Temporary live recording style 1 is to live record when holding down the record button, and style 2 is to also leave live recording on when released if at least one note was recorded (so don't disable live recording in that case)
             if (Zynthbox.SyncTimer.timerRunning) {

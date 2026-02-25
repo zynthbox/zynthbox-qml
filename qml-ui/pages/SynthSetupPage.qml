@@ -70,7 +70,7 @@ ZUI.ScreenPage {
     Timer {
         id: _syncTimer
         repeat: false
-        interval: 500
+        interval: 10
         onTriggered: {
             zynqtgui.layers_for_channel.activate_index(layersView.selector.current_index)
             // console.log("Update Selected synth")

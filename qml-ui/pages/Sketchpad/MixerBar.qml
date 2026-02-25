@@ -77,6 +77,12 @@ AbstractSketchpadPage {
             case "MixerBar_item":
                 applicationWindow().updateChannelVolume(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                 return true;
+            case "MixerBar_item_delay":
+                applicationWindow().updateChannelDelaySend(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
+            case "MixerBar_item_reverb":
+                applicationWindow().updateChannelReverbSend(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(1, false)
                 return true;
@@ -87,6 +93,12 @@ AbstractSketchpadPage {
             switch(zynqtgui.sketchpad.lastSelectedObj.className) {
             case "MixerBar_item":
                 applicationWindow().updateChannelVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
+            case "MixerBar_item_delay":
+                applicationWindow().updateChannelDelaySend(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
+            case "MixerBar_item_reverb":
+                applicationWindow().updateChannelReverbSend(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                 return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(-1, false)
@@ -336,17 +348,18 @@ AbstractSketchpadPage {
                 
                 RowLayout {
                     id: channelsReverbRow
-                    function handleClick(channel) { //TODO
-                        // zynqtgui.sketchpad.selectedTrackId = channel.id;
-                        // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                        // zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-                        // zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
+                    function handleClick(channel) { 
+                        zynqtgui.sketchpad.selectedTrackId = channel.id;
+                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                        zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_reverb", channel.id, channelsReverbRowRepeater.itemAt(channel.id), channel);
                     }
 
                     anchors.fill: parent
                     spacing: ZUI.Theme.cellSpacing
 
                     Repeater {
+                        id: channelsReverbRowRepeater
                         model: root.song.channelsModel
 
                         delegate: MixerDelegateControl {
@@ -390,17 +403,18 @@ AbstractSketchpadPage {
                 
                 RowLayout {
                     id: channelsDelayRow
-                    function handleClick(channel) { //TODO
-                        // zynqtgui.sketchpad.selectedTrackId = channel.id;
-                        // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                        // zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-                        // zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
+                    function handleClick(channel) { 
+                        zynqtgui.sketchpad.selectedTrackId = channel.id;
+                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                        zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                        zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_delay", channel.id, channelsDelayRowRepeater.itemAt(channel.id), channel);
                     }
 
                     anchors.fill: parent
                     spacing: ZUI.Theme.cellSpacing
 
                     Repeater {
+                        id: channelsDelayRowRepeater
                         model: root.song.channelsModel
 
                         delegate: MixerDelegateControl {

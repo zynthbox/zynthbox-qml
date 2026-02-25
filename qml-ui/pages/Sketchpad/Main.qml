@@ -147,6 +147,7 @@ ZUI.ScreenPage {
         function valueSetter(value) {
             if (sample != null && !sample.isEmpty) {
                 clipCppObj.rootSlice.gainHandler.gainAbsolute = ZUI.CommonUtils.clamp(value, 0, 1);
+                zynqtgui.osd.setKnobPositionIndex(0)
                 applicationWindow().showOsd({
                     "parameterName": "sample_gain",
                     "description": qsTr("%1 Gain").arg(sample.path.split("/").pop()),

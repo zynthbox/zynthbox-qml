@@ -49,6 +49,12 @@ ZUI.Popup {
         return false
     }
 
+    onClosed: {
+        //When closing the OSD reset the aux values to be empty
+        zynqtgui.osd.setAuxValue1("", "", 0, 0, 0, -1)
+        zynqtgui.osd.setAuxValue2("", "", 0, 0, 0, -1)
+    }
+
     Timer {
         id: hideTimer
         running: false; repeat: false; interval: 1500;
@@ -145,7 +151,8 @@ ZUI.Popup {
                     visible: !_barControl.discret
                     Item {
                         id: sliderItem
-                       
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         Layout.fillWidth: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit
                         Layout.alignment: Qt.AlignVCenter
@@ -183,22 +190,21 @@ ZUI.Popup {
                         }
                         Rectangle {
                             anchors.fill: parent
+                            radius: ZUI.Theme.radius
                             color: Kirigami.Theme.backgroundColor
-                            border {
-                                width: 2
-                                color: Kirigami.Theme.textColor
-                            }
-                            radius: height / 2
+                            border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
                         }
                         Item {
                             id: barContainer
                             anchors {
                                 fill: parent
-                                margins: 4
-                                leftMargin: (height / 2) + 4
-                                rightMargin: (height / 2) + 3 // This is uneven, but otherwise the visual ends up weird
+                                margins: 1
+                                // leftMargin: (height / 2) + 4
+                                // rightMargin: (height / 2) + 3 // This is uneven, but otherwise the visual ends up weird
                             }
                             property double zeroOffset: (zynqtgui.osd.visualZero - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)
+
+                            //Right amount
                             Rectangle {
                                 anchors {
                                     left: parent.left
@@ -207,18 +213,21 @@ ZUI.Popup {
                                     bottom: parent.bottom
                                 }
                                 color: Kirigami.Theme.textColor
+                                radius: ZUI.Theme.radius
+                                opacity: 0.2
                                 width: (component.invertedScale ? zynqtgui.osd.value < zynqtgui.osd.visualZero : zynqtgui.osd.value > zynqtgui.osd.visualZero) ? parent.width * ((zynqtgui.osd.value - zynqtgui.osd.visualZero) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
-                                Rectangle {
-                                    anchors {
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                        horizontalCenter: parent.right
-                                    }
-                                    radius: (height - 1)  / 2
-                                    width: height
-                                    color: Kirigami.Theme.textColor
-                                }
+                                // Rectangle {
+                                //     anchors {
+                                //         top: parent.top
+                                //         bottom: parent.bottom
+                                //         horizontalCenter: parent.right
+                                //     }
+                                //     radius: (height - 1)  / 2
+                                //     width: height
+                                //     color: "red"
+                                // }
                             }
+                            //Zero point indicator
                             Rectangle {
                                 anchors {
                                     left: parent.left
@@ -229,6 +238,8 @@ ZUI.Popup {
                                 width: 1
                                 color: Kirigami.Theme.textColor
                             }
+
+                            //Left amount
                             Rectangle {
                                 anchors {
                                     right: parent.left
@@ -236,18 +247,20 @@ ZUI.Popup {
                                     top: parent.top
                                     bottom: parent.bottom
                                 }
+                                radius: ZUI.Theme.radius
                                 color: Kirigami.Theme.textColor
+                                opacity: 0.2
                                 width: (component.invertedScale ? zynqtgui.osd.value > zynqtgui.osd.visualZero : zynqtgui.osd.value < zynqtgui.osd.visualZero) ? (parent.width * barContainer.zeroOffset) - parent.width * ((zynqtgui.osd.value - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
-                                Rectangle {
-                                    anchors {
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                        horizontalCenter: parent.left
-                                    }
-                                    radius: (height - 1) / 2
-                                    width: height
-                                    color: Kirigami.Theme.textColor
-                                }
+                                // Rectangle {
+                                //     anchors {
+                                //         top: parent.top
+                                //         bottom: parent.bottom
+                                //         horizontalCenter: parent.left
+                                //     }
+                                //     radius: (height - 1) / 2
+                                //     width: height
+                                //     color: "purple"
+                                // }
                             }
                         }
                         Item {
@@ -333,6 +346,7 @@ ZUI.Popup {
     function setAuxKbobPosition(index) {
         switch(index) {
             default:
+            case -1:
             case 0: return Kirigami.Units.gridUnit * 6
             case 1: return Kirigami.Units.gridUnit * 16   
             case 2: return Kirigami.Units.gridUnit * 26   
@@ -350,12 +364,13 @@ ZUI.Popup {
             text: zynqtgui.osd.description
             minVal: zynqtgui.osd.startLabel === "" ? zynqtgui.osd.start : zynqtgui.osd.startLabel
             maxVal: zynqtgui.osd.stopLabel === "" ? zynqtgui.osd.stop : zynqtgui.osd.stopLabel
-            val:  zynqtgui.osd.showValueLabel ? zynqtgui.osd.valueLabel : " "
+            val: zynqtgui.osd.showValueLabel ? zynqtgui.osd.valueLabel : " "
             discret: false
         }       
 
         BarControl {
             id: _auxKnob1
+            visible: zynqtgui.osd.auxValue1.knobPositionIndex !== -1
             y: setAuxKbobPosition(zynqtgui.osd.auxValue1.knobPositionIndex)  
             text: zynqtgui.osd.auxValue1.name   
             val: zynqtgui.osd.auxValue1.display
@@ -369,6 +384,7 @@ ZUI.Popup {
 
         BarControl{
             id: _auxKnob2
+            visible: zynqtgui.osd.auxValue2.knobPositionIndex !== -1
             y: setAuxKbobPosition(zynqtgui.osd.auxValue2.knobPositionIndex) 
             text: zynqtgui.osd.auxValue2.name   
             val: zynqtgui.osd.auxValue2.display

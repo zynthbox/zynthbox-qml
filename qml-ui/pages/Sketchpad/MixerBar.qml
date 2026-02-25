@@ -258,6 +258,12 @@ AbstractSketchpadPage {
                                     to: model.channel.gainHandler.maximumDecibel
                                 }
 
+                                Binding {
+                                    target: volumeControl.slider
+                                    property: "value"
+                                    value: model.channel.gainHandler.gainDb 
+                                }
+
                                 onClicked: channelsVolumeRow.handleClick(channel)                                
                                 onDoubleClicked: model.channel.gainHandler.gainDb = model.channel.initialVolume                                
                             }
@@ -375,6 +381,12 @@ AbstractSketchpadPage {
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
                                 value: controller.channel.wetFx2Amount
                                 onValueChanged: controller.channel.wetFx2Amount = slider.value
+
+                                Binding {
+                                    target: reverbControl.slider
+                                    property: "value"
+                                    value: controller.channel.wetFx2Amount
+                                }
                                 
                                 slider {
                                     from: 0
@@ -383,7 +395,7 @@ AbstractSketchpadPage {
                                 }
 
                                 onClicked: channelsReverbRow.handleClick(channel)
-                                onDoubleClicked: controller.channel.wetFx1Amount = 50                                
+                                onDoubleClicked: controller.channel.wetFx2Amount = 50                                
                                 tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
                                 
                             }
@@ -425,7 +437,7 @@ AbstractSketchpadPage {
                             controller: model
                             text2: controller.channel.wetFx1Amount.toFixed(0)+"%"
                             volumeControl: VolumeControl {
-                                id: reverbControl
+                                id: delayControl
                                 value: controller.channel.wetFx1Amount
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
@@ -435,6 +447,12 @@ AbstractSketchpadPage {
                                 slider {
                                     from: 0
                                     to: 100
+                                }
+
+                                Binding {
+                                    target: delayControl.slider
+                                    property: "value"
+                                    value: controller.channel.wetFx1Amount
                                 }
 
                                 onClicked: channelsDelayRow.handleClick(channel)

@@ -110,54 +110,57 @@ Item {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                    ZUI.NotePad {
+                        id: noteRowPad
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            bottom: parent.bottom
+                            margins: Kirigami.Units.smallSpacing
+                        }
+                        width: height
+                        note: noteRow.note
+                    }
                     IMP.SampleVisualiser {
                         anchors {
-                            fill: parent
+                            top: parent.top
+                            left: noteRowPad.right
+                            right: parent.right
+                            bottom: parent.bottom
                             margins: Kirigami.Units.smallSpacing
                         }
                         visible: noteRow.audioSource !== null
                         audioSource: noteRow.audioSource
                         trackType: _private.trackType
-                    }
-                    QQC2.Label {
-                        anchors {
-                            fill: parent
-                            margins: Kirigami.Units.smallSpacing
-                        }
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideLeft
-                        visible: noteRow.audioSource === null
-                        text: noteRow.hasClips
-                            ? qsTr("Multiple Samples")
-                            : noteRow.note ? noteRow.note.name + (noteRow.note.octave - 1) : ""
-                    }
-                    MultiPointTouchArea {
-                        anchors.fill: parent
-                        touchPoints: [
-                            TouchPoint {
-                                id: slidePoint
-                                property var currentValue: undefined
-                                property var pressedTime: undefined
-                                onPressedChanged: {
-                                    if (pressed) {
-                                        pressedTime = Date.now();
-                                        currentValue = component.preferInterpretedValue ? component.paramInterpretedDefault : parseInt(component.paramValue);
-                                    } else {
-                                        // Only reset if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
-                                        if (Math.abs(component.paramValue - currentValue) < 1 && (Date.now() - pressedTime) < 300) {
-                                            component.setNewValue(component.paramDefault);
+                        MultiPointTouchArea {
+                            anchors.fill: parent
+                            touchPoints: [
+                                TouchPoint {
+                                    id: slidePoint
+                                    property var currentValue: undefined
+                                    property var pressedTime: undefined
+                                    onPressedChanged: {
+                                        if (pressed) {
+                                            pressedTime = Date.now();
+                                            // currentValue = component.preferInterpretedValue ? component.paramInterpretedDefault : parseInt(component.paramValue);
+                                            applicationWindow().globalSequencer.setHeardData(noteRow.midiNote, component.patternModel.defaultVelocity);
+                                        } else {
+                                            // Only reset if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                            if (/*Math.abs(component.paramValue - currentValue) < 1 && */(Date.now() - pressedTime) < 300) {
+                                                // component.setNewValue(component.paramDefault);
+                                            }
+                                            currentValue = undefined;
                                         }
-                                        currentValue = undefined;
+                                    }
+                                    onXChanged: {
+                                        if (pressed && currentValue !== undefined) {
+                                            // var delta = Math.round((slidePoint.x - slidePoint.startX) * (component.scrollWidth / paramLabel.width));
+                                            // component.setNewValue(Math.min(Math.max(currentValue + delta, component.paramMin), component.paramMax));
+                                        }
                                     }
                                 }
-                                onXChanged: {
-                                    if (pressed && currentValue !== undefined) {
-                                        var delta = Math.round((slidePoint.x - slidePoint.startX) * (component.scrollWidth / paramLabel.width));
-                                        component.setNewValue(Math.min(Math.max(currentValue + delta, component.paramMin), component.paramMax));
-                                    }
-                                }
-                            }
-                        ]
+                            ]
+                        }
                     }
                 }
                 Repeater {
@@ -191,7 +194,7 @@ Item {
                                 width: 1
                                 color: "white"
                             }
-                            visible: component.sequencerPrivate.selectedStep === stepDelegate.delegateIndex && noteRow.noteIsHeard
+                            visible: applicationWindow().globalSequencer.mostRecentlyInteractedStep === stepDelegate.stepIndex && noteRow.noteIsHeard
                         }
                         Rectangle {
                             anchors.fill: parent

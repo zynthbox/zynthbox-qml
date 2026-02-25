@@ -967,24 +967,9 @@ Kirigami.AbstractApplicationWindow {
 
                 ZUI.BreadcrumbButton {
                     id: samplesButton
-                    property QtObject selectedSample: null
-                    readonly property QtObject selectedCppSample: selectedSample && selectedSample.cppObjId > -1 ? Zynthbox.Plugin.getClipById(selectedSample.cppObjId) : null
                     readonly property int selectedSampleIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
-                    Timer {
-                        id: samplesButtonThrottle
-                        interval: 1; running: false; repeat: false;
-                        onTriggered: {
-                            samplesButton.selectedSample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
-                        }
-                    }
-                    Connections {
-                        target: root.selectedChannel
-                        onSamples_changed: samplesButtonThrottle.restart()
-                        onSelectedSlotRowChanged: samplesButtonThrottle.restart()
-                    }
-                    Component.onCompleted: {
-                        samplesButtonThrottle.restart();
-                    }
+                    readonly property QtObject selectedSample: root.selectedChannel.samples[selectedSampleIndex]
+                    readonly property QtObject selectedCppSample: selectedSample && selectedSample.cppObjId > -1 ? Zynthbox.Plugin.getClipById(selectedSample.cppObjId) : null
 
                     icon.color: Kirigami.Theme.textColor
                     text: qsTr("Sample %1 ˬ").arg(samplesButton.selectedSampleIndex + 1)
@@ -992,7 +977,7 @@ Kirigami.AbstractApplicationWindow {
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 11
                     font.pointSize: 11
                     onClicked: samplesMenu.visible = true
-                    visible: root.selectedChannel.trackType == "sample-trig"
+                    visible: root.selectedChannel.trackType == "sample-trig" || (root.selectedChannel.trackType == "synth" && root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot")
 
                     ZUI.Menu {
                         id: samplesMenu
@@ -1002,8 +987,10 @@ Kirigami.AbstractApplicationWindow {
                         Repeater {
                             model: Zynthbox.Plugin.sketchpadSlotCount * 2
                             delegate: QQC2.MenuItem {
-                                text: qsTr("Sample %1").arg(index + 1)
+                                readonly property QtObject sampleObject: root.selectedChannel ? root.selectedChannel.samples[index] : null
+                                text: qsTr("Sample %1 - %2").arg(index + 1).arg(sampleObject.isEmpty ? "None" : sampleObject.filename)
                                 width: parent.width
+                                visible: root.selectedChannel.trackType == "sample-trig" || index < Zynthbox.Plugin.sketchpadSlotCount
                                 onClicked: {
                                     pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
                                 }
@@ -1017,7 +1004,7 @@ Kirigami.AbstractApplicationWindow {
                     icon.color: Kirigami.Theme.textColor
                     text: qsTr("%1").arg(samplesButton.selectedCppSample ? samplesButton.selectedSample.filename : "None")
                     Layout.fillHeight: true
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                     font.pointSize: 11
                     visible: samplesButton.visible
                     onClicked: {
@@ -1031,8 +1018,10 @@ Kirigami.AbstractApplicationWindow {
                     icon.color: Kirigami.Theme.textColor
                     icon.name: "document-edit"
                     Layout.fillHeight: true
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 2
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 4
+                    rightPadding: Kirigami.Units.largeSpacing*2
                     font.pointSize: 11
+                    text: "EDIT"
                     visible: samplesButton.visible
                     onClicked: {
                         zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
@@ -1057,7 +1046,7 @@ Kirigami.AbstractApplicationWindow {
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     rightPadding: Kirigami.Units.largeSpacing*2
                     font.pointSize: 11
-                    visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
+                    visible: root.selectedChannel.trackType === "synth" && root.selectedChannel.selectedSlot.className === "TracksBar_synthslot" && zynqtgui.curlayerEngineName.length > 0
                     Component.onCompleted: synthButton.updateSoundName();
                     // Open preset screen on clicking this synth button
                     onClicked: {
@@ -1161,12 +1150,18 @@ Kirigami.AbstractApplicationWindow {
                     font.pointSize: 11
                 }
                 ZUI.BreadcrumbButton {
+                    icon.width: 24
+                    icon.height: 24
                     icon.color: Kirigami.Theme.textColor
+                    icon.name: "document-edit"
                     text: "EDIT"
-                    visible: zynqtgui.current_screen_id === "control"
+                    visible: presetButton.visible
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 4
                     rightPadding: Kirigami.Units.largeSpacing*2
                     font.pointSize: 11
+                    onClicked: {
+                        zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                    }
                 }
             }
         }

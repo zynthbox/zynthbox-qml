@@ -387,6 +387,10 @@ GridLayout {
 
                             let wasAlreadySelected = slotDelegate.highlighted
                             control.channel.selectedSlot.setTo(_private.className, realIndex, slotDelegate, control.channel);
+                            if (slotDelegate.cppClipObject && slotDelegate.cppClipObject.rootSlice.keyZoneStart === slotDelegate.cppClipObject.rootSlice.keyZoneEnd) {
+                                // If we've got a sample, and the keyzone is a single note wide, set that note as the current heard
+                                applicationWindow().globalSequencer.setHeardData(slotDelegate.cppClipObject.rootSlice.keyZoneStart, applicationWindow().globalSequencer.pattern.defaultVelocity);
+                            }
                             if (onlySelectSlot == false) {
                                 if (wasAlreadySelected == false || onlyFocus) {
                                     let className = "TracksBar_synthslot"

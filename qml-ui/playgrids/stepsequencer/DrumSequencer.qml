@@ -39,6 +39,7 @@ Item {
     QtObject {
         id: _private
         readonly property int selectedStepGlobal: (sequencerPrivate.workingPatternModel.width * (sequencerPrivate.workingPatternModel.activeBar + sequencerPrivate.workingPatternModel.bankOffset)) + sequencerPrivate.selectedStep
+        readonly property int currentRow: sequencerPrivate.workingPatternModel.activeBar + sequencerPrivate.workingPatternModel.bankOffset
         readonly property var noteColors: zynqtgui.theme_chooser.noteColors
         readonly property string trackType: applicationWindow().selectedChannel ? applicationWindow().selectedChannel.trackType : ""
         function enableNoteForStep(midiNote, step) {
@@ -172,17 +173,19 @@ Item {
                         readonly property int delegateIndex: index
                         readonly property int stepIndex: component.patternModel ? (component.patternModel.activeBar * component.patternModel.width) + index : 0
                         readonly property bool currentlyPlayingStep: component.patternModel && component.patternModel.isPlaying ? component.patternModel.playbackPosition === stepIndex : false
-                        property QtObject stepNote: _private.barNotes.length > index ? _private.barNotes[index] : null
+                        readonly property QtObject stepNote: _private.barNotes.length > index ? _private.barNotes[index] : null
                         property bool stepEnabledForNote: subnoteIndex > -1
+                        property int velocity: 0
                         property int subnoteIndex: -1
                         Connections {
                             target: component
                             onUpdateStepData: {
                                 if (component.patternModel) {
-                                    stepDelegate.subnoteIndex = component.patternModel.subnoteIndex(component.patternModel.activeBar, stepDelegate.delegateIndex, noteRow.midiNote);
+                                    stepDelegate.subnoteIndex = component.patternModel.subnoteIndex(_private.currentRow, stepDelegate.delegateIndex, noteRow.midiNote);
                                 } else {
                                     stepDelegate.subnoteIndex = -1;
                                 }
+                                stepDelegate.velocity = stepDelegate.subnoteIndex > -1 ? component.patternModel.workingModel.subnoteMetadata(_private.currentRow, stepDelegate.delegateIndex, stepDelegate.subnoteIndex, "velocity") : 0;
                             }
                         }
                         Layout.fillHeight: true
@@ -217,6 +220,18 @@ Item {
                                 }
                                 height: Kirigami.Units.largeSpacing
                                 color: stepDelegate.stepEnabledForNote ? noteRow.noteColor : "grey"
+                            }
+                            Rectangle {
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    leftMargin: Kirigami.Units.smallSpacing
+                                    topMargin: Kirigami.Units.smallSpacing * 2 + Kirigami.Units.largeSpacing
+                                }
+                                height: Kirigami.Units.smallSpacing
+                                readonly property int maxWidth: parent.width - (Kirigami.Units.smallSpacing * 2)
+                                width: maxWidth * (stepDelegate.velocity / 127)
+                                color: "grey"
                             }
                         }
                         MouseArea {

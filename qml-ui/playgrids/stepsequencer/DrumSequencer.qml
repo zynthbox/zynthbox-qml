@@ -192,6 +192,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit
                         Rectangle {
+                            id: focusRectangle
                             anchors.fill: parent
                             color: "transparent"
                             border {
@@ -232,6 +233,19 @@ Item {
                                 readonly property int maxWidth: parent.width - (Kirigami.Units.smallSpacing * 2)
                                 width: maxWidth * (stepDelegate.velocity / 127)
                                 color: "grey"
+                                QQC2.Label {
+                                    anchors {
+                                        top: parent.bottom
+                                        left: parent.left
+                                    }
+                                    visible: focusRectangle.visible && stepDelegate.stepEnabledForNote
+                                    font {
+                                        pointSize: undefined
+                                        pixelSize: 7
+                                    }
+                                    color: "grey"
+                                    text: qsTr("%1/127").arg(stepDelegate.velocity)
+                                }
                             }
                         }
                         MouseArea {

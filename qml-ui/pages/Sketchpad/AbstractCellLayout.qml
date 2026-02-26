@@ -67,37 +67,42 @@ ZUI.CellControl {
                     anchors.fill: parent
                 }
 
-                StackLayout {
+                Item {
                     anchors.fill: parent
-                    data: control.control1
-                }
 
-                Item {                       
-                    width: control1.height
-                    height: _titleLabel.height*1.5
-
-                    anchors.left: parent.right
-                    anchors.bottom: parent.bottom
-                    anchors.leftMargin: -_titleLabel.height*2
-                    anchors.bottomMargin: -(_titleLabel.height/2)
-
-                    transform: Rotation {
-                        origin.x: 0
-                        origin.y: 0
-                        angle: -90
+                    StackLayout {
+                        id: _stack
+                        anchors.fill: parent
+                        data: control.control1
                     }
 
-                    QQC2.Label {
-                        id: _titleLabel
+                    Item {   
+                        id: _parentLabel                    
+                        width: Kirigami.Units.gridUnit
 
-                        anchors.left: parent.left
                         anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        elide: Text.ElideRight
-                        text: control.text
-                        opacity: 0.5
+                        anchors.bottom: parent.bottom      
+                        anchors.top: parent.top
+                        anchors.margins: Kirigami.Units.smallSpacing  +6         
 
-                        font.pointSize: 8
+                        QQC2.Label {
+                            id: _titleLabel
+                            height: parent.width
+                            width: parent.height
+                            anchors.top: parent.bottom
+
+                            elide: Text.ElideMiddle
+                            text: control.text
+                            opacity: 0.5
+
+                            font.pointSize: 8
+
+                            transform: Rotation {
+                                origin.x: 0
+                                origin.y: 0
+                                angle: -90
+                            }
+                        }
                     }
                 }
             }

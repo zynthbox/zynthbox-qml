@@ -90,6 +90,12 @@ AbstractSketchpadPage {
         Layers
     }  
 
+    enum SMPView {
+        Pitch,
+        Loop,
+        StartEnd
+    }  
+
     function pickNextSlot(onlySelectSlot=false) {
         switch (root.selectedChannel.selectedSlot.className) {
         case "TracksBar_synthslot":
@@ -1978,80 +1984,128 @@ AbstractSketchpadPage {
 
                 Item {}
 
-                ZUI.SectionGroup {
-                    fallbackBackground: Rectangle {
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                        color: Kirigami.Theme.backgroundColor
-                        opacity: 0.1
-                    }  
-                    
-                    ColumnLayout {
-                        anchors.fill: parent
-                        spacing: ZUI.Theme.sectionSpacing
+                ColumnLayout {
+                    spacing: ZUI.Theme.sectionSpacing
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit *  2
+                        Layout.minimumHeight: Kirigami.Units.gridUnit *  2
+                        
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: ZUI.Theme.spacing
 
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit *  2
-                            Layout.minimumHeight: Kirigami.Units.gridUnit *  2
-                            RowLayout {
-                                anchors.fill: parent
-                                spacing: ZUI.Theme.spacing
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true
 
-                                ZUI.SectionGroup {
-                                    Layout.fillHeight: true
+                                QQC2.ButtonGroup {
+                                    buttons: _SMPButtonsRow.children
+                                }
 
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        spacing: ZUI.Theme.spacing
+                                RowLayout {
+                                    id: _SMPButtonsRow
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
 
-                                        ZUI.SectionButton {
-                                            Layout.fillHeight: true
-                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                            text: "Pitch"
-                                        }
-                                        ZUI.SectionButton {
-                                            Layout.fillHeight: true
-                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                            text: "Loop"
-                                        }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Pitch"
+                                        checked: highlighted
+                                        highlighted: _SMPStack.currentView === TracksBar.SMPView.Pitch
+                                        onClicked: _SMPStack.setView(TracksBar.SMPView.Pitch)
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Loop"
+                                        checked: highlighted
+                                        highlighted: _SMPStack.currentView === TracksBar.SMPView.Loop
+                                        onClicked: _SMPStack.setView(TracksBar.SMPView.Loop)
+                                    }
 
-                                        ZUI.SectionButton {
-                                            Layout.fillHeight: true
-                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                            text: "Start/End"
-                                        }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Start/End"
+                                        checked: highlighted
+                                        highlighted: _SMPStack.currentView === TracksBar.SMPView.StartEnd
+                                        onClicked: _SMPStack.setView(TracksBar.SMPView.StartEnd)
                                     }
                                 }
+                            }
 
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
 
-                                ZUI.SectionGroup {
-                                    Layout.fillHeight: true
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true
 
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        spacing: ZUI.Theme.spacing
+                                RowLayout {
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
 
-                                        ZUI.SectionButton {
-                                            Layout.fillHeight: true
-                                            Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                            text: "All"
-                                        }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "All"
                                     }
                                 }
                             }
                         }
+                    }
+                    ZUI.SectionGroup {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        fallbackBackground: Rectangle {
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: 0.1
+                        }  
 
                         StackLayout {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            id: _SMPStack
+                            anchors.fill: parent
+                            property int currentView: TracksBar.SMPView.Pitch
+                            currentIndex : currentView
+
+                            function setView(view) {
+                                _SMPStack.currentView = view
+                                _SMPStack.currentIndex = _SMPStack.currentView
+                            }
 
                             RowLayout {
-                                id: samplesRowTrack
+                                id: _SMPPitchRow
+                                Repeater {
+                                    model: root.song.channelsModel
+                                    delegate: AbstractCellLayout {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        highlighted: index === zynqtgui.sketchpad.selectedTrackId
+                                        title: model.channel.name
+                                        text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                        text2: volumeControl.value
+
+                                        control1: VolumeControl {
+                                            id: volumeControl
+                                            value: 0                                                                           
+                                            tickLabelSet : ({"0":"0", "12":"12", "-12":"-12"})                                           
+                                            slider {
+                                                from: -12
+                                                to: 12
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Item {}
+
+                            RowLayout {
                                 spacing: ZUI.Theme.cellSpacing
 
                                 function handleClick(channel) { //TODO
@@ -2068,85 +2122,89 @@ AbstractSketchpadPage {
                                         Layout.fillHeight: true
                                         highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                         title: model.channel.name
-                                        text: "Sample Name Title"
+                                        text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
                                         text2: Math.round(_rangeSlider.first.value*100) +"-"+Math.round(_rangeSlider.second.value*100)
 
-                                        control1:  QQC2.RangeSlider {
-                                            id: _rangeSlider                                        
-                                            orientation: Qt.Vertical 
-                                            padding: ZUI.Theme.padding
+                                        control1: Item {
+                                             QQC2.RangeSlider {
+                                                id: _rangeSlider                                        
+                                                orientation: Qt.Vertical 
+                                                padding: ZUI.Theme.padding
+                                                anchors.fill: parent
+                                                anchors.margins: Kirigami.Units.smallSpacing + 6
 
-                                            background: Item {
-                                                Rectangle {
-                                                    anchors.horizontalCenter: parent.horizontalCenter
-                                                    height: parent.height
-                                                    width: Kirigami.Units.gridUnit * 0.5
-                                                    Kirigami.Theme.inherit: false
-                                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                    implicitWidth: Kirigami.Units.gridUnit
-                                                    radius: ZUI.Theme.radius
-                                                    color: Kirigami.Theme.backgroundColor
-                                                    border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
-                                                    
-                                                    // Highlight range between handles
+                                                background: Item {
                                                     Rectangle {
-                                                        y: _rangeSlider.second.visualPosition * parent.height
-                                                        height: (_rangeSlider.first.visualPosition - _rangeSlider.second.visualPosition) * parent.height
-                                                        anchors.left: parent.left
-                                                        anchors.right: parent.right
-                                                        anchors.margins: 1
+                                                        anchors.horizontalCenter: parent.horizontalCenter
+                                                        height: parent.height
+                                                        width: Kirigami.Units.gridUnit * 0.5
+                                                        Kirigami.Theme.inherit: false
+                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                        implicitWidth: Kirigami.Units.gridUnit
                                                         radius: ZUI.Theme.radius
-                                                        color: Kirigami.Theme.highlightColor 
-                                                        // opacity: 0.2
-                                                    }
+                                                        color: Kirigami.Theme.backgroundColor
+                                                        border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
+                                                        
+                                                        // Highlight range between handles
+                                                        Rectangle {
+                                                            y: _rangeSlider.second.visualPosition * parent.height
+                                                            height: (_rangeSlider.first.visualPosition - _rangeSlider.second.visualPosition) * parent.height
+                                                            anchors.left: parent.left
+                                                            anchors.right: parent.right
+                                                            anchors.margins: 1
+                                                            radius: ZUI.Theme.radius
+                                                            color: Kirigami.Theme.highlightColor 
+                                                            // opacity: 0.2
+                                                        }
 
-                                                    Rectangle {
-                                                        height: 1
-                                                        anchors.left: parent.left
-                                                        anchors.right: parent.right
-                                                        anchors.margins: 1
+                                                        Rectangle {
+                                                            height: 1
+                                                            anchors.left: parent.left
+                                                            anchors.right: parent.right
+                                                            anchors.margins: 1
+                                                            color: Kirigami.Theme.textColor
+                                                            anchors.verticalCenter: parent.verticalCenter
+                                                        }
+                                                    }
+                                                }
+
+                                                first.handle: Item {
+                                                    y: _rangeSlider.first.visualPosition * (_rangeSlider.availableHeight - height)
+                                                    x: _rangeSlider.width/2 - width/2
+                                                    implicitWidth: Kirigami.Units.gridUnit * 0.5
+                                                    implicitHeight: 22  
+
+                                                    Kirigami.Icon {
+                                                        anchors.right: parent.left
+                                                        anchors.verticalCenter: parent.bottom
+                                                        implicitHeight: 22
+                                                        implicitWidth: 22
+                                                        source: Qt.resolvedUrl("../../../img/right-arrow.svg")
                                                         color: Kirigami.Theme.textColor
-                                                        anchors.verticalCenter: parent.verticalCenter
                                                     }
                                                 }
-                                            }
 
-                                            first.handle: Item {
-                                                y: _rangeSlider.first.visualPosition * (_rangeSlider.availableHeight - height)
-                                                x: _rangeSlider.width/2 - width/2
-                                                implicitWidth: Kirigami.Units.gridUnit * 0.5
-                                                implicitHeight: 22  
-
-                                                Kirigami.Icon {
-                                                    anchors.right: parent.left
-                                                    anchors.verticalCenter: parent.bottom
+                                                second.handle: Item {
+                                                    y: _rangeSlider.second.visualPosition * (_rangeSlider.availableHeight - height)
+                                                    x: _rangeSlider.width/2 - width/2
+                                                    implicitWidth: Kirigami.Units.gridUnit * 0.5
                                                     implicitHeight: 22
-                                                    implicitWidth: 22
-                                                    source: Qt.resolvedUrl("../../../img/right-arrow.svg")
-                                                    color: Kirigami.Theme.textColor
-                                                }
-                                            }
 
-                                            second.handle: Item {
-                                                y: _rangeSlider.second.visualPosition * (_rangeSlider.availableHeight - height)
-                                                x: _rangeSlider.width/2 - width/2
-                                                implicitWidth: Kirigami.Units.gridUnit * 0.5
-                                                implicitHeight: 22
-
-                                                Kirigami.Icon {
-                                                    anchors.left: parent.right
-                                                    anchors.verticalCenter: parent.top
-                                                    implicitHeight: 22
-                                                    implicitWidth: 22
-                                                    source: Qt.resolvedUrl("../../../img/left-arrow.svg")
-                                                    color: Kirigami.Theme.textColor
-                                                }
-                                            }                                       
-                                        }  
+                                                    Kirigami.Icon {
+                                                        anchors.left: parent.right
+                                                        anchors.verticalCenter: parent.top
+                                                        implicitHeight: 22
+                                                        implicitWidth: 22
+                                                        source: Qt.resolvedUrl("../../../img/left-arrow.svg")
+                                                        color: Kirigami.Theme.textColor
+                                                    }
+                                                }                                       
+                                            }  
+                                        }
                                     }
                                 }
                             }
-                        }                        
+                        } 
                     }
                 }
                 Item {}

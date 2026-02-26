@@ -23,9 +23,10 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick 2.15
+import QtQml 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
@@ -728,11 +729,21 @@ ZUI.SectionGroup
                         }
 
                         RowLayout {
+                            id: dspLoadLayout
                             Layout.columnSpan: 3
                             Layout.fillWidth: true
                             Layout.preferredHeight: Kirigami.Units.largeSpacing
                             Kirigami.Theme.inherit: false
                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                            property double dspLoad: 0
+                            Binding {
+                                target: dspLoadLayout
+                                property: "dspLoad"
+                                value: Zynthbox.MidiRouter.processingLoad
+                                delayed: true
+                                when: zynqtgui.globalPopupOpened
+                                restoreMode: Binding.RestoreBindingOrValue
+                            }
                             QQC2.Label {
                                 Layout.fillHeight: true
                                 text: qsTr("DSP Load:")
@@ -776,7 +787,7 @@ ZUI.SectionGroup
                                             bottom: parent.bottom
                                             margins: 1
                                         }
-                                        width: zynqtgui.globalPopupOpened ? (parent.width - 2) * (1 - Zynthbox.MidiRouter.processingLoad) : 0
+                                        width: (parent.width - 2) * (1 - dspLoadLayout.dspLoad)
                                         color: Kirigami.Theme.backgroundColor
                                     }
                                     QQC2.Label {
@@ -784,7 +795,7 @@ ZUI.SectionGroup
                                             fill: parent
                                             margins: 2
                                         }
-                                        text: zynqtgui.globalPopupOpened ? qsTr("%1%").arg((100 * Zynthbox.MidiRouter.processingLoad).toFixed(1)) : ""
+                                        text: qsTr("%1%").arg((100 * dspLoadLayout.dspLoad).toFixed(1))
                                         font.pixelSize: height
                                     }
                                 }

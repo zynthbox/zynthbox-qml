@@ -2088,7 +2088,7 @@ AbstractSketchpadPage {
                                         highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                         title: model.channel.name
                                         text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-                                        text2: volumeControl.value
+                                        text2: Math.round(volumeControl.value)
 
                                         control1: VolumeControl {
                                             id: volumeControl
@@ -2098,6 +2098,16 @@ AbstractSketchpadPage {
                                                 from: -12
                                                 to: 12
                                             }
+                                        }
+
+                                        underlay: MouseArea {
+                                            anchors.fill: parent
+                                            onPressed: control1.mouseArea.handlePressed(mouse)
+                                            onReleased: control1.mouseArea.released(mouse)
+                                            onPressAndHold: control1.mouseArea.pressAndHold(mouse)
+                                            onClicked: control1.mouseArea.clicked(mouse)
+                                            onMouseXChanged: control1.mouseArea.mouseXChanged(mouse)
+                                            onMouseYChanged: control1.mouseArea.mouseYChanged(mouse)
                                         }
                                     }
                                 }

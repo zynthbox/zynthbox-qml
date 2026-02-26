@@ -2080,6 +2080,7 @@ AbstractSketchpadPage {
 
                             RowLayout {
                                 id: _SMPPitchRow
+                                spacing: ZUI.Theme.cellSpacing
                                 Repeater {
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {

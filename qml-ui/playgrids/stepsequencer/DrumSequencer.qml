@@ -120,6 +120,7 @@ Item {
                         }
                         width: height
                         note: noteRow.note
+                        highlightOctaveStart: false
                     }
                     IMP.SampleVisualiser {
                         anchors {

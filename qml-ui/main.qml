@@ -966,35 +966,145 @@ Kirigami.AbstractApplicationWindow {
                 }
 
                 ZUI.BreadcrumbButton {
-                    id: samplesButton
-                    readonly property int selectedSampleIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
-                    readonly property QtObject selectedSample: root.selectedChannel.samples[selectedSampleIndex]
-                    readonly property QtObject selectedCppSample: selectedSample && selectedSample.cppObjId > -1 ? Zynthbox.Plugin.getClipById(selectedSample.cppObjId) : null
-
+                    id: slotButton
+                    visible: root.selectedChannel && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
                     icon.color: Kirigami.Theme.textColor
-                    text: qsTr("Sample %1 ˬ").arg(samplesButton.selectedSampleIndex + 1)
                     Layout.fillHeight: true
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 11
                     font.pointSize: 11
-                    onClicked: samplesMenu.visible = true
-                    visible: root.selectedChannel.trackType == "sample-trig" || (root.selectedChannel.trackType == "synth" && root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot")
-
-                    ZUI.Menu {
-                        id: samplesMenu
-                        y: parent.height
-                        modal: true
-                        dim: false
-                        Repeater {
-                            model: Zynthbox.Plugin.sketchpadSlotCount * 2
-                            delegate: QQC2.MenuItem {
-                                readonly property QtObject sampleObject: root.selectedChannel ? root.selectedChannel.samples[index] : null
-                                text: qsTr("Sample %1 - %2").arg(index + 1).arg(sampleObject.isEmpty ? "None" : sampleObject.filename)
-                                width: parent.width
-                                visible: root.selectedChannel.trackType == "sample-trig" || index < Zynthbox.Plugin.sketchpadSlotCount
-                                onClicked: {
-                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", index, false);
+                    readonly property int selectedTotalSlotIndex: {
+                        switch(root.selectedChannel.trackType) {
+                            case "synth":
+                                switch(root.selectedChannel.selectedSlot.className) {
+                                    case "TracksBar_synthslot":
+                                        return root.selectedChannel.selectedSlot.value;
+                                    case "TracksBar_sampleslot":
+                                        return root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount;
+                                    case "TracksBar_fxslot":
+                                        return root.selectedChannel.selectedSlot.value + (Zynthbox.Plugin.sketchpadSlotCount * 2);
                                 }
-                                highlighted: root.selectedChannel.selectedSlotRow === index
+                                break;
+                            case "sample-trig":
+                                switch(root.selectedChannel.selectedSlot.className) {
+                                    case "TracksBar_sampleslot":
+                                        return root.selectedChannel.selectedSlot.value;
+                                    case "TracksBar_sampleslot2":
+                                        return root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount;
+                                    case "TracksBar_fxslot":
+                                        return root.selectedChannel.selectedSlot.value + (Zynthbox.Plugin.sketchpadSlotCount * 2);
+                                }
+                                break;
+                            default:
+                                return -1
+                        }
+                    }
+                    readonly property int selectedSampleIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
+                    text: {
+                        switch(root.selectedChannel.selectedSlot.className) {
+                            case "TracksBar_synthslot":
+                                return qsTr("Synth %1 ˬ").arg(root.selectedChannel.selectedSlot.value + 1)
+                                break;
+                            case "TracksBar_sampleslot":
+                            case "TracksBar_sampleslot2":
+                                return qsTr("Sample %1 ˬ").arg(slotButton.selectedSampleIndex + 1);
+                                break;
+                            case "TracksBar_fxslot":
+                                return qsTr("FX %1 ˬ").arg(root.selectedChannel.selectedSlot.value + 1)
+                                break;
+                        }
+                        return "Unknown";
+                    }
+                    onClicked: {
+                        slotsPicker.open();
+                        slotsPicker.currentIndex = selectedTotalSlotIndex;
+                    }
+                    readonly property QtObject currentSlotDelegate: slotsPicker.actions[selectedTotalSlotIndex]
+                    ZUI.ActionPickerPopup {
+                        id: slotsPicker
+                        rows: 5
+                        readonly property var synthSlotsData: root.selectedChannel ? root.selectedChannel.synthSlotsData : ["", "", "", "", ""]
+                        readonly property var fxSlotsData: root.selectedChannel ? root.selectedChannel.fxSlotsData : ["", "", "", "", ""]
+                        readonly property var samples: root.selectedChannel ? root.selectedChannel.samples : [null, null, null, null, null, null, null, null, null, null]
+                        Instantiator {
+                            id: slotsPickerInstantiator
+                            model: Zynthbox.Plugin.sketchpadSlotCount * 3
+                            delegate: QQC2.Action {
+                                id: slotDelegate
+                                readonly property int sampleIndex: root.selectedChannel
+                                    ? root.selectedChannel.trackType === "sample-trig"
+                                        ? index < Zynthbox.Plugin.sketchpadSlotCount * 2
+                                            ? index
+                                            : -1
+                                        : Zynthbox.Plugin.sketchpadSlotCount <= index && index < Zynthbox.Plugin.sketchpadSlotCount * 2
+                                            ? index - Zynthbox.Plugin.sketchpadSlotCount
+                                            : -1
+                                    : -1
+                                readonly property QtObject sampleObject: root.selectedChannel && sampleIndex > -1 ? slotsPicker.samples[sampleIndex] : null
+                                readonly property bool isSynthSlot: root.selectedChannel && root.selectedChannel.trackType === "synth" && index < Zynthbox.Plugin.sketchpadSlotCount
+                                readonly property bool isFxSlot: Zynthbox.Plugin.sketchpadSlotCount * 2 <= index
+                                readonly property int fxSlotIndex: isFxSlot ? index - (Zynthbox.Plugin.sketchpadSlotCount * 2) : -1
+                                readonly property string elidedSlotTitle: slotTitle.length > 26 ? slotTitle.substring(0, 13) + "…" + slotTitle.substring(slotTitle.length - 13) : slotTitle
+                                readonly property bool slotHasContents: root.selectedChannel
+                                    ? sampleObject
+                                        ? sampleObject.isEmpty
+                                            ? false
+                                            : true
+                                        : isSynthSlot
+                                            ? slotsPicker.synthSlotsData[index] !== ""
+                                                ? true
+                                                : false
+                                            : slotDelegate.isFxSlot
+                                                ? slotsPicker.fxSlotsData[fxSlotIndex] !== ""
+                                                    ? true
+                                                    : false
+                                                : false
+                                    : false
+                                readonly property string slotTitle: root.selectedChannel
+                                    ? sampleObject
+                                        ? sampleObject.isEmpty
+                                            ? qsTr("None")
+                                            : sampleObject.filename
+                                        : isSynthSlot
+                                            ? slotsPicker.synthSlotsData[index] !== ""
+                                                ? slotsPicker.synthSlotsData[index]
+                                                : qsTr("None")
+                                            : slotDelegate.isFxSlot
+                                                ? slotsPicker.fxSlotsData[fxSlotIndex] !== ""
+                                                    ? slotsPicker.fxSlotsData[fxSlotIndex]
+                                                    : qsTr("None")
+                                                : ""
+                                    : ""
+                                text: root.selectedChannel
+                                    ? sampleObject
+                                        ? sampleObject.isEmpty
+                                            ? qsTr("Sample %1:\nNone").arg(sampleIndex + 1)
+                                            : qsTr("Sample %1:\n%2").arg(sampleIndex + 1).arg(elidedSlotTitle)
+                                        : isSynthSlot
+                                            ? slotsPicker.synthSlotsData[index] !== ""
+                                                ? qsTr("Synth %1\n%2").arg(index + 1).arg(elidedSlotTitle)
+                                                : qsTr("Synth %1\nNone").arg(index + 1)
+                                            : slotDelegate.isFxSlot
+                                                ? slotsPicker.fxSlotsData[fxSlotIndex] !== ""
+                                                    ? qsTr("FX %1\n%1").arg(fxSlotIndex + 1).arg(elidedSlotTitle)
+                                                    : qsTr("FX %1\nNone").arg(fxSlotIndex + 1)
+                                                : ""
+                                    : ""
+                                // highlighted: index === selectedTotalSlotIndex
+                                onTriggered: {
+                                    if (isSynthSlot) {
+                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index, false);
+                                    } else if (isFxSlot) {
+                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", fxSlotIndex, false);
+                                    } else {
+                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", sampleIndex, false);
+                                    }
+                                }
+                            }
+                            onObjectAdded: {
+                                slotsPicker.actions.push(object);
+                            }
+                            onObjectRemoved: {
+                                slotsPicker.actions.pop(object);
                             }
                         }
                     }
@@ -1002,11 +1112,11 @@ Kirigami.AbstractApplicationWindow {
 
                 ZUI.BreadcrumbButton {
                     icon.color: Kirigami.Theme.textColor
-                    text: qsTr("%1").arg(samplesButton.selectedCppSample ? samplesButton.selectedSample.filename : "None")
+                    text: slotButton.currentSlotDelegate.slotTitle
                     Layout.fillHeight: true
                     Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                     font.pointSize: 11
-                    visible: samplesButton.visible
+                    visible: slotButton.visible
                     onClicked: {
                         zynqtgui.callable_ui_action_simple("SCREEN_PRESET");
                     }
@@ -1022,7 +1132,7 @@ Kirigami.AbstractApplicationWindow {
                     rightPadding: Kirigami.Units.largeSpacing*2
                     font.pointSize: 11
                     text: "EDIT"
-                    visible: samplesButton.visible
+                    visible: slotButton.visible && slotButton.currentSlotDelegate.slotHasContents
                     onClicked: {
                         zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
                     }
@@ -1039,129 +1149,6 @@ Kirigami.AbstractApplicationWindow {
                     rightPadding: Kirigami.Units.largeSpacing*2
                     font.pointSize: 11
                     visible: root.selectedChannel.trackType === "sample-loop"
-                }
-                ZUI.BreadcrumbButton {
-                    id: synthButton
-                    icon.color: Kirigami.Theme.textColor
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                    rightPadding: Kirigami.Units.largeSpacing*2
-                    font.pointSize: 11
-                    visible: root.selectedChannel.trackType === "synth" && root.selectedChannel.selectedSlot.className === "TracksBar_synthslot" && zynqtgui.curlayerEngineName.length > 0
-                    Component.onCompleted: synthButton.updateSoundName();
-                    // Open preset screen on clicking this synth button
-                    onClicked: {
-                        if (zynqtgui.curlayerIsFX) {
-                            zynqtgui.show_screen("effect_preset")
-                        } else {
-                            zynqtgui.show_screen("preset")
-                        }
-                    }
-
-                    Connections {
-                        target: zynqtgui.fixed_layers
-                        onList_updated: {
-                            synthButton.updateSoundName();
-                        }
-                    }
-                    Timer {
-                        id: synthButtonSoundNameThrottle
-                        interval: 0; repeat: false; running: false;
-                        onTriggered: {
-                            synthButton.text = zynqtgui.curlayerEngineName.length > 0 ? zynqtgui.curlayerEngineName : "";
-                        }
-                    }
-                    function updateSoundName() {
-                        synthButtonSoundNameThrottle.restart();
-                    }
-                }
-                ZUI.BreadcrumbButton {
-                    id: presetButton
-                    icon.color: Kirigami.Theme.textColor
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-                    rightPadding: Kirigami.Units.largeSpacing*2
-                    font.pointSize: 11
-                    visible: root.selectedChannel.trackType === "synth" && synthButton.visible
-                    onClicked: {
-                        // Open synth edit page whjen preset button is clicked
-                        zynqtgui.current_screen_id = "control";
-                        zynqtgui.forced_screen_back = "sketchpad"
-                    }
-
-                    Connections {
-                        target: zynqtgui.fixed_layers
-                        onList_updated: presetButton.updateSoundName()
-                    }
-                    Component.onCompleted: presetButton.updateSoundName()
-
-                    function updateSoundName() {
-                        presetButtonTextThrottle.restart()
-                    }
-                    Timer {
-                        id: presetButtonTextThrottle
-                        interval: 0; running: false; repeat: false;
-                        onTriggered: {
-                            presetButton.text = zynqtgui.curlayerPresetName.length > 0 ? zynqtgui.curlayerPresetName : qsTr("Presets");
-                        }
-                    }
-                }
-                ZUI.BreadcrumbButton {
-                    icon.color: Kirigami.Theme.textColor
-                    text: {
-                        switch (effectScreen) {
-                        case "layer_midi_effects":
-                        case "midi_effect_types":
-                        case "layer_midi_effect_chooser":
-                            return "MIDI FX";
-                        default:
-                            "Audio FX";
-                        }
-                    }
-                    visible: {
-                        switch (zynqtgui.current_screen_id) {
-                        case "layer_effects":
-                        case "effect_types":
-                        case "layer_effect_chooser":
-                        case "layer_midi_effects":
-                        case "midi_effect_types":
-                        case "layer_midi_effect_chooser":
-                            return true;
-                        default:
-                            return false //screensLayer.depth > 2
-                        }
-                    }
-                    property string effectScreen: ""
-                    readonly property string screenId: zynqtgui.current_screen_id
-                    onScreenIdChanged: {
-                        switch (zynqtgui.current_screen_id) {
-                        case "layer_effects":
-                        case "effect_types":
-                        case "layer_effect_chooser":
-                        case "layer_midi_effects":
-                        case "midi_effect_types":
-                        case "layer_midi_effect_chooser":
-                            effectScreen = zynqtgui.current_screen_id;
-                        default:
-                            break;
-                        }
-                    }
-                    onClicked: zynqtgui.current_screen_id = effectScreen
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                    rightPadding: Kirigami.Units.largeSpacing*2
-                    font.pointSize: 11
-                }
-                ZUI.BreadcrumbButton {
-                    icon.width: 24
-                    icon.height: 24
-                    icon.color: Kirigami.Theme.textColor
-                    icon.name: "document-edit"
-                    text: "EDIT"
-                    visible: presetButton.visible
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 4
-                    rightPadding: Kirigami.Units.largeSpacing*2
-                    font.pointSize: 11
-                    onClicked: {
-                        zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
-                    }
                 }
             }
         }

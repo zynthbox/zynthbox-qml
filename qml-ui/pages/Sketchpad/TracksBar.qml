@@ -2084,20 +2084,34 @@ AbstractSketchpadPage {
                                 Repeater {
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {
+
+                                        property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
+                                        property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
+                                        enabled: clipObj
+
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                         title: model.channel.name
                                         text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-                                        text2: Math.round(volumeControl.value)
+                                        text2: clipObj.selectedSliceObject.pitch.toFixed(2)
 
                                         control1: VolumeControl {
                                             id: volumeControl
-                                            value: 0                                                                           
-                                            tickLabelSet : ({"0":"0", "12":"12", "-12":"-12"})                                           
+                                            tickLabelSet : ({"0":"0", "48":"48", "-48":"-48"})                                           
                                             slider {
-                                                from: -12
-                                                to: 12
+                                                from: -48
+                                                to: 48
+                                                stepSize: 1
+                                            }
+
+                                            onDoubleClicked: clipObj.selectedSliceObject.pitch = controlObj.initialPitch
+                                            onValueChanged: clipObj.selectedSliceObject.pitch =  slider.value
+
+                                            Binding {
+                                                target: volumeControl.slider
+                                                property: "value"
+                                                value: clipObj.selectedSliceObject.pitch   
                                             }
                                         }
 

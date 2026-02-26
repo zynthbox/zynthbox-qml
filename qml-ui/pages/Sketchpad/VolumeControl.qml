@@ -95,6 +95,7 @@ Rectangle {
                                 color: Kirigami.Theme.textColor 
                                 opacity: 0.2
                                 height: slider.position*parent.height 
+                                visible: control.enabled
                             }
                         }
                     }

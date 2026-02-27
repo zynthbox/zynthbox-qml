@@ -366,6 +366,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.globalPopupOpenedChanged.connect(self.update_button_colors)
         self.zynqtgui.ui_settings.hardwareSequencerChanged.connect(self.update_button_colors)
         self.zynqtgui.anyStepButtonPressedChanged.connect(self.update_button_colors)
+        self.zynqtgui.isBootingCompleteChanged.connect(self.update_button_colors)
 
         for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
             self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).track_type_changed.connect(

@@ -1999,6 +1999,7 @@ AbstractSketchpadPage {
 
                 ColumnLayout {
                     spacing: ZUI.Theme.sectionSpacing
+                    enabled: root.selectedChannel.trackType !== "external"
                     Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit *  2
@@ -2084,6 +2085,7 @@ AbstractSketchpadPage {
 
                         StackLayout {
                             id: _SMPStack
+                            visible: enabled
                             anchors.fill: parent
                             property int currentView: TracksBar.SMPView.Pitch
                             currentIndex : currentView
@@ -2116,7 +2118,9 @@ AbstractSketchpadPage {
 
                                         readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
-                                        enabled: clipObj
+                                        enabled: clipObj && contentItem.visible
+
+                                        contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5 
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
@@ -2178,8 +2182,8 @@ AbstractSketchpadPage {
                                         readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
-                                        enabled: clipObj
-
+                                        enabled: clipObj && contentItem.visible
+                                        contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
@@ -2251,11 +2255,12 @@ AbstractSketchpadPage {
                                         readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
-                                        enabled: clipObj
+                                        enabled: clipObj && contentItem.visible
+                                        contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5 
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: (index === slotIndex || _SMPStack.applyToAll) && enabled
+                                        highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
                                         title: "S"+ (index+1)
                                         text: controlObj.path.split("/").pop()
                                         text2: volumeControl.slider.value.toFixed(2)+("%")

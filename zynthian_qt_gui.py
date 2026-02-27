@@ -3998,10 +3998,12 @@ class zynthian_gui(QObject):
         logging.debug("---p Starting stop_splash procedure")
         self.zynautoconnect()
         self.audio_settings.setAllControllersToMaxValue()
-        # Display main window as soon as possible so it doesn't take time to load after splash stops
-        self.displayMainWindow.emit()
+        # Stop rainbow and initialize LED config and connect to required signals to be able to update LEDs on value change instead
+        Popen(["systemctl", "stop", "rainbow-leds.service"])
         self.isBootingComplete = True
         self.bootsplashFifo.send("command:play-extro")
+        # Display main window as soon as possible so it doesn't take time to load after splash stops
+        self.displayMainWindow.emit()
         # Display sketchpad page and run set_selector at last before hiding splash to ensure knobs work fine
         self.show_modal("sketchpad")
         self.set_selector()        
@@ -4012,9 +4014,7 @@ class zynthian_gui(QObject):
             channel.update_jack_port(run_in_thread=False)
             # Cache back/preset of all selected synths of all channel
             channel.cache_bank_preset_lists()
-        # Stop rainbow and initialize LED config and connect to required signals to be able to update LEDs on value change instead
-        Popen(["systemctl", "stop", "rainbow-leds.service"])
-        self.led_config.init()
+        self.led_config.update_button_colors()
         boot_end = timer()
         logging.debug("---p Completing stop_splash procedure")
         logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")

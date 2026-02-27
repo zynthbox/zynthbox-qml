@@ -52,6 +52,8 @@ function screensaver_off() {
 # Main Program
 #------------------------------------------------------------------------------
 
+# Start rainbow-leds service if not already started
+systemctl start rainbow-leds.service
 xsetroot -cursor blank_cursor.xbm blank_cursor.xbm
 
 cd $ZYNTHIAN_UI_DIR

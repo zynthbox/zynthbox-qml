@@ -2089,10 +2089,14 @@ AbstractSketchpadPage {
                             currentIndex : currentView
 
                             property bool applyToAll: false
+                            readonly property int currentSlotIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
 
                             function setView(view) {
+                                var slotIndex = _SMPStack.currentSlotIndex
                                 _SMPStack.currentView = view
                                 _SMPStack.currentIndex = _SMPStack.currentView
+
+                                _SMPStack.children[_SMPStack.currentIndex].handleClick(slotIndex)
                             }
 
                             RowLayout {
@@ -2100,7 +2104,7 @@ AbstractSketchpadPage {
                                 spacing: ZUI.Theme.cellSpacing
                                 
                                 function handleClick(slot) { 
-                                    root.switchToSlot("TracksBar_sampleslot", slot);
+                                    root.switchToSlot("sample", slot);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", slot, _pitchRepeater.itemAt(slot), root.selectedChannel);
                                 }
@@ -2116,7 +2120,7 @@ AbstractSketchpadPage {
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SMPStack.applyToAll) && enabled
+                                        highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
                                         title: "S"+ (index+1)
                                         text: controlObj.path.split("/").pop()
                                         text2: clipObj.selectedSliceObject.pitch.toFixed(2)
@@ -2160,7 +2164,7 @@ AbstractSketchpadPage {
                                 spacing: ZUI.Theme.cellSpacing
 
                                 function handleClick(slot) { 
-                                    root.switchToSlot("TracksBar_sampleslot", slot);
+                                    root.switchToSlot("sample", slot);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_startend", slot, _startEndRepeater.itemAt(slot), root.selectedChannel);
                                 }
@@ -2178,7 +2182,7 @@ AbstractSketchpadPage {
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SMPStack.applyToAll) && enabled
+                                        highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
                                         title: "S"+ (index+1)
                                         text: controlObj.path.split("/").pop()
                                         text2: enabled ? Math.round(_rangeSlider.first.value) +"%-"+Math.round(_rangeSlider.realStopValue)+"%" : "-"
@@ -2234,7 +2238,7 @@ AbstractSketchpadPage {
                                 spacing: ZUI.Theme.cellSpacing
 
                                 function handleClick(slot) { 
-                                    root.switchToSlot("TracksBar_sampleslot", slot);
+                                    root.switchToSlot("sample", slot, false);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_loop", slot, _loopRepeater.itemAt(slot), root.selectedChannel);
                                 }
@@ -2251,7 +2255,7 @@ AbstractSketchpadPage {
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SMPStack.applyToAll) && enabled
+                                        highlighted: (index === slotIndex || _SMPStack.applyToAll) && enabled
                                         title: "S"+ (index+1)
                                         text: controlObj.path.split("/").pop()
                                         text2: volumeControl.slider.value.toFixed(2)+("%")

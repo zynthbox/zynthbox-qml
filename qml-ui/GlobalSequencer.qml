@@ -38,7 +38,10 @@ Item {
 
     readonly property alias mostRecentlyInteractedStep: _private.mostRecentlyInteractedStep
     function setMostRecentlyInteractedStep(stepIndex) {
-        _private.mostRecentlyInteractedStep = Math.max(0, Math.min(stepIndex, _private.pattern.patternLength - 1));
+        let newStep = Math.max(0, Math.min(stepIndex, _private.pattern.patternLength - 1));
+        if (_private.mostRecentlyInteractedStep !== newStep) {
+            _private.mostRecentlyInteractedStep = newStep;
+        }
     }
 
     property QtObject selectedChannel: null

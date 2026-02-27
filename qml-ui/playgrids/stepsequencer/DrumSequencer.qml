@@ -176,6 +176,8 @@ Item {
                         readonly property QtObject stepNote: _private.barNotes.length > index ? _private.barNotes[index] : null
                         property bool stepEnabledForNote: subnoteIndex > -1
                         property int velocity: 0
+                        property int delay: 0
+                        property int duration: 0
                         property int subnoteIndex: -1
                         Connections {
                             target: component
@@ -186,6 +188,16 @@ Item {
                                     stepDelegate.subnoteIndex = -1;
                                 }
                                 stepDelegate.velocity = stepDelegate.subnoteIndex > -1 ? component.patternModel.workingModel.subnoteMetadata(_private.currentRow, stepDelegate.delegateIndex, stepDelegate.subnoteIndex, "velocity") : 0;
+                                let noteDuration = stepDelegate.subnoteIndex > -1 ? component.patternModel.workingModel.subnoteMetadata(_private.currentRow, stepDelegate.delegateIndex, stepDelegate.subnoteIndex, "duration") : 0;
+                                if (!noteDuration) {
+                                    noteDuration = 0;
+                                }
+                                stepDelegate.duration = noteDuration;
+                                let noteDelay = stepDelegate.subnoteIndex > -1 ? component.patternModel.workingModel.subnoteMetadata(_private.currentRow, stepDelegate.delegateIndex, stepDelegate.subnoteIndex, "delay") : 0;
+                                if (!noteDelay) {
+                                    noteDelay = 0;
+                                }
+                                stepDelegate.delay = noteDelay;
                             }
                         }
                         Layout.fillHeight: true
@@ -246,6 +258,21 @@ Item {
                                     color: "grey"
                                     text: qsTr("%1/127").arg(stepDelegate.velocity)
                                 }
+                            }
+                            Rectangle {
+                                visible: focusRectangle.visible && stepDelegate.stepEnabledForNote && (stepDelegate.delay !== 0 || stepDelegate.duration !== 0)
+                                color: "blue"
+                                anchors.top: parent.bottom
+                                height: Kirigami.Units.smallSpacing - 1
+                                width: parent.width * (actualDuration / component.sequencerPrivate.workingPatternModel.stepLength)
+                                x: parent.width * (stepDelegate.delay / component.sequencerPrivate.workingPatternModel.stepLength)
+                                readonly property int actualDuration: stepDelegate.duration === 0
+                                    ? component.sequencerPrivate.workingPatternModel.stepLength
+                                    : stepDelegate.duration < 0
+                                        ? component.sequencerPrivate.workingPatternModel.defaultNoteDuration === 0
+                                            ? component.sequencerPrivate.workingPatternModel.stepLength
+                                            : component.sequencerPrivate.workingPatternModel.defaultNoteDuration
+                                        : stepDelegate.duration
                             }
                         }
                         MouseArea {

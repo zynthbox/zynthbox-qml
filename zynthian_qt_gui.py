@@ -531,7 +531,6 @@ class zynthian_gui(QObject):
         self.modal_timer.timeout.connect(self.close_modal)
         self.__booting_complete__ = False
         self.__shutting_down = False
-        self.rainbow_led_counter = 0
 
         # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
         # Use this timer to toggle state after 5000ms
@@ -4014,7 +4013,7 @@ class zynthian_gui(QObject):
             # Cache back/preset of all selected synths of all channel
             channel.cache_bank_preset_lists()
         # Stop rainbow and initialize LED config and connect to required signals to be able to update LEDs on value change instead
-        rainbow_led_process.terminate()
+        Popen(["systemctl", "stop", "rainbow-leds.service"])
         self.led_config.init()
         boot_end = timer()
         logging.debug("---p Completing stop_splash procedure")
@@ -5980,9 +5979,6 @@ def delete_window():
 
 if __name__ == "__main__":
     boot_start = timer()
-
-    # Start rainbow led process
-    rainbow_led_process = Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "rainbow"))
 
     # Enable qml debugger if ZYNTHBOX_DEBUG env variable is set
     if os.environ.get("ZYNTHBOX_DEBUG"):

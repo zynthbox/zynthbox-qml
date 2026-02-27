@@ -2060,9 +2060,12 @@ AbstractSketchpadPage {
                                     spacing: ZUI.Theme.spacing
 
                                     ZUI.SectionButton {
+                                        checkable: true
+                                        checked:_SMPStack.applyToAll
                                         Layout.fillHeight: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         text: "All"
+                                        onToggled: _SMPStack.applyToAll = checked
                                     }
                                 }
                             }
@@ -2085,6 +2088,8 @@ AbstractSketchpadPage {
                             property int currentView: TracksBar.SMPView.Pitch
                             currentIndex : currentView
 
+                            property bool applyToAll: false
+
                             function setView(view) {
                                 _SMPStack.currentView = view
                                 _SMPStack.currentIndex = _SMPStack.currentView
@@ -2093,26 +2098,29 @@ AbstractSketchpadPage {
                             RowLayout {
                                 id: _SMPPitchRow
                                 spacing: ZUI.Theme.cellSpacing
-                                function handleClick(channel) { 
-                                    zynqtgui.sketchpad.selectedTrackId = channel.id;
+                                
+                                function handleClick(slot) { 
+                                    root.switchToSlot("TracksBar_sampleslot", slot);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", -1, _pitchRepeater.itemAt(channel.id), channel);
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", slot, _pitchRepeater.itemAt(slot), root.selectedChannel);
                                 }
+
                                 Repeater {
                                     id: _pitchRepeater
-                                    model: root.song.channelsModel
+                                    model: root.selectedChannel.samples
                                     delegate: AbstractCellLayout {
 
-                                        readonly property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
+                                        readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         enabled: clipObj
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: index === zynqtgui.sketchpad.selectedTrackId
-                                        title: model.channel.name
-                                        text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SMPStack.applyToAll) && enabled
+                                        title: "S"+ (index+1)
+                                        text: controlObj.path.split("/").pop()
                                         text2: clipObj.selectedSliceObject.pitch.toFixed(2)
+                                        onClicked: _SMPPitchRow.handleClick(index)
 
                                         control1: VolumeControl {
                                             id: volumeControl
@@ -2124,7 +2132,7 @@ AbstractSketchpadPage {
                                             }
 
                                             onDoubleClicked: clipObj.selectedSliceObject.pitch = controlObj.initialPitch
-                                            onClicked: _SMPPitchRow.handleClick(channel)
+                                            onClicked: _SMPPitchRow.handleClick(index)
                                             onValueChanged: clipObj.selectedSliceObject.pitch =  slider.value
 
                                             Binding {
@@ -2151,35 +2159,35 @@ AbstractSketchpadPage {
                                 id: _SMPStartEndRow
                                 spacing: ZUI.Theme.cellSpacing
 
-                                function handleClick(channel) { 
-                                    zynqtgui.sketchpad.selectedTrackId = channel.id;
+                                function handleClick(slot) { 
+                                    root.switchToSlot("TracksBar_sampleslot", slot);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_startend", -1, _startEndRepeater.itemAt(channel.id), channel);
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_startend", slot, _startEndRepeater.itemAt(slot), root.selectedChannel);
                                 }
 
                                 Repeater {
                                     id: _startEndRepeater
-                                    model: root.song.channelsModel
+                                    model: root.selectedChannel.samples
                                     delegate: AbstractCellLayout {
                                         id: _startEndDelegate
 
-                                        readonly property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
+                                        readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: index === zynqtgui.sketchpad.selectedTrackId
-                                        title: model.channel.name
-                                        text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SMPStack.applyToAll) && enabled
+                                        title: "S"+ (index+1)
+                                        text: controlObj.path.split("/").pop()
                                         text2: enabled ? Math.round(_rangeSlider.first.value) +"%-"+Math.round(_rangeSlider.realStopValue)+"%" : "-"
 
                                         onDoubleClicked: {
                                             sliceObj.startPositionSamples = 0
                                             sliceObj.lengthSamples = clipObj.durationSamples
                                         }
-                                        onClicked: _SMPStartEndRow.handleClick(channel)
+                                        onClicked: _SMPStartEndRow.handleClick(index)
 
                                         control1: Item {
                                                 
@@ -2225,10 +2233,10 @@ AbstractSketchpadPage {
                                 id: _SMPLoopRow
                                 spacing: ZUI.Theme.cellSpacing
 
-                                function handleClick(channel) { 
-                                    zynqtgui.sketchpad.selectedTrackId = channel.id;
+                                function handleClick(slot) { 
+                                    root.switchToSlot("TracksBar_sampleslot", slot);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_loop", -1, _loopRepeater.itemAt(channel.id), channel);
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_loop", slot, _loopRepeater.itemAt(slot), root.selectedChannel);
                                 }
 
                                 Repeater {
@@ -2236,16 +2244,16 @@ AbstractSketchpadPage {
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {
 
-                                        readonly property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
+                                        readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: index === zynqtgui.sketchpad.selectedTrackId
-                                        title: model.channel.name
-                                        text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SMPStack.applyToAll) && enabled
+                                        title: "S"+ (index+1)
+                                        text: controlObj.path.split("/").pop()
                                         text2: volumeControl.slider.value.toFixed(2)+("%")
 
                                         control1: VolumeControl {
@@ -2253,7 +2261,7 @@ AbstractSketchpadPage {
                                             tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
                                             onValueChanged: sliceObj.loopDeltaSamples = sliceObj.lengthSamples * (slider.value/100)
                                             onDoubleClicked: sliceObj.loopDeltaSamples = sliceObj.lengthSamples * (0.5)
-                                            onClicked: _SMPLoopRow.handleClick(channel)
+                                            onClicked: _SMPLoopRow.handleClick(index)
 
                                             slider {
                                                 from: 0

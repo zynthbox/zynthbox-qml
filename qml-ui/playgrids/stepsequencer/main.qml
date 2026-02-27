@@ -320,12 +320,12 @@ IMP.BasePlayGrid {
                         component.noteListeningVelocities = [];
                         component.heardNotes = [];
                         component.heardVelocities = [];
+                        if (newChannel && newChannel.trackStyle === "drums") {
+                            _private.selectStep(0);
+                        }
                     }
                     _private.associatedChannel = newChannel;
                     _private.associatedChannelIndex =  _private.activePatternModel.sketchpadTrack;
-                    if (_private.associatedChannel && _private.associatedChannel.trackStyle === "drums") {
-                        _private.selectStep(0);
-                    }
                     Qt.callLater(_private.updateUniqueCurrentRowNotes);
                 } else {
                     _private.updateChannel();
@@ -1592,11 +1592,11 @@ IMP.BasePlayGrid {
                             }
                             function changeValue(valueName, howMuch, minValue, maxValue, defaultValue) {
                                 if (drumSequencer.visible) {
-                                    let seqPad = drumPadRepeater.itemAt(applicationWindow().globalSequencer.mostRecentlyInteractedStep)
+                                    let seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     let indicesToChange = [];
                                     if (seqPad.note) {
                                         for (let i = 0; i < seqPad.note.subnotes.length; ++i) {
-                                            if (applicationWindow().globalSequencer.heardNotes.include(seqPad.note.subnotes[i])) {
+                                            if (applicationWindow().globalSequencer.heardNotes.includes(seqPad.note.subnotes[i])) {
                                                 indicesToChange.push(i);
                                             }
                                         }

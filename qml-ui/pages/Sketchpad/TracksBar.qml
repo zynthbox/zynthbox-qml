@@ -2120,7 +2120,8 @@ AbstractSketchpadPage {
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         enabled: clipObj && contentItem.visible
 
-                                        contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5 
+                                        contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5
+                                        background.opacity: contentItem.visible ? 1 : 0.5
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
@@ -2183,7 +2184,8 @@ AbstractSketchpadPage {
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj && contentItem.visible
-                                        contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5 
+                                        contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5
+                                        background.opacity: contentItem.visible ? 1 : 0.5
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
@@ -2257,6 +2259,7 @@ AbstractSketchpadPage {
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj && contentItem.visible
                                         contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5 
+                                        background.opacity: contentItem.visible ? 1 : 0.5
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true

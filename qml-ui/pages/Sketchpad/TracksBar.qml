@@ -2241,7 +2241,7 @@ AbstractSketchpadPage {
 
                                 Repeater {
                                     id: _loopRepeater
-                                    model: root.song.channelsModel
+                                    model: root.selectedChannel.samples
                                     delegate: AbstractCellLayout {
 
                                         readonly property QtObject controlObj: modelData

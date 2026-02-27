@@ -24,7 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
@@ -503,6 +503,15 @@ AbstractSketchpadPage {
             case "TracksBar_fxslot":
                 root.sketchpadView.updateSelectedFxLayerVolume(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
+            case "TracksBar_item_pitch":
+                root.sketchpadView.updateSelectedSamplePitch(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
+            case "TracksBar_item_startend":
+                root.sketchpadView.updateSelectedSampleStartPositionSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
+            case "TracksBar_item_loop":
+                root.sketchpadView.updateSelectedSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
             default:
                 returnValue = false;
                 // console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
@@ -525,6 +534,15 @@ AbstractSketchpadPage {
                 break;
             case "TracksBar_fxslot":
                 root.sketchpadView.updateSelectedFxLayerVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
+            case "TracksBar_item_pitch":
+                root.sketchpadView.updateSelectedSamplePitch(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
+            case "TracksBar_item_startend":
+                root.sketchpadView.updateSelectedSampleStartPositionSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
+            case "TracksBar_item_loop":
+                root.sketchpadView.updateSelectedSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -595,6 +613,9 @@ AbstractSketchpadPage {
             case "TracksBar_sketchfxslot":
                 root.sketchpadView.updateSelectedChannelSketchFxLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
+            case "TracksBar_item_startend":
+                root.sketchpadView.updateSelectedSampleLengthSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
             default:
                 returnValue = false;
                 // console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
@@ -618,6 +639,9 @@ AbstractSketchpadPage {
                 break;
             case "TracksBar_sketchfxslot":
                 root.sketchpadView.updateSelectedChannelSketchFxLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                break;
+            case "TracksBar_item_startend":
+                root.sketchpadView.updateSelectedSampleLengthSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             default:
                 returnValue = false;
@@ -1308,121 +1332,111 @@ AbstractSketchpadPage {
 
                         // Take 3/5 th of available width
                         Item {
-                            // color: "yellow"
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-
-                            ColumnLayout {                                
+                            
+                            ZUI.SectionGroup {
                                 anchors.fill: parent
+                                mask: waveformContainer.showWaveform
+                                fallbackPadding: ZUI.Theme.padding
+                                fallbackBackground:  Rectangle {                                             
+                                    border.width: 1
+                                    border.color: "#ff999999"
+                                    radius: ZUI.Theme.radius
+                                    color: "#222222"
+                                }
 
-                                ZUI.SectionGroup {
-                                    Layout.fillWidth: false
-                                    Layout.fillHeight: false
-                                    implicitHeight: Kirigami.Units.gridUnit * 2
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        spacing: ZUI.Theme.spacing
+                                ColumnLayout {
+                                    id: waveItemContainer
+                                    anchors.fill: parent
 
-                                        QQC2.Label {
-                                            Layout.fillWidth: false
-                                            Layout.fillHeight: true
-                                            font.pointSize: 9
-                                            visible: waveformContainer.showWaveform
-                                            text: waveformContainer.clip
-                                                ? progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false
-                                                    ? qsTr("Missing Wave: %1").arg(waveformContainer.clip.filename)
-                                                    : qsTr("Wave : %1").arg(waveformContainer.clip.filename)
-                                            : ""
-                                            elide: Text.ElideMiddle
-                                            color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
-                                        }
+                                    ZUI.SectionGroup {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        implicitHeight: Kirigami.Units.gridUnit * 2
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            spacing: ZUI.Theme.spacing
 
-                                        ZUI.SectionButton {
-                                            visible: !waveformContainer.showWaveform
-                                            Layout.fillHeight: true
-                                            Layout.minimumWidth: Kirigami.Units.gridUnit * 3
-                                            icon.name: "go-first"
-                                            onClicked: {
-                                                switch (root.selectedChannel.selectedSlot.className) {
-                                                    case "TracksBar_synthslot":
-                                                        root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
-                                                        break;
-                                                    case "TracksBar_fxslot":
-                                                        root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
-                                                        break;
-                                                }
+                                            QQC2.Label {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                font.pointSize: 9
+                                                visible: waveformContainer.showWaveform
+                                                text: waveformContainer.clip
+                                                    ? progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false
+                                                        ? qsTr("Missing Wave: %1").arg(waveformContainer.clip.filename)
+                                                        : qsTr("Wave : %1").arg(waveformContainer.clip.filename)
+                                                : ""
+                                                elide: Text.ElideMiddle
+                                                color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
                                             }
-                                        }
+                                            Item {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                            }
 
                                             ZUI.SectionButton {
-                                            visible: !waveformContainer.showWaveform
-                                            Layout.fillHeight: true
-                                            Layout.minimumWidth: Kirigami.Units.gridUnit * 3
-                                            icon.name: "go-last"
-                                            onClicked: {
-                                                switch (root.selectedChannel.selectedSlot.className) {
-                                                    case "TracksBar_synthslot":
-                                                        root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
-                                                        break;
-                                                    case "TracksBar_fxslot":
-                                                        root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
-                                                        break;
+                                                visible: !waveformContainer.showWaveform
+                                                Layout.fillHeight: true
+                                                Layout.minimumWidth: Kirigami.Units.gridUnit * 3
+                                                icon.name: "go-previous"
+                                                onClicked: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
+                                                }
+
+                                                onPressAndHold: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
+                                                }
+                                            }
+
+                                            ZUI.SectionButton {
+                                                visible: !waveformContainer.showWaveform
+                                                Layout.minimumWidth: Kirigami.Units.gridUnit * 3
+                                                Layout.fillHeight: true
+                                                icon.name: "go-next"
+                                                onClicked: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
+                                                }
+
+                                                onPressAndHold: {
+                                                    switch (root.selectedChannel.selectedSlot.className) {
+                                                        case "TracksBar_synthslot":
+                                                            root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                        case "TracksBar_fxslot":
+                                                            root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         }
+                                    } 
 
-                                        ZUI.SectionButton {
-                                            visible: !waveformContainer.showWaveform
-                                            Layout.fillHeight: true
-                                            Layout.minimumWidth: Kirigami.Units.gridUnit * 3
-                                            icon.name: "go-previous"
-                                            onClicked: {
-                                                switch (root.selectedChannel.selectedSlot.className) {
-                                                    case "TracksBar_synthslot":
-                                                        root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
-                                                        break;
-                                                    case "TracksBar_fxslot":
-                                                        root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
-                                                        break;
-                                                }
-                                            }
-                                        }
-
-                                        ZUI.SectionButton {
-                                            visible: !waveformContainer.showWaveform
-                                            Layout.minimumWidth: Kirigami.Units.gridUnit * 3
-                                            Layout.fillHeight: true
-                                            icon.name: "go-next"
-                                            onClicked: {
-                                                switch (root.selectedChannel.selectedSlot.className) {
-                                                    case "TracksBar_synthslot":
-                                                        root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
-                                                        break;
-                                                    case "TracksBar_fxslot":
-                                                        root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }                                    
-
-                                ZUI.SectionGroup {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    mask: waveformContainer.showWaveform
-                                    fallbackPadding: ZUI.Theme.padding
-                                    fallbackBackground:  Rectangle {                                             
-                                        border.width: 1
-                                        border.color: "#ff999999"
-                                        radius: ZUI.Theme.radius
-                                        color: "#222222"
-                                    }
-
-                                    Item {
-                                        id: waveItemContainer
-                                        anchors.fill: parent
-
+                                    Item {     
+                                        Layout.fillHeight: true
+                                        Layout.fillWidth: true
                                         MouseArea {
                                             property var lastMouseX
                                             property var lastMouseY
@@ -1799,7 +1813,7 @@ AbstractSketchpadPage {
                                         }
                                     }
                                 }
-                            }
+                            }                            
                         }
 
                         // Take remaining available width
@@ -1977,7 +1991,6 @@ AbstractSketchpadPage {
                                     }
                                 }
                             }
-                            
                         }
                     }
                 }
@@ -2080,7 +2093,13 @@ AbstractSketchpadPage {
                             RowLayout {
                                 id: _SMPPitchRow
                                 spacing: ZUI.Theme.cellSpacing
+                                function handleClick(channel) { 
+                                    zynqtgui.sketchpad.selectedTrackId = channel.id;
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", -1, _pitchRepeater.itemAt(channel.id), channel);
+                                }
                                 Repeater {
+                                    id: _pitchRepeater
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {
 
@@ -2105,6 +2124,7 @@ AbstractSketchpadPage {
                                             }
 
                                             onDoubleClicked: clipObj.selectedSliceObject.pitch = controlObj.initialPitch
+                                            onClicked: _SMPPitchRow.handleClick(channel)
                                             onValueChanged: clipObj.selectedSliceObject.pitch =  slider.value
 
                                             Binding {
@@ -2131,16 +2151,17 @@ AbstractSketchpadPage {
                                 id: _SMPStartEndRow
                                 spacing: ZUI.Theme.cellSpacing
 
-                                function handleClick(channel) { //TODO
-                                    // zynqtgui.sketchpad.selectedTrackId = channel.id;
-                                    // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    // zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-                                    // zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", channel.id, mixerItemsRepeater.itemAt(channel.id), channel);
+                                function handleClick(channel) { 
+                                    zynqtgui.sketchpad.selectedTrackId = channel.id;
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_startend", -1, _startEndRepeater.itemAt(channel.id), channel);
                                 }
 
                                 Repeater {
+                                    id: _startEndRepeater
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {
+                                        id: _startEndDelegate
 
                                         readonly property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
@@ -2154,8 +2175,15 @@ AbstractSketchpadPage {
                                         text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
                                         text2: enabled ? Math.round(_rangeSlider.first.value) +"%-"+Math.round(_rangeSlider.realStopValue)+"%" : "-"
 
+                                        onDoubleClicked: {
+                                            sliceObj.startPositionSamples = 0
+                                            sliceObj.lengthSamples = clipObj.durationSamples
+                                        }
+                                        onClicked: _SMPStartEndRow.handleClick(channel)
+
                                         control1: Item {
-                                             RangeSlider {
+                                                
+                                            RangeSlider {
                                                 id: _rangeSlider                                        
                                                 anchors.fill: parent
                                                 anchors.margins: Kirigami.Units.smallSpacing + 6
@@ -2164,6 +2192,7 @@ AbstractSketchpadPage {
                                                 to: 100
 
                                                 middlePosition: 1-(sliceObj.loopDeltaSamples/sliceObj.lengthSamples)
+                                                topValueOverflows: realStopValue > 100
 
                                                 property int stopPosition: Math.min(sliceObj.startPositionSamples+sliceObj.lengthSamples, clipObj.durationSamples) 
                                                 readonly property int realStopValue: (100 * (sliceObj.startPositionSamples+sliceObj.lengthSamples))/clipObj.durationSamples 
@@ -2177,15 +2206,17 @@ AbstractSketchpadPage {
                                                 second.onMoved: {
                                                     var endPos = Math.round((second.value*clipObj.durationSamples)/100)
                                                     sliceObj.lengthSamples = endPos - sliceObj.startPositionSamples
-                                                }                   
-                                            }  
-                                        }
+                                                }  
 
-                                        // Text {
-                                        //     Layout.fillWidth: true
-                                        //     text:clipObj.durationSamples + " \n " + sliceObj.startPositionSamples + " \n " + sliceObj.lengthSamples + "\n" + sliceObj.loopDeltaSamples
-                                        //     color: "red"
-                                        // }
+                                                TapHandler {    
+                                                    enabled: !_startEndDelegate.highlighted  
+                                                    gesturePolicy: TapHandler.ReleaseWithinBounds
+                                                    grabPermissions: PointerHandler.ApprovesTakeOverByAnything                                     
+                                                    onTapped: _startEndDelegate.clicked()
+                                                    onDoubleTapped: _startEndDelegate.doubleClicked()
+                                                }                  
+                                            } 
+                                        }
                                     }
                                 }
                             }
@@ -2193,7 +2224,15 @@ AbstractSketchpadPage {
                             RowLayout {
                                 id: _SMPLoopRow
                                 spacing: ZUI.Theme.cellSpacing
+
+                                function handleClick(channel) { 
+                                    zynqtgui.sketchpad.selectedTrackId = channel.id;
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_loop", -1, _loopRepeater.itemAt(channel.id), channel);
+                                }
+
                                 Repeater {
+                                    id: _loopRepeater
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {
 
@@ -2207,14 +2246,15 @@ AbstractSketchpadPage {
                                         highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                         title: model.channel.name
                                         text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-                                        text2: clipObj.selectedSliceObject.pitch.toFixed(2)
+                                        text2: volumeControl.slider.value.toFixed(2)+("%")
 
                                         control1: VolumeControl {
                                             id: volumeControl
                                             tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
-                                            onValueChanged: {
-                                                sliceObj.loopDeltaSamples = sliceObj.lengthSamples  * (slider.value/100)
-                                            }
+                                            onValueChanged: sliceObj.loopDeltaSamples = sliceObj.lengthSamples * (slider.value/100)
+                                            onDoubleClicked: sliceObj.loopDeltaSamples = sliceObj.lengthSamples * (0.5)
+                                            onClicked: _SMPLoopRow.handleClick(channel)
+
                                             slider {
                                                 from: 0
                                                 to: 100
@@ -2250,6 +2290,7 @@ AbstractSketchpadPage {
         id: _rangeSlider                                        
         orientation: Qt.Vertical 
         property double middlePosition: 0.5
+        property bool topValueOverflows: false
        
         background: Item {
             Rectangle {
@@ -2306,7 +2347,7 @@ AbstractSketchpadPage {
         }
 
         second.handle: Item {
-            visible: enabled
+            visible: enabled && !_rangeSlider.topValueOverflows
             y: (_rangeSlider.second.visualPosition * (_rangeSlider.availableHeight))
             x: _rangeSlider.width/2 - width/2
             implicitWidth: Kirigami.Units.gridUnit * 0.5

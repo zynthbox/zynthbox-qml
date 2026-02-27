@@ -48,6 +48,61 @@ ZUI.ScreenPage {
     property bool showOccupiedSlotsHeader: false
     property QtObject selectedChannel: null
 
+    function updateSelectedSamplePitch(sign, slot = -1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlotRow;
+
+        let sketchpadSample = root.selectedChannel.samples[slot];
+        if (sketchpadSample.cppObjId > -1) {
+            let cppSample = Zynthbox.Plugin.getClipById(sketchpadSample.cppObjId);
+            let sliceObject = cppSample.selectedSliceObject;
+            let value = sliceObject.pitch + sign
+            sliceObject.pitch = Math.min(48, Math.max(value, -48))
+        }
+    }
+
+    function updateSelectedSampleStartPositionSamples(sign, slot = -1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlotRow;
+
+        let sketchpadSample = root.selectedChannel.samples[slot];
+        if (sketchpadSample.cppObjId > -1) {
+            let cppSample = Zynthbox.Plugin.getClipById(sketchpadSample.cppObjId);
+            let sliceObject = cppSample.selectedSliceObject;
+            let value = sliceObject.startPositionSamples + (sign*0.01 * cppSample.durationSamples) // increase and decrease by 1%
+            // sliceObject.startPositionSamples = Math.min(cppSample.durationSamples, Math.max(value, 0))
+            sliceObject.startPositionSamples = value
+            console.log("Start End point knob",sliceObject.startPositionSamples )
+        }
+    }
+
+    function updateSelectedSampleLengthSamples(sign, slot = -1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlotRow;
+
+        let sketchpadSample = root.selectedChannel.samples[slot];
+        if (sketchpadSample.cppObjId > -1) {
+            let cppSample = Zynthbox.Plugin.getClipById(sketchpadSample.cppObjId);
+            let sliceObject = cppSample.selectedSliceObject;
+            let value = sliceObject.lengthSamples + (sign*0.01 * cppSample.durationSamples) // increase and decrease by 1%
+            sliceObject.lengthSamples = value
+            console.log("Length point knob",sliceObject.lengthSamples )
+        }
+    }
+
+    function updateSelectedSampleLoopPosition(sign, slot = -1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlotRow;
+
+        let sketchpadSample = root.selectedChannel.samples[slot];
+        if (sketchpadSample.cppObjId > -1) {
+            let cppSample = Zynthbox.Plugin.getClipById(sketchpadSample.cppObjId);
+            let sliceObject = cppSample.selectedSliceObject;
+            let value = sliceObject.loopDeltaSamples + (sign*0.01 * sliceObject.lengthSamples)
+            sliceObject.loopDeltaSamples = value
+        }
+    }
+
     /**
      * Update layer volume of selected fx slot
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size

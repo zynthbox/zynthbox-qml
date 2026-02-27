@@ -395,8 +395,7 @@ AbstractSketchpadPage {
 
                                 onClicked: channelsReverbRow.handleClick(channel)
                                 onDoubleClicked: controller.channel.wetFx2Amount = 50                                
-                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
-                                
+                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})                                
                             }
                         }
                     }

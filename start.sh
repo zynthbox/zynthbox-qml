@@ -97,6 +97,7 @@ if command -v kwin_x11 &> /dev/null; then
     if [ -z "$ZYNTHBOX_DEBUG" ]; then
         python3 -X faulthandler ./bootlog_window.py &
         python3 -X faulthandler ./zynthian_qt_gui.py
+        ZYNTHBOX_QML_EXIT_CODE=$?
     else
         if [ "$ZYNTHBOX_DEBUG" = "block" ]; then
             extra_args="$extra_args,block"
@@ -104,12 +105,22 @@ if command -v kwin_x11 &> /dev/null; then
 
         python3 -X faulthandler ./bootlog_window.py &
         python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
+        ZYNTHBOX_QML_EXIT_CODE=$?
     fi
 
-    # If control reaches here it means the application exited.
-    # Application should never exit by itself and should always be running.
-    # Restart application
-    systemctl --user restart pipewire wireplumber mod-ttymidi zynthbox-qml
+    echo "Zynthbox QML UI exited with code $ZYNTHBOX_QML_EXIT_CODE"
+    if [ "$ZYNTHBOX_QML_EXIT_CODE" -eq 100 ]; then
+        systemctl poweroff
+    elif [ "$ZYNTHBOX_QML_EXIT_CODE" -eq 101 ]; then
+        reboot
+    elif [ "$ZYNTHBOX_QML_EXIT_CODE" -eq 102 ]; then
+        systemctl --user restart pipewire wireplumber zynthbox-qml mod-ttymidi
+    else:
+        # If control reaches here it means the application exited.
+        # Application should never exit by itself and should always be running.
+        # Restart application
+        systemctl --user restart pipewire wireplumber zynthbox-qml mod-ttymidi
+    fi
 else
     echo "ERROR: kwin was not installed. Exiting."
     exit 1

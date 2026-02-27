@@ -20,11 +20,11 @@ Rectangle {
     property alias slider: slider
     property bool enabled: true
     property alias mouseArea: mouseArea
-    property alias value : slider.value
 
     signal clicked();
     signal doubleClicked();
-    
+    signal valueChanged();
+
     border.color: Kirigami.Theme.highlightColor
     border.width: highlight ? 1 : 0
     color: "transparent"
@@ -198,6 +198,7 @@ Rectangle {
                             var newVal = ZUI.CommonUtils.clamp((mouseArea.height - mouse.y) / mouseArea.height, 0, 1)
                             mouseArea.dragHappened = true
                             slider.value = ZUI.CommonUtils.interp(newVal * (slider.to - slider.from), 0, (slider.to - slider.from), slider.from, slider.to)
+                            control.valueChanged()
                         }
                     }
                     Timer {

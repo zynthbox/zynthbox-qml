@@ -152,16 +152,16 @@ ZUI.ScreenPage {
     }
 
     contentItem: QQC2.ScrollView {
-        contentHeight: content.implicitHeight
+        id: scrollView
         leftPadding: background.leftPadding
         rightPadding: background.rightPadding
         topPadding: background.topPadding
         bottomPadding: background.bottomPadding
         QQC2.ScrollBar.horizontal.visible: false
 
-        contentItem: Column {
+        Column {
             id: content
-
+            width: scrollView.availableWidth 
             spacing: ZUI.Theme.padding
 
             EntryDelegate {

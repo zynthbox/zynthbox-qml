@@ -92,8 +92,8 @@ AbstractSketchpadPage {
 
     enum SMPView {
         Pitch,
-        Loop,
-        StartEnd
+        StartEnd,
+        Loop
     }  
 
     function pickNextSlot(onlySelectSlot=false) {
@@ -2018,19 +2018,18 @@ AbstractSketchpadPage {
                                     ZUI.SectionButton {
                                         Layout.fillHeight: true
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                        text: "Loop"
-                                        checked: highlighted
-                                        highlighted: _SMPStack.currentView === TracksBar.SMPView.Loop
-                                        onClicked: _SMPStack.setView(TracksBar.SMPView.Loop)
-                                    }
-
-                                    ZUI.SectionButton {
-                                        Layout.fillHeight: true
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                         text: "Start/End"
                                         checked: highlighted
                                         highlighted: _SMPStack.currentView === TracksBar.SMPView.StartEnd
                                         onClicked: _SMPStack.setView(TracksBar.SMPView.StartEnd)
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Loop"
+                                        checked: highlighted
+                                        highlighted: _SMPStack.currentView === TracksBar.SMPView.Loop
+                                        onClicked: _SMPStack.setView(TracksBar.SMPView.Loop)
                                     }
                                 }
                             }
@@ -2085,8 +2084,8 @@ AbstractSketchpadPage {
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {
 
-                                        property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
-                                        property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
+                                        readonly property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
+                                        readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         enabled: clipObj
 
                                         Layout.fillWidth: true
@@ -2128,9 +2127,8 @@ AbstractSketchpadPage {
                                 }
                             }
 
-                            Item {}
-
                             RowLayout {
+                                id: _SMPStartEndRow
                                 spacing: ZUI.Theme.cellSpacing
 
                                 function handleClick(channel) { //TODO
@@ -2143,88 +2141,98 @@ AbstractSketchpadPage {
                                 Repeater {
                                     model: root.song.channelsModel
                                     delegate: AbstractCellLayout {
+
+                                        readonly property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
+                                        readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
+                                        readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
+                                        enabled: clipObj
+
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                         title: model.channel.name
                                         text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-                                        text2: Math.round(_rangeSlider.first.value*100) +"-"+Math.round(_rangeSlider.second.value*100)
+                                        text2: enabled ? Math.round(_rangeSlider.first.value) +"%-"+Math.round(_rangeSlider.realStopValue)+"%" : "-"
 
                                         control1: Item {
-                                             QQC2.RangeSlider {
+                                             RangeSlider {
                                                 id: _rangeSlider                                        
-                                                orientation: Qt.Vertical 
-                                                padding: ZUI.Theme.padding
                                                 anchors.fill: parent
                                                 anchors.margins: Kirigami.Units.smallSpacing + 6
 
-                                                background: Item {
-                                                    Rectangle {
-                                                        anchors.horizontalCenter: parent.horizontalCenter
-                                                        height: parent.height
-                                                        width: Kirigami.Units.gridUnit * 0.5
-                                                        Kirigami.Theme.inherit: false
-                                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                        implicitWidth: Kirigami.Units.gridUnit
-                                                        radius: ZUI.Theme.radius
-                                                        color: Kirigami.Theme.backgroundColor
-                                                        border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
-                                                        
-                                                        // Highlight range between handles
-                                                        Rectangle {
-                                                            y: _rangeSlider.second.visualPosition * parent.height
-                                                            height: (_rangeSlider.first.visualPosition - _rangeSlider.second.visualPosition) * parent.height
-                                                            anchors.left: parent.left
-                                                            anchors.right: parent.right
-                                                            anchors.margins: 1
-                                                            radius: ZUI.Theme.radius
-                                                            color: Kirigami.Theme.highlightColor 
-                                                            // opacity: 0.2
-                                                        }
+                                                from: 0
+                                                to: 100
 
-                                                        Rectangle {
-                                                            height: 1
-                                                            anchors.left: parent.left
-                                                            anchors.right: parent.right
-                                                            anchors.margins: 1
-                                                            color: Kirigami.Theme.textColor
-                                                            anchors.verticalCenter: parent.verticalCenter
-                                                        }
-                                                    }
-                                                }
+                                                middlePosition: 1-(sliceObj.loopDeltaSamples/sliceObj.lengthSamples)
 
-                                                first.handle: Item {
-                                                    y: _rangeSlider.first.visualPosition * (_rangeSlider.availableHeight - height)
-                                                    x: _rangeSlider.width/2 - width/2
-                                                    implicitWidth: Kirigami.Units.gridUnit * 0.5
-                                                    implicitHeight: 22  
+                                                property int stopPosition: Math.min(sliceObj.startPositionSamples+sliceObj.lengthSamples, clipObj.durationSamples) 
+                                                readonly property int realStopValue: (100 * (sliceObj.startPositionSamples+sliceObj.lengthSamples))/clipObj.durationSamples 
 
-                                                    Kirigami.Icon {
-                                                        anchors.right: parent.left
-                                                        anchors.verticalCenter: parent.bottom
-                                                        implicitHeight: 22
-                                                        implicitWidth: 22
-                                                        source: Qt.resolvedUrl("../../../img/right-arrow.svg")
-                                                        color: Kirigami.Theme.textColor
-                                                    }
-                                                }
+                                                first.value: (100*sliceObj.startPositionSamples)/clipObj.durationSamples   
+                                                first.onMoved:{
+                                                    sliceObj.startPositionSamples = Math.round((first.value*clipObj.durationSamples)/100)
+                                                }                          
 
-                                                second.handle: Item {
-                                                    y: _rangeSlider.second.visualPosition * (_rangeSlider.availableHeight - height)
-                                                    x: _rangeSlider.width/2 - width/2
-                                                    implicitWidth: Kirigami.Units.gridUnit * 0.5
-                                                    implicitHeight: 22
-
-                                                    Kirigami.Icon {
-                                                        anchors.left: parent.right
-                                                        anchors.verticalCenter: parent.top
-                                                        implicitHeight: 22
-                                                        implicitWidth: 22
-                                                        source: Qt.resolvedUrl("../../../img/left-arrow.svg")
-                                                        color: Kirigami.Theme.textColor
-                                                    }
-                                                }                                       
+                                                second.value: (100*stopPosition)/clipObj.durationSamples  
+                                                second.onMoved: {
+                                                    var endPos = Math.round((second.value*clipObj.durationSamples)/100)
+                                                    sliceObj.lengthSamples = endPos - sliceObj.startPositionSamples
+                                                }                   
                                             }  
+                                        }
+
+                                        // Text {
+                                        //     Layout.fillWidth: true
+                                        //     text:clipObj.durationSamples + " \n " + sliceObj.startPositionSamples + " \n " + sliceObj.lengthSamples + "\n" + sliceObj.loopDeltaSamples
+                                        //     color: "red"
+                                        // }
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                id: _SMPLoopRow
+                                spacing: ZUI.Theme.cellSpacing
+                                Repeater {
+                                    model: root.song.channelsModel
+                                    delegate: AbstractCellLayout {
+
+                                        readonly property QtObject controlObj: model.channel.samples[model.channel.selectedSlotRow]
+                                        readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
+                                        readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
+                                        enabled: clipObj
+
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        highlighted: index === zynqtgui.sketchpad.selectedTrackId
+                                        title: model.channel.name
+                                        text: model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                        text2: clipObj.selectedSliceObject.pitch.toFixed(2)
+
+                                        control1: VolumeControl {
+                                            id: volumeControl
+                                            tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                            onValueChanged: {
+                                                sliceObj.loopDeltaSamples = sliceObj.lengthSamples  * (slider.value/100)
+                                            }
+                                            slider {
+                                                from: 0
+                                                to: 100
+                                            }
+                                            Binding {
+                                                target: volumeControl.slider
+                                                property: "value"
+                                                value: (100*sliceObj.loopDeltaSamples)/sliceObj.lengthSamples  
+                                            }
+                                        }
+                                        underlay: MouseArea {
+                                            anchors.fill: parent
+                                            onPressed: control1.mouseArea.handlePressed(mouse)
+                                            onReleased: control1.mouseArea.released(mouse)
+                                            onPressAndHold: control1.mouseArea.pressAndHold(mouse)
+                                            onClicked: control1.mouseArea.clicked(mouse)
+                                            onMouseXChanged: control1.mouseArea.mouseXChanged(mouse)
+                                            onMouseYChanged: control1.mouseArea.mouseYChanged(mouse)
                                         }
                                     }
                                 }
@@ -2237,4 +2245,81 @@ AbstractSketchpadPage {
             }
         }      
     }
+
+    component RangeSlider : QQC2.RangeSlider {
+        id: _rangeSlider                                        
+        orientation: Qt.Vertical 
+        property double middlePosition: 0.5
+       
+        background: Item {
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: parent.height
+                width: Kirigami.Units.gridUnit * 0.5
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                implicitWidth: Kirigami.Units.gridUnit
+                radius: ZUI.Theme.radius
+                color: Kirigami.Theme.backgroundColor
+                border.color: Qt.darker(Kirigami.Theme.backgroundColor, 3)
+                
+                // Highlight range between handles
+                Rectangle {
+                    visible: enabled
+                    y: _rangeSlider.second.visualPosition * parent.height
+                    height: (_rangeSlider.first.visualPosition - _rangeSlider.second.visualPosition) * parent.height
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.margins: 1
+                    radius: ZUI.Theme.radius
+                    color: Kirigami.Theme.highlightColor 
+                    // opacity: 0.2
+
+                    Rectangle {
+                        height: 1
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.margins: 1
+                        color: Kirigami.Theme.textColor
+                        y: parent.height * _rangeSlider.middlePosition
+                    }
+                }
+                
+            }
+        }
+
+        first.handle: Item {
+            visible: enabled
+            y: (_rangeSlider.first.visualPosition * (_rangeSlider.availableHeight)) - height
+            x: _rangeSlider.width/2 - width/2
+            implicitWidth: Kirigami.Units.gridUnit * 0.5
+            implicitHeight: 22  
+
+            Kirigami.Icon {
+                anchors.right: parent.left
+                anchors.verticalCenter: parent.bottom
+                implicitHeight: 22
+                implicitWidth: 22
+                source: Qt.resolvedUrl("../../../img/right-arrow.svg")
+                color: Kirigami.Theme.textColor
+            }
+        }
+
+        second.handle: Item {
+            visible: enabled
+            y: (_rangeSlider.second.visualPosition * (_rangeSlider.availableHeight))
+            x: _rangeSlider.width/2 - width/2
+            implicitWidth: Kirigami.Units.gridUnit * 0.5
+            implicitHeight: 22
+
+            Kirigami.Icon {
+                anchors.left: parent.right
+                anchors.verticalCenter: parent.top
+                implicitHeight: 22
+                implicitWidth: 22
+                source: Qt.resolvedUrl("../../../img/left-arrow.svg")
+                color: Kirigami.Theme.textColor
+            }
+        }                                       
+    } 
 }

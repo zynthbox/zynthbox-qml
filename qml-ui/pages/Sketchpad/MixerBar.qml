@@ -249,7 +249,6 @@ AbstractSketchpadPage {
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
                                 inputAudioLeveldB: visible && !model.channel.muted ? Zynthbox.AudioLevels.channels[model.channel.id] : -40
-                                value: model.channel.gainHandler.gainDb 
                                 inputAudioLevelVisible: true
 
                                 onValueChanged: model.channel.gainHandler.gainDb = slider.value
@@ -380,7 +379,6 @@ AbstractSketchpadPage {
                                 id: reverbControl
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
-                                value: controller.channel.wetFx2Amount
                                 onValueChanged: controller.channel.wetFx2Amount = slider.value
 
                                 Binding {
@@ -438,7 +436,6 @@ AbstractSketchpadPage {
                             onClicked: channelsDelayRow.handleClick(controller.channel)
                             control1: VolumeControl {
                                 id: delayControl
-                                value: controller.channel.wetFx1Amount
                                 // Disable when muted or channel is not being played in solo mode
                                 enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
                                 tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})

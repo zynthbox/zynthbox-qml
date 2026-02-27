@@ -323,7 +323,10 @@ IMP.BasePlayGrid {
                     }
                     _private.associatedChannel = newChannel;
                     _private.associatedChannelIndex =  _private.activePatternModel.sketchpadTrack;
-                    Qt.callLater(_private.updateUniqueCurrentRowNotes)
+                    if (_private.associatedChannel && _private.associatedChannel.trackStyle === "drums") {
+                        _private.selectStep(0);
+                    }
+                    Qt.callLater(_private.updateUniqueCurrentRowNotes);
                 } else {
                     _private.updateChannel();
                 }
@@ -365,8 +368,9 @@ IMP.BasePlayGrid {
         signal knob2Down();
         signal goLeft();
         signal goRight();
-        signal deselectSelectedItem()
-        signal activateSelectedItem()
+        signal deselectSelectedItem();
+        signal selectStep(int stepIndex);
+        signal activateSelectedItem();
         property bool hasSelection: false
         property int selectedStep: -1
         onSelectedStepChanged: {
@@ -1119,6 +1123,7 @@ IMP.BasePlayGrid {
                         onGoLeft: drumPadRepeater.goPrevious();
                         onGoRight: drumPadRepeater.goNext();
                         onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
+                        onSelectStep: drumPadRepeater.selectStep(stepIndex);
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
                         onKnob0Up: {
                             if (component.showPatternSettings && noteSettingsPopup.visible === false) {
@@ -1443,9 +1448,15 @@ IMP.BasePlayGrid {
                                 } else if (component.showPatternSettings) {
                                     // Do nothing when the pattern settings panel is open, it handles this itself
                                 } else if (!noteSettings.visible) {
-                                    var changeStep = true;
-                                    if (selectedIndex > -1) {
-                                        var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                    let changeStep = true;
+                                    // Always change steps when on the drum sequencer
+                                    if (drumSequencer.visible) {
+                                        if (selectedIndex > -1) {
+                                            let seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                            seqPad.currentSubNote = -1;
+                                        }
+                                    } else if (selectedIndex > -1) {
+                                        let seqPad = drumPadRepeater.itemAt(selectedIndex);
                                         if (seqPad.currentSubNote < seqPad.subNoteCount - 1) {
                                             seqPad.currentSubNote = seqPad.currentSubNote + 1;
                                             changeStep = false;
@@ -1474,7 +1485,13 @@ IMP.BasePlayGrid {
                                     // Do nothing when the pattern settings panel is open, it handles this itself
                                 } else if (!noteSettings.visible) {
                                     var changeStep = true;
-                                    if (selectedIndex > -1) {
+                                    // Always change steps when on the drum sequencer
+                                    if (drumSequencer.visible) {
+                                        if (selectedIndex > -1) {
+                                            let seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                            seqPad.currentSubNote = -1;
+                                        }
+                                    } else if (selectedIndex > -1) {
                                         var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                         if (seqPad.currentSubNote > -1) {
                                             seqPad.currentSubNote = seqPad.currentSubNote - 1;
@@ -1491,8 +1508,10 @@ IMP.BasePlayGrid {
                                             selectedIndex = selectedIndex - 1;
                                         } else {
                                             if (_private.sequence.activePatternObject.activeBar == 0) {
-                                                // if first bar, reset to no selection
-                                                selectedIndex = -1;
+                                                // if first bar, reset to no selection (unless we're using the drum sequencer, don't allow no selection for that)
+                                                if (drumSequencer.visible === false) {
+                                                    selectedIndex = -1;
+                                                }
                                             } else {
                                                 // otherwise go to the last step of the previous bar
                                                 _private.previousBar();
@@ -1502,6 +1521,19 @@ IMP.BasePlayGrid {
                                     }
                                     Qt.callLater(updateMostRecentFromSelection);
                                 }
+                            }
+                            function selectStep(stepIndex) {
+                                let bar = Math.floor(stepIndex % _private.workingPatternModel.width);
+                                let column = stepIndex - (bar * _private.workingPatternModel.width);
+                                if (bar !== _private.workingPatternModel.activeBar) {
+                                    _private.workingPatternModel.activeBar = bar;
+                                }
+                                if (selectedIndex > -1) {
+                                    let seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                    seqPad.currentSubNote = -1;
+                                }
+                                selectedIndex = column;
+                                Qt.callLater(updateMostRecentFromSelection);
                             }
                             function deselectSelectedItem() {
                                 if (component.showPatternSettings) {
@@ -1559,7 +1591,20 @@ IMP.BasePlayGrid {
                                 }
                             }
                             function changeValue(valueName, howMuch, minValue, maxValue, defaultValue) {
-                                if (drumPadRepeater.selectedIndex > -1) {
+                                if (drumSequencer.visible) {
+                                    let seqPad = drumPadRepeater.itemAt(applicationWindow().globalSequencer.mostRecentlyInteractedStep)
+                                    let indicesToChange = [];
+                                    if (seqPad.note) {
+                                        for (let i = 0; i < seqPad.note.subnotes.length; ++i) {
+                                            if (applicationWindow().globalSequencer.heardNotes.include(seqPad.note.subnotes[i])) {
+                                                indicesToChange.push(i);
+                                            }
+                                        }
+                                    }
+                                    if (indicesToChange.length > 0) {
+                                        changeStepValue(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, indicesToChange, valueName, howMuch, minValue, maxValue, defaultValue);
+                                    }
+                                } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     var indicesToChange = []
                                     if (seqPad.note && seqPad.currentSubNote === -1) {
@@ -1608,23 +1653,23 @@ IMP.BasePlayGrid {
                                 changeValue("duration", -1, -1, 1024, 0);
                             }
                             function delayUp() {
-                                if (noteSettings.visible) {
-                                    changeValue("delay", 1, - noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
+                                let stepDuration = _private.workingPatternModel.stepLength / (Zynthbox.SyncTimer.getMultiplier() / 32);
+                                if (noteSettings.visible || drumSequencer.visible) {
+                                    changeValue("delay", 1, - stepDuration + 1, stepDuration - 1, 0);
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = _private.workingPatternModel.stepLength;
                                         changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
                             }
                             function delayDown() {
-                                if (noteSettings.visible) {
-                                    changeValue("delay", -1, - noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
+                                let stepDuration = _private.workingPatternModel.stepLength / (Zynthbox.SyncTimer.getMultiplier() / 32);
+                                if (noteSettings.visible || drumSequencer.visible) {
+                                    changeValue("delay", -1, - stepDuration + 1, stepDuration - 1, 0);
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = _private.workingPatternModel.stepLength;
                                         changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
@@ -1819,6 +1864,7 @@ IMP.BasePlayGrid {
 
                 // per-note style drum sequencer
                 DrumSequencer {
+                    id: drumSequencer
                     visible: _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
                     patternModel: _private.workingPatternModel
                     sequencerPrivate: _private
@@ -2372,6 +2418,8 @@ IMP.BasePlayGrid {
                                         _private.deselectSelectedItem();
                                     }
                                 }
+                                // Select the first step of the bar
+                                _private.selectStep(_private.workingPatternModel.activeBar * _private.workingPatternModel.width);
                                 component.heardNotes = [];
                                 component.heardVelocities = [];
                             }

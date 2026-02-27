@@ -504,13 +504,26 @@ AbstractSketchpadPage {
                 root.sketchpadView.updateSelectedFxLayerVolume(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_item_pitch":
-                root.sketchpadView.updateSelectedSamplePitch(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSamplePitch(1)
+                }else {
+                    root.sketchpadView.updateSelectedSamplePitch(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
                 break;
             case "TracksBar_item_startend":
-                root.sketchpadView.updateSelectedSampleStartPositionSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSampleStartPositionSamples(1)
+                }else {
+                    root.sketchpadView.updateSelectedSampleStartPositionSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
                 break;
             case "TracksBar_item_loop":
-                root.sketchpadView.updateSelectedSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else {
+                    root.sketchpadView.updateSelectedSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                
                 break;
             default:
                 returnValue = false;
@@ -536,14 +549,25 @@ AbstractSketchpadPage {
                 root.sketchpadView.updateSelectedFxLayerVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_item_pitch":
-                root.sketchpadView.updateSelectedSamplePitch(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSamplePitch(-1)
+                }else {
+                    root.sketchpadView.updateSelectedSamplePitch(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
                 break;
             case "TracksBar_item_startend":
-                root.sketchpadView.updateSelectedSampleStartPositionSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSampleStartPositionSamples(-1)
+                }else {
+                    root.sketchpadView.updateSelectedSampleStartPositionSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
                 break;
             case "TracksBar_item_loop":
-                root.sketchpadView.updateSelectedSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
-                break;
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else {
+                    root.sketchpadView.updateSelectedSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
             default:
                 returnValue = false;
                 // console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
@@ -614,7 +638,11 @@ AbstractSketchpadPage {
                 root.sketchpadView.updateSelectedChannelSketchFxLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_item_startend":
-                root.sketchpadView.updateSelectedSampleLengthSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSampleLengthSamples(1)
+                }else {
+                    root.sketchpadView.updateSelectedSampleLengthSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
                 break;
             default:
                 returnValue = false;
@@ -641,7 +669,11 @@ AbstractSketchpadPage {
                 root.sketchpadView.updateSelectedChannelSketchFxLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 break;
             case "TracksBar_item_startend":
-                root.sketchpadView.updateSelectedSampleLengthSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                if(_SMPStack.applyToAll){
+                    root.sketchpadView.updateAllSampleLengthSamples(-1)
+                }else {
+                    root.sketchpadView.updateSelectedSampleLengthSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
                 break;
             default:
                 returnValue = false;
@@ -2104,6 +2136,7 @@ AbstractSketchpadPage {
                             RowLayout {
                                 id: _SMPPitchRow
                                 spacing: ZUI.Theme.cellSpacing
+                                property int globalPitch: 0
                                 
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot);
@@ -2115,9 +2148,11 @@ AbstractSketchpadPage {
                                     id: _pitchRepeater
                                     model: root.selectedChannel.samples
                                     delegate: AbstractCellLayout {
+                                        id: _pitchDelegate
 
                                         readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
+                                        readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj && contentItem.visible
 
                                         contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5
@@ -2125,11 +2160,24 @@ AbstractSketchpadPage {
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
+
                                         highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
                                         title: "S"+ (index+1)
-                                        text: controlObj.path.split("/").pop()
-                                        text2: clipObj.selectedSliceObject.pitch.toFixed(2)
+                                        text: controlObj? controlObj.path.split("/").pop() : ""
+                                        text2: sliceObj ? sliceObj.pitch.toFixed(2) : ""
                                         onClicked: _SMPPitchRow.handleClick(index)
+
+                                        function setValue(value){
+                                            if(!sliceObj)
+                                                return;
+
+                                            sliceObj.pitch = value
+                                        }
+
+                                        Connections {
+                                            target: _SMPPitchRow
+                                            onGlobalPitchChanged: setValue(_SMPPitchRow.globalPitch)
+                                        }
 
                                         control1: VolumeControl {
                                             id: volumeControl
@@ -2140,14 +2188,20 @@ AbstractSketchpadPage {
                                                 stepSize: 1
                                             }
 
-                                            onDoubleClicked: clipObj.selectedSliceObject.pitch = controlObj.initialPitch
+                                            onDoubleClicked: sliceObj.pitch = controlObj.initialPitch
                                             onClicked: _SMPPitchRow.handleClick(index)
-                                            onValueChanged: clipObj.selectedSliceObject.pitch =  slider.value
+                                            onValueChanged: {
+                                                if(_SMPStack.applyToAll){
+                                                    _SMPPitchRow.globalPitch = slider.value
+                                                }else{
+                                                    _pitchDelegate.setValue(slider.value)
+                                                }
+                                            }
 
                                             Binding {
                                                 target: volumeControl.slider
                                                 property: "value"
-                                                value: clipObj.selectedSliceObject.pitch   
+                                                value: sliceObj ? sliceObj.pitch : 0   
                                             }
                                         }
 
@@ -2167,6 +2221,8 @@ AbstractSketchpadPage {
                             RowLayout {
                                 id: _SMPStartEndRow
                                 spacing: ZUI.Theme.cellSpacing
+                                property int globalStartPosition: 0
+                                property int globalLengthPosition: 0
 
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot);
@@ -2183,21 +2239,48 @@ AbstractSketchpadPage {
                                         readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
+
                                         enabled: clipObj && contentItem.visible
                                         contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5
                                         background.opacity: contentItem.visible ? 1 : 0.5
+
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
+
                                         highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
                                         title: "S"+ (index+1)
-                                        text: controlObj.path.split("/").pop()
+                                        text: controlObj ? controlObj.path.split("/").pop() : ""
                                         text2: enabled ? Math.round(_rangeSlider.first.value) +"%-"+Math.round(_rangeSlider.realStopValue)+"%" : "-"
 
                                         onDoubleClicked: {
+                                            if(!sliceObj)
+                                                return;
+
                                             sliceObj.startPositionSamples = 0
                                             sliceObj.lengthSamples = clipObj.durationSamples
                                         }
                                         onClicked: _SMPStartEndRow.handleClick(index)
+
+                                        function setStartPosition(value){
+                                            if(!sliceObj)
+                                                return;
+
+                                            sliceObj.startPositionSamples = Math.round((value*clipObj.durationSamples)/100)
+                                        }
+
+                                        function setLengthPosition(value){
+                                            if(!sliceObj)
+                                                return;
+
+                                            let endPos = Math.round((value*clipObj.durationSamples)/100)
+                                            sliceObj.lengthSamples = endPos - sliceObj.startPositionSamples
+                                        }
+
+                                        Connections {
+                                            target: _SMPStartEndRow
+                                            onGlobalStartPositionChanged: setStartPosition(_SMPStartEndRow.globalStartPosition)
+                                            onGlobalLengthPositionChanged: setLengthPosition(_SMPStartEndRow.globalLengthPosition)
+                                        }
 
                                         control1: Item {
                                                 
@@ -2209,22 +2292,29 @@ AbstractSketchpadPage {
                                                 from: 0
                                                 to: 100
 
-                                                middlePosition: 1-(sliceObj.loopDeltaSamples/sliceObj.lengthSamples)
+                                                middlePosition: sliceObj ? 1-(sliceObj.loopDeltaSamples/sliceObj.lengthSamples) : 0
                                                 topValueOverflows: realStopValue > 100
 
-                                                property int stopPosition: Math.min(sliceObj.startPositionSamples+sliceObj.lengthSamples, clipObj.durationSamples) 
-                                                readonly property int realStopValue: (100 * (sliceObj.startPositionSamples+sliceObj.lengthSamples))/clipObj.durationSamples 
+                                                readonly property int stopPosition: sliceObj ? Math.min(sliceObj.startPositionSamples+sliceObj.lengthSamples, clipObj.durationSamples) : 0
+                                                readonly property int realStopValue: sliceObj ? (100 * (sliceObj.startPositionSamples+sliceObj.lengthSamples))/clipObj.durationSamples : 0
 
-                                                first.value: (100*sliceObj.startPositionSamples)/clipObj.durationSamples   
-                                                first.onMoved:{
-                                                    sliceObj.startPositionSamples = Math.round((first.value*clipObj.durationSamples)/100)
-                                                }                          
+                                                first.value: sliceObj ? (100*sliceObj.startPositionSamples)/clipObj.durationSamples : 0 
+                                                first.onMoved: {
+                                                    if(_SMPStack.applyToAll){                                                        
+                                                        _SMPStartEndRow.globalStartPosition = first.value
+                                                    }else {
+                                                        _startEndDelegate.setStartPosition(first.value)
+                                                    } 
+                                                }               
 
-                                                second.value: (100*stopPosition)/clipObj.durationSamples  
+                                                second.value: sliceObj ? (100*stopPosition)/clipObj.durationSamples : 0
                                                 second.onMoved: {
-                                                    var endPos = Math.round((second.value*clipObj.durationSamples)/100)
-                                                    sliceObj.lengthSamples = endPos - sliceObj.startPositionSamples
-                                                }  
+                                                    if(_SMPStack.applyToAll){
+                                                        _SMPStartEndRow.globalLengthPosition = second.value
+                                                    }else {
+                                                        _startEndDelegate.setLengthPosition(second.value)
+                                                    }
+                                                }
 
                                                 TapHandler {    
                                                     enabled: !_startEndDelegate.highlighted  
@@ -2242,6 +2332,7 @@ AbstractSketchpadPage {
                             RowLayout {
                                 id: _SMPLoopRow
                                 spacing: ZUI.Theme.cellSpacing
+                                property int globalLoopPosition : 0
 
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot, false);
@@ -2253,26 +2344,53 @@ AbstractSketchpadPage {
                                     id: _loopRepeater
                                     model: root.selectedChannel.samples
                                     delegate: AbstractCellLayout {
+                                        id: _loopDelegate
 
                                         readonly property QtObject controlObj: modelData
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
+
                                         enabled: clipObj && contentItem.visible
                                         contentItem.visible: root.selectedChannel.trackType === "sample-trig" ? true : index < 5 
                                         background.opacity: contentItem.visible ? 1 : 0.5
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
+
                                         highlighted: (index === _SMPStack.currentSlotIndex || _SMPStack.applyToAll) && enabled
                                         title: "S"+ (index+1)
-                                        text: controlObj.path.split("/").pop()
+                                        text: controlObj ? controlObj.path.split("/").pop() : ""
                                         text2: volumeControl.slider.value.toFixed(2)+("%")
+
+                                        function setValue(value){
+                                            if(!sliceObj)
+                                                return
+
+                                            sliceObj.loopDeltaSamples = sliceObj.lengthSamples * (value/100)
+                                        }
+
+                                        Connections{
+                                            target: _SMPLoopRow
+                                            onGlobalLoopPositionChanged: setValue(_SMPLoopRow.globalLoopPosition)
+                                        }
 
                                         control1: VolumeControl {
                                             id: volumeControl
                                             tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
-                                            onValueChanged: sliceObj.loopDeltaSamples = sliceObj.lengthSamples * (slider.value/100)
-                                            onDoubleClicked: sliceObj.loopDeltaSamples = sliceObj.lengthSamples * (0.5)
+                                            onValueChanged: {
+                                                if(_SMPStack.applyToAll)
+                                                {
+                                                    _SMPLoopRow.globalLoopPosition = slider.value
+                                                }else {
+                                                    _loopDelegate.setValue(slider.value)
+                                                }
+                                            }
+                                            onDoubleClicked: {
+                                                if(!sliceObj)
+                                                    return
+
+                                                _loopDelegate.setValue(50) 
+                                            }
                                             onClicked: _SMPLoopRow.handleClick(index)
 
                                             slider {
@@ -2282,7 +2400,7 @@ AbstractSketchpadPage {
                                             Binding {
                                                 target: volumeControl.slider
                                                 property: "value"
-                                                value: (100*sliceObj.loopDeltaSamples)/sliceObj.lengthSamples  
+                                                value: sliceObj ? (100*sliceObj.loopDeltaSamples)/sliceObj.lengthSamples : 0
                                             }
                                         }
                                         underlay: MouseArea {

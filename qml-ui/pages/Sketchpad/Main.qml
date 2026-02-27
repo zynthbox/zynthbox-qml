@@ -61,6 +61,30 @@ ZUI.ScreenPage {
         }
     }
 
+    function updateAllSamplePitch(sign) {
+        for (let i = 0; i < root.selectedChannel.samples.length; i++) {
+            updateSelectedSamplePitch(sign, i)
+        }        
+    }
+
+    function updateAllSampleStartPositionSamples(sign) {
+        for (let i = 0; i < root.selectedChannel.samples.length; i++) {
+            updateSelectedSampleStartPositionSamples(sign, i)
+        }        
+    }
+
+    function updateAllSampleLengthSamples(sign) {
+        for (let i = 0; i < root.selectedChannel.samples.length; i++) {
+            updateSelectedSampleLengthSamples(sign, i)
+        }        
+    }
+
+    function updateAllSampleLoopPosition(sign) {
+        for (let i = 0; i < root.selectedChannel.samples.length; i++) {
+            updateSelectedSampleLoopPosition(sign, i)
+        }        
+    }
+
     function updateSelectedSampleStartPositionSamples(sign, slot = -1) {
         if (slot === -1)
             slot = root.selectedChannel.selectedSlotRow;

@@ -263,7 +263,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             if config["blink"] is True:
                 wsleds[button_id] = config['blinkColor']
 
-        wsleds.show()
+        if self.zynqtgui.isBootingComplete:
+            wsleds.show()
 
     @Slot()
     def blinkOn(self):
@@ -271,7 +272,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             if config["blink"] is True:
                 wsleds[button_id] = config['color']
 
-        wsleds.show()
+        if self.zynqtgui.isBootingComplete:
+            wsleds.show()
 
     @Slot(int, 'QColor', float)
     def setStepButtonColor(self, stepIndex, stepColor, brightness):
@@ -343,7 +345,6 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         wsleds[buttonId] = buttonColor
 
     def init(self):
-        wsleds.show()
         self.connect_dependent_property_signals()
 
     @Slot()
@@ -510,4 +511,5 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
                 else:
                     self.set_button_color(buttonId, self.action_block_color[buttonIndex])
 
-        wsleds.show()
+        if self.zynqtgui.isBootingComplete:
+            wsleds.show()

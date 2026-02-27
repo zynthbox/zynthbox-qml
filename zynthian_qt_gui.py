@@ -3628,15 +3628,10 @@ class zynthian_gui(QObject):
                 self.stop()
                 self.wait_threads_end()
                 logging.info("EXITING ZYNTHIAN-UI ...")
-
-                if self.exit_code == 100:
-                    Popen(("systemctl", "poweroff"))
-                elif self.exit_code == 101:
-                    Popen(("reboot"))
-                elif self.exit_code == 102:
-                    Popen(("systemctl", "--user", "restart", "pipewire", "wireplumber", "zynthbox-qml", "mod-ttymidi"))
-                else:
-                    Popen(("systemctl", "--user", "restart", "pipewire", "wireplumber", "zynthbox-qml", "mod-ttymidi"))
+                # Using os._exit to force exit here
+                # FIXME : Find why using sys.exit is not working. Probably because of running background threads, sys.exit waits for them to exit and since the
+                #         threads keep running, sys.exit keeps waiting forever. Find a way to use sys.exit and gracefully exit the application instead of forcing
+                os._exit(self.exit_code)
             # Refresh Current Layer
             elif self.curlayer and not self.loading:
                 self.curlayer.refresh()

@@ -128,10 +128,8 @@ ZUI.CellControl {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        // mixerColumnDelegate.control.handleClick(controller.channel);
-                        control.clicked()
-                    }
+                    onClicked: control.clicked()
+                    onDoubleClicked: control.doubleClicked()                    
                 }
             }
 
@@ -146,10 +144,8 @@ ZUI.CellControl {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        // mixerColumnDelegate.control.handleClick(channel);
-                        control.clicked()
-                    }
+                    onClicked: control.clicked()
+                    onDoubleClicked: control.doubleClicked()
                 }
             }
         }

@@ -2165,6 +2165,7 @@ AbstractSketchpadPage {
                                         title: "S"+ (index+1)
                                         text: controlObj? controlObj.path.split("/").pop() : ""
                                         text2: sliceObj ? sliceObj.pitch.toFixed(2) : ""
+                                        onDoubleClicked: sliceObj.pitch = controlObj.initialPitch
                                         onClicked: _SMPPitchRow.handleClick(index)
 
                                         function setValue(value){
@@ -2188,8 +2189,8 @@ AbstractSketchpadPage {
                                                 stepSize: 1
                                             }
 
-                                            onDoubleClicked: sliceObj.pitch = controlObj.initialPitch
-                                            onClicked: _SMPPitchRow.handleClick(index)
+                                            onDoubleClicked: _pitchDelegate.doubleClicked()
+                                            onClicked: _pitchDelegate.clicked()
                                             onValueChanged: {
                                                 if(_SMPStack.applyToAll){
                                                     _SMPPitchRow.globalPitch = slider.value
@@ -2316,12 +2317,17 @@ AbstractSketchpadPage {
                                                     }
                                                 }
 
-                                                TapHandler {    
-                                                    enabled: !_startEndDelegate.highlighted  
-                                                    gesturePolicy: TapHandler.ReleaseWithinBounds
-                                                    grabPermissions: PointerHandler.ApprovesTakeOverByAnything                                     
-                                                    onTapped: _startEndDelegate.clicked()
-                                                    onDoubleTapped: _startEndDelegate.doubleClicked()
+                                                MouseArea {    
+                                                    // enabled: !_startEndDelegate.highlighted  
+                                                    // gesturePolicy: TapHandler.ReleaseWithinBounds
+                                                    // grabPermissions: PointerHandler.ApprovesTakeOverByAnything                                     
+                                                    // onTapped: _startEndDelegate.clicked()
+                                                    // onDoubleTapped: _startEndDelegate.doubleClicked()
+                                                    anchors.fill: parent
+                                                    onPressed: {
+                                                        _startEndDelegate.clicked()
+                                                        mouse.accepted = false
+                                                    }
                                                 }                  
                                             } 
                                         }
@@ -2361,6 +2367,13 @@ AbstractSketchpadPage {
                                         title: "S"+ (index+1)
                                         text: controlObj ? controlObj.path.split("/").pop() : ""
                                         text2: volumeControl.slider.value.toFixed(2)+("%")
+                                        onClicked: _SMPLoopRow.handleClick(index)
+                                        onDoubleClicked: {
+                                            if(!sliceObj)
+                                                return
+
+                                            _loopDelegate.setValue(50) 
+                                        }
 
                                         function setValue(value){
                                             if(!sliceObj)
@@ -2385,13 +2398,10 @@ AbstractSketchpadPage {
                                                     _loopDelegate.setValue(slider.value)
                                                 }
                                             }
-                                            onDoubleClicked: {
-                                                if(!sliceObj)
-                                                    return
-
-                                                _loopDelegate.setValue(50) 
-                                            }
-                                            onClicked: _SMPLoopRow.handleClick(index)
+                                            
+                                            
+                                            onDoubleClicked: _loopDelegate.doubleClicked()
+                                            onClicked: _loopDelegate.clicked()
 
                                             slider {
                                                 from: 0

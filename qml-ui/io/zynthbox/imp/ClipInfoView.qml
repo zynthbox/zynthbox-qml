@@ -62,13 +62,14 @@ Item {
                 component.clip.selectedSliceObject.startPositionSeconds = 0;
             }
         }
+
         ZUI.SketchpadDial {
             id: loopOffsetSecondsDial
             text: qsTr("Loop Offset\n(seconds)")
             controlObj: component.clip ? component.clip.selectedSliceObject : null
             controlProperty: "loopDeltaSeconds"
             valueString: component.clip ? qsTr("%1\nsecs").arg(component.clip.selectedSliceObject.loopDeltaSeconds.toFixed(2)) : 0
-            visible: component.clip && component.clip.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle && component.clip.selectedSliceObject.snapLengthToBeat === false
+            visible: component.clip && component.clip.selectedSliceObject.looping === true && component.clip.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle && component.clip.selectedSliceObject.snapLengthToBeat === false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -92,7 +93,7 @@ Item {
             controlProperty: "loopDeltaBeats"
             readonly property double beatLengthRemainder: component.clip ? component.clip.selectedSliceObject.loopDeltaBeats % 4 : 0
             valueString: component.clip ? qsTr("%1:%2\nbeats").arg(Math.floor(component.clip.selectedSliceObject.loopDeltaBeats / 4)).arg((beatLengthRemainder).toFixed(Number.isInteger(beatLengthRemainder) ? 0 : 2)) : 0
-            visible: component.clip && component.clip.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle && component.clip.selectedSliceObject.snapLengthToBeat === true
+            visible: component.clip && component.clip.selectedSliceObject.looping === true && component.clip.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle && component.clip.selectedSliceObject.snapLengthToBeat === true
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -109,6 +110,14 @@ Item {
                 component.clip.selectedSliceObject.loopDeltaBeats = 0;
             }
         }
+        Item {
+            // Placeholder object to retain layout stability when we've not got a loop happening
+            visible: component.clip && component.clip.selectedSliceObject.looping === false
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+        }
+
         ZUI.SketchpadDial {
             id: lengthSecondsDial
             text: qsTr("Length\n(seconds)")

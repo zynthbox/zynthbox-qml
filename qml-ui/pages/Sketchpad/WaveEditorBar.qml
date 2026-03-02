@@ -140,8 +140,8 @@ GridLayout {
                 }
                 return true;
             case "KNOB1_UP":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                    // No loop delta to work on with the wavetable style sounds (it's locked to 0)
+                if (waveBar.cppClipObject && (waveBar.cppClipObject.selectedSliceObject.looping === false || waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle)) {
+                    // No loop delta to work on with the wavetable style sounds (it's locked to 0), or for non-looping playback styles
                 } else {
                     if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                         waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = ZUI.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds + (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
@@ -159,8 +159,8 @@ GridLayout {
                 }
                 return true;
             case "KNOB1_DOWN":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                    // No loop delta to work on with the wavetable style sounds (it's locked to 0)
+                if (waveBar.cppClipObject && (waveBar.cppClipObject.selectedSliceObject.looping === false || waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle)) {
+                    // No loop delta to work on with the wavetable style sounds (it's locked to 0), or for non-looping playback styles
                 } else {
                     if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                         waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = ZUI.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds - (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
@@ -391,8 +391,8 @@ GridLayout {
                             }
                         } else if (pressedY < twoThirds) {
                             // Centre third (loop point) - this may need some fanciness going on when we add in loopDelta2
-                            if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                                // No loop delta to work on with the wavetable style sounds (it's locked to 0)
+                            if (waveBar.cppClipObject && (waveBar.cppClipObject.selectedSliceObject.looping === false || waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle)) {
+                                // No loop delta to work on with the wavetable style sounds (it's locked to 0), or for non-looping playback styles
                             } else {
                                 if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                                     waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = ZUI.CommonUtils.clamp(pinchMouseArea.initialLoopDelta + (Math.round(deltaX / wav.pixelsPerBeat) * wav.pixelsPerBeat * wav.pixelToSecs), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
@@ -589,7 +589,7 @@ GridLayout {
 
         // Handle for setting loop point
         Item {
-            visible: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle
+            visible: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.looping === true && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle
             anchors {
                 verticalCenter: loopLine.verticalCenter
                 left: loopLine.right
@@ -715,6 +715,7 @@ GridLayout {
             color: Kirigami.Theme.highlightColor
             opacity: 0.6
             width: startLoopLine.width
+            visible: waveBar.cppClipObject.selectedSliceObject.looping === true
             property real loopDeltaRelative: waveBar.cppClipObject
                 ? waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples / waveBar.cppClipObject.durationSamples
                 : 0

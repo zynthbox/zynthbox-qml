@@ -839,6 +839,7 @@ ZUI.ScreenPage {
                         id: clipSettingsInfoViewClipThrottle
                         interval: 1; running: false; repeat: false;
                         onTriggered: {
+                            clipSettingsInfoView.sketchpadClip = component.selectedClip;
                             clipSettingsInfoView.clip = component.cppClipObject;
                         }
                     }

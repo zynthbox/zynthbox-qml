@@ -34,6 +34,7 @@ import io.zynthbox.ui 1.0 as ZUI
 
 Item {
     id: component
+    property QtObject sketchpadClip
     property QtObject clip
     RowLayout {
         anchors {
@@ -178,16 +179,68 @@ Item {
                 component.clip.selectedSliceObject.lengthSamples = 0;
             }
         }
-        ColumnLayout {
+        GridLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            columns: 2
             QQC2.Label {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: "Some\ninformation\nreadouts\nlike\nsamplerate\nlength\nfilesize\netc\ngo here"
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                Layout.columnSpan: 2
+                text: component.sketchpadClip ? component.sketchpadClip.filename : ""
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideMiddle
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: "Duration:"
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignRight
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: component.clip ? ZUI.CommonUtils.formatTime(component.clip.durationSeconds.toFixed(3)) : ""
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: "Samplerate:"
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignRight
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: component.clip ? qsTr("%1KHz").arg((component.clip.sampleRate / 1000).toFixed(2)) : ""
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: "File size:"
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignRight
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: component.clip ? ZUI.CommonUtils.formatFileSize(component.clip.fileSize) : ""
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
             }
         }
     }

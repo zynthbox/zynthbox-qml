@@ -281,11 +281,15 @@ Item {
                             anchors.fill: parent
                             // TODO allow tap-drag to toggle a bunch of step in a range
                             onClicked: {
-                                if (stepDelegate.stepEnabledForNote) {
-                                    _private.disableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
-                                } else {
-                                    _private.enableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
+                                if (component.sequencerPrivate.toggleStepOnTouchSelect) {
+                                    if (stepDelegate.stepEnabledForNote) {
+                                        _private.disableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
+                                    } else {
+                                        _private.enableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
+                                    }
                                 }
+                                applicationWindow().globalSequencer.setHeardData(noteRow.midiNote, component.patternModel.defaultVelocity);
+                                applicationWindow().globalSequencer.setMostRecentlyInteractedStep(stepDelegate.stepIndex);
                             }
                         }
                     }

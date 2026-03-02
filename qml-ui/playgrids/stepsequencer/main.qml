@@ -592,6 +592,12 @@ IMP.BasePlayGrid {
         }
     }
     Connections {
+        target: applicationWindow().globalSequencer
+        onMostRecentlyInteractedStepChanged: {
+            _private.selectStep(applicationWindow().globalSequencer.mostRecentlyInteractedStep);
+        }
+    }
+    Connections {
         target: zynqtgui.isBootingComplete && zynqtgui.sketchpad && zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel : null
         onConnectedSoundsCountChanged: _private.updateChannel()
         onConnectedPatternsCountChanged: _private.updateChannel()
@@ -1530,7 +1536,7 @@ IMP.BasePlayGrid {
                                 }
                             }
                             function selectStep(stepIndex) {
-                                let bar = Math.floor(stepIndex % _private.workingPatternModel.width);
+                                let bar = Math.floor(stepIndex / _private.workingPatternModel.width);
                                 let column = stepIndex - (bar * _private.workingPatternModel.width);
                                 if (bar !== _private.workingPatternModel.activeBar) {
                                     _private.workingPatternModel.activeBar = bar;

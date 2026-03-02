@@ -197,8 +197,10 @@ ZUI.ScreenPage {
         function goLeft(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -214,8 +216,10 @@ ZUI.ScreenPage {
         function goRight(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -231,8 +235,10 @@ ZUI.ScreenPage {
         function goUp(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -260,8 +266,10 @@ ZUI.ScreenPage {
         function goDown(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -289,8 +297,10 @@ ZUI.ScreenPage {
         function knob0Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -304,8 +314,10 @@ ZUI.ScreenPage {
         function knob0Up(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -321,8 +333,10 @@ ZUI.ScreenPage {
         function knob0Down(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -338,8 +352,10 @@ ZUI.ScreenPage {
         function knob1Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -353,8 +369,10 @@ ZUI.ScreenPage {
         function knob1Up(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -370,8 +388,10 @@ ZUI.ScreenPage {
         function knob1Down(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -387,8 +407,10 @@ ZUI.ScreenPage {
         function knob2Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -402,8 +424,10 @@ ZUI.ScreenPage {
         function knob2Up(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -417,8 +441,10 @@ ZUI.ScreenPage {
         function knob2Down(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -432,8 +458,10 @@ ZUI.ScreenPage {
         function knob3Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -662,6 +690,16 @@ ZUI.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredHeight: Kirigami.Units.gridUnit
+                        text: qsTr("Clip Info")
+                        enabled: component.selectedClipHasWav
+                        checked: highlighted
+                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsInfoView }
+                    }
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
                         text: qsTr("General")
                         enabled: component.selectedClipHasWav
                         checked: highlighted
@@ -708,16 +746,6 @@ ZUI.ScreenPage {
                         checked: highlighted
                         highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
                         onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsGrainerator }
-                    }
-                    ZUI.SectionButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredHeight: Kirigami.Units.gridUnit
-                        text: qsTr("Clip Info")
-                        enabled: component.selectedClipHasWav
-                        checked: highlighted
-                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
-                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsInfoView }
                     }
                 }
             }
@@ -769,7 +797,6 @@ ZUI.ScreenPage {
                 
                 enabled: component.selectedClipHasWav
                 opacity: enabled ? 1 : 0.5
-
                 mask: true
                 fallbackPadding: ZUI.Theme.padding
                 fallbackBackground:  Rectangle {                                             
@@ -779,16 +806,41 @@ ZUI.ScreenPage {
                     color: "#222222"
                 }
 
-                property Item currentItem: clipSettingsBar
+                property Item currentItem: clipSettingsInfoView
+                function startThrottles() {
+                    clipSettingsInfoViewClipThrottle.restart();
+                    clipSettingsBarControlObjThrottle.restart();
+                    clipSettingsSlicesClipThrottle.restart();
+                    clipSettingsVoicesClipThrottle.restart();
+                    clipSettingsADSRClipThrottle.restart();
+                    clipSettingsGraineratorClipThrottle.restart();
+                }
                 Connections {
                     target: component
-                    onSelectedClipChanged: {
-                        clipSettingsBarControlObjThrottle.restart();
-                        clipSettingsSlicesClipThrottle.restart();
-                        clipSettingsVoicesClipThrottle.restart();
-                        clipSettingsADSRClipThrottle.restart();
-                        clipSettingsGraineratorClipThrottle.restart();
-                        clipSettingsInfoViewClipThrottle.restart();
+                    onCppClipObjectChanged: clipSettingsSectionView.startThrottles()
+                    onSelectedClipChanged: clipSettingsSectionView.startThrottles()
+                    onIsVisibleChanged: {
+                        if (component.isVisible) {
+                            clipSettingsSectionView.startThrottles();
+                        }
+                    }
+                }
+                Connections {
+                    target: zynqtgui.sketchpad.song
+                    onIsLoadingChanged: clipSettingsSectionView.startThrottles()
+                }
+                IMP.ClipInfoView {
+                    id: clipSettingsInfoView
+                    objectName: "clipSettingsInfoView"
+                    visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                    anchors.fill: parent
+                    clip: null
+                    Timer {
+                        id: clipSettingsInfoViewClipThrottle
+                        interval: 1; running: false; repeat: false;
+                        onTriggered: {
+                            clipSettingsInfoView.clip = component.cppClipObject;
+                        }
                     }
                 }
                 Sketchpad.ClipSettingsBar {
@@ -871,20 +923,6 @@ ZUI.ScreenPage {
                         interval: 1; running: false; repeat: false;
                         onTriggered: {
                             clipSettingsGrainerator.clip = component.selectedClip;
-                        }
-                    }
-                }
-                IMP.ClipInfoView {
-                    id: clipSettingsInfoView
-                    objectName: "clipSettingsInfoView"
-                    visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                    anchors.fill: parent
-                    clip: null
-                    Timer {
-                        id: clipSettingsInfoViewClipThrottle
-                        interval: 1; running: false; repeat: false;
-                        onTriggered: {
-                            clipSettingsInfoView.clip = component.cppClipObject;
                         }
                     }
                 }

@@ -143,7 +143,7 @@ GridLayout {
                 if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     // No loop delta to work on with the wavetable style sounds (it's locked to 0)
                 } else {
-                    if (waveBar.cppClipObject.snapLengthToBeat) {
+                    if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                         waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = ZUI.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds + (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
@@ -162,7 +162,7 @@ GridLayout {
                 if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     // No loop delta to work on with the wavetable style sounds (it's locked to 0)
                 } else {
-                    if (waveBar.cppClipObject.snapLengthToBeat) {
+                    if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                         waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = ZUI.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds - (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
@@ -192,7 +192,7 @@ GridLayout {
                     }
                     wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                 } else {
-                    if (waveBar.cppClipObject.snapLengthToBeat) {
+                    if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                         waveBar.cppClipObject.selectedSliceObject.lengthBeats = ZUI.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.lengthBeats + 1, 0, 64);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
@@ -222,7 +222,7 @@ GridLayout {
                     }
                     wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                 } else {
-                    if (waveBar.cppClipObject.snapLengthToBeat) {
+                    if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                         waveBar.cppClipObject.selectedSliceObject.lengthBeats = ZUI.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.lengthBeats - 1, 0, 64);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
@@ -394,7 +394,7 @@ GridLayout {
                             if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                                 // No loop delta to work on with the wavetable style sounds (it's locked to 0)
                             } else {
-                                if (waveBar.cppClipObject.snapLengthToBeat) {
+                                if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                                     waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = ZUI.CommonUtils.clamp(pinchMouseArea.initialLoopDelta + (Math.round(deltaX / wav.pixelsPerBeat) * wav.pixelsPerBeat * wav.pixelToSecs), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
                                 } else {
                                     if (zynqtgui.modeButtonPressed) {
@@ -419,7 +419,7 @@ GridLayout {
                                 }
                                 wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                             } else {
-                                if (waveBar.cppClipObject.snapLengthToBeat) {
+                                if (waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat) {
                                     waveBar.cppClipObject.selectedSliceObject.lengthBeats = ZUI.CommonUtils.clamp(pinchMouseArea.initialLengthBeats + Math.round(deltaX / wav.pixelsPerBeat), 0, 64);
                                 } else {
                                     if (zynqtgui.modeButtonPressed) {
@@ -657,13 +657,13 @@ GridLayout {
                 }
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
-                property double currentDivision: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.selectedSliceObject.lengthSamples)) : 1
+                readonly property double currentDivision: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.selectedSliceObject.lengthSamples)) : 1
                 text: waveBar.cppClipObject
                     ? waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle
                         ? "1/%1".arg(Number.isInteger(currentDivision) ? currentDivision : currentDivision.toFixed(2))
                         : qsTr("%1:%2 E", "End")
                             .arg(Math.floor(waveBar.cppClipObject.selectedSliceObject.lengthBeats / 4))
-                            .arg((waveBar.cppClipObject.selectedSliceObject.lengthBeats % 4).toFixed(waveBar.cppClipObject.snapLengthToBeat ? 0 : 2))
+                            .arg((waveBar.cppClipObject.selectedSliceObject.lengthBeats % 4).toFixed(waveBar.cppClipObject.selectedSliceObject.snapLengthToBeat ? 0 : 2))
                     : ""
             }
             Text {

@@ -46,10 +46,11 @@ IMP.BasePlayGrid {
     name:'Stepsequencer'
     isSequencer: true
     defaults: {
-        "positionalVelocity": true
+        "positionalVelocity": true,
+        "toggleStepOnTouchSelect": true
     }
     property bool isVisible: ["playgrid"].indexOf(zynqtgui.current_screen_id) >= 0
-    persist: ["positionalVelocity"]
+    persist: ["positionalVelocity", "toggleStepOnTouchSelect"]
     // additionalActions: [
     //     Kirigami.Action {
     //         text: qsTr("Load Pattern...")
@@ -285,6 +286,7 @@ IMP.BasePlayGrid {
 
         property bool patternHasUnsavedChanged: false
         property bool positionalVelocity: true
+        property bool toggleStepOnTouchSelect: true
         property var bars: [0,1,2,3,4,5,6,7]
         // This is the top bank we have available in any pattern (that is, the upper limit for any pattern's bankOffset value)
         property int bankLimit: 1
@@ -620,12 +622,17 @@ IMP.BasePlayGrid {
     }
     // on component completed
     onInitialize: {
-        _private.positionalVelocity = component.getProperty("positionalVelocity")
+        let positionalVelocity = component.getProperty("positionalVelocity");
+        _private.positionalVelocity = positionalVelocity ? true : false;
+        let toggleStepOnTouchSelect = component.getProperty("toggleStepOnTouchSelect");
+        _private.toggleStepOnTouchSelect = toggleStepOnTouchSelect ? true : false;
         _private.adoptSequence();
     }
     onPropertyChanged: {
         if (property === "positionalVelocity") {
             _private.positionalVelocity = value;
+        } else if (property === "toggleStepOnTouchSelect") {
+            _private.toggleStepOnTouchSelect = value;
         }
     }
     Connections {
@@ -1867,6 +1874,7 @@ IMP.BasePlayGrid {
                     id: drumSequencer
                     visible: _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
                     patternModel: _private.workingPatternModel
+                    playGrid: component
                     sequencerPrivate: _private
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -2584,8 +2592,19 @@ IMP.BasePlayGrid {
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
                 checked: component.getProperty("positionalVelocity")
                 onClicked: {
-                    var positionalVelocity = component.getProperty("positionalVelocity")
+                    let positionalVelocity = component.getProperty("positionalVelocity")
                     component.setProperty("positionalVelocity", !positionalVelocity);
+                }
+            }
+            QQC2.Switch {
+                Layout.fillWidth: true
+                implicitWidth: Kirigami.Units.gridUnit * 5
+                Layout.minimumWidth: Kirigami.Units.gridUnit * 5
+                Kirigami.FormData.label: "Toggle Step When Selecting With Touch"
+                checked: component.getProperty("toggleStepOnTouchSelect")
+                onClicked: {
+                    let toggleStepOnTouchSelect = component.getProperty("toggleStepOnTouchSelect")
+                    component.setProperty("toggleStepOnTouchSelect", !toggleStepOnTouchSelect);
                 }
             }
         }
@@ -2610,8 +2629,20 @@ IMP.BasePlayGrid {
                     Kirigami.FormData.label: "Use Tap Position As Velocity"
                     checked: component.getProperty("positionalVelocity")
                     onClicked: {
-                        var positionalVelocity = component.getProperty("positionalVelocity")
+                        let positionalVelocity = component.getProperty("positionalVelocity")
                         component.setProperty("positionalVelocity", !positionalVelocity);
+                    }
+                }
+                QQC2.Switch {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: Kirigami.Units.gridUnit * 5
+                    Layout.minimumHeight: Kirigami.Units.gridUnit * 2
+                    implicitWidth: Kirigami.Units.gridUnit * 5
+                    Kirigami.FormData.label: "Toggle Step When Selecting With Touch"
+                    checked: component.getProperty("toggleStepOnTouchSelect")
+                    onClicked: {
+                        let positionalVelocity = component.getProperty("toggleStepOnTouchSelect")
+                        component.setProperty("toggleStepOnTouchSelect", !toggleStepOnTouchSelect);
                     }
                 }
                 Item { Layout.fillWidth: true; Layout.fillHeight: true }

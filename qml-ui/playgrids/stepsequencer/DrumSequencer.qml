@@ -36,6 +36,7 @@ Item {
     id: component
     property QtObject patternModel
     property QtObject sequencerPrivate
+    property QtObject playGrid
     QtObject {
         id: _private
         readonly property int selectedStepGlobal: (sequencerPrivate.workingPatternModel.width * (sequencerPrivate.workingPatternModel.activeBar + sequencerPrivate.workingPatternModel.bankOffset)) + sequencerPrivate.selectedStep
@@ -98,11 +99,12 @@ Item {
             model: Zynthbox.Plugin.sketchpadSlotCount * 2
             RowLayout {
                 id: noteRow
+                Layout.preferredHeight: Kirigami.Units.gridUnit
+                spacing: 0
                 property int midiNote: component.patternModel ? component.patternModel.gridModelStartNote + index : 60
                 readonly property QtObject note: component.patternModel ? Zynthbox.PlayGridManager.getNote(midiNote, component.patternModel.sketchpadTrack) : null
                 readonly property bool noteIsHeard: applicationWindow().globalSequencer.heardNotes.includes(noteRow.note)
                 readonly property color noteColor: _private.noteColors[midiNote]
-                spacing: 0
                 readonly property bool hasClips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["hasClips"]) : false
                 readonly property var clips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["clips"]) : []
                 readonly property QtObject audioSource: clips.length === 1 ? clips[0] : null
@@ -286,6 +288,81 @@ Item {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+        RowLayout {
+            spacing: 0
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+            Layout.margins: Kirigami.Units.smallSpacing
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Select Only")
+                checked: component.sequencerPrivate.toggleStepOnTouchSelect === false
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        component.playGrid.setProperty("toggleStepOnTouchSelect", false);
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Select & Toggle")
+                checked: component.sequencerPrivate.toggleStepOnTouchSelect === true
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        component.playGrid.setProperty("toggleStepOnTouchSelect", true);
+                    }
+                }
+            }
+            Item {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("General")
+                checked: applicationWindow().globalSequencer.parameterPage === 0
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        applicationWindow().globalSequencer.setParameterPage(0);
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Probability")
+                checked: applicationWindow().globalSequencer.parameterPage === 1
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        applicationWindow().globalSequencer.setParameterPage(1);
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Ratchet")
+                checked: applicationWindow().globalSequencer.parameterPage === 2
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        applicationWindow().globalSequencer.setParameterPage(2);
                     }
                 }
             }

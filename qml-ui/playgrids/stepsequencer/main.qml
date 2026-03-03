@@ -99,8 +99,6 @@ IMP.BasePlayGrid {
         // }
 
         if (returnValue === false) {
-            var trackDelta = zynqtgui.tracksModActive ? 5 : 0
-
             switch (cuia) {
                 case "SCREEN_PLAYGRID":
                     // If we're already shown, toggle note settings
@@ -155,15 +153,11 @@ IMP.BasePlayGrid {
                     }
                     break;
                 case "SWITCH_ARROW_LEFT_RELEASED":
-                    if (zynqtgui.sketchpad.selectedTrackId > 0) {
-                        zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack - 1;
-                    }
+                    zynqtgui.callable_ui_action_simple("TRACK_PREVIOUS");
                     returnValue = true;
                     break;
                 case "SWITCH_ARROW_RIGHT_RELEASED":
-                    if (zynqtgui.sketchpad.selectedTrackId < Zynthbox.Plugin.sketchpadTrackCount) {
-                        zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack + 1;
-                    }
+                    zynqtgui.callable_ui_action_simple("TRACK_NEXT");
                     returnValue = true;
                     break;
                 case "SWITCH_KNOB3_RELEASED":
@@ -181,21 +175,6 @@ IMP.BasePlayGrid {
                         _private.activateSelectedItem();
                     }
                     returnValue = true;
-                    break;
-                case "SWITCH_NUMBER_1_RELEASED":
-                    returnValue = backButtonClearPatternHelper(0 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_2_RELEASED":
-                    returnValue = backButtonClearPatternHelper(1 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_3_RELEASED":
-                    returnValue = backButtonClearPatternHelper(2 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_4_RELEASED":
-                    returnValue = backButtonClearPatternHelper(3 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_5_RELEASED":
-                    returnValue = backButtonClearPatternHelper(4 + trackDelta);
                     break;
                 case "KNOB0_UP":
                     _private.knob0Up();

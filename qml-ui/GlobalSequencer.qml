@@ -624,6 +624,136 @@ Item {
             }
         }
     }
+
+    /**
+     * \brief Sets the given note to play with the given velocity on the given step
+     * @note If the note already exists on the step, the function will do nothing
+     * @param midiNote The midi note to ensure is enabled
+     * @param velocity The velocity to use when adding a note
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     * @param resetHeardData When true (default), the heard data will be set to the given note and velocity
+     */
+    function enableNoteForStep(midiNote, velocity, stepIndex, resetHeardData=true) {
+        let workingModel = _private.pattern.workingModel;
+        let column = stepIndex % workingModel.width;
+        let row = Math.floor(stepIndex / workingModel.width);
+        let existingSubnoteIndex = workingModel.subnoteIndex(row, column, midiNote);
+        if (existingSubnoteIndex == -1) {
+            // The note doesn't exist, add it with the current velocity (or accents as per held down up/down arrows)
+            let applyAccent = false;
+            let applyGhost = false;
+            if (zynqtgui.upButtonPressed) {
+                zynqtgui.ignoreNextUpButtonPress = true;
+                applyAccent = true;
+            }
+            if (zynqtgui.downButtonPressed) {
+                zynqtgui.ignoreNextDownButtonPress = true;
+                applyGhost = true;
+            }
+            let velocityAdjustment = applyAccent
+                ? applyGhost
+                    ? 1 // Apply both, so we land back at 1.0 times velocity
+                    : 1.5 // Apply only accent, making it 1.5 times velocity
+                : applyGhost
+                    ? 0.5 // Apply only ghost, making it 0.5 times velocity
+                    : 1 // Apply neither, leaving us at 1.0 times velocity
+            let newSubnoteIndex = workingModel.insertSubnoteSorted(row, column, Zynthbox.PlayGridManager.getNote(midiNote, workingModel.sketchpadTrack));
+            workingModel.setSubnoteMetadata(row, column, newSubnoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(velocity * velocityAdjustment), 1, 127));
+            if (resetHeardData === true) {
+                component.setHeardData(midiNote, velocity);
+            }
+        }
+    }
+    /**
+     * \brief Ensure that the heard notes are enabled for the given step
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     */
+    function enableHeardForStep(stepIndex) {
+        let heardNotes = _private.heardNotes;
+        let heardVelocities = _private.heardVelocities;
+        for (let noteIndex in heardNotes) {
+            component.enableNoteForStep(heardNotes[noteIndex].midiNote, heardVelocities[noteIndex], stepIndex, false);
+        }
+    }
+    /**
+     * \brief Sets the given note to NOT play on the given step
+     * @param midiNote The midi note to ensure is disable
+     * @param velocity The velocity to set as heard if resetHeardData is enabled
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     * @param resetHeardData When true (default), the heard data will be set to the given note and velocity
+     */
+    function disableNoteForStep(midiNote, velocity, stepIndex, resetHeardData=true) {
+        let workingModel = _private.pattern.workingModel;
+        workingModel.removeSubnoteByNoteValue(midiNote, stepIndex, stepIndex);
+        if (resetHeardData === true) {
+            component.setHeardData(midiNote, velocity);
+        }
+    }
+    /**
+     * \brief Ensure that the heard notes are disabled for the given step
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     */
+    function disableHeardForStep(stepIndex) {
+        let heardNotes = _private.heardNotes;
+        let heardVelocities = _private.heardVelocities;
+        for (let noteIndex in heardNotes) {
+            component.disableNoteForStep(heardNotes[noteIndex].midiNote, heardVelocities[noteIndex], stepIndex, false);
+        }
+    }
+    /**
+     * \brief Toggle the heard notes on the given step
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     */
+    function toggleStep(stepIndex) {
+        let workingModel = _private.pattern.workingModel;
+        let column = stepIndex % workingModel.width;
+        let row = Math.floor(stepIndex / workingModel.width);
+        // console.log("Toggle entry for step", stepIndex);
+        let applyAccent = false;
+        let applyGhost = false;
+        if (zynqtgui.upButtonPressed) {
+            zynqtgui.ignoreNextUpButtonPress = true;
+            applyAccent = true;
+        }
+        if (zynqtgui.downButtonPressed) {
+            zynqtgui.ignoreNextDownButtonPress = true;
+            applyGhost = true;
+        }
+        let velocityAdjustment = applyAccent
+            ? applyGhost
+                ? 1 // Apply both, so we land back at 1.0 times velocity
+                : 1.5 // Apply only accent, making it 1.5 times velocity
+            : applyGhost
+                ? 0.5 // Apply only ghost, making it 0.5 times velocity
+                : 1 // Apply neither, leaving us at 1.0 times velocity
+        if (_private.heardNotes.length > 0) {
+            let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
+            let removedAtLeastOne = false;
+            // First, let's see if any of the notes in our list are already on this position, and if so, remove them
+            for (var i = 0; i < _private.heardNotes.length; ++i) {
+                var subNoteIndex = workingModel.subnoteIndex(row, column, _private.heardNotes[i].midiNote);
+                if (subNoteIndex > -1) {
+                    workingModel.removeSubnote(row, column, subNoteIndex);
+                    removedAtLeastOne = true;
+                }
+            }
+
+            // And then, only if we didn't remove anything should we be adding the notes
+            if (!removedAtLeastOne) {
+                var subNoteIndex = -1;
+                for (var i = 0; i < _private.heardNotes.length; ++i) {
+                    subNoteIndex = workingModel.insertSubnoteSorted(row, column, _private.heardNotes[i]);
+                    workingModel.setSubnoteMetadata(row, column, subNoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(_private.heardVelocities[i] * velocityAdjustment), 1, 127));
+                    if (workingModel.defaultNoteDuration > 0) {
+                        workingModel.setSubnoteMetadata(row, column, subNoteIndex, "duration", workingModel.defaultNoteDuration);
+                    }
+                }
+            }
+        } else {
+            // TODO Pick the notes from that pad into the current selection
+        }
+    }
+
     /// BEGIN Sequencer mode cuia handling
     function handleSequencerStepButton(stepButtonIndex, buttonDown) {
         let workingModel = _private.pattern.workingModel;
@@ -655,51 +785,8 @@ Item {
             } else if (zynqtgui.playButtonPressed) {
                 // Do nothing (the test play wants to happen on down)
             } else {
-                let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
-                // console.log("Toggle entry for step", stepOffset + stepButtonIndex);
-                let applyAccent = false;
-                let applyGhost = false;
-                if (zynqtgui.upButtonPressed) {
-                    zynqtgui.ignoreNextUpButtonPress = true;
-                    applyAccent = true;
-                }
-                if (zynqtgui.downButtonPressed) {
-                    zynqtgui.ignoreNextDownButtonPress = true;
-                    applyGhost = true;
-                }
-                let velocityAdjustment = applyAccent
-                    ? applyGhost
-                        ? 1 // Apply both, so we land back at 1.0 times velocity
-                        : 1.5 // Apply only accent, making it 1.5 times velocity
-                    : applyGhost
-                        ? 0.5 // Apply only ghost, making it 0.5 times velocity
-                        : 1 // Apply neither, leaving us at 1.0 times velocity
-                if (_private.heardNotes.length > 0) {
-                    let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
-                    let removedAtLeastOne = false;
-                    // First, let's see if any of the notes in our list are already on this position, and if so, remove them
-                    for (var i = 0; i < _private.heardNotes.length; ++i) {
-                        var subNoteIndex = workingModel.subnoteIndex(padNoteRow, stepOffset + stepButtonIndex, _private.heardNotes[i].midiNote);
-                        if (subNoteIndex > -1) {
-                            workingModel.removeSubnote(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex);
-                            removedAtLeastOne = true;
-                        }
-                    }
-
-                    // And then, only if we didn't remove anything should we be adding the notes
-                    if (!removedAtLeastOne) {
-                        var subNoteIndex = -1;
-                        for (var i = 0; i < _private.heardNotes.length; ++i) {
-                            subNoteIndex = workingModel.insertSubnoteSorted(padNoteRow, stepOffset + stepButtonIndex, _private.heardNotes[i]);
-                            workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(_private.heardVelocities[i] * velocityAdjustment), 1, 127));
-                            if (workingModel.defaultNoteDuration > 0) {
-                                workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "duration", workingModel.defaultNoteDuration);
-                            }
-                        }
-                    }
-                } else {
-                    // TODO Pick the notes from that pad into the current selection
-                }
+                let stepOffset = (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width;
+                component.toggleStep(stepOffset + stepButtonIndex);
             }
         }
     }

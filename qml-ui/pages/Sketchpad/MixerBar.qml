@@ -77,11 +77,11 @@ AbstractSketchpadPage {
             zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", root.selectedChannel.id, mixerItemsRepeater.itemAt(root.selectedChannel.id), root.selectedChannel)
 
             return true;
-
+        case "KNOB3_DOWN":
         case "SWITCH_ARROW_LEFT_RELEASED":
             focusPreviousElementInChain()
             return true;
-
+        case "KNOB3_UP":
         case "SWITCH_ARROW_RIGHT_RELEASED":
             focusNextElementInChain()
 

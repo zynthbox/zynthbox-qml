@@ -57,10 +57,12 @@ AbstractSketchpadPage {
             bottomStack.setView(Main.BarView.TracksBar);
             returnVal = true;
             break;
+        case "KNOB3_DOWN":
         case "SWITCH_ARROW_LEFT_RELEASED":
             focusPreviousElementInChain(ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1), root.selectedChannel.selectedClip)
             returnVal = true;
             break;
+        case "KNOB3_UP":
         case "SWITCH_ARROW_RIGHT_RELEASED":
             focusNextElementInChain(ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1), root.selectedChannel.selectedClip)
             returnVal = true;

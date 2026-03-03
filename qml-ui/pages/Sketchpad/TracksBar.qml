@@ -818,12 +818,18 @@ AbstractSketchpadPage {
                 zynqtgui.ignoreNextModeButtonPress = true;
                 root.pickNextSlot();
                 returnValue = true;
+            }else {
+                focusNextElementInChain()
+                returnValue = true;
             }
             break;
         case "KNOB3_DOWN":
             if (zynqtgui.modeButtonPressed) {
                 zynqtgui.ignoreNextModeButtonPress = true;
                 root.pickPreviousSlot();
+                returnValue = true;
+            }else {
+                focusPreviousElementInChain()
                 returnValue = true;
             }
             break;

@@ -2183,11 +2183,11 @@ AbstractSketchpadPage {
 
                                 Repeater {
                                     id: _pitchRepeater
-                                    model: root.selectedChannel.samples
+                                    model: Zynthbox.Plugin.sketchpadSlotCount * 2
                                     delegate: AbstractCellLayout {
                                         id: _pitchDelegate
 
-                                        readonly property QtObject controlObj: modelData
+                                        readonly property QtObject controlObj: root.selectedChannel.samples[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj && contentItem.visible
@@ -2280,11 +2280,11 @@ AbstractSketchpadPage {
 
                                 Repeater {
                                     id: _startEndRepeater
-                                    model: root.selectedChannel.samples
+                                    model: Zynthbox.Plugin.sketchpadSlotCount * 2
                                     delegate: AbstractCellLayout {
                                         id: _startEndDelegate
 
-                                        readonly property QtObject controlObj: modelData
+                                        readonly property QtObject controlObj: root.selectedChannel.samples[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
 
@@ -2405,11 +2405,11 @@ AbstractSketchpadPage {
 
                                 Repeater {
                                     id: _loopRepeater
-                                    model: root.selectedChannel.samples
+                                    model: Zynthbox.Plugin.sketchpadSlotCount * 2
                                     delegate: AbstractCellLayout {
                                         id: _loopDelegate
 
-                                        readonly property QtObject controlObj: modelData
+                                        readonly property QtObject controlObj: root.selectedChannel.samples[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
 

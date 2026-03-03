@@ -347,9 +347,7 @@ def network_info():
 
 def start_wifi():
     logging.info("STARTING WIFI")
-
-    check_output(sys_dir + "/sbin/set_wifi.sh on", shell=True)
-    sleep(2)
+    check_output("systemctl --user start zynthbox-wifi-manager-start.service", shell=True)
 
     counter=0
     success=False
@@ -403,8 +401,7 @@ def start_wifi_hotspot():
 
 def stop_wifi():
     logging.info("STOPPING WIFI")
-
-    check_output(sys_dir + "/sbin/set_wifi.sh off", shell=True)
+    check_output("systemctl --user stop zynthbox-wifi-manager-stop.service", shell=True)
 
     counter = 0
     success = False

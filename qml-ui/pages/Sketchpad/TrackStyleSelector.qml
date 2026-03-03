@@ -52,7 +52,7 @@ ZUI.DialogQuestion {
     acceptText: qsTr("OK")
     title: qsTr("Choose Track Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
 
-    additionalButtons: [styleButtonEverything, styleButtonOneToOne, styleButtonDrums, sameButton2low3high, sameButton10Split]
+    additionalButtons: [styleButtonEverything, styleButtonOneToOne, styleButtonDrums, styleButton2low3high, styleButton10Split]
     property var cuiaCallback: function(cuia) {
         var returnValue = true;
         switch (cuia) {

@@ -2151,6 +2151,17 @@ AbstractSketchpadPage {
 
                             property bool applyToAll: false
                             readonly property int currentSlotIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
+                            readonly property var sampleCache : [
+                                root.selectedChannel.samples[0],
+                                root.selectedChannel.samples[1],
+                                root.selectedChannel.samples[2],
+                                root.selectedChannel.samples[3],
+                                root.selectedChannel.samples[4],
+                                root.selectedChannel.samples[5],
+                                root.selectedChannel.samples[6],
+                                root.selectedChannel.samples[7],
+                                root.selectedChannel.samples[8],
+                                root.selectedChannel.samples[9]]
 
                             function setView(view) {
                                 var slotIndex = _SMPStack.currentSlotIndex
@@ -2187,7 +2198,7 @@ AbstractSketchpadPage {
                                     delegate: AbstractCellLayout {
                                         id: _pitchDelegate
 
-                                        readonly property QtObject controlObj: root.selectedChannel.samples[index]
+                                        readonly property QtObject controlObj: _SMPStack.sampleCache[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj && contentItem.visible
@@ -2284,7 +2295,7 @@ AbstractSketchpadPage {
                                     delegate: AbstractCellLayout {
                                         id: _startEndDelegate
 
-                                        readonly property QtObject controlObj: root.selectedChannel.samples[index]
+                                        readonly property QtObject controlObj: _SMPStack.sampleCache[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
 
@@ -2409,7 +2420,7 @@ AbstractSketchpadPage {
                                     delegate: AbstractCellLayout {
                                         id: _loopDelegate
 
-                                        readonly property QtObject controlObj: root.selectedChannel.samples[index]
+                                        readonly property QtObject controlObj: _SMPStack.sampleCache[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
 

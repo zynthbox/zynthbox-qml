@@ -61,10 +61,12 @@ AbstractSketchpadPage {
 
         case "SWITCH_ARROW_LEFT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            // root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
             return true;
 
         case "SWITCH_ARROW_RIGHT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            // root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
             return true;
 
         case "SWITCH_ARROW_UP_RELEASED":

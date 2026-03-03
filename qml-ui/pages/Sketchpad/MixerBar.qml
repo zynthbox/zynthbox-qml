@@ -40,6 +40,29 @@ AbstractSketchpadPage {
     id: root
 
     selectedChannel: applicationWindow().selectedChannel
+
+    function focusNextElementInChain() {
+        zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("MixerBar_item")){
+            _mixerBarStack.focusElement()
+        }
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"){
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
+        }
+    }
+
+    function focusPreviousElementInChain() {
+        zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("MixerBar_item")){
+            _mixerBarStack.focusElement()
+        }
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"){
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
+        }
+    }
     
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -56,16 +79,11 @@ AbstractSketchpadPage {
             return true;
 
         case "SWITCH_ARROW_LEFT_RELEASED":
-            if (zynqtgui.sketchpad.selectedTrackId > 0) {
-                zynqtgui.sketchpad.selectedTrackId -= 1;
-            }
-
+            focusPreviousElementInChain()
             return true;
 
         case "SWITCH_ARROW_RIGHT_RELEASED":
-            if (zynqtgui.sketchpad.selectedTrackId < 9) {
-                zynqtgui.sketchpad.selectedTrackId += 1;
-            }
+            focusNextElementInChain()
 
             return true;
         case "KNOB0_TOUCHED":
@@ -209,6 +227,13 @@ AbstractSketchpadPage {
                 _mixerBarStack.currentIndex = _mixerBarStack.currentView
             }
 
+            function focusElement() {
+                let view = _mixerBarStack.children[_mixerBarStack.currentIndex]
+                if(view) {
+                    view.focusElement()
+                }
+            }
+
             ZUI.SectionGroup {
 
                 fallbackBackground: Rectangle {
@@ -217,6 +242,10 @@ AbstractSketchpadPage {
                     color: Kirigami.Theme.backgroundColor
                     opacity: 0.1
                 }  
+
+                function focusElement(){
+                    channelsVolumeRow.handleClick(root.selectedChannel)
+                }
                 
                 RowLayout {
                     id: channelsVolumeRow
@@ -340,8 +369,7 @@ AbstractSketchpadPage {
                             }
                         }
                     }
-                }
-                
+                }                
             }
 
             ZUI.SectionGroup {
@@ -351,6 +379,10 @@ AbstractSketchpadPage {
                     color: Kirigami.Theme.backgroundColor
                     opacity: 0.1
                 }  
+
+                function focusElement(){
+                    channelsReverbRow.handleClick(root.selectedChannel)
+                }
                 
                 RowLayout {
                     id: channelsReverbRow
@@ -409,6 +441,10 @@ AbstractSketchpadPage {
                     color: Kirigami.Theme.backgroundColor
                     opacity: 0.1
                 }  
+
+                function focusElement(){
+                    channelsDelayRow.handleClick(root.selectedChannel)
+                }
                 
                 RowLayout {
                     id: channelsDelayRow

@@ -48,6 +48,19 @@ ZUI.ScreenPage {
     property bool showOccupiedSlotsHeader: false
     property QtObject selectedChannel: null
 
+    //Navigation and focus chain functions
+    function focusChannel(index) {
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel")
+        {
+            channelsHeaderRepeater.itemAt(index).switchToThisChannel(false)
+        }
+        
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview")
+        {
+            clipsRepeater.itemAt(index).switchToThisClip(true)
+        }
+    } 
+
     function updateSelectedSamplePitch(sign, slot = -1) {
         if (slot === -1)
             slot = root.selectedChannel.selectedSlotRow;
@@ -751,7 +764,7 @@ ZUI.ScreenPage {
             returnValue = sketchpadPickerDialog.cuiaCallback(cuia);
         } else {
             // Forward CUIA actions to bottomBar only when bottomBar is open
-            if (bottomStack.currentIndex === 0) {
+            if (bottomStack.currentView === Main.BarView.BottomBar) {
                 if (bottomBar.tabbedView.activeItem.cuiaCallback != null)
                     returnValue = bottomBar.tabbedView.activeItem.cuiaCallback(cuia);
 
@@ -1541,14 +1554,15 @@ ZUI.ScreenPage {
                                         property QtObject channel: root.song.channelsModel.getChannel(index)
                                         property bool showVolume: state == "ChannelMode"
 
-                                        function switchToThisChannel() {
+                                        function switchToThisChannel(allowToggle=true) {
                                             // If song mode is not active, clicking on cells should activate that channel
                                             zynqtgui.sketchpad.lastSelectedObj.setTo(channelHeaderDelegate.channel.className, channelHeaderDelegate.channel, channelHeaderDelegate, channelHeaderDelegate.channel);
                                             zynqtgui.sketchpad.selectedTrackId = index;
                                             Qt.callLater(function() {
                                                 // Open TracksBar and switch to channel
                                                 // bottomStack.setView(Main.BarView.TracksBar);
-                                                root.resetBottomBar(false);
+                                                if(allowToggle)
+                                                    root.resetBottomBar(false);
                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                                 zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
                                             });

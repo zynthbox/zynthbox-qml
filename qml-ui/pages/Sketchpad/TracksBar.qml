@@ -381,17 +381,44 @@ AbstractSketchpadPage {
             }
         }
     }
+
+    function focusNextElementInChain() {
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_")){
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "TracksBar_item_pitch": _SMPPitchRow.focusNext(); break;
+                case "TracksBar_item_startend": _SMPStartEndRow.focusNext(); break;
+                case "TracksBar_item_loop": _SMPLoopRow.focusNext(); break;
+            }
+        }else {
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)       
+        }
+    }
+
+    function focusPreviousElementInChain() {
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_")){
+           switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "TracksBar_item_pitch": _SMPPitchRow.focusPrevious(); break;
+                case "TracksBar_item_startend": _SMPStartEndRow.focusPrevious(); break;
+                case "TracksBar_item_loop": _SMPLoopRow.focusPrevious(); break;
+            }
+        }else {
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)       
+        }
+    }
+
     function cuiaCallback(cuia) {
         var returnValue = false;
         // console.log(`TracksBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
         case "SWITCH_ARROW_LEFT_RELEASED":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            focusPreviousElementInChain()
             returnValue = true;
             break;
 
         case "SWITCH_ARROW_RIGHT_RELEASED":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            focusNextElementInChain()
             returnValue = true;
             break;
 
@@ -2137,6 +2164,16 @@ AbstractSketchpadPage {
                                 id: _SMPPitchRow
                                 spacing: ZUI.Theme.cellSpacing
                                 property int globalPitch: 0
+
+                                function focusNext() {
+                                    let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                    handleClick(index)
+                                }
                                 
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot);
@@ -2224,6 +2261,16 @@ AbstractSketchpadPage {
                                 spacing: ZUI.Theme.cellSpacing
                                 property int globalStartPosition: 0
                                 property int globalLengthPosition: 0
+
+                                function focusNext() {
+                                    let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                    handleClick(index)
+                                }
 
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot);
@@ -2339,6 +2386,16 @@ AbstractSketchpadPage {
                                 id: _SMPLoopRow
                                 spacing: ZUI.Theme.cellSpacing
                                 property int globalLoopPosition : 0
+
+                                function focusNext() {
+                                    let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                    handleClick(index)
+                                }
 
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot, false);

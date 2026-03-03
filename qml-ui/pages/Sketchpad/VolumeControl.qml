@@ -128,7 +128,9 @@ Rectangle {
                         id: _tickLabel
                         opacity: 0.5
                         text: {
-                            return  audioGauge.tickLabelSet[styleData.value]
+                            if(styleData.value in audioGauge.tickLabelSet)
+                                return audioGauge.tickLabelSet[styleData.value]
+                            else return ""
                         }
                         font: audioGauge.font
                     }

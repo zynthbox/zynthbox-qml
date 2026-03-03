@@ -127,6 +127,8 @@ IMP.BasePlayGrid {
                         if (_private.activePatternModel.performanceActive) {
                             // Restart the performance
                             _private.activePatternModel.startPerformance();
+                        } else if (_private.effectiveSequencerStyle === _private.drumSequencerStyle) {
+                            _private.disableSelected();
                         } else if (_private.hasSelection) {
                             _private.deselectSelectedItem();
                         } else if (component.heardNotes.length > 0) {
@@ -164,8 +166,20 @@ IMP.BasePlayGrid {
                     }
                     returnValue = true;
                     break;
+                case "SWITCH_KNOB3_RELEASED":
+                    if (_private.effectiveSequencerStyle === _private.drumSequencerStyle) {
+                        _private.toggleSelected();
+                    } else {
+                        _private.activateSelectedItem();
+                    }
+                    returnValue = true;
+                    break;
                 case "SWITCH_SELECT_RELEASED":
-                    _private.activateSelectedItem();
+                    if (_private.effectiveSequencerStyle === _private.drumSequencerStyle) {
+                        _private.enableSelected();
+                    } else {
+                        _private.activateSelectedItem();
+                    }
                     returnValue = true;
                     break;
                 case "SWITCH_NUMBER_1_RELEASED":
@@ -275,6 +289,15 @@ IMP.BasePlayGrid {
     QtObject {
         id:_private;
         readonly property int activeBarModelWidth: 16
+        property int sequencerStyle: defaultSequencerStyle
+        readonly property int effectiveSequencerStyle: sequencerStyle === defaultSequencerStyle
+            ? _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
+                ? drumSequencerStyle
+                : stepSequencerStyle
+            : sequencerStyle
+        readonly property int defaultSequencerStyle: 0
+        readonly property int stepSequencerStyle: 1
+        readonly property int drumSequencerStyle: 2
 
         readonly property QtObject sequence: applicationWindow().globalSequencer.sequence
         readonly property int activePattern: sequence ? sequence.indexOf(applicationWindow().globalSequencer.pattern) : -1 // sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePattern : -1
@@ -370,6 +393,9 @@ IMP.BasePlayGrid {
         signal knob2Down();
         signal goLeft();
         signal goRight();
+        signal enableSelected();
+        signal disableSelected();
+        signal toggleSelected();
         signal deselectSelectedItem();
         signal selectStep(int stepIndex);
         signal activateSelectedItem();
@@ -1553,6 +1579,8 @@ IMP.BasePlayGrid {
                                     // Do nothing when the pattern settings panel is open, it handles this itself
                                 } else if (noteSettingsPopup.visible) {
                                     noteSettingsPopup.close();
+                                } else if (drumSequencer.visible) {
+                                    // Do nothing for the drumsequencer, it handles this itself
                                 } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad.currentSubNote > -1) {
@@ -1568,6 +1596,8 @@ IMP.BasePlayGrid {
                                     // Do nothing when the pattern settings panel is open, it handles this itself
                                 } else if (noteSettingsPopup.visible) {
                                     // do something? or no? probably no
+                                } else if (drumSequencer.visible) {
+                                    // Do nothing for the drumsequencer, it handles this itself
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad) {
@@ -1878,7 +1908,7 @@ IMP.BasePlayGrid {
                 // per-note style drum sequencer
                 DrumSequencer {
                     id: drumSequencer
-                    visible: _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
+                    visible: _private.effectiveSequencerStyle === _private.drumSequencerStyle
                     patternModel: _private.workingPatternModel
                     playGrid: component
                     sequencerPrivate: _private

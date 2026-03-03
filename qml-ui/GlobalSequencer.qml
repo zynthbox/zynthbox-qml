@@ -657,8 +657,33 @@ Item {
                 : applyGhost
                     ? 0.5 // Apply only ghost, making it 0.5 times velocity
                     : 1 // Apply neither, leaving us at 1.0 times velocity
+            // Early and late positioning by holding the left/right arrows (for easy triplet layouts)
+            let positionEarly = false;
+            let positionLate = false;
+            if (zynqtgui.leftButtonPressed) {
+                zynqtgui.ignoreNextLeftButtonPress = true;
+                positionEarly = true;
+            }
+            if (zynqtgui.rightButtonPressed) {
+                zynqtgui.ignoreNextRightButtonPress = true;
+                positionLate = true;
+            }
+            let oneThirdStepLength = Math.round(workingModel.stepLength / 3);
+            let positionAdjustment = positionEarly
+                ? positionLate
+                    ? undefined // Apply both, so we land back at no adjustment
+                    : -oneThirdStepLength
+                : positionLate
+                    ? oneThirdStepLength
+                    : undefined  // Apply neither, leaving us at no adjusted position
             let newSubnoteIndex = workingModel.insertSubnoteSorted(row, column, Zynthbox.PlayGridManager.getNote(midiNote, workingModel.sketchpadTrack));
             workingModel.setSubnoteMetadata(row, column, newSubnoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(velocity * velocityAdjustment), 1, 127));
+            if (workingModel.defaultNoteDuration > 0) {
+                workingModel.setSubnoteMetadata(row, column, newSubnoteIndex, "duration", workingModel.defaultNoteDuration);
+            }
+            if (positionAdjustment !== undefined) {
+                workingModel.setSubnoteMetadata(row, column, newSubnoteIndex, "delay", positionAdjustment);
+            }
             if (resetHeardData === true) {
                 component.setHeardData(midiNote, velocity);
             }
@@ -726,6 +751,25 @@ Item {
             : applyGhost
                 ? 0.5 // Apply only ghost, making it 0.5 times velocity
                 : 1 // Apply neither, leaving us at 1.0 times velocity
+        // Early and late positioning by holding the left/right arrows (for easy triplet layouts)
+        let positionEarly = false;
+        let positionLate = false;
+        if (zynqtgui.leftButtonPressed) {
+            zynqtgui.ignoreNextLeftButtonPress = true;
+            positionEarly = true;
+        }
+        if (zynqtgui.rightButtonPressed) {
+            zynqtgui.ignoreNextRightButtonPress = true;
+            positionLate = true;
+        }
+        let oneThirdStepLength = Math.round(workingModel.stepLength / 3);
+        let positionAdjustment = positionEarly
+            ? positionLate
+                ? undefined // Apply both, so we land back at no adjustment
+                : -oneThirdStepLength
+            : positionLate
+                ? oneThirdStepLength
+                : undefined  // Apply neither, leaving us at no adjusted position
         if (_private.heardNotes.length > 0) {
             let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
             let removedAtLeastOne = false;
@@ -746,6 +790,9 @@ Item {
                     workingModel.setSubnoteMetadata(row, column, subNoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(_private.heardVelocities[i] * velocityAdjustment), 1, 127));
                     if (workingModel.defaultNoteDuration > 0) {
                         workingModel.setSubnoteMetadata(row, column, subNoteIndex, "duration", workingModel.defaultNoteDuration);
+                    }
+                    if (positionAdjustment !== undefined) {
+                        workingModel.setSubnoteMetadata(row, column, subNoteIndex, "delay", positionAdjustment);
                     }
                 }
             }

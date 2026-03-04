@@ -1001,6 +1001,9 @@ AbstractSketchpadPage {
                                     TrackSettingsDialog {
                                         id: trackSettingsDialog
                                     }
+                                    TrackClearOnSwitchDialog {
+                                        id: trackClearOnSwitchDialog
+                                    }
                                 }
 
                                 ZUI.SectionButton {
@@ -1011,16 +1014,15 @@ AbstractSketchpadPage {
                                     highlighted: root.selectedChannel != null && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
                                     text: qsTr("Sketch")
                                     onClicked: {
+                                        // Don't switch (or do slot selection type things) if we're already there
                                         if (["synth", "sample-trig"].includes(root.selectedChannel.trackType) == false) {
                                             if (root.selectedChannel.trackRackType == Zynthbox.ZynthboxBasics.SynthRackType) {
-                                                root.selectedChannel.trackType = "synth";
+                                                trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "synth");
                                             } else if (root.selectedChannel.trackRackType == Zynthbox.ZynthboxBasics.SampleRackType) {
-                                                root.selectedChannel.trackType = "sample-trig";
+                                                trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "sample-trig");
                                             } else {
-                                                root.selectedChannel.trackType = "synth";
+                                                trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "synth");
                                             }
-                                            // Don't switch (or do slot selection type things) if we're already there
-                                            synthsRow.switchToSlot(0, true);
                                         }
                                     }
                                     QQC2.Button {
@@ -1066,8 +1068,7 @@ AbstractSketchpadPage {
                                     highlighted: root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop"
                                     text: qsTr("Loop")
                                     onClicked: {
-                                        root.selectedChannel.trackType = "sample-loop";
-                                        sketchesRow.switchToSlot(0, true);
+                                        trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "sample-loop");
                                     }
                                 }
 
@@ -1079,8 +1080,7 @@ AbstractSketchpadPage {
                                     highlighted: root.selectedChannel != null && root.selectedChannel.trackType === "external"
                                     text: qsTr("External")
                                     onClicked: {
-                                        root.selectedChannel.trackType = "external";
-                                        externalRow.switchToSlot(0, true);
+                                        trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "external");
                                     }
                                 }
                             }
@@ -1106,8 +1106,7 @@ AbstractSketchpadPage {
                                     text: qsTr("Synthrack")
                                     onClicked: {
                                         if (root.selectedChannel.trackType != "synth") {
-                                            root.selectedChannel.trackType = "synth";
-                                            synthsRow.switchToSlot(0, true);
+                                            trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "synth");
                                         }
                                     }
                                 }
@@ -1119,8 +1118,7 @@ AbstractSketchpadPage {
                                     text: qsTr("Samplerack")
                                     onClicked: {
                                         if (root.selectedChannel.trackType != "sample-trig") {
-                                            root.selectedChannel.trackType = "sample-trig";
-                                            samplesRow.switchToSlot(0, true);
+                                            trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "sample-trig");
                                         }
                                     }
                                 }

@@ -2286,6 +2286,18 @@ class sketchpad_channel(QObject):
             return "sample"
         return trackType
 
+    @Slot(str, result=str)
+    def trackTypeLabel(self, trackType):
+        if trackType == "synth":
+            return "Synthrack"
+        elif trackType == "sample-trig":
+            return "Samplerack"
+        elif trackType == "sample-loop":
+            return "Loop"
+        elif trackType == "external":
+            return "External"
+        return ""
+
     @Slot(None)
     def handleAudioTypeSettingsChanged(self):
         if not self.__song__.__to_be_deleted__:

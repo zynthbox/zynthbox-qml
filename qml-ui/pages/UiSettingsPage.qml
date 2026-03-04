@@ -375,6 +375,29 @@ ZUI.ScreenPage {
                     }
                 }
             }
+
+            Repeater {
+                model: zynqtgui.ui_settings.displays
+                
+                EntryDelegate {
+                    text: qsTr("Display '%1' Brightness").arg(modelData.name)
+                    infoText: qsTr("%1 / %2").arg(modelData.brightness).arg(modelData.max_brightness)
+                    index: 10 + model.index
+                    onIncrementValue: modelData.brightness = Math.min(modelData.max_brightness, modelData.brightness + 1)
+                    onDecrementValue: modelData.brightness = Math.max(0, modelData.brightness - 1)
+                    
+                    QQC2.Slider {
+                        width: Kirigami.Units.gridUnit * 20
+                        from: 0
+                        to: modelData.max_brightness
+                        stepSize: 1
+                        value: modelData.brightness
+                        onValueChanged: {
+                            modelData.brightness = value;
+                        }
+                    }
+                }
+            }
         }
 
         background: ZUI.SelectorViewBackground {

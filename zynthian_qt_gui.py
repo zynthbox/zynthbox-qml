@@ -1940,13 +1940,16 @@ class zynthian_gui(QObject):
             try:
                 cuia_callback = self.opened_dialog.property("cuiaCallback")
                 visible = self.opened_dialog.property("visible")
+                opened = self.opened_dialog.property("opened") # Dialogs have an opened thing going on and we need to use that instead of visible, as that isn't guaranteed
+                if opened is not None:
+                    visible = opened
 
                 if cuia_callback is not None and cuia_callback.isCallable() and visible:
                     _result = cuia_callback.call([cuia, originId, track, slot, params[0]])
 
                     if _result is not None:
                         if _result.isError():
-                            printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                            printJSValueError("Attempted to use the current opened dialog's cuiaCallback, but it returned the error", _result)
                             return
                         elif _result.toBool():
                             # If cuiaCallback returned true, then CUIA event has been handled by qml. Return

@@ -28,7 +28,7 @@ import logging
 
 from subprocess import check_output
 from pathlib import Path
-from PySide2.QtCore import Signal, Property, Qt, QObject
+from PySide2.QtCore import Signal, Property, Qt, QObject, QFileSystemWatcher
 from PySide2.QtGui import QPixmap, QCursor, QGuiApplication
 from . import zynthian_qt_gui_base, zynthian_gui_config
 
@@ -122,6 +122,11 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
         self.__displays = [DisplaySettings(d.name, self) for d in Path("/sys/class/backlight").iterdir() if d.is_dir()]
+
+        self.__qmlFileWatcher = QFileSystemWatcher()
+        self.__qmlFileWatcher.addPath("/ZB_QML_TEST_FILE")
+        self.__qmlFileWatcher.addPath(self.get_qmlTestFile())
+        self.__qmlFileWatcher.fileChanged.connect(self.on_qmlFileChanged)
 
     def fill_list(self):
         super().fill_list()
@@ -343,5 +348,26 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     
     displays = Property('QVariantList', get_displays, constant=True)
     ### END Property displays
+
+    ### BEGIN Property qmlTestFIle
+    def get_qmlTestFile(self):        
+        with open('/ZB_QML_TEST_FILE', 'r') as f:
+            return f.readline().strip()
+
+    def on_qmlFileChanged(self, path):       
+        if(path == "/ZB_QML_TEST_FILE"):
+            self.qmlTestFileChanged.emit()
+            self.__qmlFileWatcher.addPath(self.get_qmlTestFile())
+            self.__qmlFileWatcher.addPath("/ZB_QML_TEST_FILE")
+        else: 
+            self.qmlTestFileModified.emit()
+            self.__qmlFileWatcher.addPath(path) 
+
+
+    qmlTestFileChanged = Signal()
+    qmlTestFileModified = Signal()
+
+    qmlTestFile = Property(str, get_qmlTestFile, notify=qmlTestFileChanged)
+    ### END Property showCursor
 
 # ------------------------------------------------------------------------------

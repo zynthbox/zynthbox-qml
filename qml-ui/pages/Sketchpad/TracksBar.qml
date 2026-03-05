@@ -892,7 +892,7 @@ AbstractSketchpadPage {
                 ZUI.SectionButton{
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    text: "Main"
+                    text: "Track-Slots"
                     checked: highlighted
                     highlighted: _tracksBarStack.currentView === TracksBar.View.Main
                     onClicked: _tracksBarStack.setView(TracksBar.View.Main)
@@ -919,7 +919,7 @@ AbstractSketchpadPage {
                  ZUI.SectionButton{
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    text: "FX"
+                    text: "FX-Chain"
                     checked: highlighted
                     highlighted: _tracksBarStack.currentView === TracksBar.View.FX
                     onClicked: _tracksBarStack.setView(TracksBar.View.FX)

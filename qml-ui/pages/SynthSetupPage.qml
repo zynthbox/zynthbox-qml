@@ -49,32 +49,25 @@ ZUI.ScreenPage {
     }
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
+    readonly property QtObject selectedChannel: applicationWindow().selectedChannel
 
     onSelectedChannelChanged: {
-        _syncTimer.restart();
+        if(root.visible)
+            _syncTimer.restart()    
     }
-    // Timer {
-    //     id: layerChangeThrottle
-    //     interval: 10; running: false; repeat: false;
-    //     onTriggered: {
-    //         zynqtgui.layers_for_channel.activate_index(0)
-    //     }
-    // }
-
-    //Hacky way to force update the banks views to the current selected bank
-    // readonly property int trackId : applicationWindow().selectedChannel.id
-    // onTrackIdChanged: {
-    //     _syncTimer.restart()
-    // }
+    onVisibleChanged: _syncTimer.restart()
+    
     Timer {
         id: _syncTimer
         repeat: false
-        interval: 10
+        // running: false
+        interval: 1000
         onTriggered: {
+            if(!root.visible)
+                return
+
             zynqtgui.layers_for_channel.activate_index(layersView.selector.current_index)
-            // console.log("Update Selected synth")
-            layersView.selector.current_index = layersView.selector.current_index;
+            console.log("Update Selected synth", layersView.selector.current_index)
             layersView.selector.activate_index(layersView.selector.current_index);
         }
     }
@@ -627,6 +620,7 @@ ZUI.ScreenPage {
                                 text: model.display === "None" ? qsTr("Single Presets") : model.display
                                 Binding {
                                     target: bankDelegate
+                                    when: root.visible
                                     property: "highlighted"
                                     delayed: true
                                     value: (zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.action_id == zynqtgui.curLayer.bankId) 

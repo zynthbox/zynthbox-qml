@@ -89,7 +89,20 @@ ZUI.ScreenPage {
 
     title: qsTr("UI Settings")
     screenId: "ui_settings"
-    contextualActions: []
+    contextualActions: [Kirigami.Action {
+        text: "Reload"
+        onTriggered: _testingLoader.reset()
+        visible: _stackLayout.currentIndex ===1
+    }, Kirigami.Action {
+        text: "Info"
+        onTriggered: _testingLoader.info()
+        visible: _stackLayout.currentIndex === 1
+    }, Kirigami.Action {
+        text: "Exit"
+        onTriggered: _stackLayout.currentIndex = 0
+        visible: _stackLayout.currentIndex === 1
+    }
+    ]
 
     background: Rectangle 
     {
@@ -156,271 +169,348 @@ ZUI.ScreenPage {
 
     }
 
-    contentItem: QQC2.ScrollView {
-        id: scrollView
-        leftPadding: background.leftPadding
-        rightPadding: background.rightPadding
-        topPadding: background.topPadding
-        bottomPadding: background.bottomPadding
-        QQC2.ScrollBar.horizontal.visible: false
-        function ensureVisible(item) {
-            var ypos = item.mapToItem(content, 0, 0).y
-            var ext = item.height + ypos
-            if ( ypos < flickableItem.contentY // begins before
-                || ypos > flickableItem.contentY + flickableItem.height // begins after
-                || ext < flickableItem.contentY // ends before
-                || ext > flickableItem.contentY + flickableItem.height) { // ends after
-                // don't exceed bounds
-                flickableItem.contentY = Math.max(0, Math.min(ypos - flickableItem.height + item.height + Kirigami.Units.largeSpacing * 4, content.height - flickableItem.height))
+    contentItem: StackLayout {
+        id: _stackLayout
+        QQC2.ScrollView {
+            id: scrollView
+            leftPadding: background.leftPadding
+            rightPadding: background.rightPadding
+            topPadding: background.topPadding
+            bottomPadding: background.bottomPadding
+            QQC2.ScrollBar.horizontal.visible: false
+            function ensureVisible(item) {
+                var ypos = item.mapToItem(content, 0, 0).y
+                var ext = item.height + ypos
+                if ( ypos < flickableItem.contentY // begins before
+                    || ypos > flickableItem.contentY + flickableItem.height // begins after
+                    || ext < flickableItem.contentY // ends before
+                    || ext > flickableItem.contentY + flickableItem.height) { // ends after
+                    // don't exceed bounds
+                    flickableItem.contentY = Math.max(0, Math.min(ypos - flickableItem.height + item.height + Kirigami.Units.largeSpacing * 4, content.height - flickableItem.height))
+                }
             }
-        }
-        Flickable {
-            id: flickableItem
-            contentWidth: content.width
-            contentHeight: content.height
-            flickableDirection: Flickable.VerticalFlick
-            Column {
-                id: content
-                width: scrollView.availableWidth - ZUI.Theme.padding
-                spacing: ZUI.Theme.padding
+            Flickable {
+                id: flickableItem
+                contentWidth: content.width
+                contentHeight: content.height
+                flickableDirection: Flickable.VerticalFlick
+                Column {
+                    id: content
+                    width: scrollView.availableWidth - ZUI.Theme.padding
+                    spacing: ZUI.Theme.padding
 
-                EntryDelegate {
-                    text: qsTr("Double Click Threshold Amount")
-                    infoText: qsTr("%1 ms").arg(doubleClickThresholdSlider.value)
-                    index: 0
-                    onIncrementValue: doubleClickThresholdSlider.increase()
-                    onDecrementValue: doubleClickThresholdSlider.decrease()
-
-                    QQC2.Slider {
-                        id: doubleClickThresholdSlider
-
-                        width: Kirigami.Units.gridUnit * 20
-                        from: 0
-                        to: 500
-                        stepSize: 1
-                        value: zynqtgui.ui_settings.doubleClickThreshold
-                        onPressedChanged: {
-                            // Set the value on release to save the value only when needed
-                            if (!pressed)
-                                zynqtgui.ui_settings.doubleClickThreshold = value;
-
-                        }
-                    }
-
-                }
-
-                EntryDelegate {
-                    text: qsTr("Hardware Sequencer Interaction")
-                    infoText: zynqtgui.ui_settings.hardwareSequencer ? qsTr("Enabled") : qsTr("Disabled")
-                    onClicked: zynqtgui.ui_settings.hardwareSequencer = !zynqtgui.ui_settings.hardwareSequencer
-                    index: 1
-                    onIncrementValue: zynqtgui.ui_settings.hardwareSequencer = true
-                    onDecrementValue: zynqtgui.ui_settings.hardwareSequencer = false
-
-                    QQC2.Switch {
-                        id: _switch1
-
-                        checked: zynqtgui.ui_settings.hardwareSequencer
-                        onClicked: {
-                            zynqtgui.ui_settings.hardwareSequencer = checked;
-                        }
-                    }
-
-                }
-
-                EntryDelegate {
-                    text: qsTr("Hardware Sequencer Auto-Preview")
-                    infoText: zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 0
-                        ? qsTr("When Stopped")
-                        : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 1
-                            ? qsTr("Always")
-                            : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 2
-                                ? qsTr("Never")
-                                : qsTr("Step Release")
-                    index: 2
-                    onIncrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.min(3, zynqtgui.ui_settings.hardwareSequencerPreviewStyle + 1)
-                    onDecrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.max(0, zynqtgui.ui_settings.hardwareSequencerPreviewStyle - 1)
-
-                    QQC2.Slider {
-                        width: Kirigami.Units.gridUnit * 20
-                        from: 0
-                        to: 3
-                        stepSize: 1
-                        value: zynqtgui.ui_settings.hardwareSequencerPreviewStyle
-                        onPressedChanged: {
-                            // Set the value on release to save the value only when needed
-                            if (!pressed)
-                                zynqtgui.ui_settings.hardwareSequencerPreviewStyle = value;
-                        }
-                    }
-                }
-
-                EntryDelegate {
-                    text: qsTr("Hardware Sequencer Edit Step Notes")
-                    infoText: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 0
-                        ? qsTr("Selection")
-                        : qsTr("All Entries")
-                    index: 3
-                    onIncrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.min(1, zynqtgui.ui_settings.hardwareSequencerEditInclusions + 1)
-                    onDecrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.max(0, zynqtgui.ui_settings.hardwareSequencerEditInclusions - 1)
-
-                    QQC2.Switch {
-                        checked: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1
-                        onClicked: {
-                            zynqtgui.ui_settings.hardwareSequencerEditInclusions = checked ? 1 : 0;
-                        }
-                    }
-                    // QQC2.Slider {
-                    //     width: Kirigami.Units.gridUnit * 20
-                    //     from: 0
-                    //     to: 1
-                    //     stepSize: 1
-                    //     value: zynqtgui.ui_settings.hardwareSequencerEditInclusions
-                    //     onPressedChanged: {
-                    //         // Set the value on release to save the value only when needed
-                    //         if (!pressed)
-                    //             zynqtgui.ui_settings.hardwareSequencerEditInclusions = value;
-                    //     }
-                    // }
-                }
-
-                EntryDelegate {
-                    text: qsTr("Record Live When Holding Record")
-                    infoText: zynqtgui.ui_settings.temporaryLiveRecordStyle === 0
-                        ? qsTr("Off")
-                        : zynqtgui.ui_settings.temporaryLiveRecordStyle === 1
-                            ? qsTr("When Held")
-                            : zynqtgui.ui_settings.temporaryLiveRecordStyle === 2
-                                ? qsTr("Sticky")
-                                : qsTr("Unknown")
-                    index: 4
-                    onIncrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.min(2, zynqtgui.ui_settings.temporaryLiveRecordStyle + 1)
-                    onDecrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.max(0, zynqtgui.ui_settings.temporaryLiveRecordStyle - 1)
-
-                    QQC2.Slider {
-                        width: Kirigami.Units.gridUnit * 20
-                        from: 0
-                        to: 2
-                        stepSize: 1
-                        value: zynqtgui.ui_settings.temporaryLiveRecordStyle
-                        onPressedChanged: {
-                            // Set the value on release to save the value only when needed
-                            if (!pressed)
-                                zynqtgui.ui_settings.temporaryLiveRecordStyle = value;
-                        }
-                    }
-                }
-
-                EntryDelegate {
-                    text: qsTr("Debug Mode")
-                    infoText: zynqtgui.ui_settings.debugMode ? qsTr("Enabled") : qsTr("Disabled")
-                    onClicked: zynqtgui.ui_settings.debugMode = !zynqtgui.ui_settings.debugMode
-                    index: 5
-                    onIncrementValue: zynqtgui.ui_settings.debugMode = true
-                    onDecrementValue: zynqtgui.ui_settings.debugMode = false
-
-                    QQC2.Switch {
-                        checked: zynqtgui.ui_settings.debugMode
-                        onClicked: {
-                            zynqtgui.ui_settings.debugMode = checked;
-                        }
-                    }
-
-                }
-
-                EntryDelegate {
-                    text: qsTr("Show Experimental Features")
-                    infoText: zynqtgui.ui_settings.showExperimentalFeatures ? qsTr("Enabled") : qsTr("Disabled")
-                    onClicked: zynqtgui.ui_settings.showExperimentalFeatures = !zynqtgui.ui_settings.showExperimentalFeatures
-                    index: 6
-                    onIncrementValue: zynqtgui.ui_settings.showExperimentalFeatures = true
-                    onDecrementValue: zynqtgui.ui_settings.showExperimentalFeatures = false
-
-                    QQC2.Switch {
-                        checked: zynqtgui.ui_settings.showExperimentalFeatures
-                        onClicked: {
-                            zynqtgui.ui_settings.showExperimentalFeatures = checked;
-                        }
-                    }
-
-                }
-
-                EntryDelegate {
-                    text: qsTr("Show Cursor")
-                    infoText: zynqtgui.ui_settings.showCursor ? qsTr("Enabled") : qsTr("Disabled")
-                    onClicked: zynqtgui.ui_settings.showCursor = !zynqtgui.ui_settings.showCursor
-                    index: 7
-                    onIncrementValue: zynqtgui.ui_settings.showCursor = true
-                    onDecrementValue: zynqtgui.ui_settings.showCursor = false
-
-                    QQC2.Switch {
-                        checked: zynqtgui.ui_settings.showCursor
-                        onClicked: {
-                            zynqtgui.ui_settings.showCursor = checked;
-                        }
-                    }
-
-                }
-
-                EntryDelegate {
-                    text: qsTr("Encoder Touch Response")
-                    infoText: zynqtgui.ui_settings.touchEncoders ? qsTr("Enabled") : qsTr("Disabled")
-                    onClicked: zynqtgui.ui_settings.touchEncoders = !zynqtgui.ui_settings.touchEncoders
-                    index: 8
-                    onIncrementValue: zynqtgui.ui_settings.touchEncoders = true
-                    onDecrementValue: zynqtgui.ui_settings.touchEncoders = false
-
-                    QQC2.Switch {
-                        checked: zynqtgui.ui_settings.touchEncoders
-                        onClicked: {
-                            zynqtgui.ui_settings.touchEncoders = checked;
-                        }
-                    }
-
-                }
-
-
-                EntryDelegate {
-                    text: qsTr("VNC Server")
-                    infoText: zynqtgui.ui_settings.vncserverEnabled ? qsTr("Enabled") : qsTr("Disabled")
-                    onClicked: zynqtgui.ui_settings.vncserverEnabled = !zynqtgui.ui_settings.vncserverEnabled
-                    index: 9
-                    onIncrementValue: zynqtgui.ui_settings.vncserverEnabled = true
-                    onDecrementValue: zynqtgui.ui_settings.vncserverEnabled = false
-
-                    QQC2.Switch {
-                        checked: zynqtgui.ui_settings.vncserverEnabled
-                        onClicked: {
-                            zynqtgui.ui_settings.vncserverEnabled = checked;
-                        }
-                    }
-                }
-
-                Repeater {
-                    model: zynqtgui.ui_settings.displays
                     EntryDelegate {
-                        text: qsTr("Display '%1' Brightness").arg(modelData.name)
-                        infoText: qsTr("%1 / %2").arg(modelData.brightness).arg(modelData.max_brightness)
-                        index: 10 + model.index
-                        onIncrementValue: modelData.brightness = Math.min(modelData.max_brightness, modelData.brightness + 1)
-                        onDecrementValue: modelData.brightness = Math.max(0, modelData.brightness - 1)
+                        text: qsTr("Double Click Threshold Amount")
+                        infoText: qsTr("%1 ms").arg(doubleClickThresholdSlider.value)
+                        index: 0
+                        onIncrementValue: doubleClickThresholdSlider.increase()
+                        onDecrementValue: doubleClickThresholdSlider.decrease()
+
+                        QQC2.Slider {
+                            id: doubleClickThresholdSlider
+
+                            width: Kirigami.Units.gridUnit * 20
+                            from: 0
+                            to: 500
+                            stepSize: 1
+                            value: zynqtgui.ui_settings.doubleClickThreshold
+                            onPressedChanged: {
+                                // Set the value on release to save the value only when needed
+                                if (!pressed)
+                                    zynqtgui.ui_settings.doubleClickThreshold = value;
+
+                            }
+                        }
+
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Hardware Sequencer Interaction")
+                        infoText: zynqtgui.ui_settings.hardwareSequencer ? qsTr("Enabled") : qsTr("Disabled")
+                        onClicked: zynqtgui.ui_settings.hardwareSequencer = !zynqtgui.ui_settings.hardwareSequencer
+                        index: 1
+                        onIncrementValue: zynqtgui.ui_settings.hardwareSequencer = true
+                        onDecrementValue: zynqtgui.ui_settings.hardwareSequencer = false
+
+                        QQC2.Switch {
+                            id: _switch1
+
+                            checked: zynqtgui.ui_settings.hardwareSequencer
+                            onClicked: {
+                                zynqtgui.ui_settings.hardwareSequencer = checked;
+                            }
+                        }
+
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Hardware Sequencer Auto-Preview")
+                        infoText: zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 0
+                            ? qsTr("When Stopped")
+                            : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 1
+                                ? qsTr("Always")
+                                : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 2
+                                    ? qsTr("Never")
+                                    : qsTr("Step Release")
+                        index: 2
+                        onIncrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.min(3, zynqtgui.ui_settings.hardwareSequencerPreviewStyle + 1)
+                        onDecrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.max(0, zynqtgui.ui_settings.hardwareSequencerPreviewStyle - 1)
 
                         QQC2.Slider {
                             width: Kirigami.Units.gridUnit * 20
                             from: 0
-                            to: modelData.max_brightness
+                            to: 3
                             stepSize: 1
-                            value: modelData.brightness
-                            onValueChanged: {
-                                modelData.brightness = value;
+                            value: zynqtgui.ui_settings.hardwareSequencerPreviewStyle
+                            onPressedChanged: {
+                                // Set the value on release to save the value only when needed
+                                if (!pressed)
+                                    zynqtgui.ui_settings.hardwareSequencerPreviewStyle = value;
                             }
                         }
                     }
+
+                    EntryDelegate {
+                        text: qsTr("Hardware Sequencer Edit Step Notes")
+                        infoText: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 0
+                            ? qsTr("Selection")
+                            : qsTr("All Entries")
+                        index: 3
+                        onIncrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.min(1, zynqtgui.ui_settings.hardwareSequencerEditInclusions + 1)
+                        onDecrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.max(0, zynqtgui.ui_settings.hardwareSequencerEditInclusions - 1)
+
+                        QQC2.Switch {
+                            checked: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1
+                            onClicked: {
+                                zynqtgui.ui_settings.hardwareSequencerEditInclusions = checked ? 1 : 0;
+                            }
+                        }
+                        // QQC2.Slider {
+                        //     width: Kirigami.Units.gridUnit * 20
+                        //     from: 0
+                        //     to: 1
+                        //     stepSize: 1
+                        //     value: zynqtgui.ui_settings.hardwareSequencerEditInclusions
+                        //     onPressedChanged: {
+                        //         // Set the value on release to save the value only when needed
+                        //         if (!pressed)
+                        //             zynqtgui.ui_settings.hardwareSequencerEditInclusions = value;
+                        //     }
+                        // }
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Record Live When Holding Record")
+                        infoText: zynqtgui.ui_settings.temporaryLiveRecordStyle === 0
+                            ? qsTr("Off")
+                            : zynqtgui.ui_settings.temporaryLiveRecordStyle === 1
+                                ? qsTr("When Held")
+                                : zynqtgui.ui_settings.temporaryLiveRecordStyle === 2
+                                    ? qsTr("Sticky")
+                                    : qsTr("Unknown")
+                        index: 4
+                        onIncrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.min(2, zynqtgui.ui_settings.temporaryLiveRecordStyle + 1)
+                        onDecrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.max(0, zynqtgui.ui_settings.temporaryLiveRecordStyle - 1)
+
+                        QQC2.Slider {
+                            width: Kirigami.Units.gridUnit * 20
+                            from: 0
+                            to: 2
+                            stepSize: 1
+                            value: zynqtgui.ui_settings.temporaryLiveRecordStyle
+                            onPressedChanged: {
+                                // Set the value on release to save the value only when needed
+                                if (!pressed)
+                                    zynqtgui.ui_settings.temporaryLiveRecordStyle = value;
+                            }
+                        }
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Debug Mode")
+                        infoText: zynqtgui.ui_settings.debugMode ? qsTr("Enabled") : qsTr("Disabled")
+                        onClicked: zynqtgui.ui_settings.debugMode = !zynqtgui.ui_settings.debugMode
+                        index: 5
+                        onIncrementValue: zynqtgui.ui_settings.debugMode = true
+                        onDecrementValue: zynqtgui.ui_settings.debugMode = false
+
+                        QQC2.Switch {
+                            checked: zynqtgui.ui_settings.debugMode
+                            onClicked: {
+                                zynqtgui.ui_settings.debugMode = checked;
+                            }
+                        }
+
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Show Experimental Features")
+                        infoText: zynqtgui.ui_settings.showExperimentalFeatures ? qsTr("Enabled") : qsTr("Disabled")
+                        onClicked: zynqtgui.ui_settings.showExperimentalFeatures = !zynqtgui.ui_settings.showExperimentalFeatures
+                        index: 6
+                        onIncrementValue: zynqtgui.ui_settings.showExperimentalFeatures = true
+                        onDecrementValue: zynqtgui.ui_settings.showExperimentalFeatures = false
+
+                        QQC2.Switch {
+                            checked: zynqtgui.ui_settings.showExperimentalFeatures
+                            onClicked: {
+                                zynqtgui.ui_settings.showExperimentalFeatures = checked;
+                            }
+                        }
+
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Show Cursor")
+                        infoText: zynqtgui.ui_settings.showCursor ? qsTr("Enabled") : qsTr("Disabled")
+                        onClicked: zynqtgui.ui_settings.showCursor = !zynqtgui.ui_settings.showCursor
+                        index: 7
+                        onIncrementValue: zynqtgui.ui_settings.showCursor = true
+                        onDecrementValue: zynqtgui.ui_settings.showCursor = false
+
+                        QQC2.Switch {
+                            checked: zynqtgui.ui_settings.showCursor
+                            onClicked: {
+                                zynqtgui.ui_settings.showCursor = checked;
+                            }
+                        }
+
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Encoder Touch Response")
+                        infoText: zynqtgui.ui_settings.touchEncoders ? qsTr("Enabled") : qsTr("Disabled")
+                        onClicked: zynqtgui.ui_settings.touchEncoders = !zynqtgui.ui_settings.touchEncoders
+                        index: 8
+                        onIncrementValue: zynqtgui.ui_settings.touchEncoders = true
+                        onDecrementValue: zynqtgui.ui_settings.touchEncoders = false
+
+                        QQC2.Switch {
+                            checked: zynqtgui.ui_settings.touchEncoders
+                            onClicked: {
+                                zynqtgui.ui_settings.touchEncoders = checked;
+                            }
+                        }
+
+                    }
+
+
+                    EntryDelegate {
+                        text: qsTr("VNC Server")
+                        infoText: zynqtgui.ui_settings.vncserverEnabled ? qsTr("Enabled") : qsTr("Disabled")
+                        onClicked: zynqtgui.ui_settings.vncserverEnabled = !zynqtgui.ui_settings.vncserverEnabled
+                        index: 9
+                        onIncrementValue: zynqtgui.ui_settings.vncserverEnabled = true
+                        onDecrementValue: zynqtgui.ui_settings.vncserverEnabled = false
+
+                        QQC2.Switch {
+                            checked: zynqtgui.ui_settings.vncserverEnabled
+                            onClicked: {
+                                zynqtgui.ui_settings.vncserverEnabled = checked;
+                            }
+                        }
+                    }
+
+                    Repeater {
+                        model: zynqtgui.ui_settings.displays
+                        EntryDelegate {
+                            text: qsTr("Display '%1' Brightness").arg(modelData.name)
+                            infoText: qsTr("%1 / %2").arg(modelData.brightness).arg(modelData.max_brightness)
+                            index: 10 + model.index
+                            onIncrementValue: modelData.brightness = Math.min(modelData.max_brightness, modelData.brightness + 1)
+                            onDecrementValue: modelData.brightness = Math.max(0, modelData.brightness - 1)
+
+                            QQC2.Slider {
+                                width: Kirigami.Units.gridUnit * 20
+                                from: 0
+                                to: modelData.max_brightness
+                                stepSize: 1
+                                value: modelData.brightness
+                                onValueChanged: {
+                                    modelData.brightness = value;
+                                }
+                            }
+                        }
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("QML Testing Loader")
+                        infoText:  "Load"
+                        index: 10
+                        onClicked: _stackLayout.currentIndex = 1
+
+                    }
                 }
             }
+            background: ZUI.SelectorViewBackground {
+                id: background
+            }
         }
-        background: ZUI.SelectorViewBackground {
-            id: background
+
+        Loader {
+            id: _testingLoader
+            active: false
+            asynchronous: true
+
+            ZUI.Popup {
+                id: _testingLoaderInfoDialog
+                text: "How to use:\n
+                To set the entry file to watch and load:\n
+                >> echo 'main.qml' > /ZB_QML_TEST_FILE\n
+                The current entry file is set to:\n"+zynqtgui.ui_settings.qmlTestFile 
+                onAccepted: _testingLoaderInfoDialog.close()
+                onRejected:_testingLoaderInfoDialog.close()
+
+                width: 400
+                height: 200
+
+                contentItem: QQC2.Label {
+                    text: _testingLoaderInfoDialog.text
+                }
+            }
+
+            property Component comp : null
+
+            function info() {
+                _testingLoaderInfoDialog.open()
+            }
+            function reset() {              
+                _testingLoader.active= false
+                console.log("RESET THE TEST QML FILE")
+                if(_testingLoader.comp)
+                    _testingLoader.comp.destroy()
+                _testingLoader.comp = Qt.createComponent(zynqtgui.ui_settings.qmlTestFile + "?reload=" + new Date().getTime())
+                if (_testingLoader.comp.status === Component.Ready) {
+                    _testingLoader.sourceComponent = _testingLoader.comp
+                    _testingLoader.active = true
+                } else {
+                    console.log("Component status is not ready:", component.status);
+                    _testingLoader.comp.text= component.errorString()
+                }                
+            }
+
+            Connections{
+                target: zynqtgui.ui_settings
+                onQmlTestFileChanged: _testingLoader.reset()
+                onQmlTestFileModified: _testingLoader.reset()
+            }
+
+            QQC2.Label {
+                id: _debugText
+                anchors.centerIn: parent
+                anchors.fill: parent
+                anchors.margins: Kirigami.Units.gridUnit*2
+                color: "white"
+            }
+
+            QQC2.Button {
+                text: "Load"
+                visible: !_testingLoader.active
+                onClicked: _testingLoader.reset()
+                anchors.centerIn: parent
+                height: Kirigami.Units.gridUnit * 1.5
+                width: Kirigami.Units.gridUnit * 4
+            }
         }
     }
 

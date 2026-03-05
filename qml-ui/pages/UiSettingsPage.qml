@@ -454,17 +454,15 @@ ZUI.ScreenPage {
 
             ZUI.Popup {
                 id: _testingLoaderInfoDialog
-                text: "How to use:\n
-                To set the entry file to watch and load:\n
-                >> echo 'main.qml' > /ZB_QML_TEST_FILE\n
-                The current entry file is set to:\n"+zynqtgui.ui_settings.qmlTestFile 
                 modal: true
-
-                width: 400
                 height: 200
 
                 contentItem: QQC2.Label {
-                    text: _testingLoaderInfoDialog.text
+                    id: _infoLabel
+                    text: "How to use:\n
+                To set the entry file to watch and load:\n
+                >> echo 'main.qml' > /ZB_QML_TEST_FILE\n
+                The current entry file is set to:\n"+zynqtgui.ui_settings.qmlTestFile 
                 }
             }
 

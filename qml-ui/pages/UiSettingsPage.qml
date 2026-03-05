@@ -458,8 +458,7 @@ ZUI.ScreenPage {
                 To set the entry file to watch and load:\n
                 >> echo 'main.qml' > /ZB_QML_TEST_FILE\n
                 The current entry file is set to:\n"+zynqtgui.ui_settings.qmlTestFile 
-                onAccepted: _testingLoaderInfoDialog.close()
-                onRejected:_testingLoaderInfoDialog.close()
+                modal: true
 
                 width: 400
                 height: 200

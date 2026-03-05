@@ -350,9 +350,17 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     ### END Property displays
 
     ### BEGIN Property qmlTestFIle
-    def get_qmlTestFile(self):        
-        with open('/ZB_QML_TEST_FILE', 'r') as f:
-            return f.readline().strip()
+    def get_qmlTestFile(self):
+        try:                
+            with open('/ZB_QML_TEST_FILE', 'r') as f:
+                return f.readline().strip()
+        except FileNotFoundError:
+            with open('/ZB_QML_TEST_FILE', 'w') as f:
+                f.write("")
+            return ""
+        except (PermissionError, IsADirectoryError) as e:
+            print(f"An unexpected error occurred: {e}")
+            return ""    
 
     def on_qmlFileChanged(self, path):       
         if(path == "/ZB_QML_TEST_FILE"):

@@ -471,7 +471,12 @@ ZUI.ScreenPage {
             function info() {
                 _testingLoaderInfoDialog.open()
             }
-            function reset() {              
+            function reset() {    
+                var source = String(zynqtgui.ui_settings.qmlTestFile)
+
+                if(source.length == 0)
+                    return
+
                 _testingLoader.active= false
                 console.log("RESET THE TEST QML FILE")
                 if(_testingLoader.comp)
@@ -480,9 +485,10 @@ ZUI.ScreenPage {
                 if (_testingLoader.comp.status === Component.Ready) {
                     _testingLoader.sourceComponent = _testingLoader.comp
                     _testingLoader.active = true
+                    _debugText.text = ""
                 } else {
-                    console.log("Component status is not ready:", component.status);
-                    _testingLoader.comp.text= component.errorString()
+                    console.log("Component status is not ready:", _testingLoader.comp.status);
+                    _debugText.text= _testingLoader.comp.errorString()
                 }                
             }
 

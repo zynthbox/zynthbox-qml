@@ -360,7 +360,7 @@ IMP.BasePlayGrid {
         onActivePatternModelChanged:{
             updateChannel();
             let throttle = 5;
-            while (hasSelection && --throttle < 0 ) {
+            while (hasSelection && 0 < --throttle) {
                 deselectSelectedItem();
             }
         }
@@ -2438,7 +2438,8 @@ IMP.BasePlayGrid {
                                 _private.workingPatternModel.clear();
                             } else {
                                 if (_private.selectedStep > -1) {
-                                    while (_private.hasSelection) {
+                                    let throttle = 5;
+                                    while (_private.hasSelection && 0 < --throttle) {
                                         _private.deselectSelectedItem();
                                     }
                                 }

@@ -96,6 +96,12 @@ AbstractSketchpadPage {
         Loop
     }  
 
+    enum SYNView {
+        FilterReso,
+        Attack,
+        Release
+    } 
+
     function pickNextSlot(onlySelectSlot=false) {
         switch (root.selectedChannel.selectedSlot.className) {
         case "TracksBar_synthslot":
@@ -2058,7 +2064,119 @@ AbstractSketchpadPage {
                     }
                 }
 
-                Item {}
+                ColumnLayout {
+                    spacing: ZUI.Theme.sectionSpacing
+                    enabled: root.selectedChannel.trackType !== "external"
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit *  2
+                        Layout.minimumHeight: Kirigami.Units.gridUnit *  2
+                        
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: ZUI.Theme.spacing
+
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true
+
+                                QQC2.ButtonGroup {
+                                    buttons: _SYNButtonsRow.children
+                                }
+
+                                RowLayout {
+                                    id: _SYNButtonsRow
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
+
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Filter/Reso"
+                                        checked: highlighted
+                                        highlighted: _SYNStack.currentView === TracksBar.SYNView.FilterReso
+                                        onClicked: _SYNStack.setView(TracksBar.SYNView.FilterReso)
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Attack"
+                                        checked: highlighted
+                                        highlighted: _SYNStack.currentView === TracksBar.SYNView.Attack
+                                        onClicked: _SYNStack.setView(TracksBar.SYNView.Attack)
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Release"
+                                        checked: highlighted
+                                        highlighted: _SYNStack.currentView === TracksBar.SYNView.Release
+                                        onClicked: _SYNStack.setView(TracksBar.SYNView.Release)
+                                    }
+                                }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
+
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
+
+                                    ZUI.SectionButton {
+                                        checkable: true
+                                        checked:_SYNStack.applyToAll
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "All"
+                                        onToggled: _SYNStack.applyToAll = checked
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    ZUI.SectionGroup {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        fallbackBackground: Rectangle {
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: 0.1
+                        }  
+
+                        StackLayout {
+                            id: _SYNStack
+                            visible: enabled
+                            anchors.fill: parent
+                            property int currentView: TracksBar.SYNView.FilterReso
+                            currentIndex : currentView
+
+                            property bool applyToAll: false
+                            function setView(view) {
+                                var slotIndex = _SYNStack.currentSlotIndex
+                                _SYNStack.currentView = view
+                                _SYNStack.currentIndex = _SYNStack.currentView
+
+                                _SYNStack.children[_SYNStack.currentIndex].handleClick(slotIndex)
+                            }
+
+                            RowLayout { }
+
+                            RowLayout {}
+
+                            RowLayout {}
+
+
+                        }
+                    }
+                }
 
                 ColumnLayout {
                     spacing: ZUI.Theme.sectionSpacing
@@ -2135,6 +2253,7 @@ AbstractSketchpadPage {
                             }
                         }
                     }
+
                     ZUI.SectionGroup {
                         Layout.fillWidth: true
                         Layout.fillHeight: true

@@ -359,7 +359,8 @@ IMP.BasePlayGrid {
 
         onActivePatternModelChanged:{
             updateChannel();
-            while (hasSelection) {
+            let throttle = 5;
+            while (hasSelection && --throttle < 0 ) {
                 deselectSelectedItem();
             }
         }

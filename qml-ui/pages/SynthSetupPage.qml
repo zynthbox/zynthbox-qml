@@ -24,6 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.15
+import QtQml 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
@@ -623,6 +624,7 @@ ZUI.ScreenPage {
                                     when: root.visible
                                     property: "highlighted"
                                     delayed: true
+                                    restoreMode: Binding.RestoreBindingOrValue
                                     value: (zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.action_id == zynqtgui.curLayer.bankId) 
                                         || (zynqtgui.curLayer != null && zynqtgui.curLayer.bankId.startsWith(model.action_id)
                                         || (bankView.selector.current_index === index && model.icon == "folder"))

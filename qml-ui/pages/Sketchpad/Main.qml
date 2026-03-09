@@ -999,19 +999,12 @@ ZUI.ScreenPage {
         },
         Kirigami.Action {
             text: "Save Sketch"
+            visible: root.selectedChannel && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
             onTriggered: {
                 zynqtgui.show_screen("sound_categories")
                 applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
             }
         },
-        // Kirigami.Action {
-        //     text: "" //qsTr("Sounds")
-        //     onTriggered: zynqtgui.show_modal("sound_categories")
-        //     enabled: false
-        // },
-        // Kirigami.Action {
-        //     enabled: false
-        // },
         Kirigami.Action {
             text: qsTr("Mixer")
             checked: bottomStack.currentBarView === Main.BarView.MixerBar

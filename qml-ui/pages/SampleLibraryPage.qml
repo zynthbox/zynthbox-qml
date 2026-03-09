@@ -738,6 +738,22 @@ ZUI.ScreenPage {
                                 }
                             }
                         }
+                        Timer {
+                            id: autoPreviewTimer
+                            interval: zynqtgui.ui_settings.doubleClickThreshold
+                            repeat: false; running: false;
+                            onTriggered: {
+                                if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
+                                    // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
+                                    _private.filePropertiesHelper.stopPreview();
+                                }
+                                if (_private.selectedColumn == 2 && filesListView.currentItem) {
+                                    // Only do auto-preview things if the files column is selected
+                                    _private.filePropertiesHelper.filePath = filesListView.currentItem.filePath;
+                                    _private.filePropertiesHelper.playPreview();
+                                }
+                            }
+                        }
                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                         active: zynqtgui.isBootingComplete
                         autoActivateIndexOnChange: true
@@ -750,6 +766,9 @@ ZUI.ScreenPage {
                                 sampleSlotAssigner.assignToSlot(currentItem.filePath);
                             }
                             filesListView.mostRecentlyActivatedIndex = index;
+                        }
+                        onCurrentItemChanged: {
+                            autoPreviewTimer.restart();
                         }
                         qmlSelector: ZUI.SelectorWrapper {
                             selector_list: Zynthbox.FolderListModel {

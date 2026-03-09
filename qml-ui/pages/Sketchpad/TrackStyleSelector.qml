@@ -52,7 +52,7 @@ ZUI.DialogQuestion {
     acceptText: qsTr("OK")
     title: qsTr("Choose Track Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
 
-    additionalButtons: [styleButtonEverything, styleButtonOneToOne, styleButtonDrums, styleButton2low3high, styleButton10Split]
+    additionalButtons: [styleButtonEverything, styleButtonOneToOne, styleButtonDrums, styleButton2low3high, styleButton10Octaves]
     property var cuiaCallback: function(cuia) {
         var returnValue = true;
         switch (cuia) {
@@ -64,11 +64,11 @@ ZUI.DialogQuestion {
                 } else if (_private.newTrackStyle === "drums") {
                     _private.newTrackStyle = "2-low-3-high";
                 } else if (_private.newTrackStyle === "2-low-3-high") {
-                    _private.newTrackStyle = "10-split";
+                    _private.newTrackStyle = "10-octaves";
                 }
                 break;
             case "KNOB0_DOWN":
-                if (_private.newTrackStyle === "10-split") {
+                if (_private.newTrackStyle === "10-octaves") {
                     _private.newTrackStyle = "2-low-3-high";
                 } else if (_private.newTrackStyle === "2-low-3-high") {
                     _private.newTrackStyle = "drums";
@@ -189,18 +189,18 @@ ZUI.DialogQuestion {
                 ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
             }
             QQC2.Button {
-                id: styleButton10Split
+                id: styleButton10Octaves
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
-                text: qsTr("10 Split")
-                checked: _private.newTrackStyle === "10-split"
+                text: qsTr("10 Octaves")
+                checked: _private.newTrackStyle === "10-octaves"
                 MouseArea {
                     anchors.fill: parent
                     onClicked: parent.clicked();
                 }
                 onClicked: {
-                    _private.newTrackStyle = "10-split";
+                    _private.newTrackStyle = "10-octaves";
                 }
                 ZUI.DialogQuestionButtonFocusHighlight { selectedButton: component.selectedButton }
             }
@@ -219,7 +219,7 @@ ZUI.DialogQuestion {
                     return qsTr("Slots each take precise one note, laid out sequentially from C4 (MIDI note 60), which also will be used as the sample's root note. The note assignment is enforced when samples are first loaded into a slot, but should you wish to, you can later edit these assignments.\nIn this mode, the default sample playback style will be One-shot.");
                 } else if (_private.newTrackStyle === "2-low-3-high") {
                     return qsTr("Slots will be assigned an even split on the keyboard, with slots in columns 1 and 2 being given the notes from B3 and down (MIDI note 59), and columns 3, 4, and 5 given the notes from C4 and up. The samples are further given root notes which create a playback overlap, so the lower split's samples are transposed up by 2 octaves (24 semitones), and the upper split down by that same amount.\nIn this mode, the default sample playback style will be Looping.");
-                } else if (_private.newTrackStyle === "10-split") {
+                } else if (_private.newTrackStyle === "10-octaves") {
                     return qsTr("Each slot is assigned an octave, and their root note is set to the centrepoint of that octave. That is, slot 1 will be given C-1 (MIDI note 0) through B-1 (note 11), and use F-1 (note 5) as its root. Slot 4, in turn, will use C2 through B2, with F2 as the root. Slot 10 gets C8 through B8, with F8 as the root, and so on and so forth. This is only enforced on first load, meaning that you can edit the keyzones later should you need to, to ensure your notes play at the appropriate pitch.\nIn this mode, the default sample playback style will be Looping.");
                 }
                 return "";

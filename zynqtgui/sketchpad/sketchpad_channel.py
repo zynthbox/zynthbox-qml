@@ -2148,7 +2148,7 @@ class sketchpad_channel(QObject):
     ### END Property allowMulticlip
 
     ### BEGIN Property trackStyle
-    # Possible values: "everything", "one-to-one", "drums", "2-low-3-high", "10-split", "manual"
+    # Possible values: "everything", "one-to-one", "drums", "2-low-3-high", "10-octaves", "manual"
     # Default value: "everything"
     # Only everything and one-to-one are currently exposed in the UI, done as a simple toggle
     # Intent notes:
@@ -2174,10 +2174,10 @@ class sketchpad_channel(QObject):
             self.set_samplePickingStyle("all")
             self.set_track_routing_style("standard")
             self.set_keyZoneMode("2-low-3-high")
-        elif self.__trackStyle__ == "10-split":
+        elif self.__trackStyle__ == "10-octaves":
             self.set_samplePickingStyle("all")
             self.set_track_routing_style("standard")
-            self.set_keyZoneMode("10-split")
+            self.set_keyZoneMode("10-octaves")
 
     # Certain track styles want a special playback style to go with it, which is only set on first load of a sample without metadata
     # In particular, the drums style calls for one-shots
@@ -2467,7 +2467,7 @@ class sketchpad_channel(QObject):
     # split-full will spread samples across the note range, in the order 4, 2, 1, 3, 5, starting at note 0, 24 for each, with c4 on the 12th note inside the sample's range
     # split-narrow will set the samples to play on the notes from note 60 and up, with that note as root
     # 2-low-3-high will set the slots to be split at the 2 first slots playing from 0 through c4, and the 3 last slots playing from c#4 and up, with no transposition
-    # 10-split spreads the slots evenly across the full octave range, using the F in that octave as the sample's root note (useful for multisampled instruments)
+    # 10-octaves spreads the slots evenly across the full octave range, using the F in that octave as the sample's root note (useful for multisampled instruments)
 
     @Slot()
     def updateKeyZones(self):
@@ -2536,8 +2536,8 @@ class sketchpad_channel(QObject):
                 [60, 127, 24],
                 [60, 127, 24]
             ]
-        elif self.__keyzone_mode__ == "10-split":
-            # 10-split gives each slot an octave, and puts their root note on the F note in that octave (and also just gives the final note all the remaining space on the note range)
+        elif self.__keyzone_mode__ == "10-octaves":
+            # 10-octaves gives each slot an octave, and puts their root note on the F note in that octave (and also just gives the final note all the remaining space on the note range)
             slotSettings = [
                 [0, 11, -54],
                 [12, 23, -42],

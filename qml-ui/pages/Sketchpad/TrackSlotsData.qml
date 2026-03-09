@@ -257,7 +257,7 @@ GridLayout {
                     anchors.fill: parent
                     // For external mode the first three slots are visible
                     // For other modes all slots are visible
-                    enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || realIndex === 2))
+                    enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || (realIndex === 2 && zynqtgui.ui_settings.showExperimentalFeatures)))
                     visible: enabled
                     isEmpty: text.trim().length == 0
                     muted: !slotMakesSound

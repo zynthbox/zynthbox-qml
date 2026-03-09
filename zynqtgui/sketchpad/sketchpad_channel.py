@@ -3350,9 +3350,9 @@ class sketchpad_channel(QObject):
                     midiOutDeviceName = device["text"]
                     break
 
-        return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
+        return [midiOutDeviceName,
                 f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
-                midiOutDeviceName,
+                f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
                 None,
                 None]
     externalSlotsDataChanged = Signal()

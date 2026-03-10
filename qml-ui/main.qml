@@ -1020,15 +1020,9 @@ Kirigami.AbstractApplicationWindow {
                         // slotsPicker.currentIndex = selectedTotalSlotIndex;
                         switch(root.selectedChannel.selectedSlot.className) {
                             case "TracksBar_synthslot":
-                                synthsMenu.open();
-                                break;
                             case "TracksBar_sampleslot":
                             case "TracksBar_sampleslot2":
-                                if (root.selectedChannel.trackType === "sample-trig") {
-                                    sampleTrigMenu.open();
-                                } else {
-                                    synthSamplesMenu.open();
-                                }
+                                soundSlotsMenu.open();
                                 break;
                             case "TracksBar_fxslot":
                                 fxMenu.open();
@@ -1127,33 +1121,7 @@ Kirigami.AbstractApplicationWindow {
                         }
                     }
                     ZUI.Menu {
-                        id: synthsMenu
-                        y: parent.height
-                        modal: true
-                        dim: false
-                        Repeater {
-                            model: Zynthbox.Plugin.sketchpadSlotCount
-                            delegate: QQC2.MenuItem {
-                                action: slotsPicker.actions[index]
-                                highlighted: action.slotIndex === slotButton.selectedTotalSlotIndex
-                            }
-                        }
-                    }
-                    ZUI.Menu {
-                        id: synthSamplesMenu
-                        y: parent.height
-                        modal: true
-                        dim: false
-                        Repeater {
-                            model: Zynthbox.Plugin.sketchpadSlotCount
-                            delegate: QQC2.MenuItem {
-                                action: slotsPicker.actions[index + Zynthbox.Plugin.sketchpadSlotCount]
-                                highlighted: action.slotIndex === slotButton.selectedTotalSlotIndex
-                            }
-                        }
-                    }
-                    ZUI.Menu {
-                        id: sampleTrigMenu
+                        id: soundSlotsMenu
                         y: parent.height
                         modal: true
                         dim: false

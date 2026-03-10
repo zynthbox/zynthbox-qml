@@ -295,10 +295,10 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.star_button_color = (tempColor.red(), tempColor.green(), tempColor.blue())
         self.update_button_colors()
 
-    @Slot('QColor')
-    def setModeButtonColor(self, buttonColor):
+    @Slot('QColor', float)
+    def setModeButtonColor(self, buttonColor, brightness):
         tempColor = buttonColor.darker(darkening_factor)
-        self.mode_button_color = (tempColor.red(), tempColor.green(), tempColor.blue())
+        self.mode_button_color = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
         self.update_button_colors()
 
     @Slot(int, 'QColor', float)

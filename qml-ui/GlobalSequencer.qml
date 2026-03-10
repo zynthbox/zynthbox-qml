@@ -3403,6 +3403,11 @@ Item {
             } else {
                 zynqtgui.led_config.setStarButtonColor(_private.stepWithNotesDimmed);
             }
+            if (_private.temporaryAltModeLocked) {
+                zynqtgui.led_config.setAltButtonColor(_private.blueColor, _private.baseButtonBrightness);
+            } else {
+                zynqtgui.led_config.setAltButtonColor(_private.blueColor, 1.0);
+            }
             _private.updateActionBlockLedsForTemporaryMode();
         }
     }

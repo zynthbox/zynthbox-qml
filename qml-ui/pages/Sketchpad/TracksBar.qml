@@ -2196,7 +2196,8 @@ AbstractSketchpadPage {
                                         id: _filterResoDelegate
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll)
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
+                                        enabled: root.selectedChannel.synthSlotsData[index].length > 0
 
                                         contentItem: RowLayout {
                                             spacing: ZUI.Theme.sectionSpacing
@@ -2206,10 +2207,10 @@ AbstractSketchpadPage {
                                                 Layout.fillHeight: true
                                                 Layout.fillWidth: true
                                                 readonly property QtObject c_ctrl : root.selectedChannel.filterCutoffControllers[index]
-                                                
-                                                title: "S"+ (index+1)
+                                                enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
+                                                title: "Cutoff"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: c_ctrl.value + " / " + c_ctrl.value_max
+                                                text2: c_ctrl.value + "%"
                                                 control1: VolumeControl {
                                                     id: volumeControl
                                                     slider {
@@ -2249,9 +2250,10 @@ AbstractSketchpadPage {
                                                 Layout.fillHeight: true
                                                 Layout.fillWidth: true
                                                 readonly property QtObject r_ctrl : root.selectedChannel.filterResonanceControllers[index]
-                                                title: "S"+ (index+1)
+                                                enabled: r_ctrl ? r_ctrl.controlsCount > 0 : false
+                                                title: "Res"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: r_ctrl.value
+                                                text2: r_ctrl.value + "%"
                                                 control1: VolumeControl {
                                                     id: _resSlider
                                                     slider {
@@ -2292,11 +2294,259 @@ AbstractSketchpadPage {
                                 }
                             }
 
-                            RowLayout {}
+                            RowLayout {
+                                id: _SYNAttackRow
+                                spacing: ZUI.Theme.cellSpacing
+                                property int globalAmpAttack: 0
+                                property int globalFilterAttack: 0
 
-                            RowLayout {}
+                                // function focusNext() {
+                                //     let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                //     handleClick(index)
+                                // }
 
+                                // function focusPrevious() {
+                                //     let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                //     handleClick(index)
+                                // }
+                                
+                                // function handleClick(slot) { 
+                                //     root.switchToSlot("sample", slot);
+                                //     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                //     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", slot, _pitchRepeater.itemAt(slot), root.selectedChannel);
+                                // }
 
+                                Repeater {
+                                    id: _attackRepeater
+                                    model: Zynthbox.Plugin.sketchpadSlotCount
+                                    delegate: ZUI.CellControl {
+                                        id: _attackDelegate
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
+                                        enabled: root.selectedChannel.synthSlotsData[index].length > 0
+
+                                        contentItem: RowLayout {
+                                            spacing: ZUI.Theme.sectionSpacing
+                                            AbstractCellLayout {
+                                                id: _control2
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                enabled: r_ctrl ? r_ctrl.controlsCount > 0 : false
+                                                readonly property QtObject r_ctrl : root.selectedChannel.ampAttackControllers[index]
+                                                title: "Amp"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: r_ctrl.value + "%"
+                                                control1: VolumeControl {
+                                                    id: _volControl2
+                                                    slider {
+                                                        from: _control2.r_ctrl.value_min
+                                                        to: _control2.r_ctrl.value_max
+                                                        stepSize: _control2.r_ctrl.step_size
+                                                    }
+
+                                                    Binding {
+                                                        target: _volControl2.slider
+                                                        property: "value"
+                                                        value: _control2.r_ctrl ? _control2.r_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                        }else {
+                                                            _control2.r_ctrl.value = _volControl2.slider.value
+                                                        }
+                                                    } 
+                                                }
+
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: _volControl2.mouseArea.handlePressed(mouse)
+                                                    onReleased: _volControl2.mouseArea.released(mouse)
+                                                    onPressAndHold: _volControl2.mouseArea.pressAndHold(mouse)
+                                                    onClicked: _volControl2.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: _volControl2.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: _volControl2.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                            AbstractCellLayout {
+                                                id: _control1
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                readonly property QtObject c_ctrl : root.selectedChannel.filterAttackControllers[index]
+                                                enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
+                                                title: "Filter"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: c_ctrl.value + "%"
+                                                control1: VolumeControl {
+                                                    id: volumeControl
+                                                    slider {
+                                                        from: _control1.c_ctrl ? _control1.c_ctrl.value_min : 0
+                                                        to: _control1.c_ctrl ? _control1.c_ctrl.value_max : 0
+                                                        stepSize: _control1.c_ctrl ? _control1.c_ctrl.step_size : 0
+                                                    }
+                                                    Binding {
+                                                        target: volumeControl.slider
+                                                        property: "value"
+                                                        value: _control1.c_ctrl ? _control1.c_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                        }else {
+                                                            _control1.c_ctrl.value = volumeControl.slider.value
+                                                        }
+                                                    } 
+                                                }
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: volumeControl.mouseArea.handlePressed(mouse)
+                                                    onReleased: volumeControl.mouseArea.released(mouse)
+                                                    onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                    onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                id: _SYNReleaseRow
+                                spacing: ZUI.Theme.cellSpacing
+                                property int globalAmpRelease: 0
+                                property int globalFilterRelease: 0
+
+                                // function focusNext() {
+                                //     let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                //     handleClick(index)
+                                // }
+
+                                // function focusPrevious() {
+                                //     let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                //     handleClick(index)
+                                // }
+                                
+                                // function handleClick(slot) { 
+                                //     root.switchToSlot("sample", slot);
+                                //     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                //     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", slot, _pitchRepeater.itemAt(slot), root.selectedChannel);
+                                // }
+
+                                Repeater {
+                                    id: _releaseRepeater
+                                    model: Zynthbox.Plugin.sketchpadSlotCount
+                                    delegate: ZUI.CellControl {
+                                        id: _attackDelegate
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
+                                        enabled: root.selectedChannel.synthSlotsData[index].length > 0
+
+                                        contentItem: RowLayout {
+                                            spacing: ZUI.Theme.sectionSpacing
+                                            AbstractCellLayout {
+                                                id: _control2
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                enabled: r_ctrl ? r_ctrl.controlsCount > 0 : false
+                                                readonly property QtObject r_ctrl : root.selectedChannel.ampReleaseControllers[index]
+                                                title: "Amp"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: r_ctrl.value + "%"
+                                                control1: VolumeControl {
+                                                    id: _volControl2
+                                                    slider {
+                                                        from: _control2.r_ctrl.value_min
+                                                        to: _control2.r_ctrl.value_max
+                                                        stepSize: _control2.r_ctrl.step_size
+                                                    }
+
+                                                    Binding {
+                                                        target: _volControl2.slider
+                                                        property: "value"
+                                                        value: _control2.r_ctrl ? _control2.r_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                        }else {
+                                                            _control2.r_ctrl.value = _volControl2.slider.value
+                                                        }
+                                                    } 
+                                                }
+
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: _volControl2.mouseArea.handlePressed(mouse)
+                                                    onReleased: _volControl2.mouseArea.released(mouse)
+                                                    onPressAndHold: _volControl2.mouseArea.pressAndHold(mouse)
+                                                    onClicked: _volControl2.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: _volControl2.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: _volControl2.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                            AbstractCellLayout {
+                                                id: _control1
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                readonly property QtObject c_ctrl : root.selectedChannel.filterReleaseControllers[index]
+                                                enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
+                                                title: "Filter"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: c_ctrl.value + "%"
+                                                control1: VolumeControl {
+                                                    id: volumeControl
+                                                    slider {
+                                                        from: _control1.c_ctrl ? _control1.c_ctrl.value_min : 0
+                                                        to: _control1.c_ctrl ? _control1.c_ctrl.value_max : 0
+                                                        stepSize: _control1.c_ctrl ? _control1.c_ctrl.step_size : 0
+                                                    }
+                                                    Binding {
+                                                        target: volumeControl.slider
+                                                        property: "value"
+                                                        value: _control1.c_ctrl ? _control1.c_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                        }else {
+                                                            _control1.c_ctrl.value = volumeControl.slider.value
+                                                        }
+                                                    } 
+                                                }
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: volumeControl.mouseArea.handlePressed(mouse)
+                                                    onReleased: volumeControl.mouseArea.released(mouse)
+                                                    onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                    onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

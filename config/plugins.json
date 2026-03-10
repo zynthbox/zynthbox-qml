@@ -467,7 +467,9 @@
           "resonanceControls": ["a_filter1_resonance", "a_filter2_resonance", "b_filter1_resonance", "b_filter2_resonance"],
           "filterTypeControls": ["a_filter1_type", "a_filter2_type", "b_filter1_type", "b_filter2_type"],
           "filterAttackControls": ["a_env1_attack", "a_env2_attack"],
-          "filterReleaseControls": ["a_env1_release", "a_env2_release"]
+          "filterReleaseControls": ["a_env1_release", "a_env2_release"],
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },

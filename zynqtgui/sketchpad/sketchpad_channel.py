@@ -529,6 +529,11 @@ class sketchpad_channel(QObject):
 
         self.__filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__filter_attack_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__filter_release_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__amp_attack_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__amp_release_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        
         self.__fx_filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__fx_filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__sketchfx_filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
@@ -892,6 +897,7 @@ class sketchpad_channel(QObject):
             for index, midi_channel in enumerate(self.chainedSounds):
                 self.__filter_cutoff_controllers[index].clear_controls()
                 self.__filter_resonance_controllers[index].clear_controls()
+                self.__filter_attack_controllers[index].clear_controls()
                 if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
                     layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
                     synth_controllers_dict = layer.controllers_dict
@@ -914,8 +920,33 @@ class sketchpad_channel(QObject):
                     elif "filter_resonance" in synth_controllers_dict:
                         self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
 
+                    #Add amp/filter attack/release
+                    if layer.engine.version_info.filterAttackControls is not None:
+                        for controllerName in layer.engine.version_info.filterAttackControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__filter_attack_controllers[index].add_control(synth_controllers_dict[controllerName])
+
+                    if layer.engine.version_info.ampAttackControls is not None:
+                        for controllerName in layer.engine.version_info.ampAttackControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__amp_attack_controllers[index].add_control(synth_controllers_dict[controllerName])
+
+                    if layer.engine.version_info.filterReleaseControls is not None:
+                        for controllerName in layer.engine.version_info.filterReleaseControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__filter_release_controllers[index].add_control(synth_controllers_dict[controllerName])
+
+                    if layer.engine.version_info.ampReleaseControls is not None:
+                        for controllerName in layer.engine.version_info.ampReleaseControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__amp_release_controllers[index].add_control(synth_controllers_dict[controllerName])
+
             self.filterCutoffControllersChanged.emit()
             self.filterResonanceControllersChanged.emit()
+            self.filterAttackControllersChanged.emit()
+            self.filterReleaseControllersChanged.emit()
+            self.ampAttackControllersChanged.emit()
+            self.ampReleaseControllersChanged.emit()
 
     def update_fx_filter_controllers(self):
         if not self.__song__.__to_be_deleted__:
@@ -3207,6 +3238,42 @@ class sketchpad_channel(QObject):
 
     filterResonanceControllers = Property("QVariantList", get_filterResonanceControllers, notify=filterResonanceControllersChanged)
     ### End property filterResonanceControllers
+
+    ### Begin property filterAttackControllers
+    def get_filterAttackControllers(self):
+        return self.__filter_attack_controllers
+
+    filterAttackControllersChanged = Signal()
+
+    filterAttackControllers = Property("QVariantList", get_filterAttackControllers, notify=filterAttackControllersChanged)
+    ### End property filterAttackControllers
+
+    ### Begin property filterReleaseControllers
+    def get_filterReleaseControllers(self):
+        return self.__filter_release_controllers
+
+    filterReleaseControllersChanged = Signal()
+
+    filterReleaseControllers = Property("QVariantList", get_filterReleaseControllers, notify=filterReleaseControllersChanged)
+    ### End property filterReleaseControllers
+
+    ### Begin property ampAttackControllers
+    def get_ampAttackControllers(self):
+        return self.__amp_attack_controllers
+
+    ampAttackControllersChanged = Signal()
+
+    ampAttackControllers = Property("QVariantList", get_ampAttackControllers, notify=ampAttackControllersChanged)
+    ### End property ampAttackControllers
+
+    ### Begin property ampReleaseControllers
+    def get_ampReleaseControllers(self):
+        return self.__amp_release_controllers
+
+    ampReleaseControllersChanged = Signal()
+
+    ampReleaseControllers = Property("QVariantList", get_ampReleaseControllers, notify=ampReleaseControllersChanged)
+    ### End property ampReleaseControllers
 
     ### Begin property fxFilterCutoffControllers
     def get_fxFilterCutoffControllers(self):

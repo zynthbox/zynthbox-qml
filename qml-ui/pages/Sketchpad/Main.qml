@@ -2307,5 +2307,10 @@ ZUI.ScreenPage {
                 }
             }
         }
+
+        Text {
+            color: "orange"
+            text: "Hello" + root.selectedChannel.selectedSlotRow +   root.selectedChannel.filterCutoffControllers[root.selectedChannel.selectedSlotRow].controlsCount
+        }
     }
 }

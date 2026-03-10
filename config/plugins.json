@@ -26,7 +26,12 @@
             "master"
           ],
           "cutoffControls": ["cutoff"],
-          "resonanceControls": ["res"]
+          "resonanceControls": ["res"],
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": ["filter"],
+          "ampAttackControls": ["adsr_a", "adsr2_a"],
+          "ampReleaseControls": ["adsr_r", "adsr2_r"]
         }
       }
     },
@@ -54,7 +59,12 @@
           "url": "http://distrho.sf.net/plugins/Nekobi",
           "volumeControls": null,
           "cutoffControls": ["cutoff"],
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -82,7 +92,12 @@
           "url": "http://example.org/raffo",
           "volumeControls": null,
           "cutoffControls": ["filter_cutoff"],
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": ["filter_attack"],
+          "filterReleaseControls": ["filter_release"],
+          "filterTypeControls": null,
+          "ampAttackControls": ["attack"],
+          "ampReleaseControls": ["release"]
         }
       }
     },
@@ -111,8 +126,13 @@
           "volumeControls": [
             "master_gain"
           ],
-          "cutoffControls": ["flt_hp_cutoff_upper"],
-          "resonanceControls": null
+          "cutoffControls": ["flt_hp_cutoff_upper", "flt_hp_cutoff_lower"],
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -140,7 +160,12 @@
           "url": "http://kunz.corrupt.ch/products/tal-noisemaker",
           "volumeControls": null,
           "cutoffControls": ["cutoff"],
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": ["filterattack"],
+          "filterReleaseControls": ["filterrelease"],
+          "filterTypeControls": ["filtertype"],
+          "ampAttackControls": ["ampattack"],
+          "ampReleaseControls": ["amprelease"]
         }
       }
     },
@@ -170,7 +195,12 @@
             "level"
           ],
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -200,7 +230,12 @@
             "OUT1_VOLUME"
           ],
           "cutoffControls": ["DCF1_CUTOFF"],
-          "resonanceControls": null
+          "resonanceControls": ["DCF1_RESO"],
+          "filterAttackControls": ["DCF1_ATTACK"],
+          "filterReleaseControls": ["DCF1_RELEASE"],
+          "filterTypeControls": ["DCF1_TYPE"],
+          "ampAttackControls": ["DCA1_ATTACK"],
+          "ampReleaseControls": ["DCA1_RELEASE"]
         }
       }
     },
@@ -228,7 +263,12 @@
           "url": "http://studionumbersix.com/foo/lv2/yc20",
           "volumeControls": null,
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -259,7 +299,12 @@
             "OUT2_VOLUME"
           ],
           "cutoffControls": ["DCF1_CUTOFF","DCF2_CUTOFF"],
-          "resonanceControls": ["DCF1_RESO"]
+          "resonanceControls": ["DCF1_RESO", "DCF2_RESO"],
+          "filterAttackControls": ["DCF1_ATTACK", "DCF2_ATTACK"],
+          "filterReleaseControls": ["DCF1_RELEASE", "DCF2_RELEASE"],
+          "filterTypeControls": ["DCF1_TYPE", "DCF2_TYPE"],
+          "ampAttackControls": ["DCA1_ATTACK", "DCA2_ATTACK"],
+          "ampReleaseControls": ["DCA1_RELEASE", "DCA2_RELEASE"]
         }
       }
     },
@@ -287,7 +332,12 @@
           "url": "http://tytel.org/helm",
           "volumeControls": null,
           "cutoffControls": ["cutoff"],
-          "resonanceControls": null
+          "resonanceControls": ["resonance"],
+          "filterAttackControls": ["fil_attack"],
+          "filterReleaseControls": ["fil_release"],
+          "filterTypeControls": null,
+          "ampAttackControls": ["amp_attack"],
+          "ampReleaseControls": ["amp_release"]
         }
       }
     },
@@ -315,7 +365,12 @@
           "url": "http://www.openavproductions.com/fabla",
           "volumeControls": null,
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -343,7 +398,12 @@
           "url": null,
           "volumeControls": null,
           "cutoffControls": ["filter cutoff"],
-          "resonanceControls": null
+          "resonanceControls": ["filter resonance"],
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -371,7 +431,12 @@
           "url": "https://obxd.wordpress.com",
           "volumeControls": null,
           "cutoffControls": ["cutoff"],
-          "resonanceControls": null
+          "resonanceControls": ["resonance"],
+          "filterAttackControls": ["filterattack"],
+          "filterReleaseControls": ["filterrelease"],
+          "filterTypeControls": ["filterenvamount"],
+          "ampAttackControls": ["attack"],
+          "ampReleaseControls": ["release"]
         }
       }
     },
@@ -399,7 +464,10 @@
           "url": "https://surge-synthesizer.github.io/lv2/surge",
           "volumeControls": null,
           "cutoffControls": ["a_filter1_cutoff","a_filter2_cutoff","b_filter1_cutoff","b_filter2_cutoff"],
-          "resonanceControls": null
+          "resonanceControls": ["a_filter1_resonance", "a_filter2_resonance", "b_filter1_resonance", "b_filter2_resonance"],
+          "filterTypeControls": ["a_filter1_type", "a_filter2_type", "b_filter1_type", "b_filter2_type"],
+          "filterAttackControls": ["a_env1_attack", "a_env2_attack"],
+          "filterReleaseControls": ["a_env1_release", "a_env2_release"]
         }
       }
     },
@@ -429,7 +497,12 @@
             "master"
           ],
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -457,7 +530,12 @@
           "url": "urn:juced:DrumSynth",
           "volumeControls": null,
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -485,7 +563,12 @@
           "url": null,
           "volumeControls": null,
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -513,7 +596,12 @@
           "url": null,
           "volumeControls": null,
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -541,7 +629,12 @@
           "url": null,
           "volumeControls": null,
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     },
@@ -569,7 +662,12 @@
           "url": null,
           "volumeControls": null,
           "cutoffControls": null,
-          "resonanceControls": null
+          "resonanceControls": null,
+          "filterAttackControls": null,
+          "filterReleaseControls": null,
+          "filterTypeControls": null,
+          "ampAttackControls": null,
+          "ampReleaseControls": null
         }
       }
     }

@@ -2369,9 +2369,39 @@ Item {
         if (releaseIndex > -1) {
             previouslyHeld = _private.heldTemporaryActionBlockButtons[releaseIndex];
         }
-        if (zynqtgui.modeButtonPressed || previouslyHeld) {
-            let heldMode = zynqtgui.modeButtonPressed ? (zynqtgui.altButtonPressed ? 2 : 1) : false
+        if (zynqtgui.modeButtonPressed || _private.temporaryModeLocked || previouslyHeld) {
+            let heldMode = (zynqtgui.modeButtonPressed || _private.temporaryModeLocked) ? (zynqtgui.altButtonPressed || _private.temporaryAltModeLocked ? 2 : 1) : false
             switch(cuia) {
+                // BEGIN Handle transient mode locking and unlocking
+                case "SWITCH_GLOBAL_RELEASED":
+                    // Tap the global button to lock
+                    if (zynqtgui.modeButtonPressed) {
+                        _private.temporaryModeLocked = true;
+                    }
+                    if ((zynqtgui.modeButtonPressed || _private.temporaryModeLocked) && zynqtgui.altButtonPressed) {
+                        _private.temporaryAltModeLocked = true;
+                        zynqtgui.ignoreNextAltButtonPress = true;
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_MODE_RELEASED":
+                    if (_private.temporaryModeLocked) {
+                        _private.temporaryModeLocked = false;
+                        returnValue = true;
+                    }
+                    if (_private.temporaryAltModeLocked) {
+                        _private.temporaryAltModeLocked = false;
+                        returnValue = true;
+                    }
+                    break;
+                case "SWITCH_ALT_RELEASED":
+                    if (_private.temporaryAltModeLocked) {
+                        _private.temporaryAltModeLocked = false;
+                        returnValue = true;
+                    }
+                    break;
+                // BEGIN Handle transient mode locking and unlocking
+
                 case "SWITCH_RECORD_PRESSED":
                     _private.heldTemporaryActionBlockButtons[0] = heldMode;
                     if (heldMode === 1) {
@@ -2919,7 +2949,11 @@ Item {
             updateLedColors();
         }
 
+        property bool dimLEDs: false
+        readonly property double baseButtonBrightness: dimLEDs ? 1 : 0.8
+        onBaseButtonBrightnessChanged: updateLedColors()
         readonly property var noteColors: zynqtgui.theme_chooser.noteColors
+
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
         property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.7)
         property color stepWithNotes: Qt.rgba(0.5, 0.5, 1)
@@ -3042,12 +3076,18 @@ Item {
         // This also allows you to use the ten buttons in the action block to activate the ten sound slots.
         // If any button is pressed while mode is held down, the mode will not change once mode is released.
         property int temporaryInteractionMode: interactionModeTrackClip
+        // When holding down mode and then pressing global, you can lock temporary mode on, allowing for more readily straightforward finger drumming and the like
+        property bool temporaryModeLocked: false
+        onTemporaryModeLockedChanged: updateLedColors()
+        // When in temporary mode, and hold down alt, you can also press global to lock *that* on (which then shows the chromatic buttons instead of the slots)
+        property bool temporaryAltModeLocked: false
+        onTemporaryAltModeLockedChanged: updateLedColors()
         readonly property int interactionModeSequencer: 0
         readonly property int interactionModeTrackClip: 1
         readonly property int interactionModeMusicalKeys: 2
         readonly property int interactionModeVelocityKeys: 3
         readonly property int interactionModeSlots: 4
-        readonly property int effectiveInteractionMode: zynqtgui.modeButtonPressed ? temporaryInteractionMode : interactionMode
+        readonly property int effectiveInteractionMode: zynqtgui.modeButtonPressed || temporaryModeLocked ? temporaryInteractionMode : interactionMode
         onInteractionModeChanged: {
             updateLedColors();
             switch (interactionMode) {
@@ -3070,8 +3110,8 @@ Item {
             }
         }
         function updateActionBlockLedsForTemporaryMode() {
-            if (zynqtgui.modeButtonPressed) {
-                if (zynqtgui.altButtonPressed) {
+            if (zynqtgui.modeButtonPressed || _private.temporaryModeLocked) {
+                if (zynqtgui.altButtonPressed || _private.temporaryAltModeLocked) {
                     // When the mode button is pressed, and then the alt button, the action block becomes a set of ten note musical pads with notes matching the current clip's scale
                     // (with the same notes as the musical keys mode, from the bottom left hand corner like our other note grids)
                     for (let stepIndex = 0; stepIndex < 10; ++stepIndex) {
@@ -3128,7 +3168,7 @@ Item {
             }
         }
         function updateLedsForStepSequencer() {
-            zynqtgui.led_config.setModeButtonColor(_private.sequencerModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.sequencerModeColor, _private.baseButtonBrightness);
             let workingModel = _private.pattern.workingModel;
             if (zynqtgui.altButtonPressed) {
                 // First the currently selected bar (steps are filled if they are less or equal to the available bars, and current is marked as current step, so tapping sets the current bar)
@@ -3192,7 +3232,7 @@ Item {
             }
         }
         function updateLedsForTrackClipSelector() {
-            zynqtgui.led_config.setModeButtonColor(_private.trackClipModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.trackClipModeColor, _private.baseButtonBrightness);
             for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
                 let stepColor = _private.stepEmpty;
                 let theTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
@@ -3220,7 +3260,7 @@ Item {
             }
         }
         function updateLedsForMusicalButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.musicalKeysModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.musicalKeysModeColor, _private.baseButtonBrightness);
             if (zynqtgui.altButtonPressed) {
                 let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
@@ -3262,13 +3302,13 @@ Item {
         }
         readonly property var velocityKeysVelocities: [1/16, 2/16, 3/16, 4/16, 5/16, 6/16, 7/16, 8/16, 9/16, 10/16, 11/16, 12/16, 13/16, 14/16, 15/16, 1]
         function updateLedsForVelocityButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.velocityKeysModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.velocityKeysModeColor, _private.baseButtonBrightness);
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                 zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0, 0, velocityKeysVelocities[stepIndex] * 0.5), 1.0);
             }
         }
         function updateLedsForSlotButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.slotModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.slotModeColor, _private.baseButtonBrightness);
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                 let slotMuted = false;
                 let slotGain = 0.0;
@@ -3336,7 +3376,7 @@ Item {
         interval: 0; running: false; repeat: false;
         onTriggered: {
             if (_private.pattern) {
-                let interactionMode = zynqtgui.modeButtonPressed ? _private.temporaryInteractionMode : _private.interactionMode;
+                let interactionMode = (zynqtgui.modeButtonPressed || _private.temporaryModeLocked) ? _private.temporaryInteractionMode : _private.interactionMode;
                 switch (interactionMode) {
                     case _private.interactionModeSlots:
                         _private.updateLedsForSlotButtons();
@@ -3609,9 +3649,24 @@ Item {
     Connections {
         target: Zynthbox.PlayGridManager
         // Only do this when we're in musical keys mode or when the transient mode shows notes on the action block)
-        enabled: zynqtgui.ui_settings.hardwareSequencer && (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys || (zynqtgui.modeButtonPressed && zynqtgui.altButtonPressed))
+        enabled: zynqtgui.ui_settings.hardwareSequencer && (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys || ((zynqtgui.modeButtonPressed && zynqtgui.altButtonPressed) || _private.temporaryAltModeLocked))
         onActiveNotesChanged: _private.updateLedColors()
         onActiveControllerNotesChanged: _private.updateLedColors()
+    }
+
+    Timer {
+        id: ledFlasher
+        interval: 500
+        running: _private.temporaryModeLocked
+        repeat: true
+        onRunningChanged: {
+            if (running === false) {
+                _private.dimLEDs = false;
+            }
+        }
+        onTriggered: {
+            _private.dimLEDs = !_private.dimLEDs;
+        }
     }
 
     Binding {

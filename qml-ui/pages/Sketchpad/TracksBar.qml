@@ -1168,7 +1168,7 @@ AbstractSketchpadPage {
                                 QQC2.Button {
                                     Layout.fillHeight: true
                                     visible: root.selectedChannel ? root.selectedChannel.trackType === "sample-trig" : false
-                                    text: root.selectedChannel ? qsTr("Style: %1").arg(trackStyleName(root.selectedChannel.trackStyle)) : ""
+                                    text: root.selectedChannel ? qsTr("Rack Layout: %1").arg(trackStyleName(root.selectedChannel.trackStyle)) : ""
                                     function trackStyleName(trackStyle) {
                                         switch (trackStyle) {
                                         case "everything":
@@ -1179,8 +1179,8 @@ AbstractSketchpadPage {
                                             return qsTr("Drumrack");
                                         case "2-low-3-high":
                                             return qsTr("Upper/Lower");
-                                        case "10-split":
-                                            return qsTr("10 Split");
+                                        case "10-octaves":
+                                            return qsTr("10 Octaves");
                                         default:
                                             return qsTr("Manual");
                                         }

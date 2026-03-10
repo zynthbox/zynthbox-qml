@@ -50,7 +50,7 @@ ZUI.DialogQuestion {
     width: Kirigami.Units.gridUnit * 35
     rejectText: qsTr("Cancel")
     acceptText: qsTr("OK")
-    title: qsTr("Choose Track Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+    title: qsTr("Choose Rack Layout For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
 
     additionalButtons: [styleButtonEverything, styleButtonOneToOne, styleButtonDrums, styleButton2low3high, styleButton10Octaves]
     property var cuiaCallback: function(cuia) {
@@ -216,7 +216,7 @@ ZUI.DialogQuestion {
                 } else if (_private.newTrackStyle === "one-to-one") {
                     return qsTr("Clips will play notes as they arrive to the slot column which matches their number. That is, Clip A will play into the slots in the first column, and those sounds are played into the fx in that column. For external controllers, their notes are sent to the current Clip's column.\nIn this mode, the default sample playback style will be Looping.");
                 } else if (_private.newTrackStyle === "drums") {
-                    return qsTr("Slots each take precise one note, laid out sequentially from C4 (MIDI note 60), which also will be used as the sample's root note. The note assignment is enforced when samples are first loaded into a slot, but should you wish to, you can later edit these assignments.\nIn this mode, the default sample playback style will be One-shot.");
+                    return qsTr("Slots each take precisely one note, laid out sequentially from C4 (MIDI note 60), which also will be used as the sample's root note. The note assignment is enforced when samples are first loaded into a slot, but should you wish to, you can later edit these assignments.\nIn this mode, the default sample playback style will be One-shot.");
                 } else if (_private.newTrackStyle === "2-low-3-high") {
                     return qsTr("Slots will be assigned an even split on the keyboard, with slots in columns 1 and 2 being given the notes from B3 and down (MIDI note 59), and columns 3, 4, and 5 given the notes from C4 and up. The samples are further given root notes which create a playback overlap, so the lower split's samples are transposed up by 2 octaves (24 semitones), and the upper split down by that same amount.\nIn this mode, the default sample playback style will be Looping.");
                 } else if (_private.newTrackStyle === "10-octaves") {

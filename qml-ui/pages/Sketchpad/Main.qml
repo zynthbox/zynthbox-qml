@@ -349,11 +349,80 @@ ZUI.ScreenPage {
         valueSetter(theTrack.pan + sign * 0.05);
     }
 
+    function updateAllChannelSlotLayerAmpAttack(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerAmpAttack(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerAmpAttack(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.ampAttackControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerFilterAttack(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerFilterAttack(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerFilterAttack(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.filterAttackControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerAmpRelease(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerAmpRelease(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerAmpRelease(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.ampReleaseControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerFilterRelease(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerFilterRelease(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerFilterRelease(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.filterReleaseControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerCutoff(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerCutoff(sign, i, false)
+        }    
+    }
     /**
      * Update layer filter cutoff for selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelSlotLayerCutoff(sign, slot = -1) {
+    function updateSelectedChannelSlotLayerCutoff(sign, slot = -1, show = true) {
         function valueSetter(value) {            
             if (controller != null && controller.controlsCount > 0) {
 
@@ -364,22 +433,24 @@ ZUI.ScreenPage {
                 zynqtgui.osd.setKnobPositionIndex(1)
 
                 controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max);
-                applicationWindow().showOsd({
-                    "parameterName": "layer_filter_cutoff",
-                    "description": qsTr("%1 Filter Cutoff").arg(synthName),
-                    "start": controller.value_min,
-                    "stop": controller.value_max,
-                    "step": controller.step_size,
-                    "defaultValue": null,
-                    "currentValue": controller.value,
-                    "startLabel": qsTr("%1").arg(controller.value_min),
-                    "stopLabel": qsTr("%1").arg(controller.value_max),
-                    "valueLabel": qsTr("%1").arg(controller.value),
-                    "setValueFunction": valueSetter,
-                    "showValueLabel": true,
-                    "showResetToDefault": false,
-                    "showVisualZero": false
-                });
+                if(show){
+                    applicationWindow().showOsd({
+                        "parameterName": "layer_filter_cutoff",
+                        "description": qsTr("%1 Filter Cutoff").arg(synthName),
+                        "start": controller.value_min,
+                        "stop": controller.value_max,
+                        "step": controller.step_size,
+                        "defaultValue": null,
+                        "currentValue": controller.value,
+                        "startLabel": qsTr("%1").arg(controller.value_min),
+                        "stopLabel": qsTr("%1").arg(controller.value_max),
+                        "valueLabel": qsTr("%1").arg(controller.value),
+                        "setValueFunction": valueSetter,
+                        "showValueLabel": true,
+                        "showResetToDefault": false,
+                        "showVisualZero": false
+                    });
+                }
             } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
                 applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Cutoff controller").arg(synthName), 2000);
             }
@@ -398,11 +469,16 @@ ZUI.ScreenPage {
         valueSetter(controller.value + sign * controller.step_size);
     }
 
+    function updateAllChannelSlotLayerResonance(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerResonance(sign, i, false)
+        }    
+    }
     /**
      * Update layer filter resonance for selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelSlotLayerResonance(sign, slot = -1) {
+    function updateSelectedChannelSlotLayerResonance(sign, slot = -1, show = true) {
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
 
@@ -413,22 +489,23 @@ ZUI.ScreenPage {
                 zynqtgui.osd.setKnobPositionIndex(2)
 
                 controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max);
-                applicationWindow().showOsd({
-                    "parameterName": "layer_filter_resonance",
-                    "description": qsTr("%1 Filter Resonance").arg(synthName),
-                    "start": controller.value_min,
-                    "stop": controller.value_max,
-                    "step": controller.step_size,
-                    "defaultValue": null,
-                    "currentValue": controller.value,
-                    "startLabel": qsTr("%1").arg(controller.value_min),
-                    "stopLabel": qsTr("%1").arg(controller.value_max),
-                    "valueLabel": qsTr("%1").arg(controller.value),
-                    "setValueFunction": valueSetter,
-                    "showValueLabel": true,
-                    "showResetToDefault": false,
-                    "showVisualZero": false
-                });
+                if(show)
+                    applicationWindow().showOsd({
+                        "parameterName": "layer_filter_resonance",
+                        "description": qsTr("%1 Filter Resonance").arg(synthName),
+                        "start": controller.value_min,
+                        "stop": controller.value_max,
+                        "step": controller.step_size,
+                        "defaultValue": null,
+                        "currentValue": controller.value,
+                        "startLabel": qsTr("%1").arg(controller.value_min),
+                        "stopLabel": qsTr("%1").arg(controller.value_max),
+                        "valueLabel": qsTr("%1").arg(controller.value),
+                        "setValueFunction": valueSetter,
+                        "showValueLabel": true,
+                        "showResetToDefault": false,
+                        "showVisualZero": false
+                    });
             } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
                 applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Resonance controller").arg(synthName), 2000);
             }

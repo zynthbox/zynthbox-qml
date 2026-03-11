@@ -394,6 +394,9 @@ AbstractSketchpadPage {
                 case "TracksBar_item_pitch": _SMPPitchRow.focusNext(); break;
                 case "TracksBar_item_startend": _SMPStartEndRow.focusNext(); break;
                 case "TracksBar_item_loop": _SMPLoopRow.focusNext(); break;
+                case "TracksBar_item_filter_reso": _SYNFilterResoRow.focusNext(); break;
+                case "TracksBar_item_attack": _SYNAttackRow.focusNext(); break;
+                case "TracksBar_item_release": _SYNReleaseRow.focusNext(); break;
             }
         }else {
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
@@ -407,6 +410,9 @@ AbstractSketchpadPage {
                 case "TracksBar_item_pitch": _SMPPitchRow.focusPrevious(); break;
                 case "TracksBar_item_startend": _SMPStartEndRow.focusPrevious(); break;
                 case "TracksBar_item_loop": _SMPLoopRow.focusPrevious(); break;
+                case "TracksBar_item_filter_reso": _SYNFilterResoRow.focusPrevious(); break;
+                case "TracksBar_item_attack": _SYNAttackRow.focusPrevious(); break;
+                case "TracksBar_item_release": _SYNReleaseRow.focusPrevious(); break;
             }
         }else {
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
@@ -552,11 +558,31 @@ AbstractSketchpadPage {
                 break;
             case "TracksBar_item_loop":
                 if(_SMPStack.applyToAll){
-                    root.sketchpadView.updateAllSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateAllSampleLoopPosition(1)
                 }else {
                     root.sketchpadView.updateSelectedSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
-                
+                break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerCutoff(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpAttack(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpAttack(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpRelease(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpRelease(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
                 break;
             default:
                 returnValue = false;
@@ -597,10 +623,32 @@ AbstractSketchpadPage {
                 break;
             case "TracksBar_item_loop":
                 if(_SMPStack.applyToAll){
-                    root.sketchpadView.updateAllSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateAllSampleLoopPosition(-1)
                 }else {
                     root.sketchpadView.updateSelectedSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
+                break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerCutoff(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpAttack(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpAttack(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpRelease(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpRelease(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
             default:
                 returnValue = false;
                 // console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
@@ -677,6 +725,27 @@ AbstractSketchpadPage {
                     root.sketchpadView.updateSelectedSampleLengthSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
                 break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerResonance(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterAttack(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterAttack(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterRelease(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterRelease(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
             default:
                 returnValue = false;
                 // console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
@@ -706,6 +775,27 @@ AbstractSketchpadPage {
                     root.sketchpadView.updateAllSampleLengthSamples(-1)
                 }else {
                     root.sketchpadView.updateSelectedSampleLengthSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerResonance(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterAttack(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterAttack(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterRelease(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterRelease(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                 }
                 break;
             default:
@@ -2173,21 +2263,21 @@ AbstractSketchpadPage {
                                 property int globalFilter: 0
                                 property int globalReso: 0
 
-                                // function focusNext() {
-                                //     let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
-                                //     handleClick(index)
-                                // }
+                                function focusNext() {
+                                    let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                    handleClick(index)
+                                }
 
-                                // function focusPrevious() {
-                                //     let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
-                                //     handleClick(index)
-                                // }
+                                function focusPrevious() {
+                                    let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                    handleClick(index)
+                                }
                                 
-                                // function handleClick(slot) { 
-                                //     root.switchToSlot("sample", slot);
-                                //     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                //     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", slot, _pitchRepeater.itemAt(slot), root.selectedChannel);
-                                // }
+                                function handleClick(synth) { 
+                                    root.switchToSlot("synth", synth);
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_filter_reso", synth, _filterResoRepeater.itemAt(synth), root.selectedChannel);
+                                }
 
                                 Repeater {
                                     id: _filterResoRepeater
@@ -2198,6 +2288,7 @@ AbstractSketchpadPage {
                                         Layout.fillHeight: true
                                         highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
                                         enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                        onClicked: _SYNFilterResoRow.handleClick(index)
 
                                         contentItem: RowLayout {
                                             spacing: ZUI.Theme.sectionSpacing
@@ -2210,7 +2301,8 @@ AbstractSketchpadPage {
                                                 enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
                                                 title: "Cutoff"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: c_ctrl.value + "%"
+                                                text2: enabled ? c_ctrl.value + "%" : "-"
+                                                onClicked: _filterResoDelegate.clicked()
                                                 control1: VolumeControl {
                                                     id: volumeControl
                                                     slider {
@@ -2233,6 +2325,7 @@ AbstractSketchpadPage {
                                                             _cutoffControl.c_ctrl.value = volumeControl.slider.value
                                                         }
                                                     } 
+                                                    onClicked: _filterResoDelegate.clicked()
                                                 }
                                                 underlay: MouseArea {
                                                     anchors.fill: parent
@@ -2253,7 +2346,8 @@ AbstractSketchpadPage {
                                                 enabled: r_ctrl ? r_ctrl.controlsCount > 0 : false
                                                 title: "Res"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: r_ctrl.value + "%"
+                                                text2: enabled ? r_ctrl.value + "%" : "-"
+                                                
                                                 control1: VolumeControl {
                                                     id: _resSlider
                                                     slider {
@@ -2276,7 +2370,8 @@ AbstractSketchpadPage {
                                                         }else {
                                                             _resControl.r_ctrl.value = _resSlider.slider.value
                                                         }
-                                                    } 
+                                                    }
+                                                    onClicked: _filterResoDelegate.clicked() 
                                                 }
 
                                                 underlay: MouseArea {
@@ -2300,21 +2395,21 @@ AbstractSketchpadPage {
                                 property int globalAmpAttack: 0
                                 property int globalFilterAttack: 0
 
-                                // function focusNext() {
-                                //     let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
-                                //     handleClick(index)
-                                // }
+                                function focusNext() {
+                                    let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                    handleClick(index)
+                                }
 
-                                // function focusPrevious() {
-                                //     let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
-                                //     handleClick(index)
-                                // }
+                                function focusPrevious() {
+                                    let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                    handleClick(index)
+                                }
                                 
-                                // function handleClick(slot) { 
-                                //     root.switchToSlot("sample", slot);
-                                //     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                //     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", slot, _pitchRepeater.itemAt(slot), root.selectedChannel);
-                                // }
+                                function handleClick(slot) { 
+                                    root.switchToSlot("synth", slot);
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_attack", slot, _attackRepeater.itemAt(slot), root.selectedChannel);
+                                }
 
                                 Repeater {
                                     id: _attackRepeater
@@ -2325,6 +2420,7 @@ AbstractSketchpadPage {
                                         Layout.fillHeight: true
                                         highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
                                         enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                        onClicked: _SYNAttackRow.handleClick(index)
 
                                         contentItem: RowLayout {
                                             spacing: ZUI.Theme.sectionSpacing
@@ -2336,7 +2432,7 @@ AbstractSketchpadPage {
                                                 readonly property QtObject r_ctrl : root.selectedChannel.ampAttackControllers[index]
                                                 title: "Amp"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: r_ctrl.value + "%"
+                                                text2: enabled ? r_ctrl.value + "%" : "-"
                                                 control1: VolumeControl {
                                                     id: _volControl2
                                                     slider {
@@ -2360,6 +2456,7 @@ AbstractSketchpadPage {
                                                             _control2.r_ctrl.value = _volControl2.slider.value
                                                         }
                                                     } 
+                                                    onClicked: _attackDelegate.clicked()
                                                 }
 
                                                 underlay: MouseArea {
@@ -2381,7 +2478,7 @@ AbstractSketchpadPage {
                                                 enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
                                                 title: "Filter"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: c_ctrl.value + "%"
+                                                text2: enabled ? c_ctrl.value + "%" : "-"
                                                 control1: VolumeControl {
                                                     id: volumeControl
                                                     slider {
@@ -2404,6 +2501,7 @@ AbstractSketchpadPage {
                                                             _control1.c_ctrl.value = volumeControl.slider.value
                                                         }
                                                     } 
+                                                    onClicked: _attackDelegate.clicked()
                                                 }
                                                 underlay: MouseArea {
                                                     anchors.fill: parent
@@ -2427,31 +2525,33 @@ AbstractSketchpadPage {
                                 property int globalAmpRelease: 0
                                 property int globalFilterRelease: 0
 
-                                // function focusNext() {
-                                //     let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
-                                //     handleClick(index)
-                                // }
+                                function focusNext() {
+                                    let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                    handleClick(index)
+                                }
 
-                                // function focusPrevious() {
-                                //     let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
-                                //     handleClick(index)
-                                // }
+                                function focusPrevious() {
+                                    let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                    handleClick(index)
+                                }
                                 
-                                // function handleClick(slot) { 
-                                //     root.switchToSlot("sample", slot);
-                                //     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                //     zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_pitch", slot, _pitchRepeater.itemAt(slot), root.selectedChannel);
-                                // }
+                                function handleClick(slot) { 
+                                    root.switchToSlot("synth", slot);
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_release", slot, _releaseRepeater.itemAt(slot), root.selectedChannel);
+                                }
 
                                 Repeater {
                                     id: _releaseRepeater
                                     model: Zynthbox.Plugin.sketchpadSlotCount
                                     delegate: ZUI.CellControl {
-                                        id: _attackDelegate
+                                        id: _releaseDelegate
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
                                         enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                        
+                                        onClicked: _SYNReleaseRow.handleClick(index)
 
                                         contentItem: RowLayout {
                                             spacing: ZUI.Theme.sectionSpacing
@@ -2463,7 +2563,7 @@ AbstractSketchpadPage {
                                                 readonly property QtObject r_ctrl : root.selectedChannel.ampReleaseControllers[index]
                                                 title: "Amp"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: r_ctrl.value + "%"
+                                                text2: enabled ? r_ctrl.value + "%" : "-"
                                                 control1: VolumeControl {
                                                     id: _volControl2
                                                     slider {
@@ -2487,6 +2587,7 @@ AbstractSketchpadPage {
                                                             _control2.r_ctrl.value = _volControl2.slider.value
                                                         }
                                                     } 
+                                                    onClicked: _releaseDelegate.clicked()
                                                 }
 
                                                 underlay: MouseArea {
@@ -2508,7 +2609,7 @@ AbstractSketchpadPage {
                                                 enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
                                                 title: "Filter"
                                                 text: root.selectedChannel.synthSlotsData[index]
-                                                text2: c_ctrl.value + "%"
+                                                text2: enabled ? c_ctrl.value + "%" : "-"
                                                 control1: VolumeControl {
                                                     id: volumeControl
                                                     slider {
@@ -2531,6 +2632,7 @@ AbstractSketchpadPage {
                                                             _control1.c_ctrl.value = volumeControl.slider.value
                                                         }
                                                     } 
+                                                    onClicked: _releaseDelegate.clicked()
                                                 }
                                                 underlay: MouseArea {
                                                     anchors.fill: parent

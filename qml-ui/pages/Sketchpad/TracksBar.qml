@@ -2443,7 +2443,7 @@ AbstractSketchpadPage {
                                                     _control2.r_ctrl.value = _SYNAttackRow.globalAmpAttack
                                                 }
                                             }
-                                            onGlobalAmpReleaseChanged: {
+                                            onGlobalFilterAttackChanged: {
                                                 if(_control1.enabled){
                                                     _control1.c_ctrl.value = _SYNAttackRow.globalFilterAttack
                                                 }

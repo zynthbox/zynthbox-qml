@@ -50,16 +50,16 @@ ZUI.ScreenPage {
         Kirigami.FormLayout {
             Layout.alignment: Qt.AlignCenter
             QQC2.Label {
-                Kirigami.FormData.label: "Zynthbox Image Build Datetime:"
-                text: zynqtgui.about.zynthbox_image_build_datetime
+                Kirigami.FormData.label: "ZynthboxOS Image Build Datetime:"
+                text: zynqtgui.about.zynthboxos_image_build_datetime
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Zynthbox OS Build Version:"
-                text: zynqtgui.about.zynthbox_os_build_version
+                Kirigami.FormData.label: "ZynthboxOS Build Version:"
+                text: zynqtgui.about.zynthboxos_build_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Zynthbox OS Build Datetime:"
-                text: zynqtgui.about.zynthbox_os_build_datetime
+                Kirigami.FormData.label: "ZynthboxOS Build Datetime:"
+                text: zynqtgui.about.zynthboxos_build_datetime
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Qt:"

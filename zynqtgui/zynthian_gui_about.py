@@ -68,17 +68,17 @@ class zynthian_gui_about(zynthian_qt_gui_base.zynqtgui):
             logging.error(f"Error getting version from os-release: {e}")
             return ""
 
-    def get_zynthbox_image_build_datetime(self):
+    def get_zynthboxos_image_build_datetime(self):
         return self.get_version_from_os_release("ZYNTHBOX_IMAGE_BUILD_DATETIME")
-    zynthbox_image_build_datetime = Property(str, get_get_zynthbox_image_build_datetime, constant = True)
+    zynthboxos_image_build_datetime = Property(str, get_zynthboxos_image_build_datetime, constant = True)
 
-    def get_zynthbox_os_build_version(self):
-        return self.get_version_from_os_release("ZYNTHBOX_OS_BUILD_VERSION")
-    zynthbox_os_build_version = Property(str, get_zynthbox_os_build_version, constant = True)
+    def get_zynthboxos_build_version(self):
+        return self.get_version_from_os_release("ZYNTHBOXOS_BUILD_VERSION")
+    zynthboxos_build_version = Property(str, get_zynthboxos_build_version, constant = True)
 
-    def get_zynthbox_os_build_datetime(self):
-        return self.get_version_from_os_release("ZYNTHBOX_OS_BUILD_DATETIME")
-    zynthbox_os_build_datetime = Property(str, get_zynthbox_os_build_datetime, constant = True)
+    def get_zynthboxos_build_datetime(self):
+        return self.get_version_from_os_release("ZYNTHBOXOS_BUILD_DATETIME")
+    zynthboxos_build_datetime = Property(str, get_zynthboxos_build_datetime, constant = True)
 
     def get_qt_version(self):
         return self.get_version_from_apt("libqt5core5a")

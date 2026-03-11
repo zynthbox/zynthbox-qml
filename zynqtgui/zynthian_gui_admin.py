@@ -709,35 +709,25 @@ class zynthian_gui_admin(zynthian_gui_selector):
                     process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=False)
                 except: pass
 
-                cache = apt.Cache()
-                cache.open()
+                apt_cache = apt.Cache()
+                apt_cache.open()
                 
-                pkg-zynthian-sys = cache["zynthian-sys"]
+                pkg_zynthian_sys = apt_cache["zynthian-sys"]
 
-                if pkg-zynthian-sys.is_installed:
-                    installed = pkg-zynthian-sys.installed.version
-                    candidate = pkg-zynthian-sys.candidate.version
+                if pkg_zynthian_sys.is_installed:
+                    installed = pkg_zynthian_sys.installed.version
+                    candidate = pkg_zynthian_sys.candidate.version
 
                     if installed != candidate:
                         logging.info("zynthian-sys Update Available")
                         self.checkForUpdatesCompleted.emit()
 
-                        self.zynqtgui.show_confirm(
-                            "Do you want to update the system? System will reboot after updating.",
-                            lambda: (
-                                pkg-zynthian-sys.mark_upgrade()
-                                cache.commit()
-                                logging.error(f"{pkg-zynthian-sys.name} updated.")
-                            )
-                        )
-
-                        self.updateCompleted.emit()
-                        self.reboot_confirmed()
+                        self.zynqtgui.show_confirm("Do you want to update the system? System will reboot after updating.", self.do_update_zynthboxos, apt_cache)
                     else:
-                        logging.error(f"{pkg-zynthian-sys.name} is already updated.")
+                        logging.error(f"{pkg_zynthian_sys.name} is already updated.")
                         self.checkForUpdatesUnavailable.emit()
                 else:
-                    logging.error(f"{pkg-zynthian-sys.name} is not installed.")
+                    logging.error(f"{pkg_zynthian_sys.name} is not installed.")
                     self.updateErrored.emit()
 
             except Exception as e:
@@ -752,6 +742,15 @@ class zynthian_gui_admin(zynthian_gui_selector):
         logging.info("UPDATE SYSTEM")
         self.zynqtgui.show_info("UPDATE SYSTEM")
         self.start_command([self.sys_dir + "/scripts/update_system.sh"])
+
+    def do_update_zynthboxos(self, apt_cache):
+        pkg_zynthian_sys = apt_cache["zynthian-sys"]
+        pkg_zynthian_sys.mark_upgrade()
+        apt_cache.commit()
+        logging.info(f"{pkg_zynthian_sys.name} updated.")
+
+        self.updateCompleted.emit()
+        self.reboot_confirmed()
 
     @Slot()
     def restart_gui(self):

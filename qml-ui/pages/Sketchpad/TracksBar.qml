@@ -2290,6 +2290,20 @@ AbstractSketchpadPage {
                                         enabled: root.selectedChannel.synthSlotsData[index].length > 0
                                         onClicked: _SYNFilterResoRow.handleClick(index)
 
+                                        Connections {
+                                            target: _SYNFilterResoRow
+                                            onGlobalFilterChanged: {
+                                                if(_cutoffControl.enabled){
+                                                    _cutoffControl.c_ctrl.value = _SYNFilterResoRow.globalFilter
+                                                }
+                                            }
+                                            onGlobalResoChanged: {
+                                                if(_resControl.enabled){
+                                                    _resControl.r_ctrl.value = _SYNFilterResoRow.globalReso
+                                                }
+                                            }
+                                        }
+
                                         contentItem: RowLayout {
                                             spacing: ZUI.Theme.sectionSpacing
 
@@ -2320,7 +2334,7 @@ AbstractSketchpadPage {
                                                     onValueChanged: {
                                                         if(_SYNStack.applyToAll)
                                                         {
-                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                            _SYNFilterResoRow.globalFilter = volumeControl.slider.value
                                                         }else {
                                                             _cutoffControl.c_ctrl.value = volumeControl.slider.value
                                                         }
@@ -2366,7 +2380,7 @@ AbstractSketchpadPage {
                                                     onValueChanged: {
                                                         if(_SYNStack.applyToAll)
                                                         {
-                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                            _SYNFilterResoRow.globalReso = _resSlider.slider.value
                                                         }else {
                                                             _resControl.r_ctrl.value = _resSlider.slider.value
                                                         }
@@ -2422,6 +2436,20 @@ AbstractSketchpadPage {
                                         enabled: root.selectedChannel.synthSlotsData[index].length > 0
                                         onClicked: _SYNAttackRow.handleClick(index)
 
+                                        Connections {
+                                            target: _SYNAttackRow
+                                            onGlobalAmpAttackChanged: {
+                                                if(_control2.enabled){
+                                                    _control2.r_ctrl.value = _SYNAttackRow.globalAmpAttack
+                                                }
+                                            }
+                                            onGlobalAmpReleaseChanged: {
+                                                if(_control1.enabled){
+                                                    _control1.c_ctrl.value = _SYNAttackRow.globalFilterAttack
+                                                }
+                                            }
+                                        }
+
                                         contentItem: RowLayout {
                                             spacing: ZUI.Theme.sectionSpacing
                                             AbstractCellLayout {
@@ -2451,7 +2479,7 @@ AbstractSketchpadPage {
                                                     onValueChanged: {
                                                         if(_SYNStack.applyToAll)
                                                         {
-                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                            _SYNAttackRow.globalAmpAttack = _volControl2.slider.value
                                                         }else {
                                                             _control2.r_ctrl.value = _volControl2.slider.value
                                                         }
@@ -2496,7 +2524,7 @@ AbstractSketchpadPage {
                                                     onValueChanged: {
                                                         if(_SYNStack.applyToAll)
                                                         {
-                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                            _SYNAttackRow.globalFilterAttack = _volControl2.slider.value
                                                         }else {
                                                             _control1.c_ctrl.value = volumeControl.slider.value
                                                         }
@@ -2553,6 +2581,20 @@ AbstractSketchpadPage {
                                         
                                         onClicked: _SYNReleaseRow.handleClick(index)
 
+                                        Connections {
+                                            target: _SYNReleaseRow
+                                            onGlobalAmpReleaseChanged: {
+                                                if(_control2.enabled){
+                                                    _control2.r_ctrl.value = _SYNReleaseRow.globalAmpRelease
+                                                }
+                                            }
+                                            onGlobalFilterReleaseChanged: {
+                                                if(_control1.enabled){
+                                                    _control1.c_ctrl.value = _SYNReleaseRow.globalFilterRelease
+                                                }
+                                            }
+                                        }
+
                                         contentItem: RowLayout {
                                             spacing: ZUI.Theme.sectionSpacing
                                             AbstractCellLayout {
@@ -2582,7 +2624,7 @@ AbstractSketchpadPage {
                                                     onValueChanged: {
                                                         if(_SYNStack.applyToAll)
                                                         {
-                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                            _SYNReleaseRow.globalAmpRelease = _volControl2.slider.value
                                                         }else {
                                                             _control2.r_ctrl.value = _volControl2.slider.value
                                                         }
@@ -2627,7 +2669,7 @@ AbstractSketchpadPage {
                                                     onValueChanged: {
                                                         if(_SYNStack.applyToAll)
                                                         {
-                                                            // _SMPLoopRow.globalLoopPosition = slider.value
+                                                           _SYNReleaseRow.globalFilterRelease = volumeControl.slider.value
                                                         }else {
                                                             _control1.c_ctrl.value = volumeControl.slider.value
                                                         }

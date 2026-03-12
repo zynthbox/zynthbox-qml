@@ -627,8 +627,8 @@ ZUI.ScreenPage {
                         }
                         qmlSelector: ZUI.SelectorWrapper {
                             selector_list: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                                ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"])
-                                : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"])
+                                ? _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/sketches", "/zynthian/zynthian-my-data/samples"], false)
+                                : _private.filePropertiesHelper.getOnlySubdirectoriesList(["/zynthian/zynthian-my-data/samples", "/zynthian/zynthian-my-data/sketches"], false)
                             onSelector_listChanged: {
                                 current_index = 0;
                             }
@@ -664,6 +664,18 @@ ZUI.ScreenPage {
                             }
                         }
                     }
+                }
+                QQC2.Label {
+                    visible: folderListView.count === 0
+                    opacity: 0.6
+                    anchors {
+                        fill: parent
+                        margins: Kirigami.Units.largeSpacing * 2
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    text: qsTr("No Samples\n\nYou can use the Librarian in Webconf's Tools menu to upload some to my-samples")
                 }
             }
 
@@ -777,7 +789,7 @@ ZUI.ScreenPage {
                                 showDirs: false
                                 showDotAndDotDot: false
                                 sortCaseSensitive: false
-                                nameFilters: [ "*.wav" ]
+                                nameFilters: [ "*.wav", "*.ogg" ]
                                 folder: "/zynthian/zynthian-my-data"
                                 onFolderChanged: {
                                     filesListView.mostRecentlyActivatedIndex = -1;
@@ -880,6 +892,18 @@ ZUI.ScreenPage {
                             }
                         }
                     }
+                }
+                QQC2.Label {
+                    visible: folderModel.count === 0 && folderModel.status == Zynthbox.FolderListModel.Ready
+                    opacity: 0.6
+                    anchors {
+                        fill: parent
+                        margins: Kirigami.Units.largeSpacing * 2
+                    }
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    text: qsTr("No Supported Files\n\nThis folder does have files in it, but none that we can load as samples (.wav and .ogg).")
                 }
             }
         }

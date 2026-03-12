@@ -791,6 +791,70 @@ Kirigami.AbstractApplicationWindow {
 
         valueSetter(selectedChannel.wetFx2Amount + sign)
     }
+
+    function updateAllChannelEQHiCutQuality(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQHiCutQuality(sign, i)
+        }        
+    }
+
+    function updateAllChannelEQLowCutQuality(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQLowCutQuality(sign, i)
+        }        
+    }
+
+    function updateChannelEQHiCutQuality(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[5]
+            if(!eq)
+                return
+            eq.quality = eq.quality+(sign/10)            
+        }
+    }
+
+    function updateChannelEQLowCutQuality(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[0]
+            if(!eq)
+                return
+            eq.quality = eq.quality+(sign/10)            
+        }
+    }
+
+    function updateAllChannelEQHiCut(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQHiCut(sign, i)
+        }        
+    }
+
+    function updateAllChannelEQLowCut(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQLowCut(sign, i)
+        }        
+    }
+
+    function updateChannelEQHiCut(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[5]
+            if(!eq)
+                return
+            eq.frequencyAbsolute = eq.frequencyAbsolute+(sign/100)            
+        }
+    }
+
+    function updateChannelEQLowCut(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[0]
+            if(!eq)
+                return
+            eq.frequencyAbsolute = eq.frequencyAbsolute+(sign/100)            
+        }
+    }
     /**
      * Update global playback client pan
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1

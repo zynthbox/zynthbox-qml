@@ -101,6 +101,32 @@ AbstractSketchpadPage {
             case "MixerBar_item_reverb":
                 applicationWindow().updateChannelReverbSend(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                 return true;
+            case "MixerBar_item_hicut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                return true;
+            case "MixerBar_item_lowcut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(1, false)
                 return true;
@@ -117,6 +143,32 @@ AbstractSketchpadPage {
                 return true;
             case "MixerBar_item_reverb":
                 applicationWindow().updateChannelReverbSend(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
+            case "MixerBar_item_hicut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                return true;
+            case "MixerBar_item_lowcut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
                 return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(-1, false)
@@ -503,6 +555,11 @@ AbstractSketchpadPage {
             ColumnLayout {
                 spacing: ZUI.Theme.sectionSpacing
                 enabled: root.selectedChannel.trackType !== "external"
+
+                function focusElement(){
+                    _EQStack.children[_EQStack.currentIndex].focusElement()
+                }
+
                 Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit *  2
@@ -576,6 +633,7 @@ AbstractSketchpadPage {
                         }
                     }
                 }
+
                 ZUI.SectionGroup {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -597,33 +655,26 @@ AbstractSketchpadPage {
                         property bool showQ: false
 
                         function setView(view) {
-                            // var slotIndex = _EQStack.currentSlotIndex
                             _EQStack.currentView = view
                             _EQStack.currentIndex = _EQStack.currentView
 
-                            // _EQStack.children[_SYNStack.currentIndex].handleClick(slotIndex)
+                            _EQStack.children[_EQStack.currentIndex].focusElement()
                         }
 
                         RowLayout {
                             id: _EQHiCutRow
                             spacing: ZUI.Theme.cellSpacing
-                            property int globalHiCutValue: 0
-                            property int globalHiCutQ: 0
+                            property double globalHiCutValue: 0
+                            property double globalHiCutQ: 0
 
-                            function focusNext() {
-                                // let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
-                                // handleClick(index)
-                            }
-
-                            function focusPrevious() {
-                                // let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
-                                // handleClick(index)
+                            function focusElement() {
+                                handleClick(root.selectedChannel.id)
                             }
                             
-                            function handleClick(synth) { 
-                                // root.switchToSlot("synth", synth);
-                                // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                // zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_filter_reso", synth, _filterResoRepeater.itemAt(synth), root.selectedChannel);
+                            function handleClick(channel) { 
+                                zynqtgui.sketchpad.selectedTrackId = channel;
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_hicut", channel, _hicutRepeater.itemAt(channel),  root.selectedChannel);
                             }
 
                             Repeater {
@@ -633,23 +684,33 @@ AbstractSketchpadPage {
                                     id: _hicutDelegate 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
+                                    enabled: eq !== null
                                     highlighted: (index === root.selectedChannel.selectedSlotRow || _EQStack.applyToAll) && enabled
                                     property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
                                     property QtObject eq: ctrl ? ctrl.equaliserSettings[5] : null
                                     
-                                    //[5] is hicut and [0] is lowcut and for the menu [11] highcut(lowpass) and [1] lowcut(high pass)
-                                    
-                                    onEqChanged :{
-                                        // if(_hicutDelegate.eq)
-                                            // _hicutDelegate.eq.frequency = 20000
-                                    }   
+                                    //[5] is hicut and [0] is lowcut and for the menu [11] highcut(lowpass) and [1] lowcut(high pass)     
+
+                                    Connections {
+                                        target: _EQHiCutRow
+                                        onGlobalHiCutValueChanged: {
+                                            if(_hicutDelegate.enabled){
+                                                _hicutDelegate.eq.frequencyAbsolute = _EQHiCutRow.globalHiCutValue
+                                            }
+                                        }
+
+                                        onGlobalHiCutQChanged: {
+                                            if(_hicutDelegate.enabled){
+                                                _hicutDelegate.eq.quality = _EQHiCutRow.globalHiCutQ
+                                            }
+                                        }
+                                    }                               
 
                                     contentItem: StackLayout {
 
                                         currentIndex: _EQStack.showQ ? 1 : 0
 
                                         AbstractCellLayout {
-
                                             text2: _hicutDelegate.eq
                                                   ?  (_hicutDelegate.eq.frequency < 1000.0 || zynqtgui.modeButtonPressed)
                                                     ? "%1 Hz".arg(_hicutDelegate.eq.frequency.toFixed(1))
@@ -658,6 +719,7 @@ AbstractSketchpadPage {
                                             enabled: _hicutDelegate.eq 
                                             text: root.selectedChannel.synthSlotsData[index]
                                             title: enabled ? _hicutDelegate.eq.name : "-"
+                                            onClicked: _EQHiCutRow.handleClick(index)
 
                                             ZUI.SectionGroup {
                                                 Layout.fillWidth: true
@@ -703,11 +765,18 @@ AbstractSketchpadPage {
                                                     value: _hicutDelegate.eq  ? _hicutDelegate.eq.frequencyAbsolute*100 : 0
                                                 }
 
-                                                 onValueChanged: {
+                                                onValueChanged: {
                                                     if (_hicutDelegate.eq) {
-                                                        _hicutDelegate.eq.frequencyAbsolute = slider.value/100;
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQHiCutRow.globalHiCutValue = slider.value/100
+                                                        }else{
+                                                            _hicutDelegate.eq.frequencyAbsolute = slider.value/100
+                                                        }
                                                     }
                                                 }
+                                                onClicked: _EQHiCutRow.handleClick(index)
+
+
                                             }
                                             underlay: MouseArea {
                                                 anchors.fill: parent
@@ -735,13 +804,16 @@ AbstractSketchpadPage {
                                                     stepSize: 0.1
                                                     value: _hicutDelegate.eq ? _hicutDelegate.eq.quality : 0
                                                 }
-
                                                 onValueChanged: {
-                                                    if (_hicutDelegate.eq ) {
-                                                        _hicutDelegate.eq .quality = slider.value;
+                                                    if (_hicutDelegate.eq) {
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQHiCutRow.globalHiCutQ = slider.value
+                                                        }else{
+                                                            _hicutDelegate.eq.quality = slider.value
+                                                        }
                                                     }
                                                 }
-
+                                                onClicked: _EQHiCutRow.handleClick(index)
                                             }
                                             underlay: MouseArea {
                                                 anchors.fill: parent
@@ -764,23 +836,17 @@ AbstractSketchpadPage {
                         RowLayout {
                             id: _EQLowCutRow
                             spacing: ZUI.Theme.cellSpacing
-                            property int globalLowCutValue: 0
-                            property int globalLowCutQ: 0
+                            property double globalLowCutValue: 0
+                            property double globalLowCutQ: 0
 
-                            function focusNext() {
-                                // let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
-                                // handleClick(index)
-                            }
-
-                            function focusPrevious() {
-                                // let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
-                                // handleClick(index)
+                            function focusElement() {
+                                handleClick(root.selectedChannel.id)
                             }
                             
-                            function handleClick(synth) { 
-                                // root.switchToSlot("synth", synth);
-                                // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                // zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_filter_reso", synth, _filterResoRepeater.itemAt(synth), root.selectedChannel);
+                            function handleClick(channel) { 
+                                zynqtgui.sketchpad.selectedTrackId = channel;
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_lowcut", channel, _lowcutRepeater.itemAt(channel),  root.selectedChannel);
                             }
 
                             Repeater {
@@ -796,12 +862,22 @@ AbstractSketchpadPage {
                                     property QtObject eq: ctrl ? ctrl.equaliserSettings[0] : null
                                     
                                     //[5] is hicut and [0] is lowcut and for the menu [11] highcut(lowpass) and [1] lowcut(high pass)
-                                    
-                                    onEqChanged :{
-                                        // if(_lowcutDelegate.eq)
-                                            // _lowcutDelegate.eq.frequency = 20
-                                    }   
 
+                                    Connections {
+                                        target: _EQLowCutRow
+                                        onGlobalLowCutValueChanged: {
+                                            if(_lowcutDelegate.enabled){
+                                                _lowcutDelegate.eq.frequencyAbsolute = _EQLowCutRow.globalLowCutValue
+                                            }
+                                        }
+
+                                        onGlobalLowCutQChanged: {
+                                            if(_lowcutDelegate.enabled){
+                                                _lowcutDelegate.eq.quality = _EQLowCutRow.globalLowCutQ
+                                            }
+                                        }
+                                    }   
+                                    
                                     contentItem: StackLayout {
 
                                         currentIndex: _EQStack.showQ ? 1 : 0
@@ -860,11 +936,16 @@ AbstractSketchpadPage {
                                                     value: _lowcutDelegate.eq  ? _lowcutDelegate.eq.frequencyAbsolute*100 : 0
                                                 }
 
-                                                 onValueChanged: {
+                                                onValueChanged: {
                                                     if (_lowcutDelegate.eq) {
-                                                        _lowcutDelegate.eq.frequencyAbsolute = slider.value/100;
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQLowCutRow.globalLowCutValue = slider.value/100
+                                                        }else{
+                                                            _lowcutDelegate.eq.frequencyAbsolute = slider.value/100
+                                                        }
                                                     }
                                                 }
+                                                onClicked: _EQLowCutRow.handleClick(index)
                                             }
                                             underlay: MouseArea {
                                                 anchors.fill: parent
@@ -892,13 +973,16 @@ AbstractSketchpadPage {
                                                     stepSize: 0.1
                                                     value: _lowcutDelegate.eq ? _lowcutDelegate.eq.quality : 0
                                                 }
-
                                                 onValueChanged: {
-                                                    if (_lowcutDelegate.eq ) {
-                                                        _lowcutDelegate.eq .quality = slider.value;
+                                                    if (_lowcutDelegate.eq) {
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQLowCutRow.globalLowCutQ = slider.value
+                                                        }else{
+                                                            _lowcutDelegate.eq.quality = slider.value
+                                                        }
                                                     }
                                                 }
-
+                                                onClicked: _EQLowCutRow.handleClick(index)
                                             }
                                             underlay: MouseArea {
                                                 anchors.fill: parent

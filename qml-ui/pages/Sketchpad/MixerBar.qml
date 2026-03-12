@@ -158,6 +158,11 @@ AbstractSketchpadPage {
         Comp
     }  
 
+    enum EQView {
+        HiCut,
+        LowCut
+    }
+
     contentItem: ZUI.ThreeColumnView {
         altTabs: false
         leftTab: ZUI.SectionGroup {
@@ -434,7 +439,7 @@ AbstractSketchpadPage {
                 }
             }
 
-             ZUI.SectionGroup {
+            ZUI.SectionGroup {
                 fallbackBackground: Rectangle {
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
@@ -495,8 +500,150 @@ AbstractSketchpadPage {
                 }
             }
 
+            ColumnLayout {
+                spacing: ZUI.Theme.sectionSpacing
+                enabled: root.selectedChannel.trackType !== "external"
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit *  2
+                    Layout.minimumHeight: Kirigami.Units.gridUnit *  2
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.spacing
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            QQC2.ButtonGroup {
+                                buttons: _EQButtonsRow.children
+                            }
+
+                            RowLayout {
+                                id: _EQButtonsRow
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "HiCut"
+                                    checked: highlighted
+                                    highlighted: _EQStack.currentView === MixerBar.EQView.HiCut
+                                    onClicked: _EQStack.setView(MixerBar.EQView.HiCut)
+                                }
+                                ZUI.SectionButton {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "LowCut"
+                                    checked: highlighted
+                                    highlighted: _EQStack.currentView === MixerBar.EQView.LowCut
+                                    onClicked: _EQStack.setView(MixerBar.EQView.LowCut)
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    checkable: true
+                                    checked: _EQStack.applyToAll
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "All"
+                                    onToggled: _EQStack.applyToAll = checked
+                                }
+
+                                ZUI.SectionButton {
+                                    checkable: true
+                                    // checked: _EQStack.applyToAll
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "Q"
+                                    // onToggled: _EQStack.applyToAll = checked
+                                }
+                            }
+                        }
+                    }
+                }
+                ZUI.SectionGroup {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    fallbackBackground: Rectangle {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        color: Kirigami.Theme.backgroundColor
+                        opacity: 0.1
+                    } 
+
+                    StackLayout {
+                        id: _EQStack
+                        visible: enabled
+                        anchors.fill: parent
+                        property int currentView: MixerBar.EQView.HiCut
+                        currentIndex : currentView
+
+                        property bool applyToAll: false
+                        function setView(view) {
+                            // var slotIndex = _EQStack.currentSlotIndex
+                            _EQStack.currentView = view
+                            _EQStack.currentIndex = _EQStack.currentView
+
+                            // _EQStack.children[_SYNStack.currentIndex].handleClick(slotIndex)
+                        }
+
+                        RowLayout {
+                            id: _EQHiCutRow
+                            spacing: ZUI.Theme.cellSpacing
+                            property int globalFilter: 0
+                            property int globalReso: 0
+
+                            function focusNext() {
+                                // let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                // handleClick(index)
+                            }
+
+                            function focusPrevious() {
+                                // let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                // handleClick(index)
+                            }
+                            
+                            function handleClick(synth) { 
+                                // root.switchToSlot("synth", synth);
+                                // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                // zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_filter_reso", synth, _filterResoRepeater.itemAt(synth), root.selectedChannel);
+                            }
+
+                            Repeater {
+                                id: _hicutRepeater
+                                model: Zynthbox.Plugin.sketchpadSlotCount
+                                delegate: ZUI.CellControl {
+                                    id: _hicutDelegate
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    highlighted: (index === root.selectedChannel.selectedSlotRow || _EQStack.applyToAll) && enabled
+                                    // enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                    // onClicked: _SYNFilterResoRow.handleClick(index)
+                                }
+                            }
+                        }
+                        Item {}
+                    }
+                }
+            }
+
             Item {}
-            Item {}
+
             Item {}
         }
 

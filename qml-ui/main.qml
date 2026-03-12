@@ -855,6 +855,16 @@ Kirigami.AbstractApplicationWindow {
             eq.frequencyAbsolute = eq.frequencyAbsolute+(sign/100)            
         }
     }
+
+    function updateAllChannelCompThreshold(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var comp = ctrl.compressorSettings
+            if(!comp)
+                return
+            comp.threshold = comp.threshold+(sign/100)            
+        }
+    }
     /**
      * Update global playback client pan
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1

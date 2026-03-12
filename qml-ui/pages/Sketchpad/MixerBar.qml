@@ -127,6 +127,9 @@ AbstractSketchpadPage {
                         applicationWindow().updateChannelEQLowCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
                 return true;
+            case "MixerBar_item_threshold":
+                applicationWindow().updateAllChannelCompThreshold(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(1, false)
                 return true;
@@ -169,6 +172,9 @@ AbstractSketchpadPage {
                     else
                         applicationWindow().updateChannelEQLowCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
+                return true;
+            case "MixerBar_item_threshold":
+                applicationWindow().updateAllChannelCompThreshold(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(-1, false)
@@ -213,6 +219,10 @@ AbstractSketchpadPage {
     enum EQView {
         HiCut,
         LowCut
+    }
+
+    enum CompView {
+        Threshold
     }
 
     contentItem: ZUI.ThreeColumnView {
@@ -685,7 +695,7 @@ AbstractSketchpadPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     enabled: eq !== null
-                                    highlighted: (index === root.selectedChannel.selectedSlotRow || _EQStack.applyToAll) && enabled
+                                    highlighted: (index === root.selectedChannel.id || _EQStack.applyToAll) && enabled
                                     property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
                                     property QtObject eq: ctrl ? ctrl.equaliserSettings[5] : null
                                     
@@ -752,7 +762,7 @@ AbstractSketchpadPage {
 
                                             control1: VolumeControl {
                                                 id: volumeControl
-                                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
+                                                tickLabelSet : ({"0":"20Hz", "50":"650Hz", "100":"20kHz"})
                                                 slider {
                                                     stepSize: 1
                                                     from: 0
@@ -857,7 +867,7 @@ AbstractSketchpadPage {
 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    highlighted: (index === root.selectedChannel.selectedSlotRow || _EQStack.applyToAll) && enabled
+                                    highlighted: (index === root.selectedChannel.id || _EQStack.applyToAll) && enabled
                                     property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
                                     property QtObject eq: ctrl ? ctrl.equaliserSettings[0] : null
                                     
@@ -923,7 +933,7 @@ AbstractSketchpadPage {
 
                                             control1: VolumeControl {
                                                 id: volumeControl
-                                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
+                                                tickLabelSet : ({"0":"20Hz", "50":"650Hz", "100":"20kHz"})
                                                 slider {
                                                     stepSize: 1
                                                     from: 0
@@ -1005,9 +1015,167 @@ AbstractSketchpadPage {
                 }
             }
 
-            Item {}
+            ColumnLayout {
+                spacing: ZUI.Theme.sectionSpacing
+                enabled: root.selectedChannel.trackType !== "external"
 
-            Item {}
+                function focusElement(){
+                    _compStack.children[_compStack.currentIndex].focusElement()
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit *  2
+                    Layout.minimumHeight: Kirigami.Units.gridUnit *  2
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.spacing
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            QQC2.ButtonGroup {
+                                buttons: _compButtonsRow.children
+                            }
+
+                            RowLayout {
+                                id: _compButtonsRow
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "Threshold"
+                                    checked: highlighted
+                                    highlighted: _compStack.currentView === MixerBar.CompView.Threshold
+                                    onClicked: _compStack.setView(MixerBar.CompView.Threshold)
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    checkable: true
+                                    checked: _compStack.applyToAll
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "All"
+                                    onToggled: _compStack.applyToAll = checked
+                                    visible: false
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ZUI.SectionGroup {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    fallbackBackground: Rectangle {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        color: Kirigami.Theme.backgroundColor
+                        opacity: 0.1
+                    } 
+
+                    StackLayout {
+                        id: _compStack
+                        visible: enabled
+                        anchors.fill: parent
+                        property int currentView: MixerBar.CompView.Threshold
+                        currentIndex : currentView
+
+                        property bool applyToAll: false
+
+                        function setView(view) {
+                            _compStack.currentView = view
+                            _compStack.currentIndex = _compStack.currentView
+
+                            _compStack.children[_compStack.currentIndex].focusElement()
+                        }
+
+                        RowLayout {
+                            id: _compThresholdRow
+                            spacing: ZUI.Theme.cellSpacing
+                            property double globalHiCutValue: 0
+                            property double globalHiCutQ: 0
+
+                            function focusElement() {
+                                handleClick(root.selectedChannel.id)
+                            }
+                            
+                            function handleClick(channel) { 
+                                zynqtgui.sketchpad.selectedTrackId = channel;
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_threshold", channel, _thresholdRepeater.itemAt(channel),  root.selectedChannel);
+                            }
+
+                            Repeater {
+                                id: _thresholdRepeater
+                                model: Zynthbox.Plugin.sketchpadTrackCount
+                                delegate: AbstractCellLayout {
+                                    id: _thresholdDelegate 
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    enabled: compressor !== null
+                                    highlighted: (index === root.selectedChannel.id || _compStack.applyToAll) && enabled
+                                    property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
+                                    property QtObject compressor: ctrl ? ctrl.compressorSettings : null
+
+                                    title: "Threshold"
+                                    text2: compressor ? "%1dB".arg(compressor.thresholdDB.toFixed(2)) : "-"
+
+                                    control1: VolumeControl {
+                                        id: volumeControl
+                                        slider {
+                                            from: 0
+                                            to: 100
+                                        }
+                                        tickLabelSet : ({"0":"-50dB", "50":"-20dB", "100":"10dB"})                                        
+
+                                        Binding {
+                                            target: volumeControl.slider
+                                            property: "value"
+                                            value: _thresholdDelegate.compressor ? _thresholdDelegate.compressor.threshold*100 : 0
+                                        }
+
+                                        onValueChanged: {
+                                            if (_thresholdDelegate.compressor) {
+                                                _thresholdDelegate.compressor.threshold = slider.value/100
+                                            }
+                                        }
+
+                                        onClicked: _compThresholdRow.handleClick(index)
+                                    }
+
+                                    underlay: MouseArea {
+                                        anchors.fill: parent
+                                        onPressed: volumeControl.mouseArea.handlePressed(mouse)                                                
+                                        onReleased: volumeControl.mouseArea.released(mouse)
+                                        onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                        onClicked: volumeControl.mouseArea.clicked(mouse)
+                                        onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                        onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         rightTab: ZUI.SectionGroup {

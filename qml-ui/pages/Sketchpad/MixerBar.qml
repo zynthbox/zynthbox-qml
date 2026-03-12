@@ -566,11 +566,11 @@ AbstractSketchpadPage {
 
                                 ZUI.SectionButton {
                                     checkable: true
-                                    // checked: _EQStack.applyToAll
+                                    checked: _EQStack.showQ
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                     text: "Q"
-                                    // onToggled: _EQStack.applyToAll = checked
+                                    onToggled: _EQStack.showQ = checked
                                 }
                             }
                         }
@@ -594,6 +594,8 @@ AbstractSketchpadPage {
                         currentIndex : currentView
 
                         property bool applyToAll: false
+                        property bool showQ: false
+
                         function setView(view) {
                             // var slotIndex = _EQStack.currentSlotIndex
                             _EQStack.currentView = view
@@ -605,8 +607,8 @@ AbstractSketchpadPage {
                         RowLayout {
                             id: _EQHiCutRow
                             spacing: ZUI.Theme.cellSpacing
-                            property int globalFilter: 0
-                            property int globalReso: 0
+                            property int globalHiCutValue: 0
+                            property int globalHiCutQ: 0
 
                             function focusNext() {
                                 // let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
@@ -626,18 +628,295 @@ AbstractSketchpadPage {
 
                             Repeater {
                                 id: _hicutRepeater
-                                model: Zynthbox.Plugin.sketchpadSlotCount
+                                model: Zynthbox.Plugin.sketchpadTrackCount
                                 delegate: ZUI.CellControl {
-                                    id: _hicutDelegate
+                                    id: _hicutDelegate 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     highlighted: (index === root.selectedChannel.selectedSlotRow || _EQStack.applyToAll) && enabled
+                                    property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
+                                    property QtObject eq: ctrl ? ctrl.equaliserSettings[5] : null
+                                    
+                                    //[5] is hicut and [0] is lowcut and for the menu [11] highcut(lowpass) and [1] lowcut(high pass)
+                                    
+                                    onEqChanged :{
+                                        // if(_hicutDelegate.eq)
+                                            // _hicutDelegate.eq.frequency = 20000
+                                    }   
+
+                                    contentItem: StackLayout {
+
+                                        currentIndex: _EQStack.showQ ? 1 : 0
+
+                                        AbstractCellLayout {
+
+                                            text2: _hicutDelegate.eq
+                                                  ?  (_hicutDelegate.eq.frequency < 1000.0 || zynqtgui.modeButtonPressed)
+                                                    ? "%1 Hz".arg(_hicutDelegate.eq.frequency.toFixed(1))
+                                                    : "%1 kHz".arg((_hicutDelegate.eq.frequency / 1000.0).toFixed(2))
+                                            : ""
+                                            enabled: _hicutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            title: enabled ? _hicutDelegate.eq.name : "-"
+
+                                            ZUI.SectionGroup {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                                Layout.margins: 2
+
+                                                RowLayout {
+                                                    anchors.fill: parent
+                                                    ZUI.SectionButton {
+                                                        text: "S"
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _hicutDelegate.eq ? _hicutDelegate.eq.soloed : false
+                                                        onClicked: {
+                                                            _hicutDelegate.eq.soloed =!_hicutDelegate.eq.soloed;
+                                                        }
+                                                    }
+
+                                                     ZUI.SectionButton {
+                                                        text: "A"
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _hicutDelegate.eq? _hicutDelegate.eq.active : false
+                                                        onClicked: {
+                                                            _hicutDelegate.eq.active = !_hicutDelegate.eq.active;
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            control1: VolumeControl {
+                                                id: volumeControl
+                                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
+                                                slider {
+                                                    stepSize: 1
+                                                    from: 0
+                                                    to: 100
+                                                }
+
+                                                Binding {
+                                                    target: volumeControl.slider
+                                                    property: "value"
+                                                    value: _hicutDelegate.eq  ? _hicutDelegate.eq.frequencyAbsolute*100 : 0
+                                                }
+
+                                                 onValueChanged: {
+                                                    if (_hicutDelegate.eq) {
+                                                        _hicutDelegate.eq.frequencyAbsolute = slider.value/100;
+                                                    }
+                                                }
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+
+                                        AbstractCellLayout {
+                                            title: "Q"
+                                            enabled:  _hicutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            text2: _hicutDelegate.eq ? _hicutDelegate.eq.quality.toFixed(2): "-"
+
+                                            control1: VolumeControl {
+                                                id: volumeControl2
+                                                tickLabelSet : ({"0":"0", "5":"5", "10":"10"})  
+                                                slider {
+                                                    from: 0
+                                                    to: 10
+                                                    stepSize: 0.1
+                                                    value: _hicutDelegate.eq ? _hicutDelegate.eq.quality : 0
+                                                }
+
+                                                onValueChanged: {
+                                                    if (_hicutDelegate.eq ) {
+                                                        _hicutDelegate.eq .quality = slider.value;
+                                                    }
+                                                }
+
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl2.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl2.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl2.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl2.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl2.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl2.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+                                    }
+
                                     // enabled: root.selectedChannel.synthSlotsData[index].length > 0
                                     // onClicked: _SYNFilterResoRow.handleClick(index)
                                 }
                             }
                         }
-                        Item {}
+                        
+                        RowLayout {
+                            id: _EQLowCutRow
+                            spacing: ZUI.Theme.cellSpacing
+                            property int globalLowCutValue: 0
+                            property int globalLowCutQ: 0
+
+                            function focusNext() {
+                                // let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                // handleClick(index)
+                            }
+
+                            function focusPrevious() {
+                                // let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                // handleClick(index)
+                            }
+                            
+                            function handleClick(synth) { 
+                                // root.switchToSlot("synth", synth);
+                                // zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                // zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_filter_reso", synth, _filterResoRepeater.itemAt(synth), root.selectedChannel);
+                            }
+
+                            Repeater {
+                                id: _lowcutRepeater
+                                model: Zynthbox.Plugin.sketchpadTrackCount
+                                delegate: ZUI.CellControl {
+                                    id: _lowcutDelegate 
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    highlighted: (index === root.selectedChannel.selectedSlotRow || _EQStack.applyToAll) && enabled
+                                    property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
+                                    property QtObject eq: ctrl ? ctrl.equaliserSettings[0] : null
+                                    
+                                    //[5] is hicut and [0] is lowcut and for the menu [11] highcut(lowpass) and [1] lowcut(high pass)
+                                    
+                                    onEqChanged :{
+                                        // if(_lowcutDelegate.eq)
+                                            // _lowcutDelegate.eq.frequency = 20
+                                    }   
+
+                                    contentItem: StackLayout {
+
+                                        currentIndex: _EQStack.showQ ? 1 : 0
+
+                                        AbstractCellLayout {
+                                            text2: _lowcutDelegate.eq
+                                                  ?  (_lowcutDelegate.eq.frequency < 1000.0 || zynqtgui.modeButtonPressed)
+                                                    ? "%1 Hz".arg(_lowcutDelegate.eq.frequency.toFixed(1))
+                                                    : "%1 kHz".arg((_lowcutDelegate.eq.frequency / 1000.0).toFixed(2))
+                                            : ""
+                                            enabled: _lowcutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            title: enabled ? _lowcutDelegate.eq.name : "-"
+
+                                            ZUI.SectionGroup {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                                Layout.margins: 2
+
+                                                RowLayout {
+                                                    anchors.fill: parent
+                                                    ZUI.SectionButton {
+                                                        text: "S"
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _lowcutDelegate.eq ? _lowcutDelegate.eq.soloed : false
+                                                        onClicked: {
+                                                            _lowcutDelegate.eq.soloed =!_lowcutDelegate.eq.soloed;
+                                                        }
+                                                    }
+
+                                                     ZUI.SectionButton {
+                                                        text: "A"
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _lowcutDelegate.eq? _lowcutDelegate.eq.active : false
+                                                        onClicked: {
+                                                            _lowcutDelegate.eq.active = !_lowcutDelegate.eq.active;
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            control1: VolumeControl {
+                                                id: volumeControl
+                                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})
+                                                slider {
+                                                    stepSize: 1
+                                                    from: 0
+                                                    to: 100
+                                                }
+
+                                                Binding {
+                                                    target: volumeControl.slider
+                                                    property: "value"
+                                                    value: _lowcutDelegate.eq  ? _lowcutDelegate.eq.frequencyAbsolute*100 : 0
+                                                }
+
+                                                 onValueChanged: {
+                                                    if (_lowcutDelegate.eq) {
+                                                        _lowcutDelegate.eq.frequencyAbsolute = slider.value/100;
+                                                    }
+                                                }
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+
+                                        AbstractCellLayout {
+                                            title: "Q"
+                                            enabled:  _lowcutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            text2: _lowcutDelegate.eq ? _lowcutDelegate.eq.quality.toFixed(2): "-"
+
+                                            control1: VolumeControl {
+                                                id: volumeControl2
+                                                tickLabelSet : ({"0":"0", "5":"5", "10":"10"})  
+                                                slider {
+                                                    from: 0
+                                                    to: 10
+                                                    stepSize: 0.1
+                                                    value: _lowcutDelegate.eq ? _lowcutDelegate.eq.quality : 0
+                                                }
+
+                                                onValueChanged: {
+                                                    if (_lowcutDelegate.eq ) {
+                                                        _lowcutDelegate.eq .quality = slider.value;
+                                                    }
+                                                }
+
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl2.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl2.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl2.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl2.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl2.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl2.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+                                    }
+
+                                    // enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                    // onClicked: _SYNFilterResoRow.handleClick(index)
+                                }
+                            }
+                        }
                     }
                 }
             }

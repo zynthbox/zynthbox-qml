@@ -69,7 +69,7 @@ class zynthian_gui_about(zynthian_qt_gui_base.zynqtgui):
             return ""
 
     def get_zynthboxos_image_build_datetime(self):
-        return self.get_version_from_os_release("ZYNTHBOX_IMAGE_BUILD_DATETIME")
+        return self.get_version_from_os_release("ZYNTHBOXOS_IMAGE_BUILD_DATETIME")
     zynthboxos_image_build_datetime = Property(str, get_zynthboxos_image_build_datetime, constant = True)
 
     def get_zynthboxos_build_version(self):

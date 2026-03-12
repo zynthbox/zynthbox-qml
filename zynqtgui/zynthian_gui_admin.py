@@ -722,7 +722,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
                         logging.info("zynthian-sys Update Available")
                         self.checkForUpdatesCompleted.emit()
 
-                        self.zynqtgui.show_confirm("Do you want to update the system? System will reboot after updating.", self.do_update_zynthboxos, apt_cache)
+                        self.zynqtgui.show_confirm("Do you want to update the system? System will reboot after updating.", self.do_update_zynthboxos)
                     else:
                         logging.error(f"{pkg_zynthian_sys.name} is already updated.")
                         self.checkForUpdatesUnavailable.emit()
@@ -743,14 +743,28 @@ class zynthian_gui_admin(zynthian_gui_selector):
         self.zynqtgui.show_info("UPDATE SYSTEM")
         self.start_command([self.sys_dir + "/scripts/update_system.sh"])
 
-    def do_update_zynthboxos(self, apt_cache):
-        pkg_zynthian_sys = apt_cache["zynthian-sys"]
-        pkg_zynthian_sys.mark_upgrade()
-        apt_cache.commit()
-        logging.info(f"{pkg_zynthian_sys.name} updated.")
+    def do_update_zynthboxos(self):
+        def run_cmd():
+            self.updateStarted.emit()
 
-        self.updateCompleted.emit()
-        self.reboot_confirmed()
+            try:
+                apt_cache = apt.Cache()
+                apt_cache.open()
+
+                pkg_zynthian_sys = apt_cache["zynthian-sys"]
+                pkg_zynthian_sys.mark_upgrade()
+                apt_cache.commit()
+                logging.info(f"{pkg_zynthian_sys.name} updated.")
+
+                self.updateCompleted.emit()
+                self.reboot_confirmed()
+            except Exception as e:
+                logging.error(f"Error while updating : {str(e)}")
+                self.updateErrored.emit()
+        
+        thread = Thread(target=run_cmd, args=())
+        thread.daemon = True  # thread dies with the program
+        thread.start()
 
     @Slot()
     def restart_gui(self):

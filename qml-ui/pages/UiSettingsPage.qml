@@ -434,11 +434,11 @@ ZUI.ScreenPage {
                     }
 
                     EntryDelegate {
+                        visible: zynqtgui.ui_settings.debugMode // Hide QML Testing loader when debugMode is off
                         text: qsTr("QML Testing Loader")
                         infoText:  "Load"
                         index: 10
                         onClicked: _stackLayout.currentIndex = 1
-
                     }
                 }
             }

@@ -403,12 +403,13 @@ class sketchpad_clip_metadata(QObject):
                         try:
                             with tempfile.TemporaryDirectory() as tmp:
                                 logging.info("Creating new temp file without metadata")
-                                logging.debug(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.wav'}")
-                                check_output(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.wav'}", shell=True)
+                                fileSuffix = path.rpartition('.')[1]
+                                logging.debug(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.'}{fileSuffix}")
+                                check_output(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.'}{fileSuffix}", shell=True)
 
                                 logging.info("Replacing old file")
-                                logging.debug(f"mv {Path(tmp) / 'output.wav'} {path}")
-                                check_output(f"mv {Path(tmp) / 'output.wav'} {path}", shell=True)
+                                logging.debug(f"mv {Path(tmp) / 'output.'}{fileSuffix} {path}")
+                                check_output(f"mv {Path(tmp) / 'output.'}{fileSuffix} {path}", shell=True)
 
                                 file = taglib.File(path)
                                 for key, value in tags.items():
@@ -661,21 +662,23 @@ class sketchpad_clip(QObject):
         # Find the base filename excluding our suffix (wav)
         category = ""
         file_basename = ""
+        file_suffix = ""
         if file_path.name.lower().endswith(".sketch.wav"):
             category = ".sketch"
-            file_basename = file_path.name.split(".sketch.wav")[0]
+            file_basename = file_path.name.rpartition(".sketch.wav")[0]
+            file_suffix = "sketch.wav"
         else:
-            file_basename = file_path.name.split(".wav")[0]
+            file_basename, file_suffix = file_path.name.rpartition(".")[0]
         # Remove the `counter` part from the string if exists
         file_basename = re.sub('-\d*$', '', file_basename)
 
-        if not (copy_dir_path / f"{file_basename}{category}.wav").exists():
-            return f"{file_basename}{category}.wav"
+        if not (copy_dir_path / f"{file_basename}{category}.{file_suffix}").exists():
+            return f"{file_basename}{category}.{file_suffix}"
         else:
-            while Path(copy_dir_path / f"{file_basename}-{counter}{category}.wav").exists():
+            while Path(copy_dir_path / f"{file_basename}-{counter}{category}.{file_suffix}").exists():
                 counter += 1
 
-            return f"{file_basename}-{counter}{category}.wav"
+            return f"{file_basename}-{counter}{category}.{file_suffix}"
 
     def className(self):
         return "sketchpad_clip"
@@ -886,7 +889,7 @@ class sketchpad_clip(QObject):
             elif self.__filename__.endswith(".wav"):
                 return self.__filename__[:-4]
             else:
-                return self.__filename__
+                return self.__filename__.rpartition(".")[0]
         else:
             return self.__title__
 

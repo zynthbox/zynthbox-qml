@@ -38,7 +38,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 ZUI.ScreenPage {
     id: component
     screenId: "playgrid"
-    controlsVisible: false
+    controlsVisible: true
     leftPadding: 0
     rightPadding: 0
     topPadding: 5

@@ -698,8 +698,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
     def check_for_updates_and_doupdate(self):
         def run_cmd():
-            self.checkForUpdatesStarted.emit()
-
             try:
                 apt_pkg.init_config()
                 apt_pkg.config.set("DPkg::Options::", "--force-confdef")
@@ -720,8 +718,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
                     if installed != candidate:
                         logging.info("zynthian-sys Update Available")
-                        self.checkForUpdatesCompleted.emit()
-
                         self.zynqtgui.show_confirm("Do you want to update the system? System will reboot after updating.", self.do_update_zynthboxos)
                     else:
                         logging.error(f"{pkg_zynthian_sys.name} is already updated.")
@@ -733,20 +729,18 @@ class zynthian_gui_admin(zynthian_gui_selector):
             except Exception as e:
                 logging.error(f"Error while checking for updates : {str(e)}")
                 self.checkForUpdatesErrored.emit()
+            
+            self.zynqtgui.end_long_task()
 
-        thread = Thread(target=run_cmd, args=())
-        thread.daemon = True  # thread dies with the program
-        thread.start()
+        self.zynqtgui.do_long_task(run_cmd, f"Checking for updates...<br>This may take a while.")
 
     def update_system(self):
         logging.info("UPDATE SYSTEM")
         self.zynqtgui.show_info("UPDATE SYSTEM")
         self.start_command([self.sys_dir + "/scripts/update_system.sh"])
 
-    def do_update_zynthboxos(self):
+    def do_update_zynthboxos(self, params=None):
         def run_cmd():
-            self.updateStarted.emit()
-
             try:
                 apt_cache = apt.Cache()
                 apt_cache.open()
@@ -758,15 +752,12 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
                 process_do_upgrade = run(["/zynthian/zynthian-sys/scripts/zynthbox_update_script.sh", "do_upgrade"], capture_output=False, text=True, check=True)
 
-                self.updateCompleted.emit()
                 self.reboot_confirmed()
             except Exception as e:
                 logging.error(f"Error while updating : {str(e)}")
                 self.updateErrored.emit()
-        
-        thread = Thread(target=run_cmd, args=())
-        thread.daemon = True  # thread dies with the program
-        thread.start()
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(run_cmd, f"Updating system...<br>This may take a while.")
 
     @Slot()
     def restart_gui(self):

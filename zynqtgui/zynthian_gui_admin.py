@@ -756,7 +756,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 apt_cache.commit()
                 logging.info(f"{pkg_zynthian_sys.name} updated.")
 
-                process_do_upgrade = run(["/usr/bin/zynthbox-update-script", "do_upgrade"], capture_output=False, text=True, check=True)
+                process_do_upgrade = run(["/zynthian/zynthian-sys/scripts/zynthbox_update_script.sh", "do_upgrade"], capture_output=False, text=True, check=True)
 
                 self.updateCompleted.emit()
                 self.reboot_confirmed()

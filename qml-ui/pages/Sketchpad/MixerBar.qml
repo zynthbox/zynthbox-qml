@@ -744,6 +744,8 @@ AbstractSketchpadPage {
 
                                                 RowLayout {
                                                     anchors.fill: parent
+                                                    spacing: ZUI.Theme.spacing
+                                                    
                                                     QQC2.RoundButton {
                                                         text: "S"
                                                         Layout.fillWidth: true
@@ -941,6 +943,7 @@ AbstractSketchpadPage {
 
                                                 RowLayout {
                                                     anchors.fill: parent
+                                                    spacing: ZUI.Theme.spacing
                                                     QQC2.RoundButton {
                                                         text: "S"
                                                         font.pointSize: 8

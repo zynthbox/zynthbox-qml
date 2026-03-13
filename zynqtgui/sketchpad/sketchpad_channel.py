@@ -3743,7 +3743,7 @@ class sketchpad_channel(QObject):
 
     @Slot(str, int, int)
     def setChannelSampleFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int, showLoadingScreen=True):
-        if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < 2 * Zynthbox.Plugin.instance().sketchpadSlotCount():
+        if -1 < slotIndex and slotIndex < 2 * Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < 2 * Zynthbox.Plugin.instance().sketchpadSlotCount():
             sampleClip = self.__samples__[slotIndex]
             self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sampleClip, showLoadingScreen)
 
@@ -4152,9 +4152,12 @@ class sketchpad_channel(QObject):
                 case "synth" | "TracksBar_synthslot":
                     snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
                     self.setChannelSoundFromSnapshotSlot(snapshot, "synth", destinationSlot, sourceSlot, showLoadingScreen=False)
-                case "sample-trig" | "TracksBar_sampleslot" | "TracksBar_sampleslot2":
+                case "sample-trig" | "sample-trig2" | "TracksBar_sampleslot" | "TracksBar_sampleslot2":
                     snapshot = sourceTrack.getChannelSampleSnapshot()
-                    self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot, showLoadingScreen=False)
+                    if slotType == "sample-trig" or slotType == "TracksBar_sampleslot":
+                        self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot, showLoadingScreen=False)
+                    else:
+                        self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot + Zynthbox.Plugin.instance().sketchpadSlotCount(), sourceSlot + Zynthbox.Plugin.instance().sketchpadSlotCount(), showLoadingScreen=False)
                 case "fx" | "TracksBar_fxslot":
                     snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
                     self.setChannelSoundFromSnapshotSlot(snapshot, "fx", destinationSlot, sourceSlot, showLoadingScreen=False)

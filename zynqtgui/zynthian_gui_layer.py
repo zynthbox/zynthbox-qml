@@ -1577,7 +1577,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
             #Set active layer
             if snapshot['index']<len(self.layers):
                 self.index = snapshot['index']
-                self.zynqtgui.set_curlayer(self.layers[self.index])
+                if self.index > -1:
+                    self.zynqtgui.set_curlayer(self.layers[self.index])
             elif len(self.layers)>0:
                 self.index = 0
                 self.zynqtgui.set_curlayer(self.layers[self.index])

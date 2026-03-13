@@ -227,67 +227,68 @@ AbstractSketchpadPage {
 
     readonly property alias currentView : _mixerBarStack.currentView
     function setView(view) {
+        root.sketchpadView.bottomStack.setView(Main.BarView.MixerBar)
         _mixerBarStack.setView(view)
     }
 
     contentItem: ZUI.ThreeColumnView {
         altTabs: false
-        leftTab: ZUI.SectionGroup {
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: ZUI.Theme.spacing
+        // leftTab: ZUI.SectionGroup {
+        //     ColumnLayout {
+        //         anchors.fill: parent
+        //         spacing: ZUI.Theme.spacing
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Volume"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Main
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Main)                
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Volume"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Main
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Main)                
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Reverb"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Reverb
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Reverb)  
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Reverb"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Reverb
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Reverb)  
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Delay"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Delay
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Delay)  
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Delay"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Delay
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Delay)  
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "EQ"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.EQ
-                    onClicked: _mixerBarStack.setView(MixerBar.View.EQ)  
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "EQ"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.EQ
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.EQ)  
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Comp"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Comp
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Comp)  
-                }
-            }
-        }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Comp"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Comp
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Comp)  
+        //         }
+        //     }
+        // }
 
         middleTab: StackLayout {
             id: _mixerBarStack

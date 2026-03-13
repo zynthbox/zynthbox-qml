@@ -403,7 +403,7 @@ class sketchpad_clip_metadata(QObject):
                         try:
                             with tempfile.TemporaryDirectory() as tmp:
                                 logging.info("Creating new temp file without metadata")
-                                fileSuffix = path.rpartition('.')[1]
+                                fileSuffix = path.rpartition('.')[2]
                                 logging.debug(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.'}{fileSuffix}")
                                 check_output(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.'}{fileSuffix}", shell=True)
 
@@ -668,9 +668,9 @@ class sketchpad_clip(QObject):
             file_basename = file_path.name.rpartition(".sketch.wav")[0]
             file_suffix = "sketch.wav"
         else:
-            file_basename, file_suffix = file_path.name.rpartition(".")[0]
+            file_basename, sep, file_suffix = file_path.name.rpartition(".")
         # Remove the `counter` part from the string if exists
-        file_basename = re.sub('-\d*$', '', file_basename)
+        file_basename = re.sub(r'-\d*$', '', file_basename)
 
         if not (copy_dir_path / f"{file_basename}{category}.{file_suffix}").exists():
             return f"{file_basename}{category}.{file_suffix}"

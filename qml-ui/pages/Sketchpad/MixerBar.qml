@@ -734,7 +734,7 @@ AbstractSketchpadPage {
                                             : ""
                                             enabled: _hicutDelegate.eq 
                                             text: root.selectedChannel.synthSlotsData[index]
-                                            title: enabled ? _hicutDelegate.eq.name : "-"
+                                            title: "T"+(index+1)
                                             onClicked: _EQHiCutRow.handleClick(index)
 
                                             ZUI.SectionGroup {
@@ -934,7 +934,7 @@ AbstractSketchpadPage {
                                             : ""
                                             enabled: _lowcutDelegate.eq 
                                             text: root.selectedChannel.synthSlotsData[index]
-                                            title: enabled ? _lowcutDelegate.eq.name : "-"
+                                            title: "T"+(index+1)
 
                                             ZUI.SectionGroup {
                                                 Layout.fillWidth: true
@@ -1197,7 +1197,7 @@ AbstractSketchpadPage {
                                     property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
                                     property QtObject compressor: ctrl ? ctrl.compressorSettings : null
 
-                                    title: "Threshold"
+                                    title: "T"+(index+1)
                                     text2: compressor ? "%1dB".arg(compressor.thresholdDB.toFixed(2)) : "-"
 
                                     control1: VolumeControl {

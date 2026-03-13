@@ -744,24 +744,50 @@ AbstractSketchpadPage {
 
                                                 RowLayout {
                                                     anchors.fill: parent
-                                                    ZUI.SectionButton {
+                                                    QQC2.RoundButton {
                                                         text: "S"
                                                         Layout.fillWidth: true
                                                         Layout.fillHeight: true
                                                         checked: _hicutDelegate.eq ? _hicutDelegate.eq.soloed : false
+                                                        font.pointSize: 8
+                                                        radius: 2
                                                         onClicked: {
                                                             _hicutDelegate.eq.soloed =!_hicutDelegate.eq.soloed;
                                                         }
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        }
                                                     }
 
-                                                     ZUI.SectionButton {
+                                                    QQC2.RoundButton{
                                                         text: "A"
                                                         Layout.fillWidth: true
                                                         Layout.fillHeight: true
                                                         checked: _hicutDelegate.eq? _hicutDelegate.eq.active : false
+                                                        font.pointSize: 8
+                                                        radius: 2
                                                         onClicked: {
                                                             _hicutDelegate.eq.active = !_hicutDelegate.eq.active;
                                                         }
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        }                                                        
                                                     }
                                                 }
                                             }
@@ -915,23 +941,50 @@ AbstractSketchpadPage {
 
                                                 RowLayout {
                                                     anchors.fill: parent
-                                                    ZUI.SectionButton {
+                                                    QQC2.RoundButton {
                                                         text: "S"
+                                                        font.pointSize: 8
+                                                        radius: 2
                                                         Layout.fillWidth: true
                                                         Layout.fillHeight: true
                                                         checked: _lowcutDelegate.eq ? _lowcutDelegate.eq.soloed : false
                                                         onClicked: {
                                                             _lowcutDelegate.eq.soloed =!_lowcutDelegate.eq.soloed;
                                                         }
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        }
                                                     }
 
-                                                     ZUI.SectionButton {
+                                                    QQC2.RoundButton {
                                                         text: "A"
+                                                        font.pointSize: 8
+                                                        radius: 2
                                                         Layout.fillWidth: true
                                                         Layout.fillHeight: true
                                                         checked: _lowcutDelegate.eq? _lowcutDelegate.eq.active : false
                                                         onClicked: {
                                                             _lowcutDelegate.eq.active = !_lowcutDelegate.eq.active;
+                                                        }
+
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                                         }
                                                     }
                                                 }

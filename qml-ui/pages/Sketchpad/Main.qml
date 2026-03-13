@@ -1089,26 +1089,31 @@ ZUI.ScreenPage {
 
             Kirigami.Action {
                 text: "Track-Slots"
+                checkable: true
                 onTriggered: tracksBar.setView(TracksBar.View.Main)
                 checked: tracksBar.currentView === TracksBar.View.Main && bottomStack.currentBarView  === Main.BarView.TracksBar 
             }
             Kirigami.Action {
                 text: "SYN"
+                checkable: true
                 onTriggered: tracksBar.setView(TracksBar.View.SYN)
                 checked: tracksBar.currentView === TracksBar.View.SYN && bottomStack.currentBarView  === Main.BarView.TracksBar 
             }
             Kirigami.Action {
                 text: "SMP"
+                checkable: true
                 onTriggered: tracksBar.setView(TracksBar.View.SMP)
                 checked: tracksBar.currentView === TracksBar.View.SMP && bottomStack.currentBarView  === Main.BarView.TracksBar 
             }
             Kirigami.Action {
                 text: "FX-Chain"
+                checkable: true
                 onTriggered: tracksBar.setView(TracksBar.View.FX)
                 checked: tracksBar.currentView === TracksBar.View.FX && bottomStack.currentBarView  === Main.BarView.TracksBar 
             }
             Kirigami.Action {
                 text: "Layers"
+                checkable: true
                 onTriggered: tracksBar.setView(TracksBar.View.Layers)
                 checked: tracksBar.currentView === TracksBar.View.Layers && bottomStack.currentBarView  === Main.BarView.TracksBar 
             }
@@ -1121,28 +1126,33 @@ ZUI.ScreenPage {
 
             Kirigami.Action {
                 text: "Volume"
+                checkable: true
                 onTriggered: mixerBar.setView(MixerBar.View.Main)
-                checked: mixerBar.currentView === MixerBar.View.Main && bottomStack.currentBarView  === Main.BarView.TracksBar 
+                checked: mixerBar.currentView === MixerBar.View.Main && bottomStack.currentBarView  === Main.BarView.MixerBar 
             }
             Kirigami.Action {
                 text: "Reverb"
+                checkable: true
                 onTriggered: mixerBar.setView(MixerBar.View.Reverb)
-                checked: mixerBar.currentView === MixerBar.View.Reverb && bottomStack.currentBarView  === Main.BarView.TracksBar 
+                checked: mixerBar.currentView === MixerBar.View.Reverb && bottomStack.currentBarView  === Main.BarView.MixerBar 
             }
             Kirigami.Action {
                 text: "Delay"
+                checkable: true
                 onTriggered: mixerBar.setView(MixerBar.View.Delay)
-                checked: mixerBar.currentView === MixerBar.View.Delay && bottomStack.currentBarView  === Main.BarView.TracksBar 
+                checked: mixerBar.currentView === MixerBar.View.Delay && bottomStack.currentBarView  === Main.BarView.MixerBar 
             }
             Kirigami.Action {
                 text: "EQ"
+                checkable: true
                 onTriggered: mixerBar.setView(MixerBar.View.EQ)
-                checked: mixerBar.currentView === MixerBar.View.EQ && bottomStack.currentBarView  === Main.BarView.TracksBar 
+                checked: mixerBar.currentView === MixerBar.View.EQ && bottomStack.currentBarView  === Main.BarView.MixerBar 
             }
             Kirigami.Action {
                 text: "Comp"
+                checkable: true
                 onTriggered: mixerBar.setView(MixerBar.View.Comp)
-                checked: mixerBar.currentView === MixerBar.View.Comp && bottomStack.currentBarView  === Main.BarView.TracksBar 
+                checked: mixerBar.currentView === MixerBar.View.Comp && bottomStack.currentBarView  === Main.BarView.MixerBar 
             }
         }
     ]

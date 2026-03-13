@@ -1069,23 +1069,81 @@ ZUI.ScreenPage {
 
         },
         Kirigami.Action {
-            text: qsTr("Load Sketch")
-            onTriggered: {
-                zynqtgui.show_screen("sound_categories")
+            text: qsTr("Sketch")
+            Kirigami.Action {
+                text: "Load Sketch"
+                onTriggered: zynqtgui.show_screen("sound_categories")
+            }
+            Kirigami.Action {
+                text: "Save Sketch"
+                visible: root.selectedChannel && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
+                onTriggered: {
+                    zynqtgui.show_screen("sound_categories")
+                    applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
+                }
             }
         },
+
         Kirigami.Action {
-            text: "Save Sketch"
-            visible: root.selectedChannel && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
-            onTriggered: {
-                zynqtgui.show_screen("sound_categories")
-                applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
+            text: qsTr("Quick Edit")
+
+            Kirigami.Action {
+                text: "Track-Slots"
+                onTriggered: tracksBar.setView(TracksBar.View.Main)
+                checked: tracksBar.currentView === TracksBar.View.Main && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "SYN"
+                onTriggered: tracksBar.setView(TracksBar.View.SYN)
+                checked: tracksBar.currentView === TracksBar.View.SYN && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "SMP"
+                onTriggered: tracksBar.setView(TracksBar.View.SMP)
+                checked: tracksBar.currentView === TracksBar.View.SMP && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "FX-Chain"
+                onTriggered: tracksBar.setView(TracksBar.View.FX)
+                checked: tracksBar.currentView === TracksBar.View.FX && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "Layers"
+                onTriggered: tracksBar.setView(TracksBar.View.Layers)
+                checked: tracksBar.currentView === TracksBar.View.Layers && bottomStack.currentBarView  === Main.BarView.TracksBar 
             }
         },
+
         Kirigami.Action {
             text: qsTr("Mixer")
             checked: bottomStack.currentBarView === Main.BarView.MixerBar
             onTriggered: zynqtgui.toggleSketchpadMixer()
+
+            Kirigami.Action {
+                text: "Volume"
+                onTriggered: mixerBar.setView(MixerBar.View.Main)
+                checked: mixerBar.currentView === MixerBar.View.Main && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "Reverb"
+                onTriggered: mixerBar.setView(MixerBar.View.Reverb)
+                checked: mixerBar.currentView === MixerBar.View.Reverb && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "Delay"
+                onTriggered: mixerBar.setView(MixerBar.View.Delay)
+                checked: mixerBar.currentView === MixerBar.View.Delay && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "EQ"
+                onTriggered: mixerBar.setView(MixerBar.View.EQ)
+                checked: mixerBar.currentView === MixerBar.View.EQ && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "Comp"
+                onTriggered: mixerBar.setView(MixerBar.View.Comp)
+                checked: mixerBar.currentView === MixerBar.View.Comp && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
         }
     ]
 
@@ -1341,7 +1399,6 @@ ZUI.ScreenPage {
         folderModel {
             nameFilters: ["*.sketchpad.json"]
         }
-
     }
 
     contentItem: Item {

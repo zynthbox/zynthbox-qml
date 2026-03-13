@@ -225,6 +225,11 @@ AbstractSketchpadPage {
         Threshold
     }
 
+    readonly property alias currentView : _mixerBarStack.currentView
+    function setView(view) {
+        _mixerBarStack.setView(view)
+    }
+
     contentItem: ZUI.ThreeColumnView {
         altTabs: false
         leftTab: ZUI.SectionGroup {

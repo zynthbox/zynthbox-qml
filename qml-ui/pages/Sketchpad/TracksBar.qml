@@ -976,62 +976,18 @@ AbstractSketchpadPage {
         id: trackStyleSelector
     }
 
+    function setView(view){
+        root.sketchpadView.bottomStack.setView(Main.BarView.TracksBar)
+        _tracksBarStack.setView(view)
+    }
+    readonly property alias currentView : _tracksBarStack.currentView
+
     contentItem: ZUI.ThreeColumnView {
         
         leftTab: BottomStackTabs {}
 
-        rightTab: ZUI.SectionGroup {
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: ZUI.Theme.spacing
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "Track-Slots"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.Main
-                    onClicked: _tracksBarStack.setView(TracksBar.View.Main)
-                }
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "SYN"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.SYN
-                    onClicked: _tracksBarStack.setView(TracksBar.View.SYN)
-                }
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "SMP"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.SMP
-                    onClicked: _tracksBarStack.setView(TracksBar.View.SMP)
-                }
-
-                 ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "FX-Chain"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.FX
-                    onClicked: _tracksBarStack.setView(TracksBar.View.FX)
-                }
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "Layers"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.PAT
-                    onClicked: _tracksBarStack.setView(TracksBar.View.PAT)
-                }
-            }
-        }
-
+        rightTabContainer.visible: _tracksBarStack.currentView !== TracksBar.View.Main
+       
         middleTab: QQC2.Pane {
 
             contentItem: StackLayout {

@@ -795,7 +795,19 @@ ZUI.SectionGroup
                                             fill: parent
                                             margins: 2
                                         }
-                                        text: qsTr("%1%").arg((100 * dspLoadLayout.dspLoad).toFixed(1))
+                                        Timer {
+                                            id: voiceCountFetcher
+                                            running: zynqtgui.globalPopupOpened
+                                            interval: 300
+                                            repeat: true
+                                            property int activeSamplerVoices: 0
+                                            onTriggered: {
+                                                voiceCountFetcher.activeSamplerVoices = Zynthbox.Plugin.activeSamplerVoices();
+                                            }
+                                        }
+                                        text: voiceCountFetcher.activeSamplerVoices > 0
+                                            ? qsTr("%1% (%2 sample voices)").arg((100 * dspLoadLayout.dspLoad).toFixed(1)).arg(voiceCountFetcher.activeSamplerVoices)
+                                            : qsTr("%1%").arg((100 * dspLoadLayout.dspLoad).toFixed(1))
                                         font.pixelSize: height
                                     }
                                 }

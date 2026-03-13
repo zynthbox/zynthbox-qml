@@ -240,7 +240,7 @@ Item {
                                     }
                                     visible: focusRectangle.visible && stepDelegate.stepEnabledForNote
                                     font {
-                                        pointSize: undefined
+                                        pointSize: 0
                                         pixelSize: 7
                                     }
                                     color: "grey"

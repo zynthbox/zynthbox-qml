@@ -64,6 +64,9 @@ Item {
         function updateBarNotes() {
             barNotesUpdater.restart();
         }
+        function updateClipsData() {
+            noteClipsUpdater.restart();
+        }
     }
     Timer {
         id: barNotesUpdater
@@ -77,7 +80,27 @@ Item {
         target: patternModel
         onLastModifiedChanged: _private.updateBarNotes()
     }
-    onPatternModelChanged: _private.updateBarNotes()
+
+    Timer {
+        id: noteClipsUpdater
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            component.updateClipsData();
+        }
+    }
+    signal updateClipsData();
+    Connections {
+        target: patternModel ? patternModel.clipNotesModel : null
+        onLastModifiedChanged: {
+            _private.updateClipsData();
+        }
+    }
+
+    onPatternModelChanged: {
+        _private.updateBarNotes();
+        _private.updateClipsData();
+    }
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -91,11 +114,18 @@ Item {
                 readonly property QtObject note: component.patternModel ? Zynthbox.PlayGridManager.getNote(midiNote, component.patternModel.sketchpadTrack) : null
                 readonly property bool noteIsHeard: applicationWindow().globalSequencer.heardNotes.includes(noteRow.note)
                 readonly property color noteColor: _private.noteColors[midiNote]
-                readonly property bool hasClips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["hasClips"]) : false
-                readonly property var clips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["clips"]) : []
+                property bool hasClips: false
+                property var clips: []
                 readonly property QtObject audioSource: clips.length === 1 ? clips[0] : null
                 opacity: hasClips ? 1.0 : 0.5
                 Item {
+                    Connections {
+                        target: component
+                        onUpdateClipsData: {
+                            noteRow.hasClips = component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["hasClips"]) : false;
+                            noteRow.clips = component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["clips"]) : [];
+                        }
+                    }
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5

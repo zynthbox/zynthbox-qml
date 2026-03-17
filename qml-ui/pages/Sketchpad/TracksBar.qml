@@ -1986,8 +1986,7 @@ AbstractSketchpadPage {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
-                                            // highlighted: clipDelegate.clip.enabled && clipDelegate.patternHasNotes
-                                            highlighted: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
+                                            highlighted: isCurrentClip  && clipDelegate.patternHasNotes
                                             font.pointSize: 9
                                             font.capitalization: Font.AllUppercase
                                             property int clipIndex: model.index
@@ -1998,6 +1997,7 @@ AbstractSketchpadPage {
                                             readonly property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
                                             readonly property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
                                             readonly property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
+                                            readonly property bool isCurrentClip: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
                                             property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
 
                                             onClicked: {
@@ -2043,6 +2043,21 @@ AbstractSketchpadPage {
                                             topPadding: padding
                                             rightPadding: padding
                                             bottomPadding: padding
+
+                                            Rectangle {
+                                                parent: _overlay
+                                                z: parent.z + 9999
+                                                height: clipDelegate.height + 8
+                                                width: clipDelegate.width + 8
+                                                x: clipDelegate.x-4
+                                                y: clipDelegate.y-4
+                                                color: "transparent"
+                                                border {
+                                                    width: 2
+                                                    color:  Kirigami.Theme.textColor
+                                                }
+                                                opacity: clipDelegate.isCurrentClip && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip" ? 1 : 0
+                                            }
                                             contentItem : ColumnLayout {
                                                 spacing: ZUI.Theme.spacing
                                                 QQC2.Label {
@@ -2055,12 +2070,9 @@ AbstractSketchpadPage {
                                                     horizontalAlignment: Qt.AlignHCenter
                                                 }
 
-                                                ZUI.SectionGroup {
+                                                Item {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
-                                                    mask: false
-                                                    background: null 
-                                                    padding: 0
 
                                                     Zynthbox.PatternModelVisualiserItem {
                                                         id: visualiser
@@ -2104,6 +2116,10 @@ AbstractSketchpadPage {
                                             }
                                         }                                        
                                     }
+                                }
+                                Item {
+                                    id: _overlay
+                                    anchors.fill: parent
                                 }
                             }
                         }

@@ -458,7 +458,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
                     self.set_button_color(self.button_3, led_color_active if edit_page_active else led_color_inactive)
                     self.set_button_color(self.button_4, led_color_active if playgrid_page_active else led_color_inactive)
                     self.set_button_color(self.button_5, led_color_active if song_manager_page_active else led_color_inactive)
-                self.set_button_color(self.button_star, self.star_button_color, setChannelColor=not self.zynqtgui.leftSidebarActive and self.zynqtgui.tracksModActive)
+                self.set_button_color(self.button_star, self.star_button_color)
                 self.set_button_color(self.button_mode, self.mode_button_color, setChannelColor=self.zynqtgui.leftSidebarActive)
                 self.set_button_color(self.button_under_screen_1, self.step_button_colors[0])
                 self.set_button_color(self.button_under_screen_2, self.step_button_colors[1])

@@ -2046,6 +2046,23 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    Connections {
+        target: Zynthbox.AudioFileConverter
+        onStateChanged: {
+            if (Zynthbox.AudioFileConverter.state == Zynthbox.AudioFileConverter.ConvertingState) {
+                zynqtgui.start_loading();
+            } else {
+                zynqtgui.stop_loading();
+            }
+        }
+        onTaskDescriptionChanged: {
+            zynqtgui.currentTaskMessage = Zynthbox.AudioFileConverter.taskDescription;
+        }
+        onProgressChanged: {
+            console.log("Progress is now:", Zynthbox.AudioFileConverter.progress);
+        }
+    }
+
     readonly property QtObject libraryTypePicker: libraryTypePicker
     ZUI.ActionPickerPopup {
         id: libraryTypePicker

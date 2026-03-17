@@ -1122,7 +1122,8 @@ ZUI.ScreenPage {
         Kirigami.Action {
             text: qsTr("Mixer")
             checked: bottomStack.currentBarView === Main.BarView.MixerBar
-            // onTriggered: bottomStack.setView(Main.BarView.MixerBar)
+            onTriggered: zynqtgui.toggleSketchpadMixer()
+            checkable: true
 
             Kirigami.Action {
                 text: "Volume"

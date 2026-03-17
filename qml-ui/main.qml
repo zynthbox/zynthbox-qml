@@ -26,7 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtGraphicalEffects 1.15
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -791,6 +791,80 @@ Kirigami.AbstractApplicationWindow {
 
         valueSetter(selectedChannel.wetFx2Amount + sign)
     }
+
+    function updateAllChannelEQHiCutQuality(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQHiCutQuality(sign, i)
+        }        
+    }
+
+    function updateAllChannelEQLowCutQuality(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQLowCutQuality(sign, i)
+        }        
+    }
+
+    function updateChannelEQHiCutQuality(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[5]
+            if(!eq)
+                return
+            eq.quality = eq.quality+(sign/10)            
+        }
+    }
+
+    function updateChannelEQLowCutQuality(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[0]
+            if(!eq)
+                return
+            eq.quality = eq.quality+(sign/10)            
+        }
+    }
+
+    function updateAllChannelEQHiCut(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQHiCut(sign, i)
+        }        
+    }
+
+    function updateAllChannelEQLowCut(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadTrackCount; i++) {
+            updateChannelEQLowCut(sign, i)
+        }        
+    }
+
+    function updateChannelEQHiCut(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[5]
+            if(!eq)
+                return
+            eq.frequencyAbsolute = eq.frequencyAbsolute+(sign/100)            
+        }
+    }
+
+    function updateChannelEQLowCut(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var eq = ctrl.equaliserSettings[0]
+            if(!eq)
+                return
+            eq.frequencyAbsolute = eq.frequencyAbsolute+(sign/100)            
+        }
+    }
+
+    function updateAllChannelCompThreshold(sign, channelId){
+        var ctrl = Zynthbox.AudioLevels.tracks[channelId]
+        if(ctrl) {
+            var comp = ctrl.compressorSettings
+            if(!comp)
+                return
+            comp.threshold = comp.threshold+(sign/100)            
+        }
+    }
     /**
      * Update global playback client pan
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
@@ -926,7 +1000,6 @@ Kirigami.AbstractApplicationWindow {
                             delegate: QQC2.MenuItem {
                                 text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
                                 width: parent.width
-                                font.pointSize: 11
                                 onClicked: {
                                     scenesMenu.close();
                                     switchTimer.index = index;
@@ -1004,21 +1077,31 @@ Kirigami.AbstractApplicationWindow {
                     text: {
                         switch(root.selectedChannel.selectedSlot.className) {
                             case "TracksBar_synthslot":
-                                return qsTr("Synth %1 ˬ").arg(root.selectedChannel.selectedSlot.value + 1)
+                                return qsTr("Synth %1 ˬ").arg(root.selectedChannel.selectedSlot.value + 1);
                                 break;
                             case "TracksBar_sampleslot":
                             case "TracksBar_sampleslot2":
                                 return qsTr("Sample %1 ˬ").arg(slotButton.selectedSampleIndex + 1);
                                 break;
                             case "TracksBar_fxslot":
-                                return qsTr("FX %1 ˬ").arg(root.selectedChannel.selectedSlot.value + 1)
+                                return qsTr("FX %1 ˬ").arg(root.selectedChannel.selectedSlot.value + 1);
                                 break;
                         }
                         return "Unknown";
                     }
                     onClicked: {
-                        slotsPicker.open();
-                        slotsPicker.currentIndex = selectedTotalSlotIndex;
+                        // slotsPicker.open();
+                        // slotsPicker.currentIndex = selectedTotalSlotIndex;
+                        switch(root.selectedChannel.selectedSlot.className) {
+                            case "TracksBar_synthslot":
+                            case "TracksBar_sampleslot":
+                            case "TracksBar_sampleslot2":
+                                soundSlotsMenu.open();
+                                break;
+                            case "TracksBar_fxslot":
+                                fxMenu.open();
+                                break;
+                        }
                     }
                     readonly property QtObject currentSlotDelegate: slotsPicker.actions[selectedTotalSlotIndex]
                     ZUI.ActionPickerPopup {
@@ -1032,6 +1115,7 @@ Kirigami.AbstractApplicationWindow {
                             model: Zynthbox.Plugin.sketchpadSlotCount * 3
                             delegate: QQC2.Action {
                                 id: slotDelegate
+                                readonly property int slotIndex: index
                                 readonly property int sampleIndex: root.selectedChannel
                                     ? root.selectedChannel.trackType === "sample-trig"
                                         ? index < Zynthbox.Plugin.sketchpadSlotCount * 2
@@ -1045,7 +1129,7 @@ Kirigami.AbstractApplicationWindow {
                                 readonly property bool isSynthSlot: root.selectedChannel && root.selectedChannel.trackType === "synth" && index < Zynthbox.Plugin.sketchpadSlotCount
                                 readonly property bool isFxSlot: Zynthbox.Plugin.sketchpadSlotCount * 2 <= index
                                 readonly property int fxSlotIndex: isFxSlot ? index - (Zynthbox.Plugin.sketchpadSlotCount * 2) : -1
-                                readonly property string elidedSlotTitle: slotTitle.length > 26 ? slotTitle.substring(0, 13) + "…" + slotTitle.substring(slotTitle.length - 13) : slotTitle
+                                readonly property string elidedSlotTitle: slotTitle.length > 66 ? slotTitle.substring(0, 33) + "…" + slotTitle.substring(slotTitle.length - 33) : slotTitle
                                 readonly property bool slotHasContents: root.selectedChannel
                                     ? sampleObject
                                         ? sampleObject.isEmpty
@@ -1064,34 +1148,34 @@ Kirigami.AbstractApplicationWindow {
                                 readonly property string slotTitle: root.selectedChannel
                                     ? sampleObject
                                         ? sampleObject.isEmpty
-                                            ? qsTr("None")
+                                            ? qsTr("-")
                                             : sampleObject.filename
                                         : isSynthSlot
                                             ? slotsPicker.synthSlotsData[index] !== ""
                                                 ? slotsPicker.synthSlotsData[index]
-                                                : qsTr("None")
+                                                : qsTr("-")
                                             : slotDelegate.isFxSlot
                                                 ? slotsPicker.fxSlotsData[fxSlotIndex] !== ""
                                                     ? slotsPicker.fxSlotsData[fxSlotIndex]
-                                                    : qsTr("None")
+                                                    : qsTr("-")
                                                 : ""
                                     : ""
                                 text: root.selectedChannel
                                     ? sampleObject
                                         ? sampleObject.isEmpty
-                                            ? qsTr("Sample %1:\nNone").arg(sampleIndex + 1)
-                                            : qsTr("Sample %1:\n%2").arg(sampleIndex + 1).arg(elidedSlotTitle)
+                                            ? qsTr("Sample %1: -").arg(sampleIndex + 1)
+                                            : qsTr("Sample %1: %2").arg(sampleIndex + 1).arg(elidedSlotTitle)
                                         : isSynthSlot
                                             ? slotsPicker.synthSlotsData[index] !== ""
-                                                ? qsTr("Synth %1\n%2").arg(index + 1).arg(elidedSlotTitle)
-                                                : qsTr("Synth %1\nNone").arg(index + 1)
+                                                ? qsTr("Synth %1 %2").arg(index + 1).arg(elidedSlotTitle)
+                                                : qsTr("Synth %1 -").arg(index + 1)
                                             : slotDelegate.isFxSlot
                                                 ? slotsPicker.fxSlotsData[fxSlotIndex] !== ""
-                                                    ? qsTr("FX %1\n%1").arg(fxSlotIndex + 1).arg(elidedSlotTitle)
-                                                    : qsTr("FX %1\nNone").arg(fxSlotIndex + 1)
+                                                    ? qsTr("FX %1 %1").arg(fxSlotIndex + 1).arg(elidedSlotTitle)
+                                                    : qsTr("FX %1 -").arg(fxSlotIndex + 1)
                                                 : ""
                                     : ""
-                                // highlighted: index === selectedTotalSlotIndex
+                                // highlighted: index === slotButton.selectedTotalSlotIndex
                                 onTriggered: {
                                     if (isSynthSlot) {
                                         pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index, false);
@@ -1107,6 +1191,32 @@ Kirigami.AbstractApplicationWindow {
                             }
                             onObjectRemoved: {
                                 slotsPicker.actions.pop(object);
+                            }
+                        }
+                    }
+                    ZUI.Menu {
+                        id: soundSlotsMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: Zynthbox.Plugin.sketchpadSlotCount * 2
+                            delegate: QQC2.MenuItem {
+                                action: slotsPicker.actions[index]
+                                highlighted: action.slotIndex === slotButton.selectedTotalSlotIndex
+                            }
+                        }
+                    }
+                    ZUI.Menu {
+                        id: fxMenu
+                        y: parent.height
+                        modal: true
+                        dim: false
+                        Repeater {
+                            model: Zynthbox.Plugin.sketchpadSlotCount
+                            delegate: QQC2.MenuItem {
+                                action: slotsPicker.actions[index + (Zynthbox.Plugin.sketchpadSlotCount * 2)]
+                                highlighted: action.slotIndex === slotButton.selectedTotalSlotIndex
                             }
                         }
                     }

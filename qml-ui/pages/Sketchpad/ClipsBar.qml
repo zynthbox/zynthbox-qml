@@ -57,12 +57,22 @@ AbstractSketchpadPage {
             bottomStack.setView(Main.BarView.TracksBar);
             returnVal = true;
             break;
+        case "KNOB3_DOWN":
         case "SWITCH_ARROW_LEFT_RELEASED":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            focusPreviousElementInChain(ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1), root.selectedChannel.selectedClip)
             returnVal = true;
             break;
+        case "KNOB3_UP":
         case "SWITCH_ARROW_RIGHT_RELEASED":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+            focusNextElementInChain(ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1), root.selectedChannel.selectedClip)
+            returnVal = true;
+            break;
+        case "SWITCH_ARROW_UP_RELEASED":
+            focusPreviousElementInChain(zynqtgui.sketchpad.selectedTrackId, Math.max(root.selectedChannel.selectedClip - 1, 0))
+            returnVal = true;
+            break;
+        case "SWITCH_ARROW_DOWN_RELEASED":
+            focusNextElementInChain(zynqtgui.sketchpad.selectedTrackId, Math.min(root.selectedChannel.selectedClip + 1, 4))
             returnVal = true;
             break;
         }
@@ -70,6 +80,30 @@ AbstractSketchpadPage {
         return returnVal;
     }
 
+    function focusNextElementInChain(column, row) {
+        zynqtgui.sketchpad.selectedTrackId = column
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"){
+            handleItemClick(zynqtgui.sketchpad.selectedTrackId, row)
+        }
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview" ){
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
+        }
+    }
+
+    function focusPreviousElementInChain(column, row) {
+        zynqtgui.sketchpad.selectedTrackId = column
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip"){
+            handleItemClick(zynqtgui.sketchpad.selectedTrackId, row)
+        }
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview" ){
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
+        }
+    } 
+    
     function handleItemClick(channelId, clipId){
         console.log("Handle clip cell click event", channelId, clipId)
         clipDelegateRepeater.itemAt(channelId).handleItemClick(clipId)

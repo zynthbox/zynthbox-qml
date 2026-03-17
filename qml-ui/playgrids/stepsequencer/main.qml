@@ -46,10 +46,11 @@ IMP.BasePlayGrid {
     name:'Stepsequencer'
     isSequencer: true
     defaults: {
-        "positionalVelocity": true
+        "positionalVelocity": true,
+        "toggleStepOnTouchSelect": true
     }
     property bool isVisible: ["playgrid"].indexOf(zynqtgui.current_screen_id) >= 0
-    persist: ["positionalVelocity"]
+    persist: ["positionalVelocity", "toggleStepOnTouchSelect"]
     // additionalActions: [
     //     Kirigami.Action {
     //         text: qsTr("Load Pattern...")
@@ -98,8 +99,6 @@ IMP.BasePlayGrid {
         // }
 
         if (returnValue === false) {
-            var trackDelta = zynqtgui.tracksModActive ? 5 : 0
-
             switch (cuia) {
                 case "SCREEN_PLAYGRID":
                     // If we're already shown, toggle note settings
@@ -126,6 +125,8 @@ IMP.BasePlayGrid {
                         if (_private.activePatternModel.performanceActive) {
                             // Restart the performance
                             _private.activePatternModel.startPerformance();
+                        } else if (_private.effectiveSequencerStyle === _private.drumSequencerStyle) {
+                            _private.disableSelected();
                         } else if (_private.hasSelection) {
                             _private.deselectSelectedItem();
                         } else if (component.heardNotes.length > 0) {
@@ -152,35 +153,28 @@ IMP.BasePlayGrid {
                     }
                     break;
                 case "SWITCH_ARROW_LEFT_RELEASED":
-                    if (zynqtgui.sketchpad.selectedTrackId > 0) {
-                        zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack - 1;
-                    }
+                    zynqtgui.callable_ui_action_simple("TRACK_PREVIOUS");
                     returnValue = true;
                     break;
                 case "SWITCH_ARROW_RIGHT_RELEASED":
-                    if (zynqtgui.sketchpad.selectedTrackId < Zynthbox.Plugin.sketchpadTrackCount) {
-                        zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack + 1;
+                    zynqtgui.callable_ui_action_simple("TRACK_NEXT");
+                    returnValue = true;
+                    break;
+                case "SWITCH_KNOB3_RELEASED":
+                    if (_private.effectiveSequencerStyle === _private.drumSequencerStyle) {
+                        _private.toggleSelected();
+                    } else {
+                        _private.activateSelectedItem();
                     }
                     returnValue = true;
                     break;
                 case "SWITCH_SELECT_RELEASED":
-                    _private.activateSelectedItem();
+                    if (_private.effectiveSequencerStyle === _private.drumSequencerStyle) {
+                        _private.enableSelected();
+                    } else {
+                        _private.activateSelectedItem();
+                    }
                     returnValue = true;
-                    break;
-                case "SWITCH_NUMBER_1_RELEASED":
-                    returnValue = backButtonClearPatternHelper(0 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_2_RELEASED":
-                    returnValue = backButtonClearPatternHelper(1 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_3_RELEASED":
-                    returnValue = backButtonClearPatternHelper(2 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_4_RELEASED":
-                    returnValue = backButtonClearPatternHelper(3 + trackDelta);
-                    break;
-                case "SWITCH_NUMBER_5_RELEASED":
-                    returnValue = backButtonClearPatternHelper(4 + trackDelta);
                     break;
                 case "KNOB0_UP":
                     _private.knob0Up();
@@ -274,6 +268,15 @@ IMP.BasePlayGrid {
     QtObject {
         id:_private;
         readonly property int activeBarModelWidth: 16
+        property int sequencerStyle: defaultSequencerStyle
+        readonly property int effectiveSequencerStyle: sequencerStyle === defaultSequencerStyle
+            ? _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
+                ? drumSequencerStyle
+                : stepSequencerStyle
+            : sequencerStyle
+        readonly property int defaultSequencerStyle: 0
+        readonly property int stepSequencerStyle: 1
+        readonly property int drumSequencerStyle: 2
 
         readonly property QtObject sequence: applicationWindow().globalSequencer.sequence
         readonly property int activePattern: sequence ? sequence.indexOf(applicationWindow().globalSequencer.pattern) : -1 // sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePattern : -1
@@ -285,6 +288,7 @@ IMP.BasePlayGrid {
 
         property bool patternHasUnsavedChanged: false
         property bool positionalVelocity: true
+        property bool toggleStepOnTouchSelect: true
         property var bars: [0,1,2,3,4,5,6,7]
         // This is the top bank we have available in any pattern (that is, the upper limit for any pattern's bankOffset value)
         property int bankLimit: 1
@@ -355,7 +359,8 @@ IMP.BasePlayGrid {
 
         onActivePatternModelChanged:{
             updateChannel();
-            while (hasSelection) {
+            let throttle = 5;
+            while (hasSelection && 0 < --throttle) {
                 deselectSelectedItem();
             }
         }
@@ -368,6 +373,9 @@ IMP.BasePlayGrid {
         signal knob2Down();
         signal goLeft();
         signal goRight();
+        signal enableSelected();
+        signal disableSelected();
+        signal toggleSelected();
         signal deselectSelectedItem();
         signal selectStep(int stepIndex);
         signal activateSelectedItem();
@@ -590,6 +598,12 @@ IMP.BasePlayGrid {
         }
     }
     Connections {
+        target: applicationWindow().globalSequencer
+        onMostRecentlyInteractedStepChanged: {
+            _private.selectStep(applicationWindow().globalSequencer.mostRecentlyInteractedStep);
+        }
+    }
+    Connections {
         target: zynqtgui.isBootingComplete && zynqtgui.sketchpad && zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel : null
         onConnectedSoundsCountChanged: _private.updateChannel()
         onConnectedPatternsCountChanged: _private.updateChannel()
@@ -620,12 +634,17 @@ IMP.BasePlayGrid {
     }
     // on component completed
     onInitialize: {
-        _private.positionalVelocity = component.getProperty("positionalVelocity")
+        let positionalVelocity = component.getProperty("positionalVelocity");
+        _private.positionalVelocity = positionalVelocity ? true : false;
+        let toggleStepOnTouchSelect = component.getProperty("toggleStepOnTouchSelect");
+        _private.toggleStepOnTouchSelect = toggleStepOnTouchSelect ? true : false;
         _private.adoptSequence();
     }
     onPropertyChanged: {
         if (property === "positionalVelocity") {
             _private.positionalVelocity = value;
+        } else if (property === "toggleStepOnTouchSelect") {
+            _private.toggleStepOnTouchSelect = value;
         }
     }
     Connections {
@@ -1523,7 +1542,7 @@ IMP.BasePlayGrid {
                                 }
                             }
                             function selectStep(stepIndex) {
-                                let bar = Math.floor(stepIndex % _private.workingPatternModel.width);
+                                let bar = Math.floor(stepIndex / _private.workingPatternModel.width);
                                 let column = stepIndex - (bar * _private.workingPatternModel.width);
                                 if (bar !== _private.workingPatternModel.activeBar) {
                                     _private.workingPatternModel.activeBar = bar;
@@ -1540,6 +1559,8 @@ IMP.BasePlayGrid {
                                     // Do nothing when the pattern settings panel is open, it handles this itself
                                 } else if (noteSettingsPopup.visible) {
                                     noteSettingsPopup.close();
+                                } else if (drumSequencer.visible) {
+                                    // Do nothing for the drumsequencer, it handles this itself
                                 } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad.currentSubNote > -1) {
@@ -1555,6 +1576,8 @@ IMP.BasePlayGrid {
                                     // Do nothing when the pattern settings panel is open, it handles this itself
                                 } else if (noteSettingsPopup.visible) {
                                     // do something? or no? probably no
+                                } else if (drumSequencer.visible) {
+                                    // Do nothing for the drumsequencer, it handles this itself
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad) {
@@ -1865,8 +1888,9 @@ IMP.BasePlayGrid {
                 // per-note style drum sequencer
                 DrumSequencer {
                     id: drumSequencer
-                    visible: _private.associatedChannel && _private.associatedChannel.trackStyle === "drums"
+                    visible: _private.effectiveSequencerStyle === _private.drumSequencerStyle
                     patternModel: _private.workingPatternModel
+                    playGrid: component
                     sequencerPrivate: _private
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -2414,7 +2438,8 @@ IMP.BasePlayGrid {
                                 _private.workingPatternModel.clear();
                             } else {
                                 if (_private.selectedStep > -1) {
-                                    while (_private.hasSelection) {
+                                    let throttle = 5;
+                                    while (_private.hasSelection && 0 < --throttle) {
                                         _private.deselectSelectedItem();
                                     }
                                 }
@@ -2584,8 +2609,19 @@ IMP.BasePlayGrid {
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
                 checked: component.getProperty("positionalVelocity")
                 onClicked: {
-                    var positionalVelocity = component.getProperty("positionalVelocity")
+                    let positionalVelocity = component.getProperty("positionalVelocity")
                     component.setProperty("positionalVelocity", !positionalVelocity);
+                }
+            }
+            QQC2.Switch {
+                Layout.fillWidth: true
+                implicitWidth: Kirigami.Units.gridUnit * 5
+                Layout.minimumWidth: Kirigami.Units.gridUnit * 5
+                Kirigami.FormData.label: "Toggle Step When Selecting With Touch"
+                checked: component.getProperty("toggleStepOnTouchSelect")
+                onClicked: {
+                    let toggleStepOnTouchSelect = component.getProperty("toggleStepOnTouchSelect")
+                    component.setProperty("toggleStepOnTouchSelect", !toggleStepOnTouchSelect);
                 }
             }
         }
@@ -2610,8 +2646,20 @@ IMP.BasePlayGrid {
                     Kirigami.FormData.label: "Use Tap Position As Velocity"
                     checked: component.getProperty("positionalVelocity")
                     onClicked: {
-                        var positionalVelocity = component.getProperty("positionalVelocity")
+                        let positionalVelocity = component.getProperty("positionalVelocity")
                         component.setProperty("positionalVelocity", !positionalVelocity);
+                    }
+                }
+                QQC2.Switch {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: Kirigami.Units.gridUnit * 5
+                    Layout.minimumHeight: Kirigami.Units.gridUnit * 2
+                    implicitWidth: Kirigami.Units.gridUnit * 5
+                    Kirigami.FormData.label: "Toggle Step When Selecting With Touch"
+                    checked: component.getProperty("toggleStepOnTouchSelect")
+                    onClicked: {
+                        let positionalVelocity = component.getProperty("toggleStepOnTouchSelect")
+                        component.setProperty("toggleStepOnTouchSelect", !toggleStepOnTouchSelect);
                     }
                 }
                 Item { Layout.fillWidth: true; Layout.fillHeight: true }

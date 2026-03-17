@@ -25,11 +25,84 @@
 
 import os
 import logging
-from subprocess import check_output
 
-from PySide2.QtCore import Signal, Property, Qt
+from subprocess import check_output
+from pathlib import Path
+from PySide2.QtCore import Signal, Property, Qt, QObject, QFileSystemWatcher
 from PySide2.QtGui import QPixmap, QCursor, QGuiApplication
 from . import zynthian_qt_gui_base, zynthian_gui_config
+
+class DisplaySettings(QObject):
+    def __init__(self, id, parent=None):
+        super(DisplaySettings, self).__init__(parent)
+        
+        self.__id = id
+        self.__name = ""
+        self.__brightness = 0
+        self.__min_brightness = 0
+        self.__max_brightness = 0
+
+        # Read display settings from /sys/class/backlight/{id}
+        self.backlight_path = Path(f"/sys/class/backlight/{id}")
+        if self.backlight_path.exists():
+            try:
+                display_name_file = self.backlight_path / "display_name"
+                if display_name_file.exists():
+                    self.__name = display_name_file.read_text().strip()
+                
+                brightness_file = self.backlight_path / "brightness"
+                if brightness_file.exists():
+                    self.__brightness = int(brightness_file.read_text().strip())
+                
+                max_brightness_file = self.backlight_path / "max_brightness"
+                if max_brightness_file.exists():
+                    self.__max_brightness = int(max_brightness_file.read_text().strip())
+            except Exception as e:
+                logging.error(f"Error reading backlight settings for {id}: {e}")
+    
+    ### BEGIN Property id
+    def get_id(self):
+        return self.__id
+    
+    id = Property(str, get_id, constant=True)
+    ### END Property id
+
+    ### BEGIN Property name
+    def get_name(self):
+        return self.__name
+
+    name = Property(str, get_name, constant=True)
+    ### END Property name
+
+    ### BEGIN Property brightness
+    def get_brightness(self):
+        return self.__brightness
+
+    def set_brightness(self, value):
+        if value != self.__brightness:
+            self.__brightness = value
+            brightness_file = self.backlight_path / "brightness"
+            if brightness_file.exists():
+                brightness_file.write_text(str(value))
+            self.brightnessChanged.emit()
+
+    brightnessChanged = Signal()
+    brightness = Property(int, get_brightness, set_brightness, notify=brightnessChanged)
+    ### END Property brightness
+    
+    ### BEGIN Property min_brightness
+    def get_min_brightness(self):
+        return self.__min_brightness
+    
+    min_brightness = Property(int, get_min_brightness, constant=True)
+    ### END Property min_brightness
+    
+    ### BEGIN Property max_brightness
+    def get_max_brightness(self):
+        return self.__max_brightness
+    
+    max_brightness = Property(int, get_max_brightness, constant=True)
+    ### END Property max_brightness
 
 class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     data_dir = os.environ.get("ZYNTHIAN_DATA_DIR", "/zynthian/zynthian-data")
@@ -48,6 +121,12 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__touchEncoders = True if self.zynqtgui.global_settings.value("UI/touchEncoders", "false") == "true" else False
         self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
+        self.__displays = [DisplaySettings(d.name, self) for d in Path("/sys/class/backlight").iterdir() if d.is_dir()]
+
+        self.__qmlFileWatcher = QFileSystemWatcher()
+        self.__qmlFileWatcher.addPath("/ZB_QML_TEST_FILE")
+        self.__qmlFileWatcher.addPath(self.get_qmlTestFile())
+        self.__qmlFileWatcher.fileChanged.connect(self.on_qmlFileChanged)
 
     def fill_list(self):
         super().fill_list()
@@ -262,5 +341,41 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     fontSize = Property(int, get_fontSize, set_fontSize, notify=fontSizeChanged)
     ### END Property fontSize
+    
+    ### BEGIN Property displays
+    def get_displays(self):
+        return self.__displays
+    
+    displays = Property('QVariantList', get_displays, constant=True)
+    ### END Property displays
+
+    ### BEGIN Property qmlTestFIle
+    def get_qmlTestFile(self):
+        try:                
+            with open('/ZB_QML_TEST_FILE', 'r') as f:
+                return f.readline().strip()
+        except FileNotFoundError:
+            with open('/ZB_QML_TEST_FILE', 'w') as f:
+                f.write("")
+            return ""
+        except (PermissionError, IsADirectoryError) as e:
+            print(f"An unexpected error occurred: {e}")
+            return ""    
+
+    def on_qmlFileChanged(self, path):       
+        if(path == "/ZB_QML_TEST_FILE"):
+            self.qmlTestFileChanged.emit()
+            self.__qmlFileWatcher.addPath(self.get_qmlTestFile())
+            self.__qmlFileWatcher.addPath("/ZB_QML_TEST_FILE")
+        else: 
+            self.qmlTestFileModified.emit()
+            self.__qmlFileWatcher.addPath(path) 
+
+
+    qmlTestFileChanged = Signal()
+    qmlTestFileModified = Signal()
+
+    qmlTestFile = Property(str, get_qmlTestFile, notify=qmlTestFileChanged)
+    ### END Property showCursor
 
 # ------------------------------------------------------------------------------

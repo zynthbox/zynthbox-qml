@@ -624,6 +624,183 @@ Item {
             }
         }
     }
+
+    /**
+     * \brief Sets the given note to play with the given velocity on the given step
+     * @note If the note already exists on the step, the function will do nothing
+     * @param midiNote The midi note to ensure is enabled
+     * @param velocity The velocity to use when adding a note
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     * @param resetHeardData When true (default), the heard data will be set to the given note and velocity
+     */
+    function enableNoteForStep(midiNote, velocity, stepIndex, resetHeardData=true) {
+        let workingModel = _private.pattern.workingModel;
+        let column = stepIndex % workingModel.width;
+        let row = Math.floor(stepIndex / workingModel.width);
+        let existingSubnoteIndex = workingModel.subnoteIndex(row, column, midiNote);
+        if (existingSubnoteIndex == -1) {
+            // The note doesn't exist, add it with the current velocity (or accents as per held down up/down arrows)
+            let applyAccent = false;
+            let applyGhost = false;
+            if (zynqtgui.upButtonPressed) {
+                zynqtgui.ignoreNextUpButtonPress = true;
+                applyAccent = true;
+            }
+            if (zynqtgui.downButtonPressed) {
+                zynqtgui.ignoreNextDownButtonPress = true;
+                applyGhost = true;
+            }
+            let velocityAdjustment = applyAccent
+                ? applyGhost
+                    ? 1 // Apply both, so we land back at 1.0 times velocity
+                    : 1.5 // Apply only accent, making it 1.5 times velocity
+                : applyGhost
+                    ? 0.5 // Apply only ghost, making it 0.5 times velocity
+                    : 1 // Apply neither, leaving us at 1.0 times velocity
+            // Early and late positioning by holding the left/right arrows (for easy triplet layouts)
+            let positionEarly = false;
+            let positionLate = false;
+            if (zynqtgui.leftButtonPressed) {
+                zynqtgui.ignoreNextLeftButtonPress = true;
+                positionEarly = true;
+            }
+            if (zynqtgui.rightButtonPressed) {
+                zynqtgui.ignoreNextRightButtonPress = true;
+                positionLate = true;
+            }
+            let oneThirdStepLength = Math.round(workingModel.stepLength / 3);
+            let positionAdjustment = positionEarly
+                ? positionLate
+                    ? undefined // Apply both, so we land back at no adjustment
+                    : -oneThirdStepLength
+                : positionLate
+                    ? oneThirdStepLength
+                    : undefined  // Apply neither, leaving us at no adjusted position
+            let newSubnoteIndex = workingModel.insertSubnoteSorted(row, column, Zynthbox.PlayGridManager.getNote(midiNote, workingModel.sketchpadTrack));
+            workingModel.setSubnoteMetadata(row, column, newSubnoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(velocity * velocityAdjustment), 1, 127));
+            if (workingModel.defaultNoteDuration > 0) {
+                workingModel.setSubnoteMetadata(row, column, newSubnoteIndex, "duration", workingModel.defaultNoteDuration);
+            }
+            if (positionAdjustment !== undefined) {
+                workingModel.setSubnoteMetadata(row, column, newSubnoteIndex, "delay", positionAdjustment);
+            }
+            if (resetHeardData === true) {
+                component.setHeardData(midiNote, velocity);
+            }
+        }
+    }
+    /**
+     * \brief Ensure that the heard notes are enabled for the given step
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     */
+    function enableHeardForStep(stepIndex) {
+        let heardNotes = _private.heardNotes;
+        let heardVelocities = _private.heardVelocities;
+        for (let noteIndex in heardNotes) {
+            component.enableNoteForStep(heardNotes[noteIndex].midiNote, heardVelocities[noteIndex], stepIndex, false);
+        }
+    }
+    /**
+     * \brief Sets the given note to NOT play on the given step
+     * @param midiNote The midi note to ensure is disable
+     * @param velocity The velocity to set as heard if resetHeardData is enabled
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     * @param resetHeardData When true (default), the heard data will be set to the given note and velocity
+     */
+    function disableNoteForStep(midiNote, velocity, stepIndex, resetHeardData=true) {
+        let workingModel = _private.pattern.workingModel;
+        workingModel.removeSubnoteByNoteValue(midiNote, stepIndex, stepIndex);
+        if (resetHeardData === true) {
+            component.setHeardData(midiNote, velocity);
+        }
+    }
+    /**
+     * \brief Ensure that the heard notes are disabled for the given step
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     */
+    function disableHeardForStep(stepIndex) {
+        let heardNotes = _private.heardNotes;
+        let heardVelocities = _private.heardVelocities;
+        for (let noteIndex in heardNotes) {
+            component.disableNoteForStep(heardNotes[noteIndex].midiNote, heardVelocities[noteIndex], stepIndex, false);
+        }
+    }
+    /**
+     * \brief Toggle the heard notes on the given step
+     * @param stepIndex The step to perform the action on, as a global step index (not a step button)
+     */
+    function toggleStep(stepIndex) {
+        let workingModel = _private.pattern.workingModel;
+        let column = stepIndex % workingModel.width;
+        let row = Math.floor(stepIndex / workingModel.width);
+        // console.log("Toggle entry for step", stepIndex);
+        let applyAccent = false;
+        let applyGhost = false;
+        if (zynqtgui.upButtonPressed) {
+            zynqtgui.ignoreNextUpButtonPress = true;
+            applyAccent = true;
+        }
+        if (zynqtgui.downButtonPressed) {
+            zynqtgui.ignoreNextDownButtonPress = true;
+            applyGhost = true;
+        }
+        let velocityAdjustment = applyAccent
+            ? applyGhost
+                ? 1 // Apply both, so we land back at 1.0 times velocity
+                : 1.5 // Apply only accent, making it 1.5 times velocity
+            : applyGhost
+                ? 0.5 // Apply only ghost, making it 0.5 times velocity
+                : 1 // Apply neither, leaving us at 1.0 times velocity
+        // Early and late positioning by holding the left/right arrows (for easy triplet layouts)
+        let positionEarly = false;
+        let positionLate = false;
+        if (zynqtgui.leftButtonPressed) {
+            zynqtgui.ignoreNextLeftButtonPress = true;
+            positionEarly = true;
+        }
+        if (zynqtgui.rightButtonPressed) {
+            zynqtgui.ignoreNextRightButtonPress = true;
+            positionLate = true;
+        }
+        let oneThirdStepLength = Math.round(workingModel.stepLength / 3);
+        let positionAdjustment = positionEarly
+            ? positionLate
+                ? undefined // Apply both, so we land back at no adjustment
+                : -oneThirdStepLength
+            : positionLate
+                ? oneThirdStepLength
+                : undefined  // Apply neither, leaving us at no adjusted position
+        if (_private.heardNotes.length > 0) {
+            let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
+            let removedAtLeastOne = false;
+            // First, let's see if any of the notes in our list are already on this position, and if so, remove them
+            for (var i = 0; i < _private.heardNotes.length; ++i) {
+                var subNoteIndex = workingModel.subnoteIndex(row, column, _private.heardNotes[i].midiNote);
+                if (subNoteIndex > -1) {
+                    workingModel.removeSubnote(row, column, subNoteIndex);
+                    removedAtLeastOne = true;
+                }
+            }
+
+            // And then, only if we didn't remove anything should we be adding the notes
+            if (!removedAtLeastOne) {
+                var subNoteIndex = -1;
+                for (var i = 0; i < _private.heardNotes.length; ++i) {
+                    subNoteIndex = workingModel.insertSubnoteSorted(row, column, _private.heardNotes[i]);
+                    workingModel.setSubnoteMetadata(row, column, subNoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(_private.heardVelocities[i] * velocityAdjustment), 1, 127));
+                    if (workingModel.defaultNoteDuration > 0) {
+                        workingModel.setSubnoteMetadata(row, column, subNoteIndex, "duration", workingModel.defaultNoteDuration);
+                    }
+                    if (positionAdjustment !== undefined) {
+                        workingModel.setSubnoteMetadata(row, column, subNoteIndex, "delay", positionAdjustment);
+                    }
+                }
+            }
+        } else {
+            // TODO Pick the notes from that pad into the current selection
+        }
+    }
+
     /// BEGIN Sequencer mode cuia handling
     function handleSequencerStepButton(stepButtonIndex, buttonDown) {
         let workingModel = _private.pattern.workingModel;
@@ -655,51 +832,8 @@ Item {
             } else if (zynqtgui.playButtonPressed) {
                 // Do nothing (the test play wants to happen on down)
             } else {
-                let stepOffset = (workingModel.activeBar + workingModel.bankOffset) * workingModel.width;
-                // console.log("Toggle entry for step", stepOffset + stepButtonIndex);
-                let applyAccent = false;
-                let applyGhost = false;
-                if (zynqtgui.upButtonPressed) {
-                    zynqtgui.ignoreNextUpButtonPress = true;
-                    applyAccent = true;
-                }
-                if (zynqtgui.downButtonPressed) {
-                    zynqtgui.ignoreNextDownButtonPress = true;
-                    applyGhost = true;
-                }
-                let velocityAdjustment = applyAccent
-                    ? applyGhost
-                        ? 1 // Apply both, so we land back at 1.0 times velocity
-                        : 1.5 // Apply only accent, making it 1.5 times velocity
-                    : applyGhost
-                        ? 0.5 // Apply only ghost, making it 0.5 times velocity
-                        : 1 // Apply neither, leaving us at 1.0 times velocity
-                if (_private.heardNotes.length > 0) {
-                    let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
-                    let removedAtLeastOne = false;
-                    // First, let's see if any of the notes in our list are already on this position, and if so, remove them
-                    for (var i = 0; i < _private.heardNotes.length; ++i) {
-                        var subNoteIndex = workingModel.subnoteIndex(padNoteRow, stepOffset + stepButtonIndex, _private.heardNotes[i].midiNote);
-                        if (subNoteIndex > -1) {
-                            workingModel.removeSubnote(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex);
-                            removedAtLeastOne = true;
-                        }
-                    }
-
-                    // And then, only if we didn't remove anything should we be adding the notes
-                    if (!removedAtLeastOne) {
-                        var subNoteIndex = -1;
-                        for (var i = 0; i < _private.heardNotes.length; ++i) {
-                            subNoteIndex = workingModel.insertSubnoteSorted(padNoteRow, stepOffset + stepButtonIndex, _private.heardNotes[i]);
-                            workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(_private.heardVelocities[i] * velocityAdjustment), 1, 127));
-                            if (workingModel.defaultNoteDuration > 0) {
-                                workingModel.setSubnoteMetadata(padNoteRow, stepOffset + stepButtonIndex, subNoteIndex, "duration", workingModel.defaultNoteDuration);
-                            }
-                        }
-                    }
-                } else {
-                    // TODO Pick the notes from that pad into the current selection
-                }
+                let stepOffset = (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width;
+                component.toggleStep(stepOffset + stepButtonIndex);
             }
         }
     }
@@ -2235,9 +2369,39 @@ Item {
         if (releaseIndex > -1) {
             previouslyHeld = _private.heldTemporaryActionBlockButtons[releaseIndex];
         }
-        if (zynqtgui.modeButtonPressed || previouslyHeld) {
-            let heldMode = zynqtgui.modeButtonPressed ? (zynqtgui.altButtonPressed ? 2 : 1) : false
+        if (zynqtgui.modeButtonPressed || _private.temporaryModeLocked || previouslyHeld) {
+            let heldMode = (zynqtgui.modeButtonPressed || _private.temporaryModeLocked) ? (zynqtgui.altButtonPressed || _private.temporaryAltModeLocked ? 2 : 1) : false
             switch(cuia) {
+                // BEGIN Handle transient mode locking and unlocking
+                case "SWITCH_GLOBAL_RELEASED":
+                    // Tap the global button to lock
+                    if (zynqtgui.modeButtonPressed) {
+                        _private.temporaryModeLocked = true;
+                    }
+                    if ((zynqtgui.modeButtonPressed || _private.temporaryModeLocked) && zynqtgui.altButtonPressed) {
+                        _private.temporaryAltModeLocked = true;
+                        zynqtgui.ignoreNextAltButtonPress = true;
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_MODE_RELEASED":
+                    if (_private.temporaryModeLocked) {
+                        _private.temporaryModeLocked = false;
+                        returnValue = true;
+                    }
+                    if (_private.temporaryAltModeLocked) {
+                        _private.temporaryAltModeLocked = false;
+                        returnValue = true;
+                    }
+                    break;
+                case "SWITCH_ALT_RELEASED":
+                    if (_private.temporaryAltModeLocked) {
+                        _private.temporaryAltModeLocked = false;
+                        returnValue = true;
+                    }
+                    break;
+                // BEGIN Handle transient mode locking and unlocking
+
                 case "SWITCH_RECORD_PRESSED":
                     _private.heldTemporaryActionBlockButtons[0] = heldMode;
                     if (heldMode === 1) {
@@ -2785,7 +2949,11 @@ Item {
             updateLedColors();
         }
 
+        property bool dimLEDs: false
+        readonly property double baseButtonBrightness: dimLEDs ? 1 : 0.8
+        onBaseButtonBrightnessChanged: updateLedColors()
         readonly property var noteColors: zynqtgui.theme_chooser.noteColors
+
         property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
         property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.7)
         property color stepWithNotes: Qt.rgba(0.5, 0.5, 1)
@@ -2908,12 +3076,18 @@ Item {
         // This also allows you to use the ten buttons in the action block to activate the ten sound slots.
         // If any button is pressed while mode is held down, the mode will not change once mode is released.
         property int temporaryInteractionMode: interactionModeTrackClip
+        // When holding down mode and then pressing global, you can lock temporary mode on, allowing for more readily straightforward finger drumming and the like
+        property bool temporaryModeLocked: false
+        onTemporaryModeLockedChanged: updateLedColors()
+        // When in temporary mode, and hold down alt, you can also press global to lock *that* on (which then shows the chromatic buttons instead of the slots)
+        property bool temporaryAltModeLocked: false
+        onTemporaryAltModeLockedChanged: updateLedColors()
         readonly property int interactionModeSequencer: 0
         readonly property int interactionModeTrackClip: 1
         readonly property int interactionModeMusicalKeys: 2
         readonly property int interactionModeVelocityKeys: 3
         readonly property int interactionModeSlots: 4
-        readonly property int effectiveInteractionMode: zynqtgui.modeButtonPressed ? temporaryInteractionMode : interactionMode
+        readonly property int effectiveInteractionMode: zynqtgui.modeButtonPressed || temporaryModeLocked ? temporaryInteractionMode : interactionMode
         onInteractionModeChanged: {
             updateLedColors();
             switch (interactionMode) {
@@ -2936,8 +3110,8 @@ Item {
             }
         }
         function updateActionBlockLedsForTemporaryMode() {
-            if (zynqtgui.modeButtonPressed) {
-                if (zynqtgui.altButtonPressed) {
+            if (zynqtgui.modeButtonPressed || _private.temporaryModeLocked) {
+                if (zynqtgui.altButtonPressed || _private.temporaryAltModeLocked) {
                     // When the mode button is pressed, and then the alt button, the action block becomes a set of ten note musical pads with notes matching the current clip's scale
                     // (with the same notes as the musical keys mode, from the bottom left hand corner like our other note grids)
                     for (let stepIndex = 0; stepIndex < 10; ++stepIndex) {
@@ -2994,7 +3168,7 @@ Item {
             }
         }
         function updateLedsForStepSequencer() {
-            zynqtgui.led_config.setModeButtonColor(_private.sequencerModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.sequencerModeColor, _private.baseButtonBrightness);
             let workingModel = _private.pattern.workingModel;
             if (zynqtgui.altButtonPressed) {
                 // First the currently selected bar (steps are filled if they are less or equal to the available bars, and current is marked as current step, so tapping sets the current bar)
@@ -3058,7 +3232,7 @@ Item {
             }
         }
         function updateLedsForTrackClipSelector() {
-            zynqtgui.led_config.setModeButtonColor(_private.trackClipModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.trackClipModeColor, _private.baseButtonBrightness);
             for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
                 let stepColor = _private.stepEmpty;
                 let theTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
@@ -3086,7 +3260,7 @@ Item {
             }
         }
         function updateLedsForMusicalButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.musicalKeysModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.musicalKeysModeColor, _private.baseButtonBrightness);
             if (zynqtgui.altButtonPressed) {
                 let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
@@ -3128,13 +3302,13 @@ Item {
         }
         readonly property var velocityKeysVelocities: [1/16, 2/16, 3/16, 4/16, 5/16, 6/16, 7/16, 8/16, 9/16, 10/16, 11/16, 12/16, 13/16, 14/16, 15/16, 1]
         function updateLedsForVelocityButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.velocityKeysModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.velocityKeysModeColor, _private.baseButtonBrightness);
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                 zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0, 0, velocityKeysVelocities[stepIndex] * 0.5), 1.0);
             }
         }
         function updateLedsForSlotButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.slotModeColor);
+            zynqtgui.led_config.setModeButtonColor(_private.slotModeColor, _private.baseButtonBrightness);
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                 let slotMuted = false;
                 let slotGain = 0.0;
@@ -3202,7 +3376,7 @@ Item {
         interval: 0; running: false; repeat: false;
         onTriggered: {
             if (_private.pattern) {
-                let interactionMode = zynqtgui.modeButtonPressed ? _private.temporaryInteractionMode : _private.interactionMode;
+                let interactionMode = (zynqtgui.modeButtonPressed || _private.temporaryModeLocked) ? _private.temporaryInteractionMode : _private.interactionMode;
                 switch (interactionMode) {
                     case _private.interactionModeSlots:
                         _private.updateLedsForSlotButtons();
@@ -3228,6 +3402,11 @@ Item {
                 zynqtgui.led_config.setStarButtonColor(_private.noteColors[((_private.starNote ? _private.starNote.midiNote : _private.patternKeyNote.midiNote) % 12) + 108]);
             } else {
                 zynqtgui.led_config.setStarButtonColor(_private.stepWithNotesDimmed);
+            }
+            if (_private.temporaryAltModeLocked) {
+                zynqtgui.led_config.setAltButtonColor(_private.blueColor, _private.baseButtonBrightness);
+            } else {
+                zynqtgui.led_config.setAltButtonColor(_private.blueColor, 1.0);
             }
             _private.updateActionBlockLedsForTemporaryMode();
         }
@@ -3475,9 +3654,24 @@ Item {
     Connections {
         target: Zynthbox.PlayGridManager
         // Only do this when we're in musical keys mode or when the transient mode shows notes on the action block)
-        enabled: zynqtgui.ui_settings.hardwareSequencer && (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys || (zynqtgui.modeButtonPressed && zynqtgui.altButtonPressed))
+        enabled: zynqtgui.ui_settings.hardwareSequencer && (_private.effectiveInteractionMode === _private.interactionModeMusicalKeys || ((zynqtgui.modeButtonPressed && zynqtgui.altButtonPressed) || _private.temporaryAltModeLocked))
         onActiveNotesChanged: _private.updateLedColors()
         onActiveControllerNotesChanged: _private.updateLedColors()
+    }
+
+    Timer {
+        id: ledFlasher
+        interval: 500
+        running: _private.temporaryModeLocked
+        repeat: true
+        onRunningChanged: {
+            if (running === false) {
+                _private.dimLEDs = false;
+            }
+        }
+        onTriggered: {
+            _private.dimLEDs = !_private.dimLEDs;
+        }
     }
 
     Binding {

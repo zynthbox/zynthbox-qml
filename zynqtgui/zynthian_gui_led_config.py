@@ -152,6 +152,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.step_button_colors = [led_color_inactive] * 16
         self.star_button_color = led_color_inactive
         self.mode_button_color = led_color_blue
+        self.alt_button_color = led_color_inactive
         # The order of the action block is linear, meaning record, play, back/no, up, select/yes, metronome, stop, left, down, right
         self.action_block_color = [None] * 10
 
@@ -295,10 +296,16 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.star_button_color = (tempColor.red(), tempColor.green(), tempColor.blue())
         self.update_button_colors()
 
-    @Slot('QColor')
-    def setModeButtonColor(self, buttonColor):
+    @Slot('QColor', float)
+    def setModeButtonColor(self, buttonColor, brightness):
         tempColor = buttonColor.darker(darkening_factor)
-        self.mode_button_color = (tempColor.red(), tempColor.green(), tempColor.blue())
+        self.mode_button_color = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
+        self.update_button_colors()
+
+    @Slot('QColor', float)
+    def setAltButtonColor(self, buttonColor, brightness):
+        tempColor = buttonColor.darker(darkening_factor)
+        self.alt_button_color = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
         self.update_button_colors()
 
     @Slot(int, 'QColor', float)
@@ -493,7 +500,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
                 self.set_button_color(self.button_under_screen_14, led_color_inactive)
                 self.set_button_color(self.button_under_screen_15, led_color_inactive)
                 self.set_button_color(self.button_under_screen_16, led_color_inactive)
-            self.set_button_color(self.button_alt, led_color_inactive)
+            self.set_button_color(self.button_alt, self.alt_button_color)
             self.set_button_color(self.button_global, led_color_active if self.zynqtgui.globalPopupOpened else led_color_inactive)
             for buttonIndex, buttonId in enumerate(self.action_block_id):
                 if self.action_block_color[buttonIndex] == None:

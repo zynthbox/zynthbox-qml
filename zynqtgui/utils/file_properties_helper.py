@@ -127,30 +127,35 @@ class file_properties_helper(QObject):
             subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
         return subdirectories
 
-    # Returns an ordered list of subdirectories for the given pathname, containing objects with the keys path, subpath, and name
+    # Returns an ordered list of subdirectories for the given pathname, containing objects with the keys path, subpath, and name (optionally pruning paths which don't have any files in them)
     # The list does not include the given path itself, only subdirectories
     # path contains the fill file system path of the entry
     # subpath contains the last part of the path, *excluding* the search path's last directory
     # name contains only the entry's directory name
-    @Slot(str, result='QVariantList')
-    def getOnlySubdirectoryList(self, pathname):
+    @Slot(str, bool, result='QVariantList')
+    def getOnlySubdirectoryList(self, pathname, includeEmpty=True):
         subdirectories = []
         pathStringLength = len(pathname + "/")
         afterFirstDir = False # As we want to exclude the given path, skip the first entry (which when using os.walk will always be that one)
         for dirpath, dirnames, filenames in os.walk(pathname, onerror=print, followlinks=False):
             if afterFirstDir:
-                subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
+                includeDir = True;
+                if not includeEmpty:
+                    if not filenames:
+                        includeDir = False
+                if includeDir:
+                    subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
             afterFirstDir = True
         return subdirectories
 
-    # Returns an ordered list of subdirectories for the given paths, containing objects with the keys path, subpath, and name
+    # Returns an ordered list of subdirectories for the given paths, containing objects with the keys path, subpath, and name (optionally pruning paths which don't have any files in them)
     # This is equivalent to simply calling getOnlySubdirectoryList on all entries in the paths list and concatenating the resulting lists
-    @Slot('QVariantList', result='QVariantList')
-    def getOnlySubdirectoriesList(self, paths):
+    @Slot('QVariantList', bool, result='QVariantList')
+    def getOnlySubdirectoriesList(self, paths, includeEmpty):
         subdirectories = []
         if isinstance(paths, list):
             for path in paths:
-                subdirectories.extend(self.getOnlySubdirectoryList(path))
+                subdirectories.extend(self.getOnlySubdirectoryList(path, includeEmpty))
         return subdirectories
 
     @Slot(str, 'QVariantMap')

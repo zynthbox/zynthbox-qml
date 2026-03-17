@@ -529,6 +529,11 @@ class sketchpad_channel(QObject):
 
         self.__filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__filter_attack_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__filter_release_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__amp_attack_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__amp_release_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        
         self.__fx_filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__fx_filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__sketchfx_filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
@@ -892,6 +897,7 @@ class sketchpad_channel(QObject):
             for index, midi_channel in enumerate(self.chainedSounds):
                 self.__filter_cutoff_controllers[index].clear_controls()
                 self.__filter_resonance_controllers[index].clear_controls()
+                self.__filter_attack_controllers[index].clear_controls()
                 if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
                     layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
                     synth_controllers_dict = layer.controllers_dict
@@ -914,8 +920,33 @@ class sketchpad_channel(QObject):
                     elif "filter_resonance" in synth_controllers_dict:
                         self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
 
+                    #Add amp/filter attack/release
+                    if layer.engine.version_info.filterAttackControls is not None:
+                        for controllerName in layer.engine.version_info.filterAttackControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__filter_attack_controllers[index].add_control(synth_controllers_dict[controllerName])
+
+                    if layer.engine.version_info.ampAttackControls is not None:
+                        for controllerName in layer.engine.version_info.ampAttackControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__amp_attack_controllers[index].add_control(synth_controllers_dict[controllerName])
+
+                    if layer.engine.version_info.filterReleaseControls is not None:
+                        for controllerName in layer.engine.version_info.filterReleaseControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__filter_release_controllers[index].add_control(synth_controllers_dict[controllerName])
+
+                    if layer.engine.version_info.ampReleaseControls is not None:
+                        for controllerName in layer.engine.version_info.ampReleaseControls:
+                            if controllerName in synth_controllers_dict:
+                                self.__amp_release_controllers[index].add_control(synth_controllers_dict[controllerName])
+
             self.filterCutoffControllersChanged.emit()
             self.filterResonanceControllersChanged.emit()
+            self.filterAttackControllersChanged.emit()
+            self.filterReleaseControllersChanged.emit()
+            self.ampAttackControllersChanged.emit()
+            self.ampReleaseControllersChanged.emit()
 
     def update_fx_filter_controllers(self):
         if not self.__song__.__to_be_deleted__:
@@ -2148,7 +2179,7 @@ class sketchpad_channel(QObject):
     ### END Property allowMulticlip
 
     ### BEGIN Property trackStyle
-    # Possible values: "everything", "one-to-one", "drums", "2-low-3-high", "10-split", "manual"
+    # Possible values: "everything", "one-to-one", "drums", "2-low-3-high", "10-octaves", "manual"
     # Default value: "everything"
     # Only everything and one-to-one are currently exposed in the UI, done as a simple toggle
     # Intent notes:
@@ -2174,10 +2205,10 @@ class sketchpad_channel(QObject):
             self.set_samplePickingStyle("all")
             self.set_track_routing_style("standard")
             self.set_keyZoneMode("2-low-3-high")
-        elif self.__trackStyle__ == "10-split":
+        elif self.__trackStyle__ == "10-octaves":
             self.set_samplePickingStyle("all")
             self.set_track_routing_style("standard")
-            self.set_keyZoneMode("10-split")
+            self.set_keyZoneMode("10-octaves")
 
     # Certain track styles want a special playback style to go with it, which is only set on first load of a sample without metadata
     # In particular, the drums style calls for one-shots
@@ -2285,6 +2316,18 @@ class sketchpad_channel(QObject):
         elif trackType == "sample-trig":
             return "sample"
         return trackType
+
+    @Slot(str, result=str)
+    def trackTypeLabel(self, trackType):
+        if trackType == "synth":
+            return "Synthrack"
+        elif trackType == "sample-trig":
+            return "Samplerack"
+        elif trackType == "sample-loop":
+            return "Loop"
+        elif trackType == "external":
+            return "External"
+        return ""
 
     @Slot(None)
     def handleAudioTypeSettingsChanged(self):
@@ -2455,7 +2498,7 @@ class sketchpad_channel(QObject):
     # split-full will spread samples across the note range, in the order 4, 2, 1, 3, 5, starting at note 0, 24 for each, with c4 on the 12th note inside the sample's range
     # split-narrow will set the samples to play on the notes from note 60 and up, with that note as root
     # 2-low-3-high will set the slots to be split at the 2 first slots playing from 0 through c4, and the 3 last slots playing from c#4 and up, with no transposition
-    # 10-split spreads the slots evenly across the full octave range, using the F in that octave as the sample's root note (useful for multisampled instruments)
+    # 10-octaves spreads the slots evenly across the full octave range, using the F in that octave as the sample's root note (useful for multisampled instruments)
 
     @Slot()
     def updateKeyZones(self):
@@ -2524,8 +2567,8 @@ class sketchpad_channel(QObject):
                 [60, 127, 24],
                 [60, 127, 24]
             ]
-        elif self.__keyzone_mode__ == "10-split":
-            # 10-split gives each slot an octave, and puts their root note on the F note in that octave (and also just gives the final note all the remaining space on the note range)
+        elif self.__keyzone_mode__ == "10-octaves":
+            # 10-octaves gives each slot an octave, and puts their root note on the F note in that octave (and also just gives the final note all the remaining space on the note range)
             slotSettings = [
                 [0, 11, -54],
                 [12, 23, -42],
@@ -3196,6 +3239,42 @@ class sketchpad_channel(QObject):
     filterResonanceControllers = Property("QVariantList", get_filterResonanceControllers, notify=filterResonanceControllersChanged)
     ### End property filterResonanceControllers
 
+    ### Begin property filterAttackControllers
+    def get_filterAttackControllers(self):
+        return self.__filter_attack_controllers
+
+    filterAttackControllersChanged = Signal()
+
+    filterAttackControllers = Property("QVariantList", get_filterAttackControllers, notify=filterAttackControllersChanged)
+    ### End property filterAttackControllers
+
+    ### Begin property filterReleaseControllers
+    def get_filterReleaseControllers(self):
+        return self.__filter_release_controllers
+
+    filterReleaseControllersChanged = Signal()
+
+    filterReleaseControllers = Property("QVariantList", get_filterReleaseControllers, notify=filterReleaseControllersChanged)
+    ### End property filterReleaseControllers
+
+    ### Begin property ampAttackControllers
+    def get_ampAttackControllers(self):
+        return self.__amp_attack_controllers
+
+    ampAttackControllersChanged = Signal()
+
+    ampAttackControllers = Property("QVariantList", get_ampAttackControllers, notify=ampAttackControllersChanged)
+    ### End property ampAttackControllers
+
+    ### Begin property ampReleaseControllers
+    def get_ampReleaseControllers(self):
+        return self.__amp_release_controllers
+
+    ampReleaseControllersChanged = Signal()
+
+    ampReleaseControllers = Property("QVariantList", get_ampReleaseControllers, notify=ampReleaseControllersChanged)
+    ### End property ampReleaseControllers
+
     ### Begin property fxFilterCutoffControllers
     def get_fxFilterCutoffControllers(self):
         return self.__fx_filter_cutoff_controllers
@@ -3338,9 +3417,9 @@ class sketchpad_channel(QObject):
                     midiOutDeviceName = device["text"]
                     break
 
-        return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
+        return [midiOutDeviceName,
                 f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
-                midiOutDeviceName,
+                f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
                 None,
                 None]
     externalSlotsDataChanged = Signal()
@@ -3664,7 +3743,7 @@ class sketchpad_channel(QObject):
 
     @Slot(str, int, int)
     def setChannelSampleFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int, showLoadingScreen=True):
-        if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < 2 * Zynthbox.Plugin.instance().sketchpadSlotCount():
+        if -1 < slotIndex and slotIndex < 2 * Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < 2 * Zynthbox.Plugin.instance().sketchpadSlotCount():
             sampleClip = self.__samples__[slotIndex]
             self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sampleClip, showLoadingScreen)
 
@@ -4073,9 +4152,12 @@ class sketchpad_channel(QObject):
                 case "synth" | "TracksBar_synthslot":
                     snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
                     self.setChannelSoundFromSnapshotSlot(snapshot, "synth", destinationSlot, sourceSlot, showLoadingScreen=False)
-                case "sample-trig" | "TracksBar_sampleslot" | "TracksBar_sampleslot2":
+                case "sample-trig" | "sample-trig2" | "TracksBar_sampleslot" | "TracksBar_sampleslot2":
                     snapshot = sourceTrack.getChannelSampleSnapshot()
-                    self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot, showLoadingScreen=False)
+                    if slotType == "sample-trig" or slotType == "TracksBar_sampleslot":
+                        self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot, sourceSlot, showLoadingScreen=False)
+                    else:
+                        self.setChannelSampleFromSnapshotSlot(snapshot, destinationSlot + Zynthbox.Plugin.instance().sketchpadSlotCount(), sourceSlot + Zynthbox.Plugin.instance().sketchpadSlotCount(), showLoadingScreen=False)
                 case "fx" | "TracksBar_fxslot":
                     snapshot = self.zynqtgui.layer.generate_snapshot(sourceTrack)
                     self.setChannelSoundFromSnapshotSlot(snapshot, "fx", destinationSlot, sourceSlot, showLoadingScreen=False)

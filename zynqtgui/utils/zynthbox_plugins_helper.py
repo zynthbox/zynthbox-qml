@@ -53,7 +53,11 @@ class zynthbox_plugin_version_info(QObject):
         self.volumeControls = version_details["volumeControls"]
         self.cutoffControls = version_details["cutoffControls"]
         self.resonanceControls = version_details["resonanceControls"]
-
+        self.filterAttackControls = version_details.get("filterAttackControls", [])
+        self.filterReleaseControls = version_details.get("filterReleaseControls", [])
+        self.ampAttackControls = version_details.get("ampAttackControls", [])
+        self.ampReleaseControls = version_details.get("ampReleaseControls", [])
+        self.filterTypeControls = version_details.get("filterTypeControls", [])
 
 class zynthbox_plugin_info(QObject):
     """

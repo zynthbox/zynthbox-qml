@@ -399,6 +399,7 @@ class zynthian_gui(QObject):
         self.__number5_button_pressed__ = False
         self.__ignoreNextNumber5ButtonPress__ = False
         self.__ignoreNextModeButtonPress = False
+        self.__ignoreNextAltButtonPress = False
         self.__ignoreNextRecordButtonPress = False
         self.__ignoreNextMetronomeButtonPress = False
         self.__ignoreNextPlayButtonPress = False
@@ -1690,6 +1691,10 @@ class zynthian_gui(QObject):
             self.modeButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextModeButtonPress = False
             return
+        elif cuia == "SWITCH_ALT_RELEASED" and self.ignoreNextAltButtonPress == True:
+            self.altButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextAltButtonPress = False
+            return
         elif cuia == "SWITCH_MENU_RELEASED" and self.ignoreNextMenuButtonPress == True:
             self.menuButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextMenuButtonPress = False
@@ -1811,6 +1816,9 @@ class zynthian_gui(QObject):
                 changedAnything = True
             if self.modeButtonPressed == True and self.ignoreNextModeButtonPress == False:
                 self.ignoreNextModeButtonPress = True
+                changedAnything = True
+            if self.altButtonPressed == True and self.ignoreNextAltButtonPress == False:
+                self.ignoreNextAltButtonPress = True
                 changedAnything = True
             if self.menuButtonPressed == True and self.ignoreNextMenuButtonPress == False:
                 self.ignoreNextMenuButtonPress = True
@@ -1940,13 +1948,16 @@ class zynthian_gui(QObject):
             try:
                 cuia_callback = self.opened_dialog.property("cuiaCallback")
                 visible = self.opened_dialog.property("visible")
+                opened = self.opened_dialog.property("opened") # Dialogs have an opened thing going on and we need to use that instead of visible, as that isn't guaranteed
+                if opened is not None:
+                    visible = opened
 
                 if cuia_callback is not None and cuia_callback.isCallable() and visible:
                     _result = cuia_callback.call([cuia, originId, track, slot, params[0]])
 
                     if _result is not None:
                         if _result.isError():
-                            printJSValueError("Attempted to use the main window cuiaCallback, but it returned the error", _result)
+                            printJSValueError("Attempted to use the current opened dialog's cuiaCallback, but it returned the error", _result)
                             return
                         elif _result.toBool():
                             # If cuiaCallback returned true, then CUIA event has been handled by qml. Return
@@ -4922,6 +4933,20 @@ class zynthian_gui(QObject):
 
     altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=altButtonPressedChanged)
     ### END Property altButtonPressed
+
+    ### BEGIN Property ignoreNextAltButtonPress
+    def get_ignoreNextAltButtonPress(self):
+        return self.__ignoreNextAltButtonPress
+
+    def set_ignoreNextAltButtonPress(self, val):
+        if self.__ignoreNextAltButtonPress != val:
+            self.__ignoreNextAltButtonPress = val
+            self.ignoreNextAltButtonPressChanged.emit()
+
+    ignoreNextAltButtonPressChanged = Signal()
+
+    ignoreNextAltButtonPress = Property(bool, get_ignoreNextAltButtonPress, set_ignoreNextAltButtonPress, notify=ignoreNextAltButtonPressChanged)
+    ### END Property ignoreNextAltButtonPress
 
     ### BEGIN Property knob3Pressed
     def get_knob3_pressed(self):

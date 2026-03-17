@@ -40,6 +40,29 @@ AbstractSketchpadPage {
     id: root
 
     selectedChannel: applicationWindow().selectedChannel
+
+    function focusNextElementInChain() {
+        zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("MixerBar_item")){
+            _mixerBarStack.focusElement()
+        }
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"){
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
+        }
+    }
+
+    function focusPreviousElementInChain() {
+        zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("MixerBar_item")){
+            _mixerBarStack.focusElement()
+        }
+
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"){
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
+        }
+    }
     
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -54,18 +77,13 @@ AbstractSketchpadPage {
             zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item", root.selectedChannel.id, mixerItemsRepeater.itemAt(root.selectedChannel.id), root.selectedChannel)
 
             return true;
-
+        case "KNOB3_DOWN":
         case "SWITCH_ARROW_LEFT_RELEASED":
-            if (zynqtgui.sketchpad.selectedTrackId > 0) {
-                zynqtgui.sketchpad.selectedTrackId -= 1;
-            }
-
+            focusPreviousElementInChain()
             return true;
-
+        case "KNOB3_UP":
         case "SWITCH_ARROW_RIGHT_RELEASED":
-            if (zynqtgui.sketchpad.selectedTrackId < 9) {
-                zynqtgui.sketchpad.selectedTrackId += 1;
-            }
+            focusNextElementInChain()
 
             return true;
         case "KNOB0_TOUCHED":
@@ -83,6 +101,35 @@ AbstractSketchpadPage {
             case "MixerBar_item_reverb":
                 applicationWindow().updateChannelReverbSend(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                 return true;
+            case "MixerBar_item_hicut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                return true;
+            case "MixerBar_item_lowcut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCutQuality(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCut(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                return true;
+            case "MixerBar_item_threshold":
+                applicationWindow().updateAllChannelCompThreshold(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(1, false)
                 return true;
@@ -99,6 +146,35 @@ AbstractSketchpadPage {
                 return true;
             case "MixerBar_item_reverb":
                 applicationWindow().updateChannelReverbSend(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                return true;
+            case "MixerBar_item_hicut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQHiCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQHiCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                return true;
+            case "MixerBar_item_lowcut":
+                if(_EQStack.showQ){
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCutQuality(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }else{
+                    if(_EQStack.applyToAll)
+                        applicationWindow().updateAllChannelEQLowCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    else
+                        applicationWindow().updateChannelEQLowCut(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                return true;
+            case "MixerBar_item_threshold":
+                applicationWindow().updateAllChannelCompThreshold(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 return true;
             case "MixerBar_master":
                 applicationWindow().updateMasterVolume(-1, false)
@@ -140,64 +216,79 @@ AbstractSketchpadPage {
         Comp
     }  
 
+    enum EQView {
+        HiCut,
+        LowCut
+    }
+
+    enum CompView {
+        Threshold
+    }
+
+    readonly property alias currentView : _mixerBarStack.currentView
+    function setView(view) {
+        root.sketchpadView.bottomStack.setView(Main.BarView.MixerBar)
+        _mixerBarStack.setView(view)
+    }
+
     contentItem: ZUI.ThreeColumnView {
         altTabs: false
-        leftTab: ZUI.SectionGroup {
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: ZUI.Theme.spacing
+        // leftTab: ZUI.SectionGroup {
+        //     ColumnLayout {
+        //         anchors.fill: parent
+        //         spacing: ZUI.Theme.spacing
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Volume"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Main
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Main)                
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Volume"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Main
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Main)                
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Reverb"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Reverb
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Reverb)  
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Reverb"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Reverb
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Reverb)  
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Delay"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Delay
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Delay)  
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Delay"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Delay
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Delay)  
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "EQ"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.EQ
-                    onClicked: _mixerBarStack.setView(MixerBar.View.EQ)  
-                }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "EQ"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.EQ
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.EQ)  
+        //         }
 
-                ZUI.SectionButton {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitHeight: Kirigami.Units.gridUnit
-                    text: "Comp"
-                    checked: highlighted
-                    highlighted: _mixerBarStack.currentView === MixerBar.View.Comp
-                    onClicked: _mixerBarStack.setView(MixerBar.View.Comp)  
-                }
-            }
-        }
+        //         ZUI.SectionButton {
+        //             Layout.fillWidth: true
+        //             Layout.fillHeight: true
+        //             implicitHeight: Kirigami.Units.gridUnit
+        //             text: "Comp"
+        //             checked: highlighted
+        //             highlighted: _mixerBarStack.currentView === MixerBar.View.Comp
+        //             onClicked: _mixerBarStack.setView(MixerBar.View.Comp)  
+        //         }
+        //     }
+        // }
 
         middleTab: StackLayout {
             id: _mixerBarStack
@@ -209,6 +300,13 @@ AbstractSketchpadPage {
                 _mixerBarStack.currentIndex = _mixerBarStack.currentView
             }
 
+            function focusElement() {
+                let view = _mixerBarStack.children[_mixerBarStack.currentIndex]
+                if(view) {
+                    view.focusElement()
+                }
+            }
+
             ZUI.SectionGroup {
 
                 fallbackBackground: Rectangle {
@@ -217,6 +315,10 @@ AbstractSketchpadPage {
                     color: Kirigami.Theme.backgroundColor
                     opacity: 0.1
                 }  
+
+                function focusElement(){
+                    channelsVolumeRow.handleClick(root.selectedChannel)
+                }
                 
                 RowLayout {
                     id: channelsVolumeRow
@@ -340,8 +442,7 @@ AbstractSketchpadPage {
                             }
                         }
                     }
-                }
-                
+                }                
             }
 
             ZUI.SectionGroup {
@@ -351,6 +452,10 @@ AbstractSketchpadPage {
                     color: Kirigami.Theme.backgroundColor
                     opacity: 0.1
                 }  
+
+                function focusElement(){
+                    channelsReverbRow.handleClick(root.selectedChannel)
+                }
                 
                 RowLayout {
                     id: channelsReverbRow
@@ -402,13 +507,17 @@ AbstractSketchpadPage {
                 }
             }
 
-             ZUI.SectionGroup {
+            ZUI.SectionGroup {
                 fallbackBackground: Rectangle {
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                     color: Kirigami.Theme.backgroundColor
                     opacity: 0.1
                 }  
+
+                function focusElement(){
+                    channelsDelayRow.handleClick(root.selectedChannel)
+                }
                 
                 RowLayout {
                     id: channelsDelayRow
@@ -459,9 +568,676 @@ AbstractSketchpadPage {
                 }
             }
 
-            Item {}
-            Item {}
-            Item {}
+            ColumnLayout {
+                spacing: ZUI.Theme.sectionSpacing
+                enabled: root.selectedChannel.trackType !== "external"
+
+                function focusElement(){
+                    _EQStack.children[_EQStack.currentIndex].focusElement()
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit *  2
+                    Layout.minimumHeight: Kirigami.Units.gridUnit *  2
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.spacing
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            QQC2.ButtonGroup {
+                                buttons: _EQButtonsRow.children
+                            }
+
+                            RowLayout {
+                                id: _EQButtonsRow
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "HiCut"
+                                    checked: highlighted
+                                    highlighted: _EQStack.currentView === MixerBar.EQView.HiCut
+                                    onClicked: _EQStack.setView(MixerBar.EQView.HiCut)
+                                }
+                                ZUI.SectionButton {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "LowCut"
+                                    checked: highlighted
+                                    highlighted: _EQStack.currentView === MixerBar.EQView.LowCut
+                                    onClicked: _EQStack.setView(MixerBar.EQView.LowCut)
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    checkable: true
+                                    checked: _EQStack.applyToAll
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "All"
+                                    onToggled: _EQStack.applyToAll = checked
+                                }
+
+                                ZUI.SectionButton {
+                                    checkable: true
+                                    checked: _EQStack.showQ
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "Q"
+                                    onToggled: _EQStack.showQ = checked
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ZUI.SectionGroup {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    fallbackBackground: Rectangle {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        color: Kirigami.Theme.backgroundColor
+                        opacity: 0.1
+                    } 
+
+                    StackLayout {
+                        id: _EQStack
+                        visible: enabled
+                        anchors.fill: parent
+                        property int currentView: MixerBar.EQView.HiCut
+                        currentIndex : currentView
+
+                        property bool applyToAll: false
+                        property bool showQ: false
+
+                        function setView(view) {
+                            _EQStack.currentView = view
+                            _EQStack.currentIndex = _EQStack.currentView
+
+                            _EQStack.children[_EQStack.currentIndex].focusElement()
+                        }
+
+                        RowLayout {
+                            id: _EQHiCutRow
+                            spacing: ZUI.Theme.cellSpacing
+                            property double globalHiCutValue: 0
+                            property double globalHiCutQ: 0
+
+                            function focusElement() {
+                                handleClick(root.selectedChannel.id)
+                            }
+                            
+                            function handleClick(channel) { 
+                                zynqtgui.sketchpad.selectedTrackId = channel;
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_hicut", channel, _hicutRepeater.itemAt(channel),  root.selectedChannel);
+                            }
+
+                            Repeater {
+                                id: _hicutRepeater
+                                model: Zynthbox.Plugin.sketchpadTrackCount
+                                delegate: ZUI.CellControl {
+                                    id: _hicutDelegate 
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    enabled: eq !== null
+                                    highlighted: (index === root.selectedChannel.id || _EQStack.applyToAll) && enabled
+                                    property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
+                                    property QtObject eq: ctrl ? ctrl.equaliserSettings[5] : null
+                                    
+                                    //[5] is hicut and [0] is lowcut and for the menu [11] highcut(lowpass) and [1] lowcut(high pass)     
+
+                                    Connections {
+                                        target: _EQHiCutRow
+                                        onGlobalHiCutValueChanged: {
+                                            if(_hicutDelegate.enabled){
+                                                _hicutDelegate.eq.frequencyAbsolute = _EQHiCutRow.globalHiCutValue
+                                            }
+                                        }
+
+                                        onGlobalHiCutQChanged: {
+                                            if(_hicutDelegate.enabled){
+                                                _hicutDelegate.eq.quality = _EQHiCutRow.globalHiCutQ
+                                            }
+                                        }
+                                    }                               
+
+                                    contentItem: StackLayout {
+
+                                        currentIndex: _EQStack.showQ ? 1 : 0
+
+                                        AbstractCellLayout {
+                                            text2: _hicutDelegate.eq
+                                                  ?  (_hicutDelegate.eq.frequency < 1000.0 || zynqtgui.modeButtonPressed)
+                                                    ? "%1 Hz".arg(_hicutDelegate.eq.frequency.toFixed(1))
+                                                    : "%1 kHz".arg((_hicutDelegate.eq.frequency / 1000.0).toFixed(2))
+                                            : ""
+                                            enabled: _hicutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            title: "T"+(index+1)
+                                            onClicked: _EQHiCutRow.handleClick(index)
+
+                                            ZUI.SectionGroup {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                                Layout.margins: 2
+
+                                                RowLayout {
+                                                    anchors.fill: parent
+                                                    spacing: ZUI.Theme.spacing
+                                                    
+                                                    QQC2.RoundButton {
+                                                        text: "S"
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _hicutDelegate.eq ? _hicutDelegate.eq.soloed : false
+                                                        font.pointSize: 8
+                                                        radius: 2
+                                                        onClicked: {
+                                                            _hicutDelegate.eq.soloed =!_hicutDelegate.eq.soloed;
+                                                        }
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        }
+                                                    }
+
+                                                    QQC2.RoundButton{
+                                                        text: "A"
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _hicutDelegate.eq? _hicutDelegate.eq.active : false
+                                                        font.pointSize: 8
+                                                        radius: 2
+                                                        onClicked: {
+                                                            _hicutDelegate.eq.active = !_hicutDelegate.eq.active;
+                                                        }
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        }                                                        
+                                                    }
+                                                }
+                                            }
+
+                                            control1: VolumeControl {
+                                                id: volumeControl
+                                                tickLabelSet : ({"0":"20Hz", "50":"650Hz", "100":"20kHz"})
+                                                slider {
+                                                    stepSize: 1
+                                                    from: 0
+                                                    to: 100
+                                                }
+
+                                                Binding {
+                                                    target: volumeControl.slider
+                                                    property: "value"
+                                                    value: _hicutDelegate.eq  ? _hicutDelegate.eq.frequencyAbsolute*100 : 0
+                                                }
+
+                                                onValueChanged: {
+                                                    if (_hicutDelegate.eq) {
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQHiCutRow.globalHiCutValue = slider.value/100
+                                                        }else{
+                                                            _hicutDelegate.eq.frequencyAbsolute = slider.value/100
+                                                        }
+                                                    }
+                                                }
+                                                onClicked: _EQHiCutRow.handleClick(index)
+
+
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+
+                                        AbstractCellLayout {
+                                            title: "Q"
+                                            enabled:  _hicutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            text2: _hicutDelegate.eq ? _hicutDelegate.eq.quality.toFixed(2): "-"
+
+                                            control1: VolumeControl {
+                                                id: volumeControl2
+                                                tickLabelSet : ({"0":"0", "5":"5", "10":"10"})  
+                                                slider {
+                                                    from: 0
+                                                    to: 10
+                                                    stepSize: 0.1
+                                                    value: _hicutDelegate.eq ? _hicutDelegate.eq.quality : 0
+                                                }
+                                                onValueChanged: {
+                                                    if (_hicutDelegate.eq) {
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQHiCutRow.globalHiCutQ = slider.value
+                                                        }else{
+                                                            _hicutDelegate.eq.quality = slider.value
+                                                        }
+                                                    }
+                                                }
+                                                onClicked: _EQHiCutRow.handleClick(index)
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl2.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl2.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl2.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl2.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl2.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl2.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+                                    }
+
+                                    // enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                    // onClicked: _SYNFilterResoRow.handleClick(index)
+                                }
+                            }
+                        }
+                        
+                        RowLayout {
+                            id: _EQLowCutRow
+                            spacing: ZUI.Theme.cellSpacing
+                            property double globalLowCutValue: 0
+                            property double globalLowCutQ: 0
+
+                            function focusElement() {
+                                handleClick(root.selectedChannel.id)
+                            }
+                            
+                            function handleClick(channel) { 
+                                zynqtgui.sketchpad.selectedTrackId = channel;
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_lowcut", channel, _lowcutRepeater.itemAt(channel),  root.selectedChannel);
+                            }
+
+                            Repeater {
+                                id: _lowcutRepeater
+                                model: Zynthbox.Plugin.sketchpadTrackCount
+                                delegate: ZUI.CellControl {
+                                    id: _lowcutDelegate 
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    highlighted: (index === root.selectedChannel.id || _EQStack.applyToAll) && enabled
+                                    property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
+                                    property QtObject eq: ctrl ? ctrl.equaliserSettings[0] : null
+                                    
+                                    //[5] is hicut and [0] is lowcut and for the menu [11] highcut(lowpass) and [1] lowcut(high pass)
+
+                                    Connections {
+                                        target: _EQLowCutRow
+                                        onGlobalLowCutValueChanged: {
+                                            if(_lowcutDelegate.enabled){
+                                                _lowcutDelegate.eq.frequencyAbsolute = _EQLowCutRow.globalLowCutValue
+                                            }
+                                        }
+
+                                        onGlobalLowCutQChanged: {
+                                            if(_lowcutDelegate.enabled){
+                                                _lowcutDelegate.eq.quality = _EQLowCutRow.globalLowCutQ
+                                            }
+                                        }
+                                    }   
+                                    
+                                    contentItem: StackLayout {
+
+                                        currentIndex: _EQStack.showQ ? 1 : 0
+
+                                        AbstractCellLayout {
+                                            text2: _lowcutDelegate.eq
+                                                  ?  (_lowcutDelegate.eq.frequency < 1000.0 || zynqtgui.modeButtonPressed)
+                                                    ? "%1 Hz".arg(_lowcutDelegate.eq.frequency.toFixed(1))
+                                                    : "%1 kHz".arg((_lowcutDelegate.eq.frequency / 1000.0).toFixed(2))
+                                            : ""
+                                            enabled: _lowcutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            title: "T"+(index+1)
+
+                                            ZUI.SectionGroup {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                                Layout.margins: 2
+
+                                                RowLayout {
+                                                    anchors.fill: parent
+                                                    spacing: ZUI.Theme.spacing
+                                                    QQC2.RoundButton {
+                                                        text: "S"
+                                                        font.pointSize: 8
+                                                        radius: 2
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _lowcutDelegate.eq ? _lowcutDelegate.eq.soloed : false
+                                                        onClicked: {
+                                                            _lowcutDelegate.eq.soloed =!_lowcutDelegate.eq.soloed;
+                                                        }
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.positiveBackgroundColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        }
+                                                    }
+
+                                                    QQC2.RoundButton {
+                                                        text: "A"
+                                                        font.pointSize: 8
+                                                        radius: 2
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: true
+                                                        checked: _lowcutDelegate.eq? _lowcutDelegate.eq.active : false
+                                                        onClicked: {
+                                                            _lowcutDelegate.eq.active = !_lowcutDelegate.eq.active;
+                                                        }
+
+                                                        contentItem: QQC2.Label {
+                                                            text: parent.text
+                                                            font: parent.font
+                                                            horizontalAlignment: Text.AlignHCenter
+                                                        }
+                                                        background: Rectangle {
+                                                            radius: parent.radius
+                                                            border.width: 1
+                                                            border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                            color: parent.down || parent.checked ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            control1: VolumeControl {
+                                                id: volumeControl
+                                                tickLabelSet : ({"0":"20Hz", "50":"650Hz", "100":"20kHz"})
+                                                slider {
+                                                    stepSize: 1
+                                                    from: 0
+                                                    to: 100
+                                                }
+
+                                                Binding {
+                                                    target: volumeControl.slider
+                                                    property: "value"
+                                                    value: _lowcutDelegate.eq  ? _lowcutDelegate.eq.frequencyAbsolute*100 : 0
+                                                }
+
+                                                onValueChanged: {
+                                                    if (_lowcutDelegate.eq) {
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQLowCutRow.globalLowCutValue = slider.value/100
+                                                        }else{
+                                                            _lowcutDelegate.eq.frequencyAbsolute = slider.value/100
+                                                        }
+                                                    }
+                                                }
+                                                onClicked: _EQLowCutRow.handleClick(index)
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+
+                                        AbstractCellLayout {
+                                            title: "Q"
+                                            enabled:  _lowcutDelegate.eq 
+                                            text: root.selectedChannel.synthSlotsData[index]
+                                            text2: _lowcutDelegate.eq ? _lowcutDelegate.eq.quality.toFixed(2): "-"
+
+                                            control1: VolumeControl {
+                                                id: volumeControl2
+                                                tickLabelSet : ({"0":"0", "5":"5", "10":"10"})  
+                                                slider {
+                                                    from: 0
+                                                    to: 10
+                                                    stepSize: 0.1
+                                                    value: _lowcutDelegate.eq ? _lowcutDelegate.eq.quality : 0
+                                                }
+                                                onValueChanged: {
+                                                    if (_lowcutDelegate.eq) {
+                                                        if(_EQStack.applyToAll) {
+                                                            _EQLowCutRow.globalLowCutQ = slider.value
+                                                        }else{
+                                                            _lowcutDelegate.eq.quality = slider.value
+                                                        }
+                                                    }
+                                                }
+                                                onClicked: _EQLowCutRow.handleClick(index)
+                                            }
+                                            underlay: MouseArea {
+                                                anchors.fill: parent
+                                                onPressed: volumeControl2.mouseArea.handlePressed(mouse)                                                
+                                                onReleased: volumeControl2.mouseArea.released(mouse)
+                                                onPressAndHold: volumeControl2.mouseArea.pressAndHold(mouse)
+                                                onClicked: volumeControl2.mouseArea.clicked(mouse)
+                                                onMouseXChanged: volumeControl2.mouseArea.mouseXChanged(mouse)
+                                                onMouseYChanged: volumeControl2.mouseArea.mouseYChanged(mouse)
+                                            }
+                                        }
+                                    }
+
+                                    // enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                    // onClicked: _SYNFilterResoRow.handleClick(index)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ColumnLayout {
+                spacing: ZUI.Theme.sectionSpacing
+                enabled: root.selectedChannel.trackType !== "external"
+
+                function focusElement(){
+                    _compStack.children[_compStack.currentIndex].focusElement()
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit *  2
+                    Layout.minimumHeight: Kirigami.Units.gridUnit *  2
+                    
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: ZUI.Theme.spacing
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            QQC2.ButtonGroup {
+                                buttons: _compButtonsRow.children
+                            }
+
+                            RowLayout {
+                                id: _compButtonsRow
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "Threshold"
+                                    checked: highlighted
+                                    highlighted: _compStack.currentView === MixerBar.CompView.Threshold
+                                    onClicked: _compStack.setView(MixerBar.CompView.Threshold)
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+
+                        ZUI.SectionGroup {
+                            Layout.fillHeight: true
+
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: ZUI.Theme.spacing
+
+                                ZUI.SectionButton {
+                                    checkable: true
+                                    checked: _compStack.applyToAll
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                    text: "All"
+                                    onToggled: _compStack.applyToAll = checked
+                                    visible: false
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ZUI.SectionGroup {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    fallbackBackground: Rectangle {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                        color: Kirigami.Theme.backgroundColor
+                        opacity: 0.1
+                    } 
+
+                    StackLayout {
+                        id: _compStack
+                        visible: enabled
+                        anchors.fill: parent
+                        property int currentView: MixerBar.CompView.Threshold
+                        currentIndex : currentView
+
+                        property bool applyToAll: false
+
+                        function setView(view) {
+                            _compStack.currentView = view
+                            _compStack.currentIndex = _compStack.currentView
+
+                            _compStack.children[_compStack.currentIndex].focusElement()
+                        }
+
+                        RowLayout {
+                            id: _compThresholdRow
+                            spacing: ZUI.Theme.cellSpacing
+                            property double globalHiCutValue: 0
+                            property double globalHiCutQ: 0
+
+                            function focusElement() {
+                                handleClick(root.selectedChannel.id)
+                            }
+                            
+                            function handleClick(channel) { 
+                                zynqtgui.sketchpad.selectedTrackId = channel;
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.sketchpad.lastSelectedObj.setTo("MixerBar_item_threshold", channel, _thresholdRepeater.itemAt(channel),  root.selectedChannel);
+                            }
+
+                            Repeater {
+                                id: _thresholdRepeater
+                                model: Zynthbox.Plugin.sketchpadTrackCount
+                                delegate: AbstractCellLayout {
+                                    id: _thresholdDelegate 
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    enabled: compressor !== null
+                                    highlighted: (index === root.selectedChannel.id || _compStack.applyToAll) && enabled
+                                    property QtObject ctrl : Zynthbox.AudioLevels.tracks[index]
+                                    property QtObject compressor: ctrl ? ctrl.compressorSettings : null
+
+                                    title: "T"+(index+1)
+                                    text2: compressor ? "%1dB".arg(compressor.thresholdDB.toFixed(2)) : "-"
+
+                                    control1: VolumeControl {
+                                        id: volumeControl
+                                        slider {
+                                            from: 0
+                                            to: 100
+                                        }
+                                        tickLabelSet : ({"0":"-50dB", "50":"-20dB", "100":"10dB"})                                        
+
+                                        Binding {
+                                            target: volumeControl.slider
+                                            property: "value"
+                                            value: _thresholdDelegate.compressor ? _thresholdDelegate.compressor.threshold*100 : 0
+                                        }
+
+                                        onValueChanged: {
+                                            if (_thresholdDelegate.compressor) {
+                                                _thresholdDelegate.compressor.threshold = slider.value/100
+                                            }
+                                        }
+
+                                        onClicked: _compThresholdRow.handleClick(index)
+                                    }
+
+                                    underlay: MouseArea {
+                                        anchors.fill: parent
+                                        onPressed: volumeControl.mouseArea.handlePressed(mouse)                                                
+                                        onReleased: volumeControl.mouseArea.released(mouse)
+                                        onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                        onClicked: volumeControl.mouseArea.clicked(mouse)
+                                        onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                        onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         rightTab: ZUI.SectionGroup {

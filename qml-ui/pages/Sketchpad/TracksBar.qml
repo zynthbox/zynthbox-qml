@@ -96,6 +96,12 @@ AbstractSketchpadPage {
         Loop
     }  
 
+    enum SYNView {
+        FilterReso,
+        Attack,
+        Release
+    } 
+
     function pickNextSlot(onlySelectSlot=false) {
         switch (root.selectedChannel.selectedSlot.className) {
         case "TracksBar_synthslot":
@@ -381,17 +387,50 @@ AbstractSketchpadPage {
             }
         }
     }
+
+    function focusNextElementInChain() {
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_")){
+            switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "TracksBar_item_pitch": _SMPPitchRow.focusNext(); break;
+                case "TracksBar_item_startend": _SMPStartEndRow.focusNext(); break;
+                case "TracksBar_item_loop": _SMPLoopRow.focusNext(); break;
+                case "TracksBar_item_filter_reso": _SYNFilterResoRow.focusNext(); break;
+                case "TracksBar_item_attack": _SYNAttackRow.focusNext(); break;
+                case "TracksBar_item_release": _SYNReleaseRow.focusNext(); break;
+            }
+        }else {
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)       
+        }
+    }
+
+    function focusPreviousElementInChain() {
+        if(zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_")){
+           switch(zynqtgui.sketchpad.lastSelectedObj.className) {
+                case "TracksBar_item_pitch": _SMPPitchRow.focusPrevious(); break;
+                case "TracksBar_item_startend": _SMPStartEndRow.focusPrevious(); break;
+                case "TracksBar_item_loop": _SMPLoopRow.focusPrevious(); break;
+                case "TracksBar_item_filter_reso": _SYNFilterResoRow.focusPrevious(); break;
+                case "TracksBar_item_attack": _SYNAttackRow.focusPrevious(); break;
+                case "TracksBar_item_release": _SYNReleaseRow.focusPrevious(); break;
+            }
+        }else {
+            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)       
+        }
+    }
+
     function cuiaCallback(cuia) {
         var returnValue = false;
         // console.log(`TracksBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
         case "SWITCH_ARROW_LEFT_RELEASED":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            focusPreviousElementInChain()
             returnValue = true;
             break;
 
         case "SWITCH_ARROW_RIGHT_RELEASED":
-            zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            focusNextElementInChain()
             returnValue = true;
             break;
 
@@ -519,11 +558,31 @@ AbstractSketchpadPage {
                 break;
             case "TracksBar_item_loop":
                 if(_SMPStack.applyToAll){
-                    root.sketchpadView.updateAllSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateAllSampleLoopPosition(1)
                 }else {
                     root.sketchpadView.updateSelectedSampleLoopPosition(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
-                
+                break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerCutoff(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpAttack(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpAttack(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpRelease(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpRelease(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
                 break;
             default:
                 returnValue = false;
@@ -564,10 +623,32 @@ AbstractSketchpadPage {
                 break;
             case "TracksBar_item_loop":
                 if(_SMPStack.applyToAll){
-                    root.sketchpadView.updateAllSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    root.sketchpadView.updateAllSampleLoopPosition(-1)
                 }else {
                     root.sketchpadView.updateSelectedSampleLoopPosition(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
+                break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerCutoff(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpAttack(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpAttack(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerAmpRelease(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerAmpRelease(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
             default:
                 returnValue = false;
                 // console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
@@ -644,6 +725,27 @@ AbstractSketchpadPage {
                     root.sketchpadView.updateSelectedSampleLengthSamples(1, zynqtgui.sketchpad.lastSelectedObj.value)
                 }
                 break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerResonance(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterAttack(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterAttack(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterRelease(1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterRelease(1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
             default:
                 returnValue = false;
                 // console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
@@ -673,6 +775,27 @@ AbstractSketchpadPage {
                     root.sketchpadView.updateAllSampleLengthSamples(-1)
                 }else {
                     root.sketchpadView.updateSelectedSampleLengthSamples(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                }
+                break;
+            case "TracksBar_item_filter_reso":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerResonance(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_attack":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterAttack(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterAttack(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
+                }
+                break;
+            case "TracksBar_item_release":
+                if(_SYNStack.applyToAll){
+                    root.sketchpadView.updateAllChannelSlotLayerFilterRelease(-1)
+                }else {
+                    root.sketchpadView.updateSelectedChannelSlotLayerFilterRelease(-1, zynqtgui.sketchpad.lastSelectedObj.value, false)
                 }
                 break;
             default:
@@ -791,12 +914,18 @@ AbstractSketchpadPage {
                 zynqtgui.ignoreNextModeButtonPress = true;
                 root.pickNextSlot();
                 returnValue = true;
+            }else {
+                focusNextElementInChain()
+                returnValue = true;
             }
             break;
         case "KNOB3_DOWN":
             if (zynqtgui.modeButtonPressed) {
                 zynqtgui.ignoreNextModeButtonPress = true;
                 root.pickPreviousSlot();
+                returnValue = true;
+            }else {
+                focusPreviousElementInChain()
                 returnValue = true;
             }
             break;
@@ -847,62 +976,18 @@ AbstractSketchpadPage {
         id: trackStyleSelector
     }
 
+    function setView(view){
+        root.sketchpadView.bottomStack.setView(Main.BarView.TracksBar)
+        _tracksBarStack.setView(view)
+    }
+    readonly property alias currentView : _tracksBarStack.currentView
+
     contentItem: ZUI.ThreeColumnView {
         
         leftTab: BottomStackTabs {}
 
-        rightTab: ZUI.SectionGroup {
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: ZUI.Theme.spacing
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "Main"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.Main
-                    onClicked: _tracksBarStack.setView(TracksBar.View.Main)
-                }
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "SYN"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.SYN
-                    onClicked: _tracksBarStack.setView(TracksBar.View.SYN)
-                }
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "SMP"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.SMP
-                    onClicked: _tracksBarStack.setView(TracksBar.View.SMP)
-                }
-
-                 ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "FX"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.FX
-                    onClicked: _tracksBarStack.setView(TracksBar.View.FX)
-                }
-
-                ZUI.SectionButton{
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    text: "Layers"
-                    checked: highlighted
-                    highlighted: _tracksBarStack.currentView === TracksBar.View.PAT
-                    onClicked: _tracksBarStack.setView(TracksBar.View.PAT)
-                }
-            }
-        }
-
+        rightTabContainer.visible: _tracksBarStack.currentView !== TracksBar.View.Main
+       
         middleTab: QQC2.Pane {
 
             contentItem: StackLayout {
@@ -968,6 +1053,9 @@ AbstractSketchpadPage {
                                     TrackSettingsDialog {
                                         id: trackSettingsDialog
                                     }
+                                    TrackClearOnSwitchDialog {
+                                        id: trackClearOnSwitchDialog
+                                    }
                                 }
 
                                 ZUI.SectionButton {
@@ -978,16 +1066,15 @@ AbstractSketchpadPage {
                                     highlighted: root.selectedChannel != null && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
                                     text: qsTr("Sketch")
                                     onClicked: {
+                                        // Don't switch (or do slot selection type things) if we're already there
                                         if (["synth", "sample-trig"].includes(root.selectedChannel.trackType) == false) {
                                             if (root.selectedChannel.trackRackType == Zynthbox.ZynthboxBasics.SynthRackType) {
-                                                root.selectedChannel.trackType = "synth";
+                                                trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "synth");
                                             } else if (root.selectedChannel.trackRackType == Zynthbox.ZynthboxBasics.SampleRackType) {
-                                                root.selectedChannel.trackType = "sample-trig";
+                                                trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "sample-trig");
                                             } else {
-                                                root.selectedChannel.trackType = "synth";
+                                                trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "synth");
                                             }
-                                            // Don't switch (or do slot selection type things) if we're already there
-                                            synthsRow.switchToSlot(0, true);
                                         }
                                     }
                                     QQC2.Button {
@@ -1033,8 +1120,7 @@ AbstractSketchpadPage {
                                     highlighted: root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop"
                                     text: qsTr("Loop")
                                     onClicked: {
-                                        root.selectedChannel.trackType = "sample-loop";
-                                        sketchesRow.switchToSlot(0, true);
+                                        trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "sample-loop");
                                     }
                                 }
 
@@ -1046,8 +1132,7 @@ AbstractSketchpadPage {
                                     highlighted: root.selectedChannel != null && root.selectedChannel.trackType === "external"
                                     text: qsTr("External")
                                     onClicked: {
-                                        root.selectedChannel.trackType = "external";
-                                        externalRow.switchToSlot(0, true);
+                                        trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "external");
                                     }
                                 }
                             }
@@ -1073,8 +1158,7 @@ AbstractSketchpadPage {
                                     text: qsTr("Synthrack")
                                     onClicked: {
                                         if (root.selectedChannel.trackType != "synth") {
-                                            root.selectedChannel.trackType = "synth";
-                                            synthsRow.switchToSlot(0, true);
+                                            trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "synth");
                                         }
                                     }
                                 }
@@ -1086,8 +1170,7 @@ AbstractSketchpadPage {
                                     text: qsTr("Samplerack")
                                     onClicked: {
                                         if (root.selectedChannel.trackType != "sample-trig") {
-                                            root.selectedChannel.trackType = "sample-trig";
-                                            samplesRow.switchToSlot(0, true);
+                                            trackClearOnSwitchDialog.switchTrackType(root.selectedChannel, "sample-trig");
                                         }
                                     }
                                 }
@@ -1131,7 +1214,7 @@ AbstractSketchpadPage {
                                 QQC2.Button {
                                     Layout.fillHeight: true
                                     visible: root.selectedChannel ? root.selectedChannel.trackType === "sample-trig" : false
-                                    text: root.selectedChannel ? qsTr("Style: %1").arg(trackStyleName(root.selectedChannel.trackStyle)) : ""
+                                    text: root.selectedChannel ? qsTr("Rack Layout: %1").arg(trackStyleName(root.selectedChannel.trackStyle)) : ""
                                     function trackStyleName(trackStyle) {
                                         switch (trackStyle) {
                                         case "everything":
@@ -1142,8 +1225,8 @@ AbstractSketchpadPage {
                                             return qsTr("Drumrack");
                                         case "2-low-3-high":
                                             return qsTr("Upper/Lower");
-                                        case "10-split":
-                                            return qsTr("10 Split");
+                                        case "10-octaves":
+                                            return qsTr("10 Octaves");
                                         default:
                                             return qsTr("Manual");
                                         }
@@ -1903,8 +1986,7 @@ AbstractSketchpadPage {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             text: root.selectedChannel != null ? qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97)) : ""
-                                            // highlighted: clipDelegate.clip.enabled && clipDelegate.patternHasNotes
-                                            highlighted: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
+                                            highlighted: isCurrentClip  && clipDelegate.patternHasNotes
                                             font.pointSize: 9
                                             font.capitalization: Font.AllUppercase
                                             property int clipIndex: model.index
@@ -1915,6 +1997,7 @@ AbstractSketchpadPage {
                                             readonly property QtObject cppClipObject: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
                                             readonly property QtObject pattern: root.selectedChannel != null ? root.sequence.getByClipId(root.selectedChannel.id, clipIndex) : null
                                             readonly property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
+                                            readonly property bool isCurrentClip: root.selectedChannel != null && root.selectedChannel.selectedClip === clipIndex
                                             property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
 
                                             onClicked: {
@@ -1960,6 +2043,21 @@ AbstractSketchpadPage {
                                             topPadding: padding
                                             rightPadding: padding
                                             bottomPadding: padding
+
+                                            Rectangle {
+                                                parent: _overlay
+                                                z: parent.z + 9999
+                                                height: clipDelegate.height + 8
+                                                width: clipDelegate.width + 8
+                                                x: clipDelegate.x-4
+                                                y: clipDelegate.y-4
+                                                color: "transparent"
+                                                border {
+                                                    width: 2
+                                                    color:  Kirigami.Theme.textColor
+                                                }
+                                                opacity: clipDelegate.isCurrentClip && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip" ? 1 : 0
+                                            }
                                             contentItem : ColumnLayout {
                                                 spacing: ZUI.Theme.spacing
                                                 QQC2.Label {
@@ -1972,12 +2070,9 @@ AbstractSketchpadPage {
                                                     horizontalAlignment: Qt.AlignHCenter
                                                 }
 
-                                                ZUI.SectionGroup {
+                                                Item {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
-                                                    mask: false
-                                                    background: null 
-                                                    padding: 0
 
                                                     Zynthbox.PatternModelVisualiserItem {
                                                         id: visualiser
@@ -2022,12 +2117,555 @@ AbstractSketchpadPage {
                                         }                                        
                                     }
                                 }
+                                Item {
+                                    id: _overlay
+                                    anchors.fill: parent
+                                }
                             }
                         }
                     }
                 }
 
-                Item {}
+                ColumnLayout {
+                    spacing: ZUI.Theme.sectionSpacing
+                    enabled: root.selectedChannel.trackType !== "external"
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit *  2
+                        Layout.minimumHeight: Kirigami.Units.gridUnit *  2
+                        
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: ZUI.Theme.spacing
+
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true
+
+                                QQC2.ButtonGroup {
+                                    buttons: _SYNButtonsRow.children
+                                }
+
+                                RowLayout {
+                                    id: _SYNButtonsRow
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
+
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Filter/Reso"
+                                        checked: highlighted
+                                        highlighted: _SYNStack.currentView === TracksBar.SYNView.FilterReso
+                                        onClicked: _SYNStack.setView(TracksBar.SYNView.FilterReso)
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Attack"
+                                        checked: highlighted
+                                        highlighted: _SYNStack.currentView === TracksBar.SYNView.Attack
+                                        onClicked: _SYNStack.setView(TracksBar.SYNView.Attack)
+                                    }
+                                    ZUI.SectionButton {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "Release"
+                                        checked: highlighted
+                                        highlighted: _SYNStack.currentView === TracksBar.SYNView.Release
+                                        onClicked: _SYNStack.setView(TracksBar.SYNView.Release)
+                                    }
+                                }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
+
+                            ZUI.SectionGroup {
+                                Layout.fillHeight: true
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    spacing: ZUI.Theme.spacing
+
+                                    ZUI.SectionButton {
+                                        checkable: true
+                                        checked:_SYNStack.applyToAll
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "All"
+                                        onToggled: _SYNStack.applyToAll = checked
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    ZUI.SectionGroup {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        fallbackBackground: Rectangle {
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.View
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: 0.1
+                        }  
+
+                        StackLayout {
+                            id: _SYNStack
+                            visible: enabled
+                            anchors.fill: parent
+                            property int currentView: TracksBar.SYNView.FilterReso
+                            currentIndex : currentView
+
+                            property bool applyToAll: false
+                            function setView(view) {
+                                var slotIndex = _SYNStack.currentSlotIndex
+                                _SYNStack.currentView = view
+                                _SYNStack.currentIndex = _SYNStack.currentView
+
+                                _SYNStack.children[_SYNStack.currentIndex].handleClick(slotIndex)
+                            }
+
+                            RowLayout {
+                                id: _SYNFilterResoRow
+                                spacing: ZUI.Theme.cellSpacing
+                                property int globalFilter: 0
+                                property int globalReso: 0
+
+                                function focusNext() {
+                                    let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                    handleClick(index)
+                                }
+                                
+                                function handleClick(synth) { 
+                                    root.switchToSlot("synth", synth);
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_filter_reso", synth, _filterResoRepeater.itemAt(synth), root.selectedChannel);
+                                }
+
+                                Repeater {
+                                    id: _filterResoRepeater
+                                    model: Zynthbox.Plugin.sketchpadSlotCount
+                                    delegate: ZUI.CellControl {
+                                        id: _filterResoDelegate
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
+                                        enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                        onClicked: _SYNFilterResoRow.handleClick(index)
+
+                                        Connections {
+                                            target: _SYNFilterResoRow
+                                            onGlobalFilterChanged: {
+                                                if(_cutoffControl.enabled){
+                                                    _cutoffControl.c_ctrl.value = _SYNFilterResoRow.globalFilter
+                                                }
+                                            }
+                                            onGlobalResoChanged: {
+                                                if(_resControl.enabled){
+                                                    _resControl.r_ctrl.value = _SYNFilterResoRow.globalReso
+                                                }
+                                            }
+                                        }
+
+                                        contentItem: RowLayout {
+                                            spacing: ZUI.Theme.sectionSpacing
+
+                                            AbstractCellLayout {
+                                                id: _cutoffControl
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                readonly property QtObject c_ctrl : root.selectedChannel.filterCutoffControllers[index]
+                                                enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
+                                                title: "Cutoff"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: enabled ? c_ctrl.value + "%" : "-"
+                                                onClicked: _filterResoDelegate.clicked()
+                                                control1: VolumeControl {
+                                                    id: volumeControl
+                                                    slider {
+                                                        from: _cutoffControl.c_ctrl ? _cutoffControl.c_ctrl.value_min : 0
+                                                        to: _cutoffControl.c_ctrl ? _cutoffControl.c_ctrl.value_max : 0
+                                                        stepSize: _cutoffControl.c_ctrl ? _cutoffControl.c_ctrl.step_size : 0
+                                                    }
+                                                    Binding {
+                                                        target: volumeControl.slider
+                                                        property: "value"
+                                                        value: _cutoffControl.c_ctrl ? _cutoffControl.c_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            _SYNFilterResoRow.globalFilter = volumeControl.slider.value
+                                                        }else {
+                                                            _cutoffControl.c_ctrl.value = volumeControl.slider.value
+                                                        }
+                                                    } 
+                                                    onClicked: _filterResoDelegate.clicked()
+                                                }
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: volumeControl.mouseArea.handlePressed(mouse)
+                                                    onReleased: volumeControl.mouseArea.released(mouse)
+                                                    onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                    onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                            AbstractCellLayout {
+                                                id: _resControl
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                readonly property QtObject r_ctrl : root.selectedChannel.filterResonanceControllers[index]
+                                                enabled: r_ctrl ? r_ctrl.controlsCount > 0 : false
+                                                title: "Res"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: enabled ? r_ctrl.value + "%" : "-"
+                                                
+                                                control1: VolumeControl {
+                                                    id: _resSlider
+                                                    slider {
+                                                        from: _resControl.r_ctrl.value_min
+                                                        to: _resControl.r_ctrl.value_max
+                                                        stepSize: _resControl.r_ctrl.step_size
+                                                    }
+
+                                                    Binding {
+                                                        target: _resSlider.slider
+                                                        property: "value"
+                                                        value: _resControl.r_ctrl ? _resControl.r_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            _SYNFilterResoRow.globalReso = _resSlider.slider.value
+                                                        }else {
+                                                            _resControl.r_ctrl.value = _resSlider.slider.value
+                                                        }
+                                                    }
+                                                    onClicked: _filterResoDelegate.clicked() 
+                                                }
+
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: _resSlider.mouseArea.handlePressed(mouse)
+                                                    onReleased: _resSlider.mouseArea.released(mouse)
+                                                    onPressAndHold: _resSlider.mouseArea.pressAndHold(mouse)
+                                                    onClicked: _resSlider.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: _resSlider.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: _resSlider.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                id: _SYNAttackRow
+                                spacing: ZUI.Theme.cellSpacing
+                                property int globalAmpAttack: 0
+                                property int globalFilterAttack: 0
+
+                                function focusNext() {
+                                    let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                    handleClick(index)
+                                }
+                                
+                                function handleClick(slot) { 
+                                    root.switchToSlot("synth", slot);
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_attack", slot, _attackRepeater.itemAt(slot), root.selectedChannel);
+                                }
+
+                                Repeater {
+                                    id: _attackRepeater
+                                    model: Zynthbox.Plugin.sketchpadSlotCount
+                                    delegate: ZUI.CellControl {
+                                        id: _attackDelegate
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
+                                        enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                        onClicked: _SYNAttackRow.handleClick(index)
+
+                                        Connections {
+                                            target: _SYNAttackRow
+                                            onGlobalAmpAttackChanged: {
+                                                if(_control2.enabled){
+                                                    _control2.r_ctrl.value = _SYNAttackRow.globalAmpAttack
+                                                }
+                                            }
+                                            onGlobalFilterAttackChanged: {
+                                                if(_control1.enabled){
+                                                    _control1.c_ctrl.value = _SYNAttackRow.globalFilterAttack
+                                                }
+                                            }
+                                        }
+
+                                        contentItem: RowLayout {
+                                            spacing: ZUI.Theme.sectionSpacing
+                                            AbstractCellLayout {
+                                                id: _control2
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                enabled: r_ctrl ? r_ctrl.controlsCount > 0 : false
+                                                readonly property QtObject r_ctrl : root.selectedChannel.ampAttackControllers[index]
+                                                title: "Amp"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: enabled ? r_ctrl.value + "%" : "-"
+                                                control1: VolumeControl {
+                                                    id: _volControl2
+                                                    slider {
+                                                        from: _control2.r_ctrl.value_min
+                                                        to: _control2.r_ctrl.value_max
+                                                        stepSize: _control2.r_ctrl.step_size
+                                                    }
+
+                                                    Binding {
+                                                        target: _volControl2.slider
+                                                        property: "value"
+                                                        value: _control2.r_ctrl ? _control2.r_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            _SYNAttackRow.globalAmpAttack = _volControl2.slider.value
+                                                        }else {
+                                                            _control2.r_ctrl.value = _volControl2.slider.value
+                                                        }
+                                                    } 
+                                                    onClicked: _attackDelegate.clicked()
+                                                }
+
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: _volControl2.mouseArea.handlePressed(mouse)
+                                                    onReleased: _volControl2.mouseArea.released(mouse)
+                                                    onPressAndHold: _volControl2.mouseArea.pressAndHold(mouse)
+                                                    onClicked: _volControl2.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: _volControl2.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: _volControl2.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                            AbstractCellLayout {
+                                                id: _control1
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                readonly property QtObject c_ctrl : root.selectedChannel.filterAttackControllers[index]
+                                                enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
+                                                title: "Filter"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: enabled ? c_ctrl.value + "%" : "-"
+                                                control1: VolumeControl {
+                                                    id: volumeControl
+                                                    slider {
+                                                        from: _control1.c_ctrl ? _control1.c_ctrl.value_min : 0
+                                                        to: _control1.c_ctrl ? _control1.c_ctrl.value_max : 0
+                                                        stepSize: _control1.c_ctrl ? _control1.c_ctrl.step_size : 0
+                                                    }
+                                                    Binding {
+                                                        target: volumeControl.slider
+                                                        property: "value"
+                                                        value: _control1.c_ctrl ? _control1.c_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            _SYNAttackRow.globalFilterAttack = _volControl2.slider.value
+                                                        }else {
+                                                            _control1.c_ctrl.value = volumeControl.slider.value
+                                                        }
+                                                    } 
+                                                    onClicked: _attackDelegate.clicked()
+                                                }
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: volumeControl.mouseArea.handlePressed(mouse)
+                                                    onReleased: volumeControl.mouseArea.released(mouse)
+                                                    onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                    onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                id: _SYNReleaseRow
+                                spacing: ZUI.Theme.cellSpacing
+                                property int globalAmpRelease: 0
+                                property int globalFilterRelease: 0
+
+                                function focusNext() {
+                                    let index = Math.min(root.selectedChannel.selectedSlotRow+1, 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(root.selectedChannel.selectedSlotRow-1, 0)
+                                    handleClick(index)
+                                }
+                                
+                                function handleClick(slot) { 
+                                    root.switchToSlot("synth", slot);
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.sketchpad.lastSelectedObj.setTo("TracksBar_item_release", slot, _releaseRepeater.itemAt(slot), root.selectedChannel);
+                                }
+
+                                Repeater {
+                                    id: _releaseRepeater
+                                    model: Zynthbox.Plugin.sketchpadSlotCount
+                                    delegate: ZUI.CellControl {
+                                        id: _releaseDelegate
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        highlighted: (index === root.selectedChannel.selectedSlotRow || _SYNStack.applyToAll) && enabled
+                                        enabled: root.selectedChannel.synthSlotsData[index].length > 0
+                                        
+                                        onClicked: _SYNReleaseRow.handleClick(index)
+
+                                        Connections {
+                                            target: _SYNReleaseRow
+                                            onGlobalAmpReleaseChanged: {
+                                                if(_control2.enabled){
+                                                    _control2.r_ctrl.value = _SYNReleaseRow.globalAmpRelease
+                                                }
+                                            }
+                                            onGlobalFilterReleaseChanged: {
+                                                if(_control1.enabled){
+                                                    _control1.c_ctrl.value = _SYNReleaseRow.globalFilterRelease
+                                                }
+                                            }
+                                        }
+
+                                        contentItem: RowLayout {
+                                            spacing: ZUI.Theme.sectionSpacing
+                                            AbstractCellLayout {
+                                                id: _control2
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                enabled: r_ctrl ? r_ctrl.controlsCount > 0 : false
+                                                readonly property QtObject r_ctrl : root.selectedChannel.ampReleaseControllers[index]
+                                                title: "Amp"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: enabled ? r_ctrl.value + "%" : "-"
+                                                control1: VolumeControl {
+                                                    id: _volControl2
+                                                    slider {
+                                                        from: _control2.r_ctrl.value_min
+                                                        to: _control2.r_ctrl.value_max
+                                                        stepSize: _control2.r_ctrl.step_size
+                                                    }
+
+                                                    Binding {
+                                                        target: _volControl2.slider
+                                                        property: "value"
+                                                        value: _control2.r_ctrl ? _control2.r_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                            _SYNReleaseRow.globalAmpRelease = _volControl2.slider.value
+                                                        }else {
+                                                            _control2.r_ctrl.value = _volControl2.slider.value
+                                                        }
+                                                    } 
+                                                    onClicked: _releaseDelegate.clicked()
+                                                }
+
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: _volControl2.mouseArea.handlePressed(mouse)
+                                                    onReleased: _volControl2.mouseArea.released(mouse)
+                                                    onPressAndHold: _volControl2.mouseArea.pressAndHold(mouse)
+                                                    onClicked: _volControl2.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: _volControl2.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: _volControl2.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                            AbstractCellLayout {
+                                                id: _control1
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                readonly property QtObject c_ctrl : root.selectedChannel.filterReleaseControllers[index]
+                                                enabled: c_ctrl ? c_ctrl.controlsCount > 0 : false
+                                                title: "Filter"
+                                                text: root.selectedChannel.synthSlotsData[index]
+                                                text2: enabled ? c_ctrl.value + "%" : "-"
+                                                control1: VolumeControl {
+                                                    id: volumeControl
+                                                    slider {
+                                                        from: _control1.c_ctrl ? _control1.c_ctrl.value_min : 0
+                                                        to: _control1.c_ctrl ? _control1.c_ctrl.value_max : 0
+                                                        stepSize: _control1.c_ctrl ? _control1.c_ctrl.step_size : 0
+                                                    }
+                                                    Binding {
+                                                        target: volumeControl.slider
+                                                        property: "value"
+                                                        value: _control1.c_ctrl ? _control1.c_ctrl.value : 0
+                                                    }
+
+                                                    tickLabelSet : ({"0":"0", "50":"50", "100":"100"})   
+                                                    onValueChanged: {
+                                                        if(_SYNStack.applyToAll)
+                                                        {
+                                                           _SYNReleaseRow.globalFilterRelease = volumeControl.slider.value
+                                                        }else {
+                                                            _control1.c_ctrl.value = volumeControl.slider.value
+                                                        }
+                                                    } 
+                                                    onClicked: _releaseDelegate.clicked()
+                                                }
+                                                underlay: MouseArea {
+                                                    anchors.fill: parent
+                                                    onPressed: volumeControl.mouseArea.handlePressed(mouse)
+                                                    onReleased: volumeControl.mouseArea.released(mouse)
+                                                    onPressAndHold: volumeControl.mouseArea.pressAndHold(mouse)
+                                                    onClicked: volumeControl.mouseArea.clicked(mouse)
+                                                    onMouseXChanged: volumeControl.mouseArea.mouseXChanged(mouse)
+                                                    onMouseYChanged: volumeControl.mouseArea.mouseYChanged(mouse)
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 ColumnLayout {
                     spacing: ZUI.Theme.sectionSpacing
@@ -2104,6 +2742,7 @@ AbstractSketchpadPage {
                             }
                         }
                     }
+
                     ZUI.SectionGroup {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -2124,6 +2763,17 @@ AbstractSketchpadPage {
 
                             property bool applyToAll: false
                             readonly property int currentSlotIndex: root.selectedChannel && root.selectedChannel.selectedSlot ? (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.selectedSlot.value : root.selectedChannel.selectedSlot.value + Zynthbox.Plugin.sketchpadSlotCount) : -1
+                            readonly property var sampleCache : [
+                                root.selectedChannel.samples[0],
+                                root.selectedChannel.samples[1],
+                                root.selectedChannel.samples[2],
+                                root.selectedChannel.samples[3],
+                                root.selectedChannel.samples[4],
+                                root.selectedChannel.samples[5],
+                                root.selectedChannel.samples[6],
+                                root.selectedChannel.samples[7],
+                                root.selectedChannel.samples[8],
+                                root.selectedChannel.samples[9]]
 
                             function setView(view) {
                                 var slotIndex = _SMPStack.currentSlotIndex
@@ -2137,6 +2787,16 @@ AbstractSketchpadPage {
                                 id: _SMPPitchRow
                                 spacing: ZUI.Theme.cellSpacing
                                 property int globalPitch: 0
+
+                                function focusNext() {
+                                    let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                    handleClick(index)
+                                }
                                 
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot);
@@ -2146,11 +2806,11 @@ AbstractSketchpadPage {
 
                                 Repeater {
                                     id: _pitchRepeater
-                                    model: root.selectedChannel.samples
+                                    model: Zynthbox.Plugin.sketchpadSlotCount * 2
                                     delegate: AbstractCellLayout {
                                         id: _pitchDelegate
 
-                                        readonly property QtObject controlObj: modelData
+                                        readonly property QtObject controlObj: _SMPStack.sampleCache[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
                                         enabled: clipObj && contentItem.visible
@@ -2165,6 +2825,7 @@ AbstractSketchpadPage {
                                         title: "S"+ (index+1)
                                         text: controlObj? controlObj.path.split("/").pop() : ""
                                         text2: sliceObj ? sliceObj.pitch.toFixed(2) : ""
+                                        onDoubleClicked: sliceObj.pitch = controlObj.initialPitch
                                         onClicked: _SMPPitchRow.handleClick(index)
 
                                         function setValue(value){
@@ -2188,8 +2849,8 @@ AbstractSketchpadPage {
                                                 stepSize: 1
                                             }
 
-                                            onDoubleClicked: sliceObj.pitch = controlObj.initialPitch
-                                            onClicked: _SMPPitchRow.handleClick(index)
+                                            onDoubleClicked: _pitchDelegate.doubleClicked()
+                                            onClicked: _pitchDelegate.clicked()
                                             onValueChanged: {
                                                 if(_SMPStack.applyToAll){
                                                     _SMPPitchRow.globalPitch = slider.value
@@ -2224,6 +2885,16 @@ AbstractSketchpadPage {
                                 property int globalStartPosition: 0
                                 property int globalLengthPosition: 0
 
+                                function focusNext() {
+                                    let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                    handleClick(index)
+                                }
+
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
@@ -2232,11 +2903,11 @@ AbstractSketchpadPage {
 
                                 Repeater {
                                     id: _startEndRepeater
-                                    model: root.selectedChannel.samples
+                                    model: Zynthbox.Plugin.sketchpadSlotCount * 2
                                     delegate: AbstractCellLayout {
                                         id: _startEndDelegate
 
-                                        readonly property QtObject controlObj: modelData
+                                        readonly property QtObject controlObj: _SMPStack.sampleCache[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
 
@@ -2316,12 +2987,17 @@ AbstractSketchpadPage {
                                                     }
                                                 }
 
-                                                TapHandler {    
-                                                    enabled: !_startEndDelegate.highlighted  
-                                                    gesturePolicy: TapHandler.ReleaseWithinBounds
-                                                    grabPermissions: PointerHandler.ApprovesTakeOverByAnything                                     
-                                                    onTapped: _startEndDelegate.clicked()
-                                                    onDoubleTapped: _startEndDelegate.doubleClicked()
+                                                MouseArea {    
+                                                    // enabled: !_startEndDelegate.highlighted  
+                                                    // gesturePolicy: TapHandler.ReleaseWithinBounds
+                                                    // grabPermissions: PointerHandler.ApprovesTakeOverByAnything                                     
+                                                    // onTapped: _startEndDelegate.clicked()
+                                                    // onDoubleTapped: _startEndDelegate.doubleClicked()
+                                                    anchors.fill: parent
+                                                    onPressed: {
+                                                        _startEndDelegate.clicked()
+                                                        mouse.accepted = false
+                                                    }
                                                 }                  
                                             } 
                                         }
@@ -2334,6 +3010,16 @@ AbstractSketchpadPage {
                                 spacing: ZUI.Theme.cellSpacing
                                 property int globalLoopPosition : 0
 
+                                function focusNext() {
+                                    let index = Math.min(_SMPStack.currentSlotIndex+1,  root.selectedChannel.trackType === "sample-trig"? 9 : 4)
+                                    handleClick(index)
+                                }
+
+                                function focusPrevious() {
+                                    let index = Math.max(_SMPStack.currentSlotIndex-1, 0)
+                                    handleClick(index)
+                                }
+
                                 function handleClick(slot) { 
                                     root.switchToSlot("sample", slot, false);
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
@@ -2342,11 +3028,11 @@ AbstractSketchpadPage {
 
                                 Repeater {
                                     id: _loopRepeater
-                                    model: root.selectedChannel.samples
+                                    model: Zynthbox.Plugin.sketchpadSlotCount * 2
                                     delegate: AbstractCellLayout {
                                         id: _loopDelegate
 
-                                        readonly property QtObject controlObj: modelData
+                                        readonly property QtObject controlObj: _SMPStack.sampleCache[index]
                                         readonly property QtObject clipObj: controlObj ? Zynthbox.PlayGridManager.getClipById(controlObj.cppObjId) : null 
                                         readonly property QtObject sliceObj: clipObj ? clipObj.selectedSliceObject : null
 
@@ -2361,6 +3047,13 @@ AbstractSketchpadPage {
                                         title: "S"+ (index+1)
                                         text: controlObj ? controlObj.path.split("/").pop() : ""
                                         text2: volumeControl.slider.value.toFixed(2)+("%")
+                                        onClicked: _SMPLoopRow.handleClick(index)
+                                        onDoubleClicked: {
+                                            if(!sliceObj)
+                                                return
+
+                                            _loopDelegate.setValue(50) 
+                                        }
 
                                         function setValue(value){
                                             if(!sliceObj)
@@ -2384,14 +3077,10 @@ AbstractSketchpadPage {
                                                 }else {
                                                     _loopDelegate.setValue(slider.value)
                                                 }
-                                            }
-                                            onDoubleClicked: {
-                                                if(!sliceObj)
-                                                    return
-
-                                                _loopDelegate.setValue(50) 
-                                            }
-                                            onClicked: _SMPLoopRow.handleClick(index)
+                                            }                                            
+                                            
+                                            onDoubleClicked: _loopDelegate.doubleClicked()
+                                            onClicked: _loopDelegate.clicked()
 
                                             slider {
                                                 from: 0

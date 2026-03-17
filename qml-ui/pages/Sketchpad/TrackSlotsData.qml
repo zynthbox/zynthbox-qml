@@ -191,19 +191,19 @@ GridLayout {
                 if (control.slotTypeLabel == "") {
                     switch (control.slotType) {
                         case "synth":
-                            return qsTr("Synths :")
+                            return qsTr("Synth 1-5:")
                         case "sample-trig":
-                            return control.channel && control.channel.trackType == "sample-trig" ? qsTr("Samples 1:") : qsTr("Samples :")
+                            return qsTr("Smp 1-5:")
                         case "sample-trig2":
-                            return qsTr("Samples 2:")
+                            return qsTr("Smp 6-10:")
                         case "sample-loop":
-                            return qsTr("Sketches :")
+                            return qsTr("Loop 1-5:")
                         case "external":
-                            return qsTr("Settings :")
+                            return qsTr("Settings:")
                         case "fx":
-                            return qsTr("FX :")
+                            return qsTr("FX:")
                         case "sketch-fx":
-                            return qsTr("FX :")
+                            return qsTr("FX:")
                         case "text":
                             return qsTr("")
                     }
@@ -257,7 +257,7 @@ GridLayout {
                     anchors.fill: parent
                     // For external mode the first three slots are visible
                     // For other modes all slots are visible
-                    enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || realIndex === 2))
+                    enabled: (control.slotType !== "external") || (control.slotType === "external" && (realIndex === 0 || realIndex === 1 || (realIndex === 2 && zynqtgui.ui_settings.showExperimentalFeatures)))
                     visible: enabled
                     isEmpty: text.trim().length == 0
                     muted: !slotMakesSound

@@ -37,7 +37,11 @@ import io.zynthbox.components 1.0 as Zynthbox
 ZUI.ScreenPage {
     id: root
     title: zynqtgui.control.selector_path_element
-
+background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
     screenId: "control"
     property bool isVisible:zynqtgui.current_screen_id === "control"
     property var cuiaCallback: function(cuia) {

@@ -80,6 +80,7 @@ QQC2.ApplicationWindow {
         anchors.top: parent.bottom
         anchors.topMargin: -80
         horizontalAlignment: Qt.AlignHCenter
+        verticalAlignment: Qt.AlignVCenter
         font.pointSize: 14
         color: "white"
         text: bootLogInterface.bootLog

@@ -302,7 +302,7 @@ ColumnLayout {
             text: qsTr("General")
             checked: component.currentParameterPageIndex === 0
             onClicked: {
-                component.currentParameterPageIndex = 0;
+                applicationWindow().globalSequencer.setParameterPage(0);
             }
         }
         ZUI.PlayGridButton {
@@ -311,7 +311,7 @@ ColumnLayout {
             text: qsTr("Probability")
             checked: component.currentParameterPageIndex === 1
             onClicked: {
-                component.currentParameterPageIndex = 1;
+                applicationWindow().globalSequencer.setParameterPage(1);
             }
         }
         ZUI.PlayGridButton {
@@ -320,7 +320,7 @@ ColumnLayout {
             text: qsTr("Ratchet")
             checked: component.currentParameterPageIndex === 2
             onClicked: {
-                component.currentParameterPageIndex = 2;
+                applicationWindow().globalSequencer.setParameterPage(2);
             }
         }
     }

@@ -39,6 +39,17 @@ ZUI.ScreenPage {
     id: component
     screenId: "channel_wave_editor"
     title: qsTr("Track Wave Editor")
+    padding: ZUI.Theme.sectionPadding
+    topPadding: padding
+    rightPadding: padding
+    bottomPadding: padding
+    leftPadding: padding
+
+    background: Rectangle 
+    {
+        color: Kirigami.Theme.backgroundColor
+        opacity: 0.4
+    }
 
     property bool isVisible:zynqtgui.current_screen_id === "channel_wave_editor"
     property QtObject selectedChannel: applicationWindow().selectedChannel
@@ -186,8 +197,10 @@ ZUI.ScreenPage {
         function goLeft(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -203,8 +216,10 @@ ZUI.ScreenPage {
         function goRight(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -220,8 +235,10 @@ ZUI.ScreenPage {
         function goUp(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -249,8 +266,10 @@ ZUI.ScreenPage {
         function goDown(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -278,8 +297,10 @@ ZUI.ScreenPage {
         function knob0Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -293,8 +314,10 @@ ZUI.ScreenPage {
         function knob0Up(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -310,8 +333,10 @@ ZUI.ScreenPage {
         function knob0Down(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -327,8 +352,10 @@ ZUI.ScreenPage {
         function knob1Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -342,8 +369,10 @@ ZUI.ScreenPage {
         function knob1Up(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -359,8 +388,10 @@ ZUI.ScreenPage {
         function knob1Down(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -376,8 +407,10 @@ ZUI.ScreenPage {
         function knob2Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -391,8 +424,10 @@ ZUI.ScreenPage {
         function knob2Up(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -406,8 +441,10 @@ ZUI.ScreenPage {
         function knob2Down(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -421,8 +458,10 @@ ZUI.ScreenPage {
         function knob3Touched(cuia) {
             let returnValue = true;
             if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = clipSettingsBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                     returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
@@ -535,96 +574,97 @@ ZUI.ScreenPage {
         }
     ]
 
-    RowLayout {
-        anchors.fill: parent
+    contentItem: ZUI.ThreeColumnView {
         spacing: Kirigami.Units.largeSpacing
+        altTabs: false
 
-        ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            spacing: 0
-            GridLayout {
+        leftTab: ColumnLayout {
+            spacing: ZUI.Theme.sectionSpacing
+            ZUI.SectionGroup {
+                visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
-                visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
-                columns: 2
-                rowSpacing: 0
-                columnSpacing: 0
-                QQC2.Button {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                    text: "+1"
-                    visible: testNotePad.displayCompoundNote === false
-                    onClicked: {
-                        testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 1);
+                GridLayout {
+                    anchors.fill: parent
+                    columns: 2
+                    rowSpacing: 0
+                    columnSpacing: 0
+                    ZUI.SectionButton {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "+1"
+                        visible: testNotePad.displayCompoundNote === false
+                        onClicked: {
+                            testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 1);
+                        }
                     }
-                }
-                QQC2.Button {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                    text: "+12"
-                    visible: testNotePad.displayCompoundNote === false
-                    onClicked: {
-                        testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 12);
+                    ZUI.SectionButton  {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "+12"
+                        visible: testNotePad.displayCompoundNote === false
+                        onClicked: {
+                            testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 12);
+                        }
                     }
-                }
-                ZUI.NotePad {
-                    id: testNotePad
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit
-                    Layout.columnSpan: 2
-                    positionalVelocity: true
-                    highlightOctaveStart: false
-                    property int midiNote: 60
-                    property QtObject midiNoteObject: component.selectedChannel ? Zynthbox.PlayGridManager.getNote(testNotePad.midiNote, component.selectedChannel.id) : null
-                    property bool displayCompoundNote: !(component.heardNotes.length === 0 || (component.heardNotes.length === 1 && component.heardNotes[0].midiNote === testNotePad.midiNote))
-                    note: component.selectedChannel
-                        ? testNotePad.displayCompoundNote
-                            ? Zynthbox.PlayGridManager.getCompoundNote(component.heardNotes)
-                            : midiNoteObject
-                        : null
-                }
-                QQC2.Button {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                    text: "-1"
-                    visible: testNotePad.displayCompoundNote === false
-                    onClicked: {
-                        testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 1);
+                    ZUI.NotePad {
+                        id: testNotePad
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        Layout.columnSpan: 2
+                        positionalVelocity: true
+                        highlightOctaveStart: false
+                        property int midiNote: 60
+                        property QtObject midiNoteObject: component.selectedChannel ? Zynthbox.PlayGridManager.getNote(testNotePad.midiNote, component.selectedChannel.id) : null
+                        property bool displayCompoundNote: !(component.heardNotes.length === 0 || (component.heardNotes.length === 1 && component.heardNotes[0].midiNote === testNotePad.midiNote))
+                        note: component.selectedChannel
+                            ? testNotePad.displayCompoundNote
+                                ? Zynthbox.PlayGridManager.getCompoundNote(component.heardNotes)
+                                : midiNoteObject
+                            : null
                     }
-                }
-                QQC2.Button {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                    text: "-12"
-                    visible: testNotePad.displayCompoundNote === false
-                    onClicked: {
-                        testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 12);
+                    ZUI.SectionButton  {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "-1"
+                        visible: testNotePad.displayCompoundNote === false
+                        onClicked: {
+                            testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 1);
+                        }
                     }
-                }
-                QQC2.Button {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.25
-                    Layout.columnSpan: 2
-                    icon.name: "edit-clear-locationbar"
-                    visible: testNotePad.displayCompoundNote === true
-                    onClicked: {
-                        component.heardNotes = [];
+                    ZUI.SectionButton  {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "-12"
+                        visible: testNotePad.displayCompoundNote === false
+                        onClicked: {
+                            testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 12);
+                        }
+                    }
+                    ZUI.SectionButton  {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.25
+                        Layout.columnSpan: 2
+                        icon.name: "edit-clear-locationbar"
+                        visible: testNotePad.displayCompoundNote === true
+                        onClicked: {
+                            component.heardNotes = [];
+                        }
                     }
                 }
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                Layout.preferredHeight: visible ? Kirigami.Units.gridUnit * 1.8 : 0
                 visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
                 icon.name: component.cppClipObject && component.cppClipObject.isPlaying ? "media-playback-stop" : "media-playback-start"
                 onClicked: {
@@ -635,105 +675,101 @@ ZUI.ScreenPage {
                     }
                 }
             }
-            Item {
-                Layout.fillWidth: true
-                Layout.minimumHeight: Kirigami.Units.largeSpacing
-                Layout.maximumHeight: Kirigami.Units.largeSpacing
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
+            ZUI.SectionGroup {
                 Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit
-                text: qsTr("General")
-                enabled: component.selectedClipHasWav
-                checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsBar"
-                MouseArea {
-                    anchors.fill: parent;
-                    enabled: component.selectedClipHasWav
-                    onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsBar }
+                Layout.fillWidth: true
+
+                QQC2.ButtonGroup {
+                    buttons: _buttonsLayout.children
                 }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit
-                text: qsTr("Slices")
-                enabled: component.selectedClipHasWav
-                checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices"
-                MouseArea {
-                    anchors.fill: parent;
-                    enabled: component.selectedClipHasWav
-                    onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsSlices }
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit
-                text: qsTr("Voices/EQ")
-                enabled: component.selectedClipHasWav
-                checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices"
-                MouseArea {
-                    anchors.fill: parent;
-                    enabled: component.selectedClipHasWav
-                    onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsVoices }
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit
-                text: qsTr("Envelope")
-                enabled: component.selectedClipHasWav
-                checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
-                MouseArea {
-                    anchors.fill: parent;
-                    enabled: component.selectedClipHasWav
-                    onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsADSR }
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit
-                text: qsTr("Granular")
-                visible: clipSettingsGrainerator.sliceObject && (clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle)
-                enabled: component.selectedClipHasWav
-                checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
-                MouseArea {
-                    anchors.fill: parent;
-                    enabled: component.selectedClipHasWav
-                    onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsGrainerator }
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit
-                text: qsTr("Clip Info")
-                enabled: component.selectedClipHasWav
-                checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
-                MouseArea {
-                    anchors.fill: parent;
-                    enabled: component.selectedClipHasWav
-                    onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsInfoView }
+                ColumnLayout {
+                    id: _buttonsLayout
+                    anchors.fill: parent
+                    spacing: ZUI.Theme.spacing
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        text: qsTr("Clip Info")
+                        enabled: component.selectedClipHasWav
+                        checked: highlighted
+                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsInfoView }
+                    }
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        text: qsTr("General")
+                        enabled: component.selectedClipHasWav
+                        checked: highlighted
+                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsBar"
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsBar }
+                    }
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        text: qsTr("Slices")
+                        enabled: component.selectedClipHasWav
+                        checked: highlighted
+                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices"
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsSlices }
+                    }
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        text: qsTr("Voices/EQ")
+                        enabled: component.selectedClipHasWav
+                        checked: highlighted
+                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices"
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsVoices }
+                    }
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        text: qsTr("Envelope")
+                        enabled: component.selectedClipHasWav
+                        checked: highlighted
+                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsADSR }
+                    }
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        text: qsTr("Granular")
+                        visible: clipSettingsGrainerator.sliceObject && (clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle)
+                        enabled: component.selectedClipHasWav
+                        checked: highlighted
+                        highlighted: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsGrainerator }
+                    }
                 }
             }
         }
 
-        ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-            Rectangle {
+        middleTab: ColumnLayout {
+            spacing: ZUI.Theme.sectionSpacing
+
+            ZUI.SectionGroup {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 9
-                color: "#222222"
-                border.width: 1
-                border.color: "#ff999999"
+                
                 enabled: component.selectedClipHasWav
                 opacity: enabled ? 1 : 0.5
+
+                mask: true
+                fallbackPadding: ZUI.Theme.padding
+                fallbackBackground:  Rectangle {                                             
+                    border.width: 1
+                    border.color: "#ff999999"
+                    radius: ZUI.Theme.radius
+                    color: "#222222"
+                }
 
                 Sketchpad.WaveEditorBar {
                     id: waveBar
@@ -752,27 +788,60 @@ ZUI.ScreenPage {
                     visible: component.selectedClipHasWav
                 }
             }
-            Rectangle {
+
+            ZUI.SectionGroup  {
                 id: clipSettingsSectionView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 11
-                color: "#222222"
-                border.width: 1
-                border.color: "#ff999999"
-                radius: 4
+                
                 enabled: component.selectedClipHasWav
                 opacity: enabled ? 1 : 0.5
-                property Item currentItem: clipSettingsBar
+                mask: true
+                fallbackPadding: ZUI.Theme.padding
+                fallbackBackground:  Rectangle {                                             
+                    border.width: 1
+                    border.color: "#ff999999"
+                    radius: ZUI.Theme.radius
+                    color: "#222222"
+                }
+
+                property Item currentItem: clipSettingsInfoView
+                function startThrottles() {
+                    clipSettingsInfoViewClipThrottle.restart();
+                    clipSettingsBarControlObjThrottle.restart();
+                    clipSettingsSlicesClipThrottle.restart();
+                    clipSettingsVoicesClipThrottle.restart();
+                    clipSettingsADSRClipThrottle.restart();
+                    clipSettingsGraineratorClipThrottle.restart();
+                }
                 Connections {
                     target: component
-                    onSelectedClipChanged: {
-                        clipSettingsBarControlObjThrottle.restart();
-                        clipSettingsSlicesClipThrottle.restart();
-                        clipSettingsVoicesClipThrottle.restart();
-                        clipSettingsADSRClipThrottle.restart();
-                        clipSettingsGraineratorClipThrottle.restart();
-                        clipSettingsInfoViewClipThrottle.restart();
+                    onCppClipObjectChanged: clipSettingsSectionView.startThrottles()
+                    onSelectedClipChanged: clipSettingsSectionView.startThrottles()
+                    onIsVisibleChanged: {
+                        if (component.isVisible) {
+                            clipSettingsSectionView.startThrottles();
+                        }
+                    }
+                }
+                Connections {
+                    target: zynqtgui.sketchpad.song
+                    onIsLoadingChanged: clipSettingsSectionView.startThrottles()
+                }
+                IMP.ClipInfoView {
+                    id: clipSettingsInfoView
+                    objectName: "clipSettingsInfoView"
+                    visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                    anchors.fill: parent
+                    clip: null
+                    Timer {
+                        id: clipSettingsInfoViewClipThrottle
+                        interval: 1; running: false; repeat: false;
+                        onTriggered: {
+                            clipSettingsInfoView.sketchpadClip = component.selectedClip;
+                            clipSettingsInfoView.clip = component.cppClipObject;
+                        }
                     }
                 }
                 Sketchpad.ClipSettingsBar {
@@ -858,31 +927,13 @@ ZUI.ScreenPage {
                         }
                     }
                 }
-                IMP.ClipInfoView {
-                    id: clipSettingsInfoView
-                    objectName: "clipSettingsInfoView"
-                    visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                    anchors.fill: parent
-                    clip: null
-                    Timer {
-                        id: clipSettingsInfoViewClipThrottle
-                        interval: 1; running: false; repeat: false;
-                        onTriggered: {
-                            clipSettingsInfoView.clip = component.cppClipObject;
-                        }
-                    }
-                }
             }
         }
 
-        ColumnLayout {
+        rightTab: ColumnLayout {
             id: clipBar
 
             spacing: 1
-            Layout.fillWidth: false
-            Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-
             Repeater {
                 model: Zynthbox.Plugin.sketchpadSlotCount * 2
                 delegate: Rectangle {

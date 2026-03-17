@@ -61,10 +61,12 @@ AbstractSketchpadPage {
 
         case "SWITCH_ARROW_LEFT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            // root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
             return true;
 
         case "SWITCH_ARROW_RIGHT_RELEASED":
             zynqtgui.sketchpad.selectedTrackId = ZUI.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+            // root.sketchpadView.focusChannel(zynqtgui.sketchpad.selectedTrackId)
             return true;
 
         case "SWITCH_ARROW_UP_RELEASED":
@@ -256,16 +258,16 @@ AbstractSketchpadPage {
             }
         } else if (type === "external") {
             console.log("handleItemClick : External")
-            switch (root.selectedChannel.selectedSlotRow) {
+            switch (root.selectedChannel.selectedSlot.value) {
             case 0:
             default:
-                externalAudioSourcePicker.pickChannel(root.selectedChannel);
+                externalMidiOutPicker.pickOutput(root.selectedChannel);
                 break;
             case 1:
                 externalMidiChannelPicker.pickChannel(root.selectedChannel);
                 break;
             case 2:
-                externalMidiOutPicker.pickOutput(root.selectedChannel);
+                externalAudioSourcePicker.pickChannel(root.selectedChannel);
                 break;
             }
         }

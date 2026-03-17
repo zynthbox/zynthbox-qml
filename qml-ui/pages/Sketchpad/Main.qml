@@ -48,6 +48,19 @@ ZUI.ScreenPage {
     property bool showOccupiedSlotsHeader: false
     property QtObject selectedChannel: null
 
+    //Navigation and focus chain functions
+    function focusChannel(index) {
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel")
+        {
+            channelsHeaderRepeater.itemAt(index).switchToThisChannel(false)
+        }
+        
+        if(zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clipoverview")
+        {
+            clipsRepeater.itemAt(index).switchToThisClip(true)
+        }
+    } 
+
     function updateSelectedSamplePitch(sign, slot = -1) {
         if (slot === -1)
             slot = root.selectedChannel.selectedSlotRow;
@@ -336,11 +349,80 @@ ZUI.ScreenPage {
         valueSetter(theTrack.pan + sign * 0.05);
     }
 
+    function updateAllChannelSlotLayerAmpAttack(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerAmpAttack(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerAmpAttack(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.ampAttackControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerFilterAttack(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerFilterAttack(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerFilterAttack(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.filterAttackControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerAmpRelease(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerAmpRelease(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerAmpRelease(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.ampReleaseControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerFilterRelease(sign){
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerFilterRelease(sign, i, false)
+        }   
+    }
+
+    function updateSelectedChannelSlotLayerFilterRelease(sign, slot=-1) {
+        if (slot === -1)
+            slot = root.selectedChannel.selectedSlot.value;
+        var controller = root.selectedChannel.filterReleaseControllers[slot];        
+
+        if (controller != null && controller.controlsCount > 0) {
+           controller.value = controller.value + sign * controller.step_size
+        }
+    }
+
+    function updateAllChannelSlotLayerCutoff(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerCutoff(sign, i, false)
+        }    
+    }
     /**
      * Update layer filter cutoff for selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelSlotLayerCutoff(sign, slot = -1) {
+    function updateSelectedChannelSlotLayerCutoff(sign, slot = -1, show = true) {
         function valueSetter(value) {            
             if (controller != null && controller.controlsCount > 0) {
 
@@ -351,22 +433,24 @@ ZUI.ScreenPage {
                 zynqtgui.osd.setKnobPositionIndex(1)
 
                 controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max);
-                applicationWindow().showOsd({
-                    "parameterName": "layer_filter_cutoff",
-                    "description": qsTr("%1 Filter Cutoff").arg(synthName),
-                    "start": controller.value_min,
-                    "stop": controller.value_max,
-                    "step": controller.step_size,
-                    "defaultValue": null,
-                    "currentValue": controller.value,
-                    "startLabel": qsTr("%1").arg(controller.value_min),
-                    "stopLabel": qsTr("%1").arg(controller.value_max),
-                    "valueLabel": qsTr("%1").arg(controller.value),
-                    "setValueFunction": valueSetter,
-                    "showValueLabel": true,
-                    "showResetToDefault": false,
-                    "showVisualZero": false
-                });
+                if(show){
+                    applicationWindow().showOsd({
+                        "parameterName": "layer_filter_cutoff",
+                        "description": qsTr("%1 Filter Cutoff").arg(synthName),
+                        "start": controller.value_min,
+                        "stop": controller.value_max,
+                        "step": controller.step_size,
+                        "defaultValue": null,
+                        "currentValue": controller.value,
+                        "startLabel": qsTr("%1").arg(controller.value_min),
+                        "stopLabel": qsTr("%1").arg(controller.value_max),
+                        "valueLabel": qsTr("%1").arg(controller.value),
+                        "setValueFunction": valueSetter,
+                        "showValueLabel": true,
+                        "showResetToDefault": false,
+                        "showVisualZero": false
+                    });
+                }
             } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
                 applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Cutoff controller").arg(synthName), 2000);
             }
@@ -385,11 +469,16 @@ ZUI.ScreenPage {
         valueSetter(controller.value + sign * controller.step_size);
     }
 
+    function updateAllChannelSlotLayerResonance(sign) {
+        for (let i = 0; i < Zynthbox.Plugin.sketchpadSlotCount; i++) {
+            updateSelectedChannelSlotLayerResonance(sign, i, false)
+        }    
+    }
     /**
      * Update layer filter resonance for selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelSlotLayerResonance(sign, slot = -1) {
+    function updateSelectedChannelSlotLayerResonance(sign, slot = -1, show = true) {
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
 
@@ -400,22 +489,23 @@ ZUI.ScreenPage {
                 zynqtgui.osd.setKnobPositionIndex(2)
 
                 controller.value = ZUI.CommonUtils.clamp(value, controller.value_min, controller.value_max);
-                applicationWindow().showOsd({
-                    "parameterName": "layer_filter_resonance",
-                    "description": qsTr("%1 Filter Resonance").arg(synthName),
-                    "start": controller.value_min,
-                    "stop": controller.value_max,
-                    "step": controller.step_size,
-                    "defaultValue": null,
-                    "currentValue": controller.value,
-                    "startLabel": qsTr("%1").arg(controller.value_min),
-                    "stopLabel": qsTr("%1").arg(controller.value_max),
-                    "valueLabel": qsTr("%1").arg(controller.value),
-                    "setValueFunction": valueSetter,
-                    "showValueLabel": true,
-                    "showResetToDefault": false,
-                    "showVisualZero": false
-                });
+                if(show)
+                    applicationWindow().showOsd({
+                        "parameterName": "layer_filter_resonance",
+                        "description": qsTr("%1 Filter Resonance").arg(synthName),
+                        "start": controller.value_min,
+                        "stop": controller.value_max,
+                        "step": controller.step_size,
+                        "defaultValue": null,
+                        "currentValue": controller.value,
+                        "startLabel": qsTr("%1").arg(controller.value_min),
+                        "stopLabel": qsTr("%1").arg(controller.value_max),
+                        "valueLabel": qsTr("%1").arg(controller.value),
+                        "setValueFunction": valueSetter,
+                        "showValueLabel": true,
+                        "showResetToDefault": false,
+                        "showVisualZero": false
+                    });
             } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
                 applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Resonance controller").arg(synthName), 2000);
             }
@@ -751,7 +841,7 @@ ZUI.ScreenPage {
             returnValue = sketchpadPickerDialog.cuiaCallback(cuia);
         } else {
             // Forward CUIA actions to bottomBar only when bottomBar is open
-            if (bottomStack.currentIndex === 0) {
+            if (bottomStack.currentView === Main.BarView.BottomBar) {
                 if (bottomBar.tabbedView.activeItem.cuiaCallback != null)
                     returnValue = bottomBar.tabbedView.activeItem.cuiaCallback(cuia);
 
@@ -979,30 +1069,91 @@ ZUI.ScreenPage {
 
         },
         Kirigami.Action {
-            text: qsTr("Load Sketch")
-            onTriggered: {
-                zynqtgui.show_screen("sound_categories")
+            text: qsTr("Sketch")
+            Kirigami.Action {
+                text: "Load Sketch"
+                onTriggered: zynqtgui.show_screen("sound_categories")
+            }
+            Kirigami.Action {
+                text: "Save Sketch"
+                visible: root.selectedChannel && ["synth", "sample-trig"].includes(root.selectedChannel.trackType)
+                onTriggered: {
+                    zynqtgui.show_screen("sound_categories")
+                    applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
+                }
             }
         },
+
         Kirigami.Action {
-            text: "Save Sketch"
-            onTriggered: {
-                zynqtgui.show_screen("sound_categories")
-                applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
+            text: qsTr("Quick Edit")
+
+            Kirigami.Action {
+                text: "Track-Slots"
+                checkable: true
+                onTriggered: tracksBar.setView(TracksBar.View.Main)
+                checked: tracksBar.currentView === TracksBar.View.Main && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "SYN"
+                checkable: true
+                onTriggered: tracksBar.setView(TracksBar.View.SYN)
+                checked: tracksBar.currentView === TracksBar.View.SYN && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "SMP"
+                checkable: true
+                onTriggered: tracksBar.setView(TracksBar.View.SMP)
+                checked: tracksBar.currentView === TracksBar.View.SMP && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "FX-Chain"
+                checkable: true
+                onTriggered: tracksBar.setView(TracksBar.View.FX)
+                checked: tracksBar.currentView === TracksBar.View.FX && bottomStack.currentBarView  === Main.BarView.TracksBar 
+            }
+            Kirigami.Action {
+                text: "Layers"
+                checkable: true
+                onTriggered: tracksBar.setView(TracksBar.View.Layers)
+                checked: tracksBar.currentView === TracksBar.View.Layers && bottomStack.currentBarView  === Main.BarView.TracksBar 
             }
         },
-        // Kirigami.Action {
-        //     text: "" //qsTr("Sounds")
-        //     onTriggered: zynqtgui.show_modal("sound_categories")
-        //     enabled: false
-        // },
-        // Kirigami.Action {
-        //     enabled: false
-        // },
+
         Kirigami.Action {
             text: qsTr("Mixer")
             checked: bottomStack.currentBarView === Main.BarView.MixerBar
-            onTriggered: zynqtgui.toggleSketchpadMixer()
+            // onTriggered: bottomStack.setView(Main.BarView.MixerBar)
+
+            Kirigami.Action {
+                text: "Volume"
+                checkable: true
+                onTriggered: mixerBar.setView(MixerBar.View.Main)
+                checked: mixerBar.currentView === MixerBar.View.Main && bottomStack.currentBarView  === Main.BarView.MixerBar 
+            }
+            Kirigami.Action {
+                text: "Reverb"
+                checkable: true
+                onTriggered: mixerBar.setView(MixerBar.View.Reverb)
+                checked: mixerBar.currentView === MixerBar.View.Reverb && bottomStack.currentBarView  === Main.BarView.MixerBar 
+            }
+            Kirigami.Action {
+                text: "Delay"
+                checkable: true
+                onTriggered: mixerBar.setView(MixerBar.View.Delay)
+                checked: mixerBar.currentView === MixerBar.View.Delay && bottomStack.currentBarView  === Main.BarView.MixerBar 
+            }
+            Kirigami.Action {
+                text: "EQ"
+                checkable: true
+                onTriggered: mixerBar.setView(MixerBar.View.EQ)
+                checked: mixerBar.currentView === MixerBar.View.EQ && bottomStack.currentBarView  === Main.BarView.MixerBar 
+            }
+            Kirigami.Action {
+                text: "Comp"
+                checkable: true
+                onTriggered: mixerBar.setView(MixerBar.View.Comp)
+                checked: mixerBar.currentView === MixerBar.View.Comp && bottomStack.currentBarView  === Main.BarView.MixerBar 
+            }
         }
     ]
 
@@ -1258,7 +1409,6 @@ ZUI.ScreenPage {
         folderModel {
             nameFilters: ["*.sketchpad.json"]
         }
-
     }
 
     contentItem: Item {
@@ -1541,14 +1691,15 @@ ZUI.ScreenPage {
                                         property QtObject channel: root.song.channelsModel.getChannel(index)
                                         property bool showVolume: state == "ChannelMode"
 
-                                        function switchToThisChannel() {
+                                        function switchToThisChannel(allowToggle=true) {
                                             // If song mode is not active, clicking on cells should activate that channel
                                             zynqtgui.sketchpad.lastSelectedObj.setTo(channelHeaderDelegate.channel.className, channelHeaderDelegate.channel, channelHeaderDelegate, channelHeaderDelegate.channel);
                                             zynqtgui.sketchpad.selectedTrackId = index;
                                             Qt.callLater(function() {
                                                 // Open TracksBar and switch to channel
                                                 // bottomStack.setView(Main.BarView.TracksBar);
-                                                root.resetBottomBar(false);
+                                                if(allowToggle)
+                                                    root.resetBottomBar(false);
                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                                 zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
                                             });

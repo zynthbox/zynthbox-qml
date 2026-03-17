@@ -52,21 +52,24 @@ function screensaver_off() {
 # Main Program
 #------------------------------------------------------------------------------
 
+cd $ZYNTHIAN_UI_DIR
+
 # Start rainbow-leds service if not already started
 systemctl start rainbow-leds.service
 xsetroot -cursor blank_cursor.xbm blank_cursor.xbm
-
-cd $ZYNTHIAN_UI_DIR
-
-# DSI display on trixie does not turn on after bootloader
-# Try to turn on display before starting application
-# FIXME : DISPLAY should automatically turn on during boot and should turn off after powering off
-xrandr --output DSI-1-2 --mode 1280x800 || true
 
 screensaver_off
 
 #Load Config Environment
 load_config_env
+
+# If display width and height is set, try to turn on display with xrandr
+if [ -n "$DISPLAY_WIDTH" -a -n "$DISPLAY_HEIGHT" ]; then
+    # X11 is using wrong /dev/dri/cardX as the default card and hence display turns off when startx runs after splash
+    # Try to turn on display before starting application for the connected display or return true
+    # FIXME : startx should use correct card and display should turn on when startx runs
+    xrandr --output $(xrandr | grep -oP "(.*)(?= connected)") --mode ${DISPLAY_WIDTH}x${DISPLAY_HEIGHT} || true
+fi
 
 if [ -z ${XRANDR_ROTATE} ]; then
     echo "not rotating"

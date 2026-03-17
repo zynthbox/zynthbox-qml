@@ -36,6 +36,19 @@ Item {
     id: component
     property QtObject patternModel
     property QtObject sequencerPrivate
+    property QtObject playGrid
+    Connections {
+        target: sequencerPrivate
+        onEnableSelected: {
+            applicationWindow().globalSequencer.enableHeardForStep(_private.selectedStepGlobal);
+        }
+        onDisableSelected: {
+            applicationWindow().globalSequencer.disableHeardForStep(_private.selectedStepGlobal);
+        }
+        onToggleSelected: {
+            applicationWindow().globalSequencer.toggleStep(_private.selectedStepGlobal);
+        }
+    }
     QtObject {
         id: _private
         readonly property int selectedStepGlobal: (sequencerPrivate.workingPatternModel.width * (sequencerPrivate.workingPatternModel.activeBar + sequencerPrivate.workingPatternModel.bankOffset)) + sequencerPrivate.selectedStep
@@ -43,36 +56,10 @@ Item {
         readonly property var noteColors: zynqtgui.theme_chooser.noteColors
         readonly property string trackType: applicationWindow().selectedChannel ? applicationWindow().selectedChannel.trackType : ""
         function enableNoteForStep(midiNote, step) {
-            let column = step % component.patternModel.width;
-            let row = Math.floor(step / component.patternModel.width);
-            let existingSubnoteIndex = component.patternModel.subnoteIndex(row, column, midiNote);
-            if (existingSubnoteIndex == -1) {
-                // The note doesn't exist, add it with the current velocity (or accents as per held down up/down arrows)
-                let applyAccent = false;
-                let applyGhost = false;
-                if (zynqtgui.upButtonPressed) {
-                    zynqtgui.ignoreNextUpButtonPress = true;
-                    applyAccent = true;
-                }
-                if (zynqtgui.downButtonPressed) {
-                    zynqtgui.ignoreNextDownButtonPress = true;
-                    applyGhost = true;
-                }
-                let velocityAdjustment = applyAccent
-                    ? applyGhost
-                        ? 1 // Apply both, so we land back at 1.0 times velocity
-                        : 1.5 // Apply only accent, making it 1.5 times velocity
-                    : applyGhost
-                        ? 0.5 // Apply only ghost, making it 0.5 times velocity
-                        : 1 // Apply neither, leaving us at 1.0 times velocity
-                let newSubnoteIndex = component.patternModel.insertSubnoteSorted(row, column, Zynthbox.PlayGridManager.getNote(midiNote, component.patternModel.sketchpadTrack));
-                component.patternModel.setSubnoteMetadata(row, column, newSubnoteIndex, "velocity", ZUI.CommonUtils.clamp(Math.round(component.patternModel.defaultVelocity * velocityAdjustment), 1, 127));
-                applicationWindow().globalSequencer.setHeardData(midiNote, component.patternModel.defaultVelocity);
-            }
+            applicationWindow().globalSequencer.enableNoteForStep(midiNote, component.patternModel.defaultVelocity, step);
         }
         function disableNoteForStep(midiNote, step) {
-            component.patternModel.removeSubnoteByNoteValue(midiNote, step, step);
-            applicationWindow().globalSequencer.setHeardData(midiNote, component.patternModel.defaultVelocity);
+            applicationWindow().globalSequencer.disableNoteForStep(midiNote, component.patternModel.defaultVelocity, step);
         }
         function updateBarNotes() {
             barNotesUpdater.restart();
@@ -98,11 +85,12 @@ Item {
             model: Zynthbox.Plugin.sketchpadSlotCount * 2
             RowLayout {
                 id: noteRow
+                Layout.preferredHeight: Kirigami.Units.gridUnit
+                spacing: 0
                 property int midiNote: component.patternModel ? component.patternModel.gridModelStartNote + index : 60
                 readonly property QtObject note: component.patternModel ? Zynthbox.PlayGridManager.getNote(midiNote, component.patternModel.sketchpadTrack) : null
                 readonly property bool noteIsHeard: applicationWindow().globalSequencer.heardNotes.includes(noteRow.note)
                 readonly property color noteColor: _private.noteColors[midiNote]
-                spacing: 0
                 readonly property bool hasClips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["hasClips"]) : false
                 readonly property var clips: component.patternModel ? component.patternModel.clipNotesModel.data(component.patternModel.clipNotesModel.index(midiNote), component.patternModel.clipNotesModel.roles["clips"]) : []
                 readonly property QtObject audioSource: clips.length === 1 ? clips[0] : null
@@ -252,7 +240,7 @@ Item {
                                     }
                                     visible: focusRectangle.visible && stepDelegate.stepEnabledForNote
                                     font {
-                                        pointSize: undefined
+                                        pointSize: 0
                                         pixelSize: 7
                                     }
                                     color: "grey"
@@ -279,13 +267,92 @@ Item {
                             anchors.fill: parent
                             // TODO allow tap-drag to toggle a bunch of step in a range
                             onClicked: {
-                                if (stepDelegate.stepEnabledForNote) {
-                                    _private.disableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
-                                } else {
-                                    _private.enableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
+                                if (component.sequencerPrivate.toggleStepOnTouchSelect) {
+                                    if (stepDelegate.stepEnabledForNote) {
+                                        _private.disableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
+                                    } else {
+                                        _private.enableNoteForStep(noteRow.midiNote, stepDelegate.stepIndex);
+                                    }
                                 }
+                                applicationWindow().globalSequencer.setHeardData(noteRow.midiNote, component.patternModel.defaultVelocity);
+                                applicationWindow().globalSequencer.setMostRecentlyInteractedStep(stepDelegate.stepIndex);
                             }
                         }
+                    }
+                }
+            }
+        }
+        RowLayout {
+            spacing: 0
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+            Layout.margins: Kirigami.Units.smallSpacing
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Select Only")
+                checked: component.sequencerPrivate.toggleStepOnTouchSelect === false
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        component.playGrid.setProperty("toggleStepOnTouchSelect", false);
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Select & Toggle")
+                checked: component.sequencerPrivate.toggleStepOnTouchSelect === true
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        component.playGrid.setProperty("toggleStepOnTouchSelect", true);
+                    }
+                }
+            }
+            Item {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("General")
+                checked: applicationWindow().globalSequencer.parameterPage === 0
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        applicationWindow().globalSequencer.setParameterPage(0);
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Probability")
+                checked: applicationWindow().globalSequencer.parameterPage === 1
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        applicationWindow().globalSequencer.setParameterPage(1);
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                text: qsTr("Ratchet")
+                checked: applicationWindow().globalSequencer.parameterPage === 2
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        applicationWindow().globalSequencer.setParameterPage(2);
                     }
                 }
             }

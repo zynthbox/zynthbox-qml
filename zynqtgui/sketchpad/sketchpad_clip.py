@@ -936,8 +936,30 @@ class sketchpad_clip(QObject):
     # on the originalPath metadata field
     @Slot(str)
     def importFromFile(self, path):
-        self.set_path(path, should_copy=True, read_metadata=True)
-        self.__metadata.set_originalPath(path)
+        # when importing, copy the file here if ogg, or convert if wav, and then should_copy becomes false and we simply load outright
+        suffix = path.lower().rpartition(".")[2]
+        if suffix == "wav":
+            new_filename = self.generate_unique_filename(path + ".ogg", self.bank_path)
+            logging.error(f"Converting wav sample ({path}) into ogg, directly into bank folder ({self.bank_path / new_filename})")
+            self.bank_path.mkdir(parents=True, exist_ok=True)
+            newpath = str(self.bank_path / new_filename)
+            successfulConversionStart = Zynthbox.AudioFileConverter.instance().convert(path, newpath)
+            if successfulConversionStart and Zynthbox.AudioFileConverter.instance().state() == Zynthbox.AudioFileConverter.ConversionState.SuccessState:
+                self.set_path(newpath, should_copy=False, read_metadata=True)
+                self.__metadata.set_originalPath(path)
+            else:
+                logging.error(f"Conversion failed in some way, tool state is {Zynthbox.AudioFileConverter.instance().state()}")
+                # signal our failure somehow...
+        elif suffix == "ogg":
+            new_filename = self.generate_unique_filename(path, self.bank_path)
+            logging.error(f"Copying ogg sample ({path}) into bank folder ({self.bank_path / new_filename})")
+            self.bank_path.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(path, self.bank_path / new_filename)
+            self.set_path(path, should_copy=False, read_metadata=True)
+            self.__metadata.set_originalPath(path)
+        else:
+            # This must fail, only try to load supported files... signal the failure somehow
+            logging.error(f"Unsupported file suffix {suffix} (must be wav or ogg) for {path}")
         # TODO Handling duplicates: We may very well want to eventually hold only one copy of a wave asset on disk
         # and then reference-count its users, so that we can remove it from the sketchpad when all users have gone.
         # This, however, will need tracking globally, otherwise we end up unable to track when it's being used by
@@ -974,14 +996,13 @@ class sketchpad_clip(QObject):
             new_filename = ""
             selected_path = Path(path)
 
-            if self.is_channel_sample:
-                if should_copy:
+            if should_copy:
+                if self.is_channel_sample:
                     new_filename = self.generate_unique_filename(selected_path, self.bank_path)
                     logging.error(f"Copying sample({path}) into bank folder ({self.bank_path / new_filename})")
                     self.bank_path.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(selected_path, self.bank_path / new_filename)
-            else:
-                if should_copy:
+                else:
                     new_filename = self.generate_unique_filename(selected_path, self.wav_path)
                     logging.error(f"Copying clip({path}) into sketchpad folder ({self.wav_path / new_filename})")
                     shutil.copy2(selected_path, self.wav_path / new_filename)

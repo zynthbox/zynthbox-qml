@@ -76,7 +76,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
         self.list_metadata.append({"icon": "video-display", "large": True });
         self.list_data.append((None, 0, "-----------------------------"))
         self.list_metadata.append({"icon": "", "large": False });
-        self.list_data.append((self.check_for_updates, 0, "Check for software updates"))
+        self.list_data.append((self.check_for_updates_and_doupdate, 0, "Check for software updates"))
         self.list_metadata.append({"icon": "update-none", "large": True });
         self.list_data.append((None, 0, "-----------------------------"))
         self.list_metadata.append({"icon": "", "large": False });
@@ -696,10 +696,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
             )
         return update_available
 
-    def check_for_updates(self):
+    def check_for_updates_and_doupdate(self):
         def run_cmd():
-            self.checkForUpdatesStarted.emit()
-
             try:
                 apt_pkg.init_config()
                 apt_pkg.config.set("DPkg::Options::", "--force-confdef")
@@ -709,52 +707,57 @@ class zynthian_gui_admin(zynthian_gui_selector):
                     process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=False)
                 except: pass
 
-                #cache = apt.cache.Cache()
-                #cache.open()
-                #cache["zynthbox-update-script"].mark_install()
-                #cache.commit()
+                apt_cache = apt.Cache()
+                apt_cache.open()
+                
+                pkg_zynthian_sys = apt_cache["zynthian-sys"]
 
-                process_upgrade_updater = run(["apt-get", "install", "-y", "zynthbox-update-script"], capture_output=False, text=True, check=False)
+                if pkg_zynthian_sys.is_installed:
+                    installed = pkg_zynthian_sys.installed.version
+                    candidate = pkg_zynthian_sys.candidate.version
 
-                process_check_for_updates = run(["/usr/bin/zynthbox-update-script", "check_for_updates"], capture_output=False, text=True, check=False)
-
-                if process_check_for_updates.returncode > 0:
-                    self.checkForUpdatesUnavailable.emit()
+                    if installed != candidate:
+                        logging.info("zynthian-sys Update Available")
+                        self.zynqtgui.show_confirm("Do you want to update the system? System will reboot after updating.", self.do_update_zynthboxos)
+                    else:
+                        logging.error(f"{pkg_zynthian_sys.name} is already updated.")
+                        self.checkForUpdatesUnavailable.emit()
                 else:
-                    logging.info("zynthbox-update-script Update Available")
-                    self.checkForUpdatesCompleted.emit()
+                    logging.error(f"{pkg_zynthian_sys.name} is not installed.")
+                    self.updateErrored.emit()
 
-                    self.zynqtgui.show_confirm("Do you want to update the system? System will reboot after updating.",
-                                             self.run_update)
             except Exception as e:
                 logging.error(f"Error while checking for updates : {str(e)}")
                 self.checkForUpdatesErrored.emit()
+            
+            self.zynqtgui.end_long_task()
 
-        thread = Thread(target=run_cmd, args=())
-        thread.daemon = True  # thread dies with the program
-        thread.start()
-
-    def run_update(self, params=None):
-        def run_cmd():
-            self.updateStarted.emit()
-
-            try:
-                process_check_for_updates = run(["/usr/bin/zynthbox-update-script", "do_upgrade"], capture_output=False, text=True, check=True)
-
-                self.updateCompleted.emit()
-                self.reboot_confirmed()
-            except Exception as e:
-                logging.error(f"Error while updating : {str(e)}")
-                self.updateErrored.emit()
-
-        thread = Thread(target=run_cmd, args=())
-        thread.daemon = True  # thread dies with the program
-        thread.start()
+        self.zynqtgui.do_long_task(run_cmd, f"Checking for updates...<br>This may take a while.")
 
     def update_system(self):
         logging.info("UPDATE SYSTEM")
         self.zynqtgui.show_info("UPDATE SYSTEM")
         self.start_command([self.sys_dir + "/scripts/update_system.sh"])
+
+    def do_update_zynthboxos(self, params=None):
+        def run_cmd():
+            try:
+                apt_cache = apt.Cache()
+                apt_cache.open()
+
+                pkg_zynthian_sys = apt_cache["zynthian-sys"]
+                pkg_zynthian_sys.mark_upgrade()
+                apt_cache.commit()
+                logging.info(f"{pkg_zynthian_sys.name} updated.")
+
+                process_do_upgrade = run(["/zynthian/zynthian-sys/scripts/zynthbox_update_script.sh", "do_upgrade"], capture_output=False, text=True, check=True)
+
+                self.reboot_confirmed()
+            except Exception as e:
+                logging.error(f"Error while updating : {str(e)}")
+                self.updateErrored.emit()
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(run_cmd, f"Updating system...<br>This may take a while.")
 
     @Slot()
     def restart_gui(self):

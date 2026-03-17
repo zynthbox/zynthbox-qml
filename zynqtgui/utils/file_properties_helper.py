@@ -38,7 +38,8 @@ class file_properties_helper(QObject):
             self.file_path = newPath
             self.file_path_changed.emit()
 
-            is_wav = self.file_path.name.endswith(".wav")
+            is_wav = self.file_path.name.lower().endswith(".wav")
+            is_audio = is_wav or self.file_path.name.lower().endswith(".ogg")
 
             is_sketch = False
             if is_wav:
@@ -62,6 +63,7 @@ class file_properties_helper(QObject):
                 "size": file_stat.st_size,
                 "humanSize": sizeof_fmt(file_stat.st_size),
                 "isWav": is_wav,
+                "isAudio": is_audio,
                 "isSketch": is_sketch,
                 "isDir": self.file_path.is_dir(),
                 "isFile": self.file_path.is_file(),
@@ -272,7 +274,7 @@ class file_properties_helper(QObject):
 
     @Slot(None)
     def playPreview(self):
-        if self.file_metadata is not None and self.file_metadata["isWav"]:
+        if self.file_metadata is not None and self.file_metadata["isAudio"]:
             if self.preview_clip is not None:
                 self.preview_clip.stop()
                 if self.preview_clip.getFilePath() != str(self.file_path):
@@ -289,7 +291,7 @@ class file_properties_helper(QObject):
 
     @Slot(None)
     def stopPreview(self):
-        if self.file_metadata is not None and self.file_metadata["isWav"] and self.preview_clip is not None:
+        if self.file_metadata is not None and self.file_metadata["isAudio"] and self.preview_clip is not None:
             self.preview_clip.stop()
             self.is_preview_playing = False
             self.is_preview_playing_changed.emit()

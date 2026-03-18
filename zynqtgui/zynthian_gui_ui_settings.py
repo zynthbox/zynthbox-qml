@@ -115,6 +115,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
         self.__temporaryLiveRecordStyle = int(self.zynqtgui.global_settings.value("UI/temporaryLiveRecordStyle", 1))
+        self.__sampleAutoPreview = True if self.zynqtgui.global_settings.value("UI/sampleAutoPreview", "true") == "true" else False
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
         self.__showExperimentalFeatures = True if self.zynqtgui.global_settings.value("UI/showExperimentalFeatures", "false") == "true" else False
         self.__showCursor = True if self.zynqtgui.global_settings.value("UI/showCursor", "false") == "true" else False
@@ -231,6 +232,21 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     temporaryLiveRecordStyle = Property(int, get_temporaryLiveRecordStyle, set_temporaryLiveRecordStyle, notify=temporaryLiveRecordStyleChanged)
     ### END Property temporaryLiveRecordStyle
+
+    ### BEGIN Property sampleAutoPreview
+    def get_sampleAutoPreview(self):
+        return self.__sampleAutoPreview
+
+    def set_sampleAutoPreview(self, value):
+        if value != self.__sampleAutoPreview:
+            self.__sampleAutoPreview = value
+            self.zynqtgui.global_settings.setValue("UI/sampleAutoPreview", self.__sampleAutoPreview)
+            self.sampleAutoPreviewChanged.emit()
+
+    sampleAutoPreviewChanged = Signal()
+
+    sampleAutoPreview = Property(bool, get_sampleAutoPreview, set_sampleAutoPreview, notify=sampleAutoPreviewChanged)
+    ### END Property sampleAutoPreview
 
     ### BEGIN Property debugMode
     def get_debugMode(self):

@@ -697,6 +697,17 @@ ZUI.ScreenPage {
                             Kirigami.Theme.inherit: false
                             Kirigami.Theme.colorSet: Kirigami.Theme.View
                         }
+                        Item {
+                            Layout.fillWidth: true
+                        }
+                        ZUI.SectionButton {
+                            Layout.fillHeight: true
+                            text: qsTr("Auto Preview")
+                            checked: zynqtgui.ui_settings.sampleAutoPreview
+                            onClicked: {
+                                zynqtgui.ui_settings.sampleAutoPreview = !zynqtgui.ui_settings.sampleAutoPreview
+                            }
+                        }
                     }
                     ZUI.SelectorView {
                         id: filesListView
@@ -759,7 +770,7 @@ ZUI.ScreenPage {
                                     // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
                                     _private.filePropertiesHelper.stopPreview();
                                 }
-                                if (_private.selectedColumn == 2 && filesListView.currentItem) {
+                                if (_private.selectedColumn == 2 && filesListView.currentItem && zynqtgui.ui_settings.sampleAutoPreview) {
                                     // Only do auto-preview things if the files column is selected
                                     _private.filePropertiesHelper.filePath = filesListView.currentItem.filePath;
                                     _private.filePropertiesHelper.playPreview();

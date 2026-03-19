@@ -228,7 +228,7 @@ ZUI.ScreenPage {
                     if (_private.selectedColumn == 2) {
                         // Then we just kind of... use this as a "play" button style thing for testing samples (toggle the preview playback for whatever is currently selected)
                         if (filesListView.selector.current_index > -1) {
-                            filesListView.currentItem.doPreview();
+                            filesListView.doPreview();
                         }
                     } else {
                         _private.selectedColumn = Math.min(_private.maxColumn, _private.selectedColumn + 1);
@@ -770,7 +770,7 @@ ZUI.ScreenPage {
                                     // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
                                     _private.filePropertiesHelper.stopPreview();
                                 }
-                                if (_private.selectedColumn == 2 && filesListView.currentItem && zynqtgui.ui_settings.sampleAutoPreview) {
+                                if (_private.selectedColumn == 2 && filesListView.currentItem && filesListView.currentItem.isAudio && zynqtgui.ui_settings.sampleAutoPreview) {
                                     // Only do auto-preview things if the files column is selected
                                     _private.filePropertiesHelper.filePath = filesListView.currentItem.filePath;
                                     _private.filePropertiesHelper.playPreview();
@@ -786,7 +786,9 @@ ZUI.ScreenPage {
                                 _private.selectedColumn = 2;
                             }
                             if (filesListView.mostRecentlyActivatedIndex === index) {
-                                sampleSlotAssigner.assignToSlot(currentItem.filePath);
+                                if (currentItem.isAudio) {
+                                    sampleSlotAssigner.assignToSlot(currentItem.filePath);
+                                }
                             }
                             filesListView.mostRecentlyActivatedIndex = index;
                         }
@@ -800,7 +802,7 @@ ZUI.ScreenPage {
                                 showDirs: false
                                 showDotAndDotDot: false
                                 sortCaseSensitive: false
-                                nameFilters: [ "*.wav", "*.ogg" ]
+                                // nameFilters: [ "*.wav", "*.ogg" ]
                                 folder: "/zynthian/zynthian-my-data"
                                 onFolderChanged: {
                                     filesListView.mostRecentlyActivatedIndex = -1;
@@ -811,6 +813,23 @@ ZUI.ScreenPage {
                                 filesListView.itemActivated(screenId, index);
                             }
                         }
+                        function doPreview() {
+                            if (filesListView.currentItem && filesListView.currentItem.previewIsPlayingForThisEntry) {
+                                _private.filePropertiesHelper.stopPreview();
+                            } else {
+                                if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
+                                    // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
+                                    _private.filePropertiesHelper.stopPreview();
+                                }
+                                if (_private.selectedColumn != 2) {
+                                    _private.selectedColumn = 2;
+                                }
+                                if (filesListView.currentItem && filesListView.currentItem.isAudio) {
+                                    _private.filePropertiesHelper.filePath = filesListView.currentItem.filePath;
+                                    _private.filePropertiesHelper.playPreview();
+                                }
+                            }
+                        }
                         delegate: ZUI.SelectorDelegate {
                             id: fileDelegate
                             width: ListView.view.width
@@ -819,25 +838,8 @@ ZUI.ScreenPage {
                             selector: filesListView.selector
                             text: model.fileName
                             readonly property string filePath: model.filePath
+                            readonly property bool isAudio: model.fileName.toLowerCase().endsWith(".wav") || model.fileName.toLowerCase().endsWith(".ogg")
                             readonly property bool previewIsPlayingForThisEntry: (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying && _private.filePropertiesHelper.filePath == model.filePath) ? true : false
-                            function doPreview() {
-                                if (fileDelegate.previewIsPlayingForThisEntry) {
-                                    _private.filePropertiesHelper.stopPreview();
-                                } else {
-                                    if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
-                                        // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
-                                        _private.filePropertiesHelper.stopPreview();
-                                    }
-                                    if (_private.selectedColumn != 2) {
-                                        _private.selectedColumn = 2;
-                                    }
-                                    if (filesListView.selector.current_index != model.index) {
-                                        filesListView.selector.current_index = model.index;
-                                    }
-                                    _private.filePropertiesHelper.filePath = model.filePath;
-                                    _private.filePropertiesHelper.playPreview();
-                                }
-                            }
                             contentItem: ColumnLayout {
                                 spacing: 0
                                 Layout.fillWidth: true
@@ -854,7 +856,7 @@ ZUI.ScreenPage {
                                                 fill: parent
                                                 margins: Kirigami.Units.smallSpacing
                                             }
-                                            source: "folder-music-symbolic"
+                                            source: fileDelegate.isAudio ? "folder-music-symbolic" : "unknown"
                                         }
                                     }
                                     QQC2.Label {
@@ -866,6 +868,7 @@ ZUI.ScreenPage {
                                         wrapMode: Text.Wrap
                                         maximumLineCount: 3
                                         elide: Text.ElideRight
+                                        opacity: isAudio ? 1.0 : 0.6
                                     }
                                     Item {
                                         Layout.fillHeight: true
@@ -876,12 +879,15 @@ ZUI.ScreenPage {
                                                 fill: parent
                                                 margins: Kirigami.Units.smallSpacing
                                             }
+                                            visible: fileDelegate.isAudio
                                             source: fileDelegate.previewIsPlayingForThisEntry ? "media-playback-stop" : "media-playback-start"
                                         }
                                         MouseArea {
                                             anchors.fill: parent
+                                            enabled: fileDelegate.isAudio
                                             onClicked: {
-                                                fileDelegate.doPreview();
+                                                filesListView.selector.current_index = model.index;
+                                                filesListView.doPreview();
                                             }
                                         }
                                     }

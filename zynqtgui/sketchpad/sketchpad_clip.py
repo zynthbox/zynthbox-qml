@@ -936,10 +936,11 @@ class sketchpad_clip(QObject):
     # on the originalPath metadata field
     @Slot(str)
     def importFromFile(self, path):
-        # when importing, copy the file here if ogg, or convert if wav, and then should_copy becomes false and we simply load outright
-        suffix = path.lower().rpartition(".")[2]
+        # when importing, copy the file here if ogg, or convert if wav, (and then should_copy becomes false and we simply load outright)
+        pathMinusSuffix, separator, suffix = path.rpartition(".")
+        suffix = suffix.lower()
         if suffix == "wav":
-            new_filename = self.generate_unique_filename(path + ".ogg", self.bank_path)
+            new_filename = self.generate_unique_filename(pathMinusSuffix + ".ogg", self.bank_path)
             logging.error(f"Converting wav sample ({path}) into ogg, directly into bank folder ({self.bank_path / new_filename})")
             self.bank_path.mkdir(parents=True, exist_ok=True)
             newpath = str(self.bank_path / new_filename)

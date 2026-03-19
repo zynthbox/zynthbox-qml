@@ -269,10 +269,7 @@ Item {
                                         left: parent.left
                                     }
                                     visible: focusRectangle.visible && stepDelegate.stepEnabledForNote
-                                    font {
-                                        pointSize: 0
-                                        pixelSize: 7
-                                    }
+                                    font.pointSize: 7
                                     color: "grey"
                                     text: qsTr("%1/127").arg(stepDelegate.velocity)
                                 }

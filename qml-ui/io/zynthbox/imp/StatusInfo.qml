@@ -798,15 +798,23 @@ ZUI.SectionGroup
                                         Timer {
                                             id: voiceCountFetcher
                                             running: zynqtgui.globalPopupOpened
-                                            interval: 300
+                                            interval: 100
                                             repeat: true
                                             property int activeSamplerVoices: 0
                                             onTriggered: {
-                                                voiceCountFetcher.activeSamplerVoices = Zynthbox.Plugin.activeSamplerVoices();
+                                                voiceCountFetcher.activeSamplerVoices = Math.max(Math.max(0, voiceCountFetcher.activeSamplerVoices - 1), Zynthbox.Plugin.activeSamplerVoices());
+                                            }
+                                        }
+                                        Connections {
+                                            target: zynqtgui
+                                            onGlobalPopupOpenedChanged: {
+                                                if (zynqtgui.globalPopupOpened === false) {
+                                                    voiceCountFetcher.activeSamplerVoices = 0;
+                                                }
                                             }
                                         }
                                         text: voiceCountFetcher.activeSamplerVoices > 0
-                                            ? qsTr("%1% (%2 sample voices)").arg((100 * dspLoadLayout.dspLoad).toFixed(1)).arg(voiceCountFetcher.activeSamplerVoices)
+                                            ? qsTr("%1% (%2 peak sample voices)").arg((100 * dspLoadLayout.dspLoad).toFixed(1)).arg(voiceCountFetcher.activeSamplerVoices)
                                             : qsTr("%1%").arg((100 * dspLoadLayout.dspLoad).toFixed(1))
                                         font.pixelSize: height
                                     }

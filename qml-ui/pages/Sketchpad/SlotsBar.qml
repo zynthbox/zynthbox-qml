@@ -633,13 +633,13 @@ AbstractSketchpadPage {
             samplePickerDialog.saveMode = (pickWhat === "save-location");
             if (pickWhat === "sample" || pickWhat === "save-location") {
                 samplePickerDialog.folderModel.folder = samplePickerDialog.saveMode ? "/zynthian/zynthian-my-data/samples/my-samples" : "/zynthian/zynthian-my-data/samples";
-                samplePickerDialog.folderModel.nameFilters = ["*.wav"];
+                samplePickerDialog.folderModel.nameFilters = ["*.wav", "*.ogg"];
             } else if (pickWhat === "sketch") {
                 samplePickerDialog.folderModel.folder = samplePickerDialog.saveMode ? "/zynthian/zynthian-my-data/sketches/my-sketches" :  "/zynthian/zynthian-my-data/sketches";
                 samplePickerDialog.folderModel.nameFilters = ["*.sketch.wav"];
             } else if (pickWhat === "recording") {
                 samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir;
-                samplePickerDialog.folderModel.nameFilters = ["*.wav"];
+                samplePickerDialog.folderModel.nameFilters = ["*.wav", "*.ogg"];
             }
             samplePickerDialog.open();
             if (samplePickerDialog.saveMode) {
@@ -697,11 +697,11 @@ AbstractSketchpadPage {
                 loopPickerDialog.thingToPick = qsTr("Loop");
             } else if (pickWhat === "sample") {
                 loopPickerDialog.folderModel.folder = loopPickerDialog.saveMode ? "/zynthian/zynthian-my-data/samples/my-samples" : "/zynthian/zynthian-my-data/samples";
-                loopPickerDialog.folderModel.nameFilters = ["*.wav"];
+                loopPickerDialog.folderModel.nameFilters = ["*.wav", "*.ogg"];
                 loopPickerDialog.thingToPick = qsTr("Sample");
             } else if (pickWhat === "recording") {
                 loopPickerDialog.folderModel.folder = sketchPickerPopup.sketch.recordingDir;
-                loopPickerDialog.folderModel.nameFilters = ["*.wav"];
+                loopPickerDialog.folderModel.nameFilters = ["*.wav", "*.ogg"];
                 loopPickerDialog.thingToPick = qsTr("Recording");
             }
             loopPickerDialog.open();

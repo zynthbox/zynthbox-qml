@@ -582,14 +582,22 @@ class zynthian_gui(QObject):
 
         self.zynautoconnect_audio_flag = False
         self.zynautoconnect_midi_flag = False
+        self.kit_version = os.environ.get("ZYNTHIAN_KIT_VERSION")
 
         # Global zselectors
         self.__zselectors = [None, None, None, None]
         self.__zselector_controllers = [None, None, None, None]
-        self.__knob_delta_factors = [500, 500, 500, 1]
-        self.__knob_values_max = [20000, 20000, 20000, 20000]
-        self.__knob_values_default = [10000, 10000, 10000, 10000]
-        self.__knob_values = [10000, 10000, 10000, 10000]
+
+        if self.kit_version == "Z2_V5B":
+            self.__knob_delta_factors = [1, 500, 500, 1]
+            self.__knob_values_max = [2048, 20000, 20000, 20000]
+            self.__knob_values_default = [0, 10000, 10000, 10000]
+            self.__knob_values = [0, 10000, 10000, 10000]
+        else:
+            self.__knob_delta_factors = [500, 500, 500, 1]
+            self.__knob_values_max = [20000, 20000, 20000, 20000]
+            self.__knob_values_default = [10000, 10000, 10000, 10000]
+            self.__knob_values = [10000, 10000, 10000, 10000]
 
         # Create Global FX Settings
         self.global_settings = QSettings()
@@ -605,6 +613,7 @@ class zynthian_gui(QObject):
         self.global_settings.endGroup()
 
         self.knobDeltaChanged.connect(self.knobDeltaCuiaEmitter, Qt.QueuedConnection)
+        self.knobAbsoluteChanged.connect(self.knobAbsoluteCuiaEmitter, Qt.QueuedConnection)
 
         # This variable will decide if zyncoder_read should be called or not depending on whether
         # global set_selector is in progress or not
@@ -781,6 +790,13 @@ class zynthian_gui(QObject):
             else:
                 self.callable_ui_action(f"KNOB{knob_index}_DOWN")
 
+    @Slot(int, int)
+    def knobAbsoluteCuiaEmitter(self, knob_index, value):
+        """
+        Emit CUIA Actions when knob absolute value changes
+        """
+        self.callable_ui_action(f"KNOB{knob_index}_ABSOLUTE", [value - self.__knob_values_max[knob_index]//2])
+
     @Slot(None)
     def set_selector(self):
         if not self.isBootingComplete:
@@ -804,6 +820,7 @@ class zynthian_gui(QObject):
                     self.__zselectors[knob_index].hide()
 
     knobDeltaChanged = Signal(int, int, arguments=["knobIndex", "delta"])
+    knobAbsoluteChanged = Signal(int, int, arguments=["knobIndex", "value"])
     ### END Global controller and selector
 
     # ---------------------------------------------------------------------------
@@ -3257,23 +3274,29 @@ class zynthian_gui(QObject):
                 try:
                     if self.__zselectors[knob_index]:
                         self.__zselectors[knob_index].read_zyncoder()
-
-                        value_change = self.__zselectors[knob_index].value - self.__knob_values[knob_index]
-                        # Use floor/ceil as per knob change direction to produce similar effect for both increasing and decreasing values with knobs
-                        if value_change > 0:
-                            delta = math.floor(value_change / self.__knob_delta_factors[knob_index])
-                        else:
-                            delta = math.ceil(value_change / self.__knob_delta_factors[knob_index])
-
-                        if delta != 0:
-                            self.knobDeltaChanged.emit(knob_index, delta)
-                            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
-                            if self.__zselectors[knob_index].value - self.__knob_delta_factors[knob_index] < 0 or \
-                                    self.__zselectors[knob_index].value + self.__knob_delta_factors[knob_index] > self.__knob_values_max[knob_index]:
-                                self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
-                                self.__knob_values[knob_index] = self.__knob_values_default[knob_index]
-                            else:
+                        if self.kit_version == "Z2_V5B":
+                            # Small Knobs are fixed end pots in 5B revision
+                            # Emit absolute value change signal instead of knob delta
+                            if self.__knob_values[knob_index] != self.__zselectors[knob_index].value:
                                 self.__knob_values[knob_index] = self.__zselectors[knob_index].value
+                                self.knobAbsoluteChanged.emit(knob_index, self.__zselectors[knob_index].value)
+                        else:
+                            value_change = self.__zselectors[knob_index].value - self.__knob_values[knob_index]
+                            # Use floor/ceil as per knob change direction to produce similar effect for both increasing and decreasing values with knobs
+                            if value_change > 0:
+                                delta = math.floor(value_change / self.__knob_delta_factors[knob_index])
+                            else:
+                                delta = math.ceil(value_change / self.__knob_delta_factors[knob_index])
+
+                            if delta != 0:
+                                self.knobDeltaChanged.emit(knob_index, delta)
+                                # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+                                if self.__zselectors[knob_index].value - self.__knob_delta_factors[knob_index] < 0 or \
+                                        self.__zselectors[knob_index].value + self.__knob_delta_factors[knob_index] > self.__knob_values_max[knob_index]:
+                                    self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
+                                    self.__knob_values[knob_index] = self.__knob_values_default[knob_index]
+                                else:
+                                    self.__knob_values[knob_index] = self.__zselectors[knob_index].value
                 except Exception as e:
                     logging.exception(f"Error reading zyncoder value : {str(e)}")
 

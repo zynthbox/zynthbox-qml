@@ -2015,6 +2015,8 @@ ZUI.ScreenPage {
                                             Kirigami.Theme.inherit: false
                                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                             highlighted: index === zynqtgui.sketchpad.selectedTrackId 
+                                            // gridUnit is density dependent, and on our standard display, it's 24, so... 4 is a sensible sort of threshold at that size, so until we need something more specific, we can heuristics it to this
+                                            property int dragThreshold: Kirigami.Units.gridUnit / 6
                                             contentItem: Item {
                                                 Item {
                                                     anchors.fill: parent
@@ -2031,8 +2033,15 @@ ZUI.ScreenPage {
 
                                                                 property QtObject selectedBand: null
                                                                 property var pressedTime: undefined
-                                                                readonly property QtObject
-                                                                eqDoublePressedTimer: Timer {
+                                                                property bool dragHappened: false
+                                                                readonly property QtObject dragHappenedResetTimer: Timer {
+                                                                    interval: 300
+                                                                    repeat: false
+                                                                    onTriggered: {
+                                                                        slidePoint.dragHappened = false;
+                                                                    }
+                                                                }
+                                                                readonly property QtObject eqDoublePressedTimer: Timer {
                                                                     interval: zynqtgui.ui_settings.doubleClickThreshold
                                                                     running: false
                                                                     repeat: false
@@ -2052,7 +2061,7 @@ ZUI.ScreenPage {
                                                                 }
 
                                                                 property point startingPoint
-                                                                property double startingGain
+                                                                property double startingQuality
                                                                 property double startingFrequency
 
                                                                 // Set the startOffset to 1 to move forward, and 0 to try the current one first
@@ -2079,34 +2088,46 @@ ZUI.ScreenPage {
                                                                         pressedTime = Date.now();
                                                                         selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
                                                                         slidePoint.ensureSelectedBand(0);
-                                                                        slidePoint.startingGain = selectedBand.gainAbsolute;
+                                                                        slidePoint.startingQuality = selectedBand.qualityAbsolute;
                                                                         slidePoint.startingFrequency = selectedBand.frequencyAbsolute;
                                                                         slidePoint.startingPoint.x = slidePoint.x;
                                                                         slidePoint.startingPoint.y = slidePoint.y;
                                                                     } else {
-                                                                        // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
-                                                                        if ((Date.now() - pressedTime) < 300) {
-                                                                            if (eqDoublePressedTimer.running) {
-                                                                                // If we clicked again this quickly, it was a double-click
-                                                                                eqDoublePressedTimer.stop();
-                                                                                passthroughVisualiserItem.source.equaliserEnabled = !passthroughVisualiserItem.source.equaliserEnabled;
-                                                                            } else {
-                                                                                eqDoublePressedTimer.restart();
+                                                                        if (slidePoint.dragHappened) {
+                                                                            dragHappenedResetTimer.restart();
+                                                                            // In case the double-clicky timer is running, but we're actually dragging, don't do that...
+                                                                            eqDoublePressedTimer.stop();
+                                                                        } else {
+                                                                            // Only accept this as a tap if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                                                            if ((Date.now() - pressedTime) < 300) {
+                                                                                if (eqDoublePressedTimer.running) {
+                                                                                    // If we clicked again this quickly, it was a double-click
+                                                                                    eqDoublePressedTimer.stop();
+                                                                                    passthroughVisualiserItem.source.equaliserEnabled = !passthroughVisualiserItem.source.equaliserEnabled;
+                                                                                } else {
+                                                                                    eqDoublePressedTimer.restart();
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
                                                                 }
                                                                 onYChanged: {
-                                                                    if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
+                                                                    if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200 && (slidePoint.dragHappened || Math.abs(slidePoint.y - slidePoint.startingPoint.y) > mixerCell.dragThreshold)) {
+                                                                        slidePoint.dragHappened = true;
+                                                                        // In case the double-clicky timer is running, but we're actually dragging, don't do that...
+                                                                        eqDoublePressedTimer.stop();
                                                                         // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                         if (selectedBand.active === true) {
-                                                                            let newGain = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
-                                                                            selectedBand.gainAbsolute = Math.min(Math.max(slidePoint.startingGain - newGain, 0), 1);
+                                                                            let newQuality = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
+                                                                            selectedBand.qualityAbsolute = slidePoint.startingQuality - newQuality;
                                                                         }
                                                                     }
                                                                 }
                                                                 onXChanged: {
-                                                                    if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200) {
+                                                                    if (pressed && equaliserEnabledVisualiser.audioLevelsTrack.equaliserEnabled && eqDoublePressedTimer.running === false && (Date.now() - pressedTime) > 200 && (slidePoint.dragHappened || Math.abs(slidePoint.x - slidePoint.startingPoint.x) > mixerCell.dragThreshold)) {
+                                                                        slidePoint.dragHappened = true;
+                                                                        // In case the double-clicky timer is running, but we're actually dragging, don't do that...
+                                                                        eqDoublePressedTimer.stop();
                                                                         // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                         if (selectedBand.active === true) {
                                                                             let newFrequency = (slidePoint.x - slidePoint.startingPoint.x) / (graphTouchArea.width * 2.5);

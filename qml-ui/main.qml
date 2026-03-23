@@ -112,6 +112,9 @@ Kirigami.AbstractApplicationWindow {
                     result = true;
                 }
                 break;
+            case "KNOB0_ABSOLUTE":
+                console.log(`KNOB0 Absolute Value changed to ${value}`);
+                break;
             case "KNOB0_UP":
                 if (zynqtgui.globalButtonPressed) {
                     zynqtgui.ignoreNextGlobalButtonPress = true;

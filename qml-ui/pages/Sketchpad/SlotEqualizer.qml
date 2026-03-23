@@ -60,6 +60,8 @@ ZUI.DialogQuestion {
 
     height: applicationWindow().height
     width: applicationWindow().width
+    // gridUnit is density dependent, and on our standard display, it's 24, so... 4 is a sensible sort of threshold at that size, so until we need something more specific, we can heuristics it to this
+    property int dragThreshold: Kirigami.Units.gridUnit / 6
 
     acceptText: qsTr("Close")
     rejectText: ""
@@ -275,9 +277,9 @@ ZUI.DialogQuestion {
                             }
                         } else {
                             if (zynqtgui.modeButtonPressed) {
-                                currentObject.quality = currentObject.quality + 0.01;
+                                currentObject.qualityAbsolute = currentObject.qualityAbsolute + 0.001;
                             } else {
-                                currentObject.quality = currentObject.quality + 0.1;
+                                currentObject.qualityAbsolute = currentObject.qualityAbsolute + 0.01;
                             }
                         }
                     }
@@ -291,9 +293,9 @@ ZUI.DialogQuestion {
                             }
                         } else {
                             if (zynqtgui.modeButtonPressed) {
-                                currentObject.quality = currentObject.quality - 0.01;
+                                currentObject.qualityAbsolute = currentObject.qualityAbsolute - 0.001;
                             } else {
-                                currentObject.quality = currentObject.quality - 0.1;
+                                currentObject.qualityAbsolute = currentObject.qualityAbsolute - 0.01;
                             }
                         }
                     }
@@ -392,11 +394,21 @@ ZUI.DialogQuestion {
                         source: _private.slotPassthroughClient
                     }
 
+                    Timer {
+                        id: dragHappenedResetTimer
+                        interval: 300
+                        repeat: false
+                        onTriggered: {
+                            slidePoint.dragHappened = false;
+                        }
+                    }
+
                     touchPoints: [
                         TouchPoint {
                             id: slidePoint;
                             property QtObject selectedBand: null
                             property var pressedTime: undefined
+                            property bool dragHappened: false
                             onPressedChanged: {
                                 if (pressed) {
                                     pressedTime = Date.now();
@@ -407,6 +419,9 @@ ZUI.DialogQuestion {
                                         selectedBand = currentObject;
                                     }
                                 } else {
+                                    if (slidePoint.dragHappened) {
+                                        dragHappenedResetTimer.restart();
+                                    }
                                     // Only select what's underneath if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
                                     if ((Date.now() - pressedTime) < 300) {
                                         // Find the band underneath the touch point
@@ -420,13 +435,15 @@ ZUI.DialogQuestion {
                                 }
                             }
                             onYChanged: {
-                                if (pressed && selectedBand) {
-                                    let newGain = 1-(slidePoint.y / graphTouchArea.height);
-                                    selectedBand.gainAbsolute = Math.min(Math.max(newGain, 0), 1);
+                                if (pressed && selectedBand && (slidePoint.dragHappened || Math.abs(slidePoint.y - slidePoint.startY) > component.dragThreshold)) {
+                                    slidePoint.dragHappened = true;
+                                    let newQuality = 1-(slidePoint.y / graphTouchArea.height);
+                                    selectedBand.qualityAbsolute = Math.max(0.0, Math.min(newQuality, 1.0));
                                 }
                             }
                             onXChanged: {
-                                if (pressed && selectedBand) {
+                                if (pressed && selectedBand && (slidePoint.dragHappened || Math.abs(slidePoint.x - slidePoint.startX) > component.dragThreshold)) {
+                                    slidePoint.dragHappened = true;
                                     selectedBand.frequencyAbsolute = slidePoint.x / graphTouchArea.width;
                                 }
                             }
@@ -544,13 +561,13 @@ ZUI.DialogQuestion {
                                                 width: height
                                                 inputMode: QQC2.Dial.Vertical
                                                 handle: null
-                                                value: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality : 0
+                                                value: bandDelegate.filterSettings ? bandDelegate.filterSettings.qualityAbsolute : 0
                                                 from: 0
-                                                to: 10
-                                                stepSize: 0.1
+                                                to: 1
+                                                stepSize: 0.01
                                                 onValueChanged: {
                                                     if (bandDelegate.filterSettings) {
-                                                        bandDelegate.filterSettings.quality = value;
+                                                        bandDelegate.filterSettings.qualityAbsolute = value;
                                                     }
                                                 }
                                                 property double lastPressed: 0

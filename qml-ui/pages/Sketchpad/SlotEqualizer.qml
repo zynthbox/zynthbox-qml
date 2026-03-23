@@ -421,15 +421,16 @@ ZUI.DialogQuestion {
                                 } else {
                                     if (slidePoint.dragHappened) {
                                         dragHappenedResetTimer.restart();
-                                    }
-                                    // Only select what's underneath if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
-                                    if ((Date.now() - pressedTime) < 300) {
-                                        // Find the band underneath the touch point
-                                        let frequencyForPosition = 20.0 * Math.pow(2.0, (slidePoint.startX / graphTouchArea.width) * 10.0);
-                                        let tappedBand = _private.slotPassthroughClient.equaliserNearestToFrequency(frequencyForPosition);
-                                        tappedBand.selected = true;
-                                        // Also make sure to de-select the compressor, in case that one's selected
-                                        _private.slotPassthroughClient.compressorSettings.selected = false;
+                                    } else {
+                                        // Only select what's underneath if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                        if ((Date.now() - pressedTime) < 300) {
+                                            // Find the band underneath the touch point
+                                            let frequencyForPosition = 20.0 * Math.pow(2.0, (slidePoint.startX / graphTouchArea.width) * 10.0);
+                                            let tappedBand = _private.slotPassthroughClient.equaliserNearestToFrequency(frequencyForPosition);
+                                            tappedBand.selected = true;
+                                            // Also make sure to de-select the compressor, in case that one's selected
+                                            _private.slotPassthroughClient.compressorSettings.selected = false;
+                                        }
                                     }
                                     selectedBand = null;
                                 }

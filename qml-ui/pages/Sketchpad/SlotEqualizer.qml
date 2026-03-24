@@ -544,6 +544,7 @@ ZUI.DialogQuestion {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
                                     ColumnLayout {
                                         Layout.fillWidth: true
+                                        enabled: bandDelegate.filterSettings && bandDelegate.filterSettings.hasQuality
                                         Kirigami.Heading {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: false
@@ -587,7 +588,7 @@ ZUI.DialogQuestion {
                                                     }
                                                 }
                                                 ZUI.KnobIndicator {
-                                                    visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                                    visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected && bandDelegate.filterSettings.hasQuality
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
                                                     width: height
@@ -605,6 +606,7 @@ ZUI.DialogQuestion {
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
+                                        enabled: bandDelegate.filterSettings && bandDelegate.filterSettings.hasGain
                                         Kirigami.Heading {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: false
@@ -647,7 +649,7 @@ ZUI.DialogQuestion {
                                                     }
                                                 }
                                                 ZUI.KnobIndicator {
-                                                    visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                                    visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected && bandDelegate.filterSettings.hasGain
                                                     anchors.centerIn: parent
                                                     height: parent.height / 2
                                                     width: height

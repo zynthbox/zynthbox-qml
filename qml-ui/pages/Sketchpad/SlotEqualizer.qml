@@ -438,8 +438,12 @@ ZUI.DialogQuestion {
                             onYChanged: {
                                 if (pressed && selectedBand && (slidePoint.dragHappened || Math.abs(slidePoint.y - slidePoint.startY) > component.dragThreshold)) {
                                     slidePoint.dragHappened = true;
-                                    let newQuality = 1-(slidePoint.y / graphTouchArea.height);
-                                    selectedBand.qualityAbsolute = Math.max(0.0, Math.min(newQuality, 1.0));
+                                    let newValue = 1-(slidePoint.y / graphTouchArea.height);
+                                    if (selectedBand.secondaryProperty === 0) {
+                                        selectedBand.qualityAbsolute = Math.max(0.0, Math.min(newValue, 1.0));
+                                    } else {
+                                        selectedBand.gainAbsolute = Math.max(0.0, Math.min(newValue, 1.0));
+                                    }
                                 }
                             }
                             onXChanged: {

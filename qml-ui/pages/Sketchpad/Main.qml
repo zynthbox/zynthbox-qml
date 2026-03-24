@@ -2062,6 +2062,7 @@ ZUI.ScreenPage {
 
                                                                 property point startingPoint
                                                                 property double startingQuality
+                                                                property double startingGain
                                                                 property double startingFrequency
 
                                                                 // Set the startOffset to 1 to move forward, and 0 to try the current one first
@@ -2089,6 +2090,7 @@ ZUI.ScreenPage {
                                                                         selectedBand = passthroughVisualiserItem.getCurrentSelectedBand();
                                                                         slidePoint.ensureSelectedBand(0);
                                                                         slidePoint.startingQuality = selectedBand.qualityAbsolute;
+                                                                        slidePoint.startingGain = selectedBand.gainAbsolute;
                                                                         slidePoint.startingFrequency = selectedBand.frequencyAbsolute;
                                                                         slidePoint.startingPoint.x = slidePoint.x;
                                                                         slidePoint.startingPoint.y = slidePoint.y;
@@ -2118,8 +2120,12 @@ ZUI.ScreenPage {
                                                                         eqDoublePressedTimer.stop();
                                                                         // After ensuring our selected band is proper, and then, only if that band is active, actually move stuff around
                                                                         if (selectedBand.active === true) {
-                                                                            let newQuality = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
-                                                                            selectedBand.qualityAbsolute = slidePoint.startingQuality - newQuality;
+                                                                            let newValue = (slidePoint.y - slidePoint.startingPoint.y) / (graphTouchArea.height * 2.5);
+                                                                            if (selectedBand.secondaryProperty === 0) {
+                                                                                selectedBand.qualityAbsolute = slidePoint.startingQuality - newValue;
+                                                                            } else {
+                                                                                selectedBand.gainAbsolute = slidePoint.startingGain - newValue;
+                                                                            }
                                                                         }
                                                                     }
                                                                 }

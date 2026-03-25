@@ -1748,20 +1748,35 @@ Kirigami.AbstractApplicationWindow {
                         ZUI.SectionButton {
                             id: globalPlaybackButton
                             width: Kirigami.Units.gridUnit*4
-                            height: parent.height
-                            onClicked: {
-                                if (zynqtgui.sketchpad.isMetronomeRunning) {
-                                    zynqtgui.callable_ui_action_simple("SWITCH_STOP_RELEASED");
-                                } else {
-                                    zynqtgui.callable_ui_action_simple("SWITCH_PLAY_RELEASED");
-                                }
-                            }
                             checked: highlighted
-                            highlighted: zynqtgui.sketchpad.isMetronomeRunning 
+                            highlighted: zynqtgui.sketchpad.isMetronomeRunning
                             icon.name: zynqtgui.sketchpad.isMetronomeRunning ? "media-playback-stop" : "media-playback-start"
                             icon.width: 24
                             icon.height: 24
                             icon.color: checked || pressed || highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                            height: parent.height
+                            down: globalPlaybackButtonToucher.pressed
+                            MouseArea {
+                                id: globalPlaybackButtonToucher
+                                anchors.fill: parent
+                                property bool pressedWasDuringPlayback: false
+                                onPressed: {
+                                    if (zynqtgui.sketchpad.isMetronomeRunning) {
+                                        pressedWasDuringPlayback = true;
+                                        zynqtgui.stopButtonPressed = true;
+                                    } else {
+                                        pressedWasDuringPlayback = false;
+                                        zynqtgui.playButtonPressed = true;
+                                    }
+                                }
+                                onReleased: {
+                                    if (pressedWasDuringPlayback) {
+                                        zynqtgui.stopButtonPressed = false;
+                                    } else {
+                                        zynqtgui.playButtonPressed = false;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

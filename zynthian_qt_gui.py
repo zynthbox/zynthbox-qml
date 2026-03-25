@@ -1737,19 +1737,24 @@ class zynthian_gui(QObject):
             self.ignoreNextNumber5ButtonPress = False
             return
         elif cuia == "SWITCH_PLAY_RELEASED" and self.ignoreNextPlayButtonPress == True:
+            self.playButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextPlayButtonPress = False
             return
         elif cuia == "SWITCH_STOP_RELEASED" and self.ignoreNextStopButtonPress == True:
+            self.stopButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextStopButtonPress = False
             return
         elif cuia == "SWITCH_RECORD_RELEASED" and self.ignoreNextRecordButtonPress == True:
+            self.recordButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextRecordButtonPress = False
             return
         elif cuia == "SWITCH_METRONOME_RELEASED" and self.ignoreNextMetronomeButtonPress == True:
+            self.metronomeButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextMetronomeButtonPress = False
             return
         elif cuia == "SWITCH_KNOB3_RELEASED" and self.ignoreNextKnob3Press == True:
             self.ignoreNextKnob3Press = False
+            return
         elif cuia == "SWITCH_GLOBAL_RELEASED" and self.ignoreNextGlobalButtonPress == True:
             self.globalButtonPressed = False # Ensure we have marked the button as released
             self.ignoreNextGlobalButtonPress = False

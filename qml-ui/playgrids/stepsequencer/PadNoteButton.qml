@@ -90,46 +90,50 @@ QQC2.Button {
                     onXChanged: updateInsideBounds();
                     onYChanged: updateInsideBounds();
                     onPressedChanged: {
-                        if (pressed) {
-                            updateInsideBounds();
-                            longPressTimer.subNoteIndex = -1;
-                            longPressTimer.restart();
+                        if (zynqtgui.playButtonPressed) {
+                            applicationWindow().globalSequencer.handleSequencerStepButton(component.padNoteIndex, pressed);
                         } else {
-                            if (x > -1 && y > -1 && x < component.width && y < component.height) {
-                                if (!longPressTimer.pressingAndHolding) {
-                                    if (padNoteRect.shouldChange) {
-                                        if (applicationWindow().globalSequencer.heardNotes.length > 0) {
-                                            var removedAtLeastOne = false;
-                                            // First, let's see if any of the notes in our list are already on this position, and if so, remove them
-                                            for (var i = 0; i < applicationWindow().globalSequencer.heardNotes.length; ++i) {
-                                                var subNoteIndex = component.patternModel.workingModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, applicationWindow().globalSequencer.heardNotes[i].midiNote);
-                                                if (subNoteIndex > -1) {
-                                                    component.patternModel.workingModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
-                                                    removedAtLeastOne = true;
-                                                }
-                                            }
-
-                                            // And then, only if we didn't remove anything should we be adding the notes
-                                            if (!removedAtLeastOne) {
-                                                var subNoteIndex = -1;
+                            if (pressed) {
+                                updateInsideBounds();
+                                longPressTimer.subNoteIndex = -1;
+                                longPressTimer.restart();
+                            } else {
+                                if (x > -1 && y > -1 && x < component.width && y < component.height) {
+                                    if (!longPressTimer.pressingAndHolding) {
+                                        if (padNoteRect.shouldChange) {
+                                            if (applicationWindow().globalSequencer.heardNotes.length > 0) {
+                                                var removedAtLeastOne = false;
+                                                // First, let's see if any of the notes in our list are already on this position, and if so, remove them
                                                 for (var i = 0; i < applicationWindow().globalSequencer.heardNotes.length; ++i) {
-                                                    subNoteIndex = component.patternModel.workingModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, applicationWindow().globalSequencer.heardNotes[i]);
-                                                    component.patternModel.workingModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", applicationWindow().globalSequencer.heardVelocities[i]);
-                                                    if (component.patternModel.workingModel.defaultNoteDuration > 0) {
-                                                        component.patternModel.workingModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "duration", component.patternModel.workingModel.defaultNoteDuration);
+                                                    var subNoteIndex = component.patternModel.workingModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, applicationWindow().globalSequencer.heardNotes[i].midiNote);
+                                                    if (subNoteIndex > -1) {
+                                                        component.patternModel.workingModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
+                                                        removedAtLeastOne = true;
                                                     }
                                                 }
+
+                                                // And then, only if we didn't remove anything should we be adding the notes
+                                                if (!removedAtLeastOne) {
+                                                    var subNoteIndex = -1;
+                                                    for (var i = 0; i < applicationWindow().globalSequencer.heardNotes.length; ++i) {
+                                                        subNoteIndex = component.patternModel.workingModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, applicationWindow().globalSequencer.heardNotes[i]);
+                                                        component.patternModel.workingModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", applicationWindow().globalSequencer.heardVelocities[i]);
+                                                        if (component.patternModel.workingModel.defaultNoteDuration > 0) {
+                                                            component.patternModel.workingModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "duration", component.patternModel.workingModel.defaultNoteDuration);
+                                                        }
+                                                    }
+                                                }
+                                                component.currentSubNote = -1;
+                                                component.note = component.patternModel.workingModel.getNote(component.padNoteRow, component.padNoteIndex);
                                             }
-                                            component.currentSubNote = -1;
-                                            component.note = component.patternModel.workingModel.getNote(component.padNoteRow, component.padNoteIndex);
+                                        } else {
+                                            component.tapped(-1);
                                         }
-                                    } else {
-                                        component.tapped(-1);
                                     }
                                 }
+                                longPressTimer.pressingAndHolding = false;
+                                longPressTimer.stop();
                             }
-                            longPressTimer.pressingAndHolding = false;
-                            longPressTimer.stop();
                         }
                     }
                 }
@@ -183,22 +187,26 @@ QQC2.Button {
                                 onXChanged: updateInsideBounds();
                                 onYChanged: updateInsideBounds();
                                 onPressedChanged: {
-                                    if (pressed) {
-                                        updateInsideBounds();
-                                        longPressTimer.subNoteIndex = index;
-                                        longPressTimer.restart();
+                                    if (zynqtgui.playButtonPressed) {
+                                        applicationWindow().globalSequencer.handleSequencerStepButton(component.padNoteIndex, pressed);
                                     } else {
-                                        if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
-                                            if (!longPressTimer.pressingAndHolding) {
-                                                if (zynqtgui.altButtonPressed) {
-                                                    component.tapped(index);
-                                                } else {
-                                                    component.tapped(-1);
+                                        if (pressed) {
+                                            updateInsideBounds();
+                                            longPressTimer.subNoteIndex = index;
+                                            longPressTimer.restart();
+                                        } else {
+                                            if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
+                                                if (!longPressTimer.pressingAndHolding) {
+                                                    if (zynqtgui.altButtonPressed) {
+                                                        component.tapped(index);
+                                                    } else {
+                                                        component.tapped(-1);
+                                                    }
                                                 }
                                             }
+                                            longPressTimer.pressingAndHolding = false;
+                                            longPressTimer.stop();
                                         }
-                                        longPressTimer.pressingAndHolding = false;
-                                        longPressTimer.stop();
                                     }
                                 }
                             }

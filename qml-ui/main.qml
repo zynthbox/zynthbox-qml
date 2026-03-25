@@ -813,7 +813,7 @@ Kirigami.AbstractApplicationWindow {
             var eq = ctrl.equaliserSettings[5]
             if(!eq)
                 return
-            eq.quality = eq.quality+(sign/10)            
+            eq.qualityAbsolute = eq.qualityAbsolute+(sign/100)            
         }
     }
 
@@ -823,7 +823,7 @@ Kirigami.AbstractApplicationWindow {
             var eq = ctrl.equaliserSettings[0]
             if(!eq)
                 return
-            eq.quality = eq.quality+(sign/10)            
+            eq.qualityAbsolute = eq.qualityAbsolute+(sign/100)            
         }
     }
 

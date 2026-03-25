@@ -717,7 +717,7 @@ AbstractSketchpadPage {
 
                                         onGlobalHiCutQChanged: {
                                             if(_hicutDelegate.enabled){
-                                                _hicutDelegate.eq.quality = _EQHiCutRow.globalHiCutQ
+                                                _hicutDelegate.eq.qualityAbsolute = _EQHiCutRow.globalHiCutQ
                                             }
                                         }
                                     }                               
@@ -841,19 +841,23 @@ AbstractSketchpadPage {
 
                                             control1: VolumeControl {
                                                 id: volumeControl2
-                                                tickLabelSet : ({"0":"0", "5":"5", "10":"10"})  
+                                                tickLabelSet : ({"0":"0", "50":"50%", "100":"100%"})  
                                                 slider {
                                                     from: 0
-                                                    to: 10
-                                                    stepSize: 0.1
-                                                    value: _hicutDelegate.eq ? _hicutDelegate.eq.quality : 0
+                                                    to: 100
+                                                    stepSize: 1
+                                                }
+                                                Binding {
+                                                    target: volumeControl2.slider
+                                                    property: "value"
+                                                    value: _hicutDelegate.eq ? _hicutDelegate.eq.qualityAbsolute*100 : 0
                                                 }
                                                 onValueChanged: {
                                                     if (_hicutDelegate.eq) {
                                                         if(_EQStack.applyToAll) {
-                                                            _EQHiCutRow.globalHiCutQ = slider.value
+                                                            _EQHiCutRow.globalHiCutQ = slider.value/100
                                                         }else{
-                                                            _hicutDelegate.eq.quality = slider.value
+                                                            _hicutDelegate.eq.qualityAbsolute = slider.value/100
                                                         }
                                                     }
                                                 }
@@ -917,7 +921,7 @@ AbstractSketchpadPage {
 
                                         onGlobalLowCutQChanged: {
                                             if(_lowcutDelegate.enabled){
-                                                _lowcutDelegate.eq.quality = _EQLowCutRow.globalLowCutQ
+                                                _lowcutDelegate.eq.qualityAbsolute = _EQLowCutRow.globalLowCutQ
                                             }
                                         }
                                     }   
@@ -1038,19 +1042,23 @@ AbstractSketchpadPage {
 
                                             control1: VolumeControl {
                                                 id: volumeControl2
-                                                tickLabelSet : ({"0":"0", "5":"5", "10":"10"})  
+                                                tickLabelSet : ({"0":"0%", "50":"50%", "100":"100%"})  
                                                 slider {
                                                     from: 0
-                                                    to: 10
-                                                    stepSize: 0.1
-                                                    value: _lowcutDelegate.eq ? _lowcutDelegate.eq.quality : 0
+                                                    to: 100
+                                                    stepSize: 1
+                                                }
+                                                Binding {
+                                                    target: volumeControl2.slider
+                                                    property: "value"
+                                                    value: _lowcutDelegate.eq ? _lowcutDelegate.eq.qualityAbsolute*100 : 0
                                                 }
                                                 onValueChanged: {
                                                     if (_lowcutDelegate.eq) {
                                                         if(_EQStack.applyToAll) {
-                                                            _EQLowCutRow.globalLowCutQ = slider.value
+                                                            _EQLowCutRow.globalLowCutQ = slider.value/100
                                                         }else{
-                                                            _lowcutDelegate.eq.quality = slider.value
+                                                            _lowcutDelegate.eq.qualityAbsolute = slider.value/100
                                                         }
                                                     }
                                                 }
@@ -1172,8 +1180,6 @@ AbstractSketchpadPage {
                         RowLayout {
                             id: _compThresholdRow
                             spacing: ZUI.Theme.cellSpacing
-                            property double globalHiCutValue: 0
-                            property double globalHiCutQ: 0
 
                             function focusElement() {
                                 handleClick(root.selectedChannel.id)

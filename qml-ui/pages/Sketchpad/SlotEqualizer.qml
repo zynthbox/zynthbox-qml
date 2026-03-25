@@ -71,9 +71,62 @@ ZUI.DialogQuestion {
             : ""
         : qsTr("%1 Equalizer").arg(_private.engineData.name)
 
+    // TODO Handle the track/clip/whatnot changing underneath us (now that globalsequencer can do that... and also any external controller that's set up properly)
     cuiaCallback: function(cuia) {
         let returnValue = false;
         switch (cuia) {
+        // If somebody requests changing to a different screen while the dialogue is open, let that happen
+        case "SWITCH_NUMBER_1_RELEASED":
+        case "SCREEN_SKETCHPAD":
+            component.reject();
+            if (["sketchpad"].includes(zynqtgui.current_screen_id)) {
+                returnValue = true;
+            } else {
+                returnValue = false;
+            }
+            break;
+        case "SWITCH_NUMBER_2_RELEASED":
+        case "SCREEN_BANK":
+        case "SCREEN_PRESET":
+        case "SCREEN_LAYER":
+        case "SCREEN_LAYER_FX":
+            component.reject();
+            if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset", "effects_for_channel", "effect_preset", "sketch_effects_for_channel", "sketch_effect_preset", "sample_library"].includes(zynqtgui.current_screen_id)) {
+                returnValue = true;
+            } else {
+                returnValue = false;
+            }
+            break;
+        case "SWITCH_NUMBER_3_RELEASED":
+        case "SCREEN_CONTROL":
+            component.reject();
+            if (["control", "channel_wave_editor", "channel_external_setup"].includes(zynqtgui.current_screen_id)) {
+                returnValue = true;
+            } else {
+                returnValue = false;
+            }
+            break;
+        case "SCREEN_EDIT_CONTEXTUAL":
+        case "SWITCH_NUMBER_4_RELEASED":
+        case "SCREEN_PLAYGRID":
+            component.reject();
+            if (["playgrid"].includes(zynqtgui.current_screen_id)) {
+                returnValue = true;
+            } else {
+                returnValue = false;
+            }
+            break;
+        case "SWITCH_NUMBER_5_RELEASED":
+        case "SCREEN_SONG_MANAGER":
+            component.reject();
+            if (["song_manager"].includes(zynqtgui.current_screen_id)) {
+                returnValue = true;
+            } else {
+                returnValue = false;
+            }
+            break;
+        case "SCREEN_ALSA_MIXER":
+        case "SCREEN_MAIN_MENU":
         case "SWITCH_BACK_RELEASED":
             component.reject();
             returnValue = true;

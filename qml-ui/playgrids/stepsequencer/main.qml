@@ -107,10 +107,10 @@ IMP.BasePlayGrid {
                     } else {
                         if (_private.selectedStep > -1) {
                             component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
-                        } else if (component.heardNotes.length > 0) {
+                        } else if (applicationWindow().globalSequencer.heardNotes.length > 0) {
                             var filter = []
-                            for (var i = 0; i < component.heardNotes.length; ++i) {
-                                filter.push(component.heardNotes[i].midiNote);
+                            for (var i = 0; i < applicationWindow().globalSequencer.heardNotes.length; ++i) {
+                                filter.push(applicationWindow().globalSequencer.heardNotes[i].midiNote);
                             }
                             component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
                         } else {
@@ -129,9 +129,8 @@ IMP.BasePlayGrid {
                             _private.disableSelected();
                         } else if (_private.hasSelection) {
                             _private.deselectSelectedItem();
-                        } else if (component.heardNotes.length > 0) {
-                            component.heardNotes = [];
-                            component.heardVelocities = [];
+                        } else if (applicationWindow().globalSequencer.heardNotes.length > 0) {
+                            applicationWindow().globalSequencer.setHeardData(undefined, undefined);
                         }
                     }
                     returnValue = true;
@@ -245,8 +244,7 @@ IMP.BasePlayGrid {
     property bool nudgeOverlayEnabled: false
     property bool nudgePerformed: false
 
-    property var heardNotes: []
-    property var heardVelocities: []
+    readonly property alias selectedStep: _private.selectedStep
     property var currentRowUniqueNotes: []
     property var currentRowUniqueMidiNotes: []
     property var currentBarNotes: []
@@ -319,11 +317,6 @@ IMP.BasePlayGrid {
                     if (_private.associatedChannel != newChannel) {
                         // When switching tracks, clear our whatever you're listening to, otherwise things end up very strange...
                         // But, only do that when actually *switching* channels, not just when doing other stuff...
-                        component.noteListeningActivations = 0;
-                        component.noteListeningNotes = [];
-                        component.noteListeningVelocities = [];
-                        component.heardNotes = [];
-                        component.heardVelocities = [];
                         if (newChannel && newChannel.trackStyle === "drums") {
                             _private.selectStep(0);
                         }
@@ -406,7 +399,7 @@ IMP.BasePlayGrid {
                     firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
                     lastStep = _private.workingPatternModel.patternLength - 1;
                 }
-                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, component.heardNotes);
+                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, applicationWindow().globalSequencer.heardNotes);
             }
         }
         function nudgeRight() {
@@ -421,7 +414,7 @@ IMP.BasePlayGrid {
                     firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
                     lastStep = _private.workingPatternModel.patternLength - 1;
                 }
-                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, component.heardNotes);
+                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, applicationWindow().globalSequencer.heardNotes);
             }
         }
 
@@ -647,81 +640,6 @@ IMP.BasePlayGrid {
             _private.toggleStepOnTouchSelect = value;
         }
     }
-    Connections {
-        target: Zynthbox.MidiRouter
-        // If we are already listening, we need to keep listening even if the user switched away from the sequencer
-        enabled: component.isVisible || component.noteListeningActivations > 0
-        onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
-            // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.activePatternModel.sketchpadTrack, "listening on port", listenToPort);
-            let targetTrack = Zynthbox.MidiRouter.sketchpadTrackTargetTrack(_private.activePatternModel.sketchpadTrack);
-            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort)
-                && (targetTrack == _private.activePatternModel.sketchpadTrack
-                    ? sketchpadTrack == _private.activePatternModel.sketchpadTrack
-                    : sketchpadTrack == targetTrack
-                )
-                && size === 3) {
-                if (127 < byte1 && byte1 < 160) {
-                    let setOn = true;
-                    // By convention, an "off" note can be either a midi off message, or an on message with a velocity of 0
-                    if (byte1 < 144 || byte3 === 0) {
-                        setOn = false;
-                    }
-                    let midiNote = byte2;
-                    let velocity = byte3;
-                    if (setOn === true) {
-                        if (component.noteListeningActivations === 0) {
-                            // Clear the current state, in case there's something there (otherwise things look a little weird)
-                            component.heardNotes = [];
-                            component.heardVelocities = [];
-                        }
-                        // Count up one tick for a note on message
-                        component.noteListeningActivations = component.noteListeningActivations + 1;
-                        // Create a new note based on the new thing that just arrived, but only if it's an on note
-                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, _private.activePatternModel.sketchpadTrack);
-                        var existingIndex = component.noteListeningNotes.indexOf(newNote);
-                        if (existingIndex > -1) {
-                            component.noteListeningNotes.splice(existingIndex, 1);
-                            component.noteListeningVelocities.splice(existingIndex, 1);
-                        }
-                        component.noteListeningNotes.push(newNote);
-                        component.noteListeningVelocities.push(velocity);
-                        // console.log("Registering note on , new activation count is", component.noteListeningActivations, component.noteListeningNotes);
-                    } else if (setOn == false) {
-                        // Count down one for a note off message
-                        component.noteListeningActivations = component.noteListeningActivations - 1;
-                        // console.log("Registering note off, new activation count is", component.noteListeningActivations, component.noteListeningNotes, component.noteListeningVelocities);
-                    }
-                    if (component.noteListeningActivations < 0) {
-                        // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
-                        // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
-                        // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
-                        // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
-                        component.noteListeningActivations = 0;
-                        component.noteListeningNotes = [];
-                        component.noteListeningVelocities = [];
-                    }
-                    if (component.noteListeningActivations > 0) {
-                        // As we listen, assign all the heard notes to the heard notes thinger so we show things as we listen
-                        component.heardNotes = component.noteListeningNotes;
-                        component.heardVelocities = component.noteListeningVelocities;
-                    }
-                    if (component.noteListeningActivations === 0) {
-                        // Now, if we're back down to zero, then we've had all the notes released, and we should clear our lists, ready for next go
-                        component.noteListeningNotes = [];
-                        component.noteListeningVelocities = [];
-                    }
-                } else if (175 < byte1 && byte1 < 192 && byte2 === 123) {
-                    // console.log("Registering all-off, resetting to empty, bytes are", byte1, byte2, byte3);
-                    component.noteListeningActivations = 0;
-                    component.noteListeningNotes = [];
-                    component.noteListeningVelocities = [];
-                }
-            }
-        }
-    }
-    property int noteListeningActivations: 0
-    property var noteListeningNotes: []
-    property var noteListeningVelocities: []
 
     // IMP.SequenceLoader {
     //     id: sequenceLoader
@@ -1091,7 +1009,7 @@ IMP.BasePlayGrid {
 
                 // notes grid
                 Item {
-                    visible: !(_private.associatedChannel && _private.associatedChannel.trackStyle === "drums")
+                    visible: _private.effectiveSequencerStyle === _private.stepSequencerStyle
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     DrumsGrid {
@@ -1128,7 +1046,7 @@ IMP.BasePlayGrid {
                 // sequencer
                 Rectangle {
                     id: drumPad
-                    visible: !(_private.associatedChannel && _private.associatedChannel.trackStyle === "drums")
+                    visible: _private.effectiveSequencerStyle === _private.stepSequencerStyle
                     property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
                     Layout.fillWidth: true;
                     Layout.minimumHeight: parent.height / 5;
@@ -1438,8 +1356,7 @@ IMP.BasePlayGrid {
                                             stepNotes.push(note.subnotes[i]);
                                         }
                                     }
-                                    component.heardNotes = stepNotes;
-                                    component.heardVelocities = stepVelocities;
+                                    applicationWindow().globalSequencer.setHeardData(stepNotes, stepVelocities);
                                     if (noteSettings.visible) {
                                         noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                                     }
@@ -1457,8 +1374,8 @@ IMP.BasePlayGrid {
                                         noteLengthVisualiser.clearVisualisation();
                                     }
                                 } else {
+                                    applicationWindow().globalSequencer.setHeardData(undefined, undefined);
                                     noteLengthVisualiser.clearVisualisation();
-                                    Qt.callLater(updateMostRecentFromSelection);
                                 }
                             }
                             function goNext() {
@@ -1592,9 +1509,9 @@ IMP.BasePlayGrid {
                                         }
                                     } else {
                                         let filter = []
-                                        if (component.heardNotes.length > 0) {
-                                            for (var i = 0; i < component.heardNotes.length; ++i) {
-                                                filter.push(component.heardNotes[i].midiNote);
+                                        if (applicationWindow().globalSequencer.heardNotes.length > 0) {
+                                            for (var i = 0; i < applicationWindow().globalSequencer.heardNotes.length; ++i) {
+                                                filter.push(applicationWindow().globalSequencer.heardNotes[i].midiNote);
                                             }
                                         }
                                         component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
@@ -1875,7 +1792,7 @@ IMP.BasePlayGrid {
                                                     firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
                                                     lastStep = _private.workingPatternModel.patternLength - 1;
                                                 }
-                                                _private.workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, component.heardNotes);
+                                                _private.workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, applicationWindow().globalSequencer.heardNotes);
                                             }
                                         }
                                     }
@@ -2427,8 +2344,10 @@ IMP.BasePlayGrid {
 
                 ZUI.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                    text: "Note:\n" + (component.heardNotes.length > 0
-                        ? Zynthbox.Chords.symbol(component.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
+                    text: "Note:\n" + (applicationWindow().globalSequencer.heardNotes.length > 0
+                        ? applicationWindow().globalSequencer.currentHeardIsKeyNote
+                            ? qsTr("%1%2 ⚿").arg(applicationWindow().globalSequencer.patternKeyNote.name).arg(applicationWindow().globalSequencer.patternKeyNote.octave - 1)
+                            : Zynthbox.Chords.symbol(applicationWindow().globalSequencer.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
                         : "(all)")
                     visualPressAndHold: true
                     onClicked: {
@@ -2443,10 +2362,12 @@ IMP.BasePlayGrid {
                                         _private.deselectSelectedItem();
                                     }
                                 }
-                                // Select the first step of the bar
-                                _private.selectStep(_private.workingPatternModel.activeBar * _private.workingPatternModel.width);
-                                component.heardNotes = [];
-                                component.heardVelocities = [];
+                                // Select the first step of the bar if we're in drumsequender mode, otherwise reset the selection to the pattern key
+                                if (_private.effectiveSequencerStyle === _private.drumSequencerStyle) {
+                                    _private.selectStep(_private.workingPatternModel.activeBar * _private.workingPatternModel.width);
+                                } else {
+                                    applicationWindow().globalSequencer.setHeardData(undefined, undefined);
+                                }
                             }
                         }
                     }
@@ -2461,7 +2382,7 @@ IMP.BasePlayGrid {
                         }
                         height: parent.width * 0.3
                         width: height
-                        visible: component.heardNotes.length > 0 || _private.selectedStep > -1
+                        visible: applicationWindow().globalSequencer.currentHeardIsKeyNote === false || _private.selectedStep > -1
                         source: "edit-clear-locationbar"
                     }
                     ZUI.ActionPickerPopup {
@@ -2474,25 +2395,25 @@ IMP.BasePlayGrid {
                         }
                         actions: [
                             QQC2.Action {
-                                text: component.heardNotes.length > 1
+                                text: applicationWindow().globalSequencer.heardNotes.length > 1
                                     ? qsTr("Remove Selected Notes\nFrom Pattern")
                                     : qsTr("Remove Selected Note\nFrom Pattern")
-                                enabled: component.heardNotes.length > 0
+                                enabled: applicationWindow().globalSequencer.heardNotes.length > 0
                                 onTriggered: {
                                     let firstStep = _private.workingPatternModel.width * _private.workingPatternModel.bankOffset;
                                     let lastStep = firstStep + _private.workingPatternModel.patternLength;
-                                    _private.workingPatternModel.removeSubnotesByNoteValue(component.heardNotes, firstStep, lastStep);
+                                    _private.workingPatternModel.removeSubnotesByNoteValue(applicationWindow().globalSequencer.heardNotes, firstStep, lastStep);
                                 }
                             },
                             QQC2.Action {
-                                text: component.heardNotes.length > 1
+                                text: applicationWindow().globalSequencer.heardNotes.length > 1
                                     ? qsTr("Remove Selected Notes\nFrom Bar")
                                     : qsTr("Remove Selected Note\nFrom Bar")
-                                enabled: component.heardNotes.length > 0
+                                enabled: applicationWindow().globalSequencer.heardNotes.length > 0
                                 onTriggered: {
                                     let firstStep = _private.workingPatternModel.width * (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset);
                                     let lastStep = firstStep + _private.workingPatternModel.width;
-                                    _private.workingPatternModel.removeSubnotesByNoteValue(component.heardNotes, firstStep, lastStep);
+                                    _private.workingPatternModel.removeSubnotesByNoteValue(applicationWindow().globalSequencer.heardNotes, firstStep, lastStep);
                                 }
                             },
                             QQC2.Action {
@@ -2515,7 +2436,7 @@ IMP.BasePlayGrid {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.selectedStep > -1
                         ? "Step\n%1".arg((_private.workingPatternModel.width * (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset)) + _private.selectedStep + 1)
-                        : component.heardNotes.length > 0
+                        : applicationWindow().globalSequencer.heardNotes.length > 0
                             ? "%1\n%2".arg(noteLength).arg(velocity)
                             : (component.currentBarNotes.length > 0 ? component.currentBarNotes.length : "-") + " in\nBar"
                     property var stepNames: {
@@ -2544,7 +2465,7 @@ IMP.BasePlayGrid {
                                 ? defaultNoteSettingsButton.stepNames[_private.workingPatternModel.defaultNoteDuration]
                                 : _private.workingPatternModel.defaultNoteDuration + "/128th"
                         : ""
-                    property string velocity: component.heardVelocities.length === 0 ? "" : "Vel " + component.heardVelocities[0]
+                    property string velocity: applicationWindow().globalSequencer.heardVelocities.length === 0 ? "" : "Vel " + applicationWindow().globalSequencer.heardVelocities[0]
                     onPressed: {
                         component.nudgeOverlayEnabled = true;
                     }
@@ -2559,10 +2480,10 @@ IMP.BasePlayGrid {
                         } else {
                             if (_private.selectedStep > -1) {
                                 component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
-                            } else if (component.heardNotes.length > 0) {
+                            } else if (applicationWindow().globalSequencer.heardNotes.length > 0) {
                                 var filter = []
-                                for (var i = 0; i < component.heardNotes.length; ++i) {
-                                    filter.push(component.heardNotes[i].midiNote);
+                                for (var i = 0; i < applicationWindow().globalSequencer.heardNotes.length; ++i) {
+                                    filter.push(applicationWindow().globalSequencer.heardNotes[i].midiNote);
                                 }
                                 component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
                             } else {

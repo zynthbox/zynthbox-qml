@@ -33,8 +33,11 @@ Item {
     id: component
     readonly property alias heardNotes: _private.heardNotes
     readonly property alias heardVelocities: _private.heardVelocities
+    readonly property alias noteListeningNotes: _private.noteListeningNotes
     readonly property alias sequence: _private.sequence
     readonly property alias pattern: _private.pattern
+    readonly property alias patternKeyNote: _private.patternKeyNote
+    readonly property bool currentHeardIsKeyNote: heardNotes.length === 1 && heardNotes[0] === patternKeyNote
 
     readonly property alias mostRecentlyInteractedStep: _private.mostRecentlyInteractedStep
     function setMostRecentlyInteractedStep(stepIndex) {
@@ -64,7 +67,7 @@ Item {
                 let newNote = heardNotes[i];
                 if (Number.isInteger(newNote)) {
                     newHeard.push(Zynthbox.PlayGridManager.getNote(ZUI.CommonUtils.clamp(newNote, 0, 127), _private.pattern.sketchpadTrack));
-                } else if (typeof(newNote) == "Note") {
+                } else if (typeof(newNote) == "object" && newNote.hasOwnProperty("midiNote") && newNote.hasOwnProperty("sketchpadTrack")) {
                     newHeard.push(newNote);
                 } else {
                     givenIsValid = false;

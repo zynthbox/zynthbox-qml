@@ -797,6 +797,7 @@ AbstractSketchpadPage {
                                             control1: VolumeControl {
                                                 id: volumeControl
                                                 tickLabelSet : ({"0":"20Hz", "50":"650Hz", "100":"20kHz"})
+                                                fontSize: 6
                                                 slider {
                                                     stepSize: 1
                                                     from: 0
@@ -1000,6 +1001,7 @@ AbstractSketchpadPage {
                                             control1: VolumeControl {
                                                 id: volumeControl
                                                 tickLabelSet : ({"0":"20Hz", "50":"650Hz", "100":"20kHz"})
+                                                fontSize: 6
                                                 slider {
                                                     stepSize: 1
                                                     from: 0

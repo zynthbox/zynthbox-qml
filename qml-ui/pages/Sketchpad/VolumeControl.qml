@@ -20,6 +20,7 @@ Rectangle {
     property alias slider: slider
     property bool enabled: true
     property alias mouseArea: mouseArea
+    property int fontSize: 8
 
     signal clicked();
     signal doubleClicked();
@@ -62,7 +63,7 @@ Rectangle {
                 maximumValue: slider.to
                 value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
 
-                font.pointSize: 8
+                font.pointSize: control.fontSize
                 style: GaugeStyle {
                     valueBar: Item {
                         implicitWidth: 8

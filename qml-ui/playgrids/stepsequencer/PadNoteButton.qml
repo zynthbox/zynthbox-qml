@@ -92,6 +92,7 @@ QQC2.Button {
                     onPressedChanged: {
                         if (zynqtgui.playButtonPressed) {
                             applicationWindow().globalSequencer.handleSequencerStepButton(component.padNoteIndex, pressed);
+                            applicationWindow().globalSequencer.setMostRecentlyInteractedStep(component.padNoteIndex);
                         } else {
                             if (pressed) {
                                 updateInsideBounds();
@@ -189,6 +190,7 @@ QQC2.Button {
                                 onPressedChanged: {
                                     if (zynqtgui.playButtonPressed) {
                                         applicationWindow().globalSequencer.handleSequencerStepButton(component.padNoteIndex, pressed);
+                                        applicationWindow().globalSequencer.setMostRecentlyInteractedStep(component.padNoteIndex);
                                     } else {
                                         if (pressed) {
                                             updateInsideBounds();

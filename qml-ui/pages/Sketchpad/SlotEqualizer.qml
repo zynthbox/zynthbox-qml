@@ -597,7 +597,7 @@ ZUI.DialogQuestion {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
                                     ColumnLayout {
                                         Layout.fillWidth: true
-                                        enabled: bandDelegate.filterSettings && bandDelegate.filterSettings.hasQuality
+                                        visible: bandDelegate.filterSettings && bandDelegate.filterSettings.hasQuality
                                         Kirigami.Heading {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: false
@@ -659,7 +659,7 @@ ZUI.DialogQuestion {
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
-                                        enabled: bandDelegate.filterSettings && bandDelegate.filterSettings.hasGain
+                                        visible: bandDelegate.filterSettings && bandDelegate.filterSettings.hasGain
                                         Kirigami.Heading {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: false
@@ -728,6 +728,7 @@ ZUI.DialogQuestion {
                                             bottom: parent.bottom
                                             horizontalCenter: parent.horizontalCenter
                                         }
+                                        visible: bandDelegate.filterSettings && bandDelegate.filterSettings.filterType != Zynthbox.JackPassthroughFilter.NoFilterType
                                         width: height
                                         inputMode: QQC2.Dial.Vertical
                                         handle: null

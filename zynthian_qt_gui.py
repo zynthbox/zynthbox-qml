@@ -125,6 +125,7 @@ from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 from zynqtgui.zynthian_gui_ui_settings import zynthian_gui_ui_settings
+from zynqtgui.zynthian_gui_usb_settings import zynthian_gui_usb_settings
 from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.zynthian_osd import zynthian_osd
 from zynqtgui.utils.webconf_fifo_handler import webconf_fifo_handler
@@ -1166,6 +1167,7 @@ class zynthian_gui(QObject):
         self.__zynthbox_plugins_helper = zynthbox_plugins_helper(self)
 
         self.screens["ui_settings"] = zynthian_gui_ui_settings(self)
+        self.screens["usb_settings"] = zynthian_gui_usb_settings(self)
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
         self.screens["confirm"] = zynthian_gui_confirm(self)
@@ -4242,6 +4244,9 @@ class zynthian_gui(QObject):
     def ui_settings(self):
         return self.screens["ui_settings"]
 
+    def usb_settings(self):
+        return self.screens["usb_settings"]
+
     def song_manager(self):
         return self.screens["song_manager"]
 
@@ -5828,6 +5833,7 @@ class zynthian_gui(QObject):
     network = Property(QObject, network, constant=True)
     hardware = Property(QObject, hardware, constant=True)
     ui_settings = Property(QObject, ui_settings, constant=True)
+    usb_settings = Property(QObject, usb_settings, constant=True)
     song_manager = Property(QObject, song_manager, constant=True)
     sound_categories = Property(QObject, sound_categories, constant=True)
     led_config = Property(QObject, led_config, constant=True)

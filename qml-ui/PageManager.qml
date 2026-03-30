@@ -51,6 +51,7 @@ ZUI.Stack {
         "network":"NetworkPage.qml",
         "hardware":"HardwarePage.qml",
         "ui_settings":"UiSettingsPage.qml",
+        "usb_settings":"UsbSettingsPage.qml",
         "playgrid": "PlayGrid.qml",
         "playgrid_downloader": "PlayGridDownloaderPage.qml",
         "channel_external_setup": "ChannelExternalSetup.qml",

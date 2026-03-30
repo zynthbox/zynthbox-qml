@@ -37,6 +37,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
         super(zynthian_gui_usb_settings, self).__init__(parent)
         self.__audioInterfaceStyle = int(self.zynqtgui.global_settings.value("USB/audioInterfaceStyle", 0))
         self.__midiPerTrack = True if self.zynqtgui.global_settings.value("USB/midiPerTrack", "true") == "true" else False
+        self.__ethernet = True if self.zynqtgui.global_settings.value("USB/ethernet", "false") == "true" else False
 
     def fill_list(self):
         super().fill_list()
@@ -78,5 +79,20 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
 
     midiPerTrack = Property(bool, get_midiPerTrack, set_midiPerTrack, notify=midiPerTrackChanged)
     ### END Property midiPerTrack
+
+    ### BEGIN Property ethernet
+    def get_ethernet(self):
+        return self.__ethernet
+
+    def set_ethernet(self, value):
+        if value != self.__ethernet:
+            self.__ethernet = value
+            self.zynqtgui.global_settings.setValue("UI/ethernet", self.__ethernet)
+            self.ethernetChanged.emit()
+
+    ethernetChanged = Signal()
+
+    ethernet = Property(bool, get_ethernet, set_ethernet, notify=ethernetChanged)
+    ### END Property ethernet
 
 # ------------------------------------------------------------------------------

@@ -219,7 +219,22 @@ ZUI.ScreenPage {
                             zynqtgui.usb_settings.midiPerTrack = checked;
                         }
                     }
+                }
 
+                EntryDelegate {
+                    text: qsTr("USB Ethernet Device (10.55.0.1)")
+                    infoText: zynqtgui.usb_settings.ethernet ? qsTr("Enabled") : qsTr("Disabled")
+                    onClicked: zynqtgui.usb_settings.ethernet = !zynqtgui.usb_settings.ethernet
+                    index: 2
+                    onIncrementValue: zynqtgui.usb_settings.ethernet = true
+                    onDecrementValue: zynqtgui.usb_settings.ethernet = false
+
+                    QQC2.Switch {
+                        checked: zynqtgui.usb_settings.ethernet
+                        onClicked: {
+                            zynqtgui.usb_settings.ethernet = checked;
+                        }
+                    }
                 }
             }
         }

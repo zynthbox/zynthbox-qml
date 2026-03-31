@@ -48,7 +48,7 @@ MIDI_OUTPUT_PORT_COUNT=11
 ##################################
 # USB Ethernet configuration
 
-CREATE_ETHERNET_DEVICE=1
+CREATE_ETHERNET_DEVICE=0
 
 ETHERNET_HOST="00:dc:c8:f7:75:14"
 ETHERNET_SELF="00:dd:dc:eb:6d:a1"
@@ -63,7 +63,7 @@ cd /sys/kernel/config/usb_gadget/
 if [ "$1" = "stop" ]; then
     # the following logic is from https://github.com/larsks/systemd-usb-gadget/
     SYSDIR=/sys/kernel/config/usb_gadget/
-    DEVDIR=$SYSDIR/zynthbox-gadget
+    DEVDIR=${SYSDIR}zynthbox-gadget
 
     [ -d $DEVDIR ] || exit
 

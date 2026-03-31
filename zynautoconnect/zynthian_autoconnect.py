@@ -707,7 +707,7 @@ def audio_autoconnect(force=False):
     # logging.info("Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on TrackPassthrough and FXPassthrough")
     # BEGIN Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on TrackPassthrough and FXPassthrough
     try:
-        usbGadgetInputs = jclient.get_ports(name_pattern="usb-gadget-in:", is_audio=True, is_output=False, is_input=True)
+        usbGadgetInputs = ["UAC2 PCM:capture_FL", "UAC2 PCM:capture_FR"]
         song = zynthian_gui_config.zynqtgui.screens["sketchpad"].song
         synthEntryExists = [False] * 16 # TODO If we want to have more than 16 synth slots, this will need changing
         # Format is trackPassthroughLanesEnabled[trackId][laneId][laneType]
@@ -1198,22 +1198,16 @@ def audio_autoconnect(force=False):
     ### BEGIN Handle USB Gadget audio routing
     # Connect everything connected to the individual AudioLevels track and system playback client to the equivalent usb-gadget outputs (if that client exists)
     # For the first set, we should have precisely 2 playback ports
-    usbGadgetOutputs = jclient.get_ports("usb-gadget-global:playback_")
+    usbGadgetOutputs = jclient.get_ports("UAC2 PCM:playback_F")
     if len(usbGadgetOutputs) == 2:
-        for port in zbjack.getAllConnections("AudioLevels:SystemPlayback-left_in"):
-            zbjack.connectPorts(get_jack_port_name(port), get_jack_port_name(usbGadgetOutputs[0]))
-        for port in zbjack.getAllConnections("AudioLevels:SystemPlayback-right_in"):
-            zbjack.connectPorts(get_jack_port_name(port), get_jack_port_name(usbGadgetOutputs[1]))
+        zbjack.connectPorts(get_jack_port_name("AudioLevels:SystemPlayback-left_out"), get_jack_port_name(usbGadgetOutputs[0]))
+        zbjack.connectPorts(get_jack_port_name("AudioLevels:SystemPlayback-right_out"), get_jack_port_name(usbGadgetOutputs[1]))
     # We should have exactly 20 playback ports here, 2 for each track
-    usbGadgetOutputs = jclient.get_ports("usb-gadget-tracks:playback_")
+    usbGadgetOutputs = jclient.get_ports("UAC2 PCM:playback_AUX")
     if len(usbGadgetOutputs) == 20:
-        # The first pair will be system playback (for the poor sods who end up unable to listen to more than the stereo input, we want it to be at least useful)
-        # The remaining pairs will be for the individual tracks
         for channelId in range(0, 10):
-            for port in zbjack.getAllConnections(f"AudioLevels:Channel{channelId + 1}-left_in"):
-                zbjack.connectPorts(get_jack_port_name(port), get_jack_port_name(usbGadgetOutputs[(2 * channelId)]))
-            for port in zbjack.getAllConnections(f"AudioLevels:Channel{channelId + 1}-right_in"):
-                zbjack.connectPorts(get_jack_port_name(port), get_jack_port_name(usbGadgetOutputs[(2 * channelId) + 1]))
+            zbjack.connectPorts(get_jack_port_name(f"AudioLevels:Channel{channelId + 1}-left_out"), get_jack_port_name(usbGadgetOutputs[(2 * channelId)]))
+            zbjack.connectPorts(get_jack_port_name(f"AudioLevels:Channel{channelId + 1}-right_out"), get_jack_port_name(usbGadgetOutputs[(2 * channelId) + 1]))
     ### END Handle USB Gadget audio routing
 
     headphones_out = jclient.get_ports("Headphones", is_input=True, is_audio=True)

@@ -57,7 +57,7 @@ ColumnLayout {
                 delegate: ZUI.NotePad {
                     visible: component.visible && index < columnRepeater.columnCount
                     positionalVelocity: component.positionalVelocity
-                    note: visible && component.model.lastModified > 0 ? component.model.data(component.model.index(row, index), component.model.roles['note']) : null
+                    note: visible && component.model.lastModified > 0 && zynqtgui.sketchpad.song !== null ? component.model.data(component.model.index(row, index), component.model.roles['note']) : null
                     property var metadata: visible && component.model.lastModified > 0 ? component.model.data(component.model.index(row, index), component.model.roles['metadata']) : undefined
                     text: metadata !== undefined && metadata["displayText"] !== undefined ? metadata["displayText"] : ""
                     property color noteColor: note ? component.noteColors[note.midiNote] : ""

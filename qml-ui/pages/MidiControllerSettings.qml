@@ -211,6 +211,12 @@ ZUI.ScreenPage {
 
                         }
 
+                        Kirigami.Icon {
+                            Layout.fillHeight: true
+                            Layout.margins: Kirigami.Units.largeSpacing
+                            visible: devicesListViewDelegate.midiRouterDevice.receiveBeatClock
+                            source: "accept_time_event"
+                        }
                     }
 
                     background: ZUI.DelegateBackground {

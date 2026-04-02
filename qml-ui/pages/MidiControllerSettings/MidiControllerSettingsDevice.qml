@@ -136,6 +136,7 @@ QQC2.ScrollView {
         }
         RowLayout {
             id: firstDeviceSettingsRow
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             function goNext() { component.currentRow = secondDeviceSettingsRow; }
             function goPrevious() { component.currentRow = deviceComponentHeader; }
             function knob0up() {
@@ -159,6 +160,7 @@ QQC2.ScrollView {
             Layout.fillWidth: true
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: _private.selectedDeviceObject === null
                     ? ""
@@ -184,6 +186,7 @@ QQC2.ScrollView {
             }
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 visible: _private.selectedDeviceObject && _private.selectedDeviceObject.noteSplitPoint < 127
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: _private.selectedDeviceObject === null ? "" : qsTr("Upper Zone Master Channel:\nChannel %1").arg(_private.selectedDeviceObject.upperMasterChannel + 1)
@@ -206,6 +209,7 @@ QQC2.ScrollView {
             }
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: _private.selectedDeviceObject === null ? "" : _private.selectedDeviceObject.sendTimecode ? qsTr("Send MIDI Timecode:\nYes") : qsTr("Send MIDI Timecode:\nNo")
                 onClicked: {
@@ -226,7 +230,8 @@ QQC2.ScrollView {
         }
         RowLayout {
             id: secondDeviceSettingsRow
-            function goNext() { component.currentRow = addNewInputFilterButton; }
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            function goNext() { component.currentRow = thirdDeviceSettingsRow; }
             function goPrevious() { component.currentRow = firstDeviceSettingsRow; }
             function knob0up() {
                 _private.selectedDeviceObject.noteSplitPoint = Math.min(127, _private.selectedDeviceObject.noteSplitPoint + 1);
@@ -259,6 +264,7 @@ QQC2.ScrollView {
             Layout.fillWidth: true
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: _private.selectedDeviceObject === null ? "" : qsTr("Last Note In Lower Split:\n%1").arg(Zynthbox.KeyScales.midiNoteName(_private.selectedDeviceObject.noteSplitPoint))
                 onClicked: {
@@ -283,6 +289,7 @@ QQC2.ScrollView {
             }
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 visible: _private.selectedDeviceObject && _private.selectedDeviceObject.noteSplitPoint < 127
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: _private.selectedDeviceObject === null ? "" : qsTr("Lower Zone Last Member Channel:\nChannel %1").arg(_private.selectedDeviceObject.lastLowerZoneMemberChannel + 1)
@@ -305,6 +312,7 @@ QQC2.ScrollView {
             }
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: _private.selectedDeviceObject === null ? "" : _private.selectedDeviceObject.sendBeatClock ? qsTr("Send MIDI Beat Clock (24 PPQN):\nYes") : qsTr("Send MIDI Beat Clock (24 PPQN):\nNo")
                 onClicked: {
@@ -320,6 +328,76 @@ QQC2.ScrollView {
                     width: Kirigami.Units.iconSizes.smallMedium
                     knobId: 2
                     visible: component.currentRow === secondDeviceSettingsRow
+                }
+            }
+        }
+        RowLayout {
+            id: thirdDeviceSettingsRow
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            function goNext() { component.currentRow = addNewInputFilterButton; }
+            function goPrevious() { component.currentRow = secondDeviceSettingsRow; }
+            function knob0up() {
+                _private.selectedDeviceObject.receiveBeatClock = true;
+                // When explicitly enabling a clock source, that means "use this for clock, unless it's missing"
+                Zynthbox.MidiRouter.clockSource = Zynthbox.MidiRouter.ExternalClockSource;
+            }
+            function knob0down() {
+                // When explicitly disabling a clock source, that means "use the internal clock"
+                Zynthbox.MidiRouter.clockSource = Zynthbox.MidiRouter.InternalClockSource;
+                _private.selectedDeviceObject.receiveBeatClock = false;
+            }
+            function knob1up() {
+                _private.selectedDeviceObject.nextPpqn();
+            }
+            function knob1down() {
+                _private.selectedDeviceObject.previousPpqn();
+            }
+            function knob2up() {
+            }
+            function knob2down() {
+            }
+            Layout.fillWidth: true
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                text: _private.selectedDeviceObject === null ? "" : _private.selectedDeviceObject.receiveBeatClock ? qsTr("Use As MIDI Beat Clock Source:\nYes") : qsTr("Use As MIDI Beat Clock Source:\nNo")
+                onClicked: {
+                    _private.selectedDeviceObject.receiveBeatClock = !_private.selectedDeviceObject.receiveBeatClock;
+                }
+                ZUI.KnobIndicator {
+                    anchors {
+                        left: parent.left
+                        bottom: parent.bottom
+                        margins: Kirigami.Units.smallSpacing
+                    }
+                    height: Kirigami.Units.iconSizes.smallMedium
+                    width: Kirigami.Units.iconSizes.smallMedium
+                    knobId: 0
+                    visible: component.currentRow === thirdDeviceSettingsRow
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: _private.selectedDeviceObject && _private.selectedDeviceObject.receiveBeatClock
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                text: _private.selectedDeviceObject === null ? "" : qsTr("Provided Pulses per Quarter Note (PPQN):\n%1").arg(_private.selectedDeviceObject.ppqn)
+                onClicked: {
+                    ppqnPicker.pickPpqn(_private.selectedDeviceObject.ppqn, function(newPpqn) {
+                        _private.selectedDeviceObject.ppqn = newPpqn;
+                    });
+                }
+                ZUI.KnobIndicator {
+                    anchors {
+                        left: parent.left
+                        bottom: parent.bottom
+                        margins: Kirigami.Units.smallSpacing
+                    }
+                    height: Kirigami.Units.iconSizes.smallMedium
+                    width: Kirigami.Units.iconSizes.smallMedium
+                    knobId: 1
+                    visible: component.currentRow === thirdDeviceSettingsRow
                 }
             }
         }

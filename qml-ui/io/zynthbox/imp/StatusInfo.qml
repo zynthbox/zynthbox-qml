@@ -356,7 +356,7 @@ ZUI.SectionGroup
                         Layout.alignment: Qt.AlignTop
                         // Hide scale info for now
                         // text: zynqtgui.sketchpad.song.selectedScale +" "+ Zynthbox.SyncTimer.bpm
-                        text: Zynthbox.SyncTimer.bpm
+                        text: Zynthbox.SyncTimer.externalClockActive ? Zynthbox.SyncTimer.effectiveBpm.toFixed(1) : Zynthbox.SyncTimer.bpm
                         font.pointSize: 8
                     }
                     Kirigami.Icon {
@@ -529,45 +529,56 @@ ZUI.SectionGroup
                             contentItem: Item {
                                 ColumnLayout {
                                     anchors.fill: parent
-                                    ZUI.SketchpadDial {
+                                    Item {
                                         Layout.fillHeight: true
                                         Layout.fillWidth: true
                                         Layout.margins: Kirigami.Units.gridUnit
-                                        id: bpmDial
-                                        text: qsTr("BPM")
-                                        controlObj: Zynthbox.SyncTimer
-                                        controlProperty: "bpm"
-                                        knobId: 3
-
-                                        dial {
-                                            stepSize: 1
-                                            from: 50
-                                            to: 200
+                                        QQC2.Label {
+                                            visible: bpmDial.visible === false
+                                            anchors.fill: parent
+                                            verticalAlignment: Text.AlignVCenter
+                                            horizontalAlignment: Text.AlignHCenter
+                                            text: Zynthbox.SyncTimer.externalClockActive ? qsTr("External BPM:\n%1").arg(Zynthbox.SyncTimer.effectiveBpm.toFixed(1)) : ""
                                         }
+                                        ZUI.SketchpadDial {
+                                            id: bpmDial
+                                            anchors.fill: parent
+                                            visible: Zynthbox.SyncTimer.externalClockActive === false
+                                            text: qsTr("BPM")
+                                            controlObj: Zynthbox.SyncTimer
+                                            controlProperty: "bpm"
+                                            knobId: 3
 
-                                        onPressed: registerTap();
-                                        property int bpm: 0
-                                        property var timestamps: []
-                                        function registerTap() {
-                                            var newStamp = Date.now();
-                                            if (bpmDial.timestamps.length > 0 && newStamp - bpmDial.timestamps[timestamps.length - 1] > 2000) {
-                                                // If the most recent tap was more than two seconds ago, clear the list and start a new estimation
-                                                bpmDial.timestamps = [];
-                                                bpm = 0;
+                                            dial {
+                                                stepSize: 1
+                                                from: 50
+                                                to: 200
                                             }
-                                            bpmDial.timestamps.push(newStamp);
-                                            if (bpmDial.timestamps.length > 1) {
-                                                var differences = [];
-                                                for (var i = 0; i < bpmDial.timestamps.length - 1; ++i) {
-                                                    differences.push(bpmDial.timestamps[i + 1] - bpmDial.timestamps[i]);
+
+                                            onPressed: registerTap();
+                                            property int bpm: 0
+                                            property var timestamps: []
+                                            function registerTap() {
+                                                var newStamp = Date.now();
+                                                if (bpmDial.timestamps.length > 0 && newStamp - bpmDial.timestamps[timestamps.length - 1] > 2000) {
+                                                    // If the most recent tap was more than two seconds ago, clear the list and start a new estimation
+                                                    bpmDial.timestamps = [];
+                                                    bpm = 0;
                                                 }
-                                                var sum = 0;
-                                                for (var i = 0; i < differences.length; ++i) {
-                                                    sum += differences[i];
+                                                bpmDial.timestamps.push(newStamp);
+                                                if (bpmDial.timestamps.length > 1) {
+                                                    var differences = [];
+                                                    for (var i = 0; i < bpmDial.timestamps.length - 1; ++i) {
+                                                        differences.push(bpmDial.timestamps[i + 1] - bpmDial.timestamps[i]);
+                                                    }
+                                                    var sum = 0;
+                                                    for (var i = 0; i < differences.length; ++i) {
+                                                        sum += differences[i];
+                                                    }
+                                                    var average = sum / differences.length;
+                                                    bpmDial.bpm = 60000 / average;
+                                                    Zynthbox.SyncTimer.setBpm(bpmDial.bpm)
                                                 }
-                                                var average = sum / differences.length;
-                                                bpmDial.bpm = 60000 / average;
-                                                Zynthbox.SyncTimer.setBpm(bpmDial.bpm)
                                             }
                                         }
                                     }

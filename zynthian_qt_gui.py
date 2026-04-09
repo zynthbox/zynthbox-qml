@@ -3986,6 +3986,40 @@ class zynthian_gui(QObject):
         root.send_event(close_message, event_mask=mask)
         display.flush()
 
+    @Slot(None)
+    def minimize_current_window(self):
+        if zynthian_gui_config.app.focusWindow():
+            return
+        display = Xlib.display.Display()
+        root = display.screen().root
+        wid = root.get_full_property(display.intern_atom('_NET_ACTIVE_WINDOW'), Xlib.X.AnyPropertyType).value[0]
+
+        logging.debug(wid)
+        window = display.create_resource_object("window", wid)
+        window.unmap()
+        display.sync()
+        # window.iconify()
+
+        # wm_state = display.intern_atom('_NET_WM_STATE')
+        # hidden = display.intern_atom('_NET_WM_STATE_HIDDEN')
+    
+        # # Prepare the event
+        # data = [
+        #     1,  # _NET_WM_STATE_ADD (or 2 for toggle)
+        #     hidden.id,
+        #     0, 0, 0
+        # ]
+        
+        # event = Xlib.protocol.event.ClientMessage(
+        #     window=window,
+        #     client_type=wm_state,
+        #     data=(32, (data[0], data[1], data[2], data[3], data[4]))
+        # )
+        
+        # # Send event to root window
+        # root.send_event(event, event_mask=Xlib.X.SubstructureNotifyMask | Xlib.X.SubstructureRedirectMask)
+        # display.sync()
+
     def get_active_midi_channel(self):
         if self.curlayer == None:
             return lib_zyncoder.get_midi_active_chan()

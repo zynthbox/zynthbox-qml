@@ -36,6 +36,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import QtQuick.Controls.Styles 1.4
 
 import io.zynthbox.ui 1.0 as ZUI
+import io.zynthbox.mpris 1.0 as MPRIS
+
 
 import io.zynthbox.components 1.0 as Zynthbox
 
@@ -3107,7 +3109,14 @@ AbstractSketchpadPage {
                         } 
                     }
                 }
-                Item {}
+
+                Item {
+
+                    MPRIS.PlayersView {
+                        anchors.fill: parent
+                    }
+
+                }
                 Item {}
             }
         }      

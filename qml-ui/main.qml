@@ -2575,6 +2575,17 @@ Kirigami.AbstractApplicationWindow {
                         zynqtgui.close_current_window();
                     }
                 }
+
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitWidth: 1
+                    text: qsTr("HIDE")
+                    onClicked: {
+                        clipPickerMenu.visible = false;
+                        zynqtgui.minimize_current_window();
+                    }
+                }
                 // TODO Return for 1.1, but also probably with more and better functionality (this is ooooold code, doesn't really match current setup)
                 // QQC2.Button {
                 //     Layout.fillWidth: true

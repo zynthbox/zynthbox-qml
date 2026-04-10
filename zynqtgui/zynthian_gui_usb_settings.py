@@ -28,7 +28,7 @@ import logging
 import subprocess
 from pathlib import Path
 
-from PySide2.QtCore import Signal, Property
+from PySide2.QtCore import Signal, Property, Slot, Qt
 from . import zynthian_qt_gui_base
 
 class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
@@ -86,7 +86,10 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
         self.__midiPerTrack = True if self.zynqtgui.global_settings.value("USB/midiPerTrack", "true") == "true" else False
         self.__ethernet = True if self.zynqtgui.global_settings.value("USB/ethernet", "false") == "true" else False
 
-        self.restart_usb_gadget()
+        self.audioInterfaceStyleChanged.connect(self.restart_usb_gadget, Qt.QueuedConnection)
+        self.midiPerTrackChanged.connect(self.restart_usb_gadget, Qt.QueuedConnection)
+        self.ethernetChanged.connect(self.restart_usb_gadget, Qt.QueuedConnection)
+        self.zynqtgui.isBootingCompleteChanged.connect(self.restart_usb_gadget, Qt.QueuedConnection)
 
     def fill_list(self):
         super().fill_list()
@@ -100,6 +103,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
     # - One USB Audio gadget, with 1 stereo input channel and 1 stereo output channel, at 48000Hz
     # - One USB Audio gadget, 10 stereo output channels, at 48000Hz
     # - One USB MIDI gadget
+    @Slot()
     def restart_usb_gadget(self):
         gadget_dir = self.gadget_base_dir / self.gadget_name
         config_dir = gadget_dir / "configs" / "c.1"
@@ -136,6 +140,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
             # For a short description of the available attributes, see:
             # https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-uac2
             if self.__audioInterfaceStyle >= 1:
+                logging.info("Creating Global Output USB Audio Gadget")
                 # The global input/output device
                 global_audio = gadget_dir / "functions" / "uac2.usb0"
                 global_audio.mkdir(parents=True, exist_ok=True)
@@ -152,6 +157,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
                 global_audio_link.symlink_to(global_audio)
 
             if self.__audioInterfaceStyle >= 2:
+                logging.info("Creating Tracks Output USB Audio Gadget")
                 # The tracks output-only device
                 tracks_audio = gadget_dir / "functions" / "uac2.usb1"
                 tracks_audio.mkdir(parents=True, exist_ok=True)
@@ -167,6 +173,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
             # Create our MIDI gadget
             # For a short description of the available attributes, see:
             # https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-midi
+            logging.info("Creating USB MIDI Gadget")
             midi = gadget_dir / "functions" / "midi.usb0"
             midi.mkdir(parents=True, exist_ok=True)
             (midi / "id").write_text(self.midi_id, encoding="utf-8")
@@ -193,6 +200,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
     def stop_usb_gadget(self):
         # Run the stop shell script to cleanly stop the gadget, and remove any existing gadget directory
         try:
+            logging.info("Removing USB Audio and MIDI Gadget")
             subprocess.run(["/bin/bash", str(Path(self.sys_dir) / "sbin/stop-usb-gadget.sh")], check=True)
         except Exception as err:
             logging.exception("Failed to stop USB gadget: %s", err)
@@ -209,7 +217,6 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
             self.__audioInterfaceStyle = value
             self.zynqtgui.global_settings.setValue("USB/audioInterfaceStyle", self.__audioInterfaceStyle)
             self.audioInterfaceStyleChanged.emit()
-            self.restart_usb_gadget()
 
     audioInterfaceStyleChanged = Signal()
 
@@ -225,7 +232,6 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
             self.__midiPerTrack = value
             self.zynqtgui.global_settings.setValue("USB/midiPerTrack", self.__midiPerTrack)
             self.midiPerTrackChanged.emit()
-            self.restart_usb_gadget()
 
     midiPerTrackChanged = Signal()
 
@@ -241,7 +247,6 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
             self.__ethernet = value
             self.zynqtgui.global_settings.setValue("USB/ethernet", self.__ethernet)
             self.ethernetChanged.emit()
-            self.restart_usb_gadget()
 
     ethernetChanged = Signal()
 

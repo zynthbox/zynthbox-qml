@@ -207,7 +207,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
     def set_audioInterfaceStyle(self, value):
         if value != self.__audioInterfaceStyle:
             self.__audioInterfaceStyle = value
-            self.zynqtgui.global_settings.setValue("UI/audioInterfaceStyle", self.__audioInterfaceStyle)
+            self.zynqtgui.global_settings.setValue("USB/audioInterfaceStyle", self.__audioInterfaceStyle)
             self.audioInterfaceStyleChanged.emit()
             self.restart_usb_gadget()
 
@@ -223,7 +223,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
     def set_midiPerTrack(self, value):
         if value != self.__midiPerTrack:
             self.__midiPerTrack = value
-            self.zynqtgui.global_settings.setValue("UI/midiPerTrack", self.__midiPerTrack)
+            self.zynqtgui.global_settings.setValue("USB/midiPerTrack", self.__midiPerTrack)
             self.midiPerTrackChanged.emit()
             self.restart_usb_gadget()
 
@@ -239,7 +239,7 @@ class zynthian_gui_usb_settings(zynthian_qt_gui_base.zynqtgui):
     def set_ethernet(self, value):
         if value != self.__ethernet:
             self.__ethernet = value
-            self.zynqtgui.global_settings.setValue("UI/ethernet", self.__ethernet)
+            self.zynqtgui.global_settings.setValue("USB/ethernet", self.__ethernet)
             self.ethernetChanged.emit()
             self.restart_usb_gadget()
 

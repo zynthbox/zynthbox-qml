@@ -338,10 +338,12 @@ ZUI.SectionGroup
                             id: metronomeLabel
                             // font.pointSize: 8
                             text: {
-                                if (zynqtgui.sketchpad.isMetronomeRunning && zynqtgui.sketchpad.currentBeat >= 0 && zynqtgui.sketchpad.currentBar >= 0) {
-                                    return (zynqtgui.sketchpad.currentBar+1) + "." + (zynqtgui.sketchpad.currentBeat+1)
+                                if (Zynthbox.SyncTimer.externalClockActive) {
+                                    return "%1.%2".arg(Math.floor(Zynthbox.SyncTimer.songPosition / 16) + 1).arg(Math.floor((Zynthbox.SyncTimer.songPosition % 16) / 4) + 1);
+                                } else if (zynqtgui.sketchpad.isMetronomeRunning && zynqtgui.sketchpad.currentBeat >= 0 && zynqtgui.sketchpad.currentBar >= 0) {
+                                    return (zynqtgui.sketchpad.currentBar+1) + "." + (zynqtgui.sketchpad.currentBeat+1);
                                 } else {
-                                    return "1.1"
+                                    return "1.1";
                                 }
                             }
                         }

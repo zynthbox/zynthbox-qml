@@ -4020,6 +4020,42 @@ class zynthian_gui(QObject):
         # root.send_event(event, event_mask=Xlib.X.SubstructureNotifyMask | Xlib.X.SubstructureRedirectMask)
         # display.sync()
 
+    @Slot(str)
+    def show_window(self, wid):
+        if zynthian_gui_config.app.focusWindow():
+            return
+        display = Xlib.display.Display()
+        # root = display.screen().root
+        # wid = root.get_full_property(display.intern_atom('_NET_ACTIVE_WINDOW'), Xlib.X.AnyPropertyType).value[0]
+
+        logging.debug(wid)
+        window = display.create_resource_object("window", wid)
+        window.map()
+        display.sync()
+
+    @Slot(None)
+    def get_windows_name(self):
+
+        # Connect to the X server
+        d = Xlib.display.Display()
+        root = d.screen().root
+        logging.debug("window names")
+        # Query all child windows of the root
+        query = root.query_tree()
+
+        print(f"{'ID':<12} | {'Window Name'}")
+        print("-" * 30)
+
+        for child in query.children:
+            # Get the window name (WM_NAME property)
+            name = child.get_wm_name()
+            
+            # Filter for windows that actually have names (open apps)
+            if name:
+                window_id = hex(child.id)
+                logging.debug(child.get_wm_icon_name())
+                print(f"{window_id:<12} | {name}")
+
     def get_active_midi_channel(self):
         if self.curlayer == None:
             return lib_zyncoder.get_midi_active_chan()

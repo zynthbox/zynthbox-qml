@@ -411,12 +411,39 @@ ZUI.ScreenPage {
                         }
                     }
 
+                    EntryDelegate {
+                        visible: zynqtgui.ui_settings.debugMode // Hide QML Testing loader when debugMode is off
+                        text: qsTr("QML Testing Loader")
+                        infoText:  "Load"
+                        index: 10
+                        onClicked: _stackLayout.currentIndex = 1
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("LED Brightness")
+                        infoText: qsTr("%1% ").arg(zynqtgui.ui_settings.ledBrightness)
+                        index: 11
+                        onIncrementValue: zynqtgui.ui_settings.ledBrightness = Math.min(100, zynqtgui.ui_settings.ledBrightness + 1)
+                        onDecrementValue: zynqtgui.ui_settings.ledBrightness = Math.max(0, zynqtgui.ui_settings.ledBrightness - 1)
+
+                        QQC2.Slider {
+                            width: Kirigami.Units.gridUnit * 20
+                            from: 0
+                            to: 100
+                            stepSize: 1
+                            value: zynqtgui.ui_settings.ledBrightness
+                            onValueChanged: {
+                                zynqtgui.ui_settings.ledBrightness = value;
+                            }
+                        }
+                    }
+
                     Repeater {
                         model: zynqtgui.ui_settings.displays
                         EntryDelegate {
                             text: qsTr("Display '%1' Brightness").arg(modelData.name)
                             infoText: qsTr("%1 / %2").arg(modelData.brightness).arg(modelData.max_brightness)
-                            index: 10 + model.index
+                            index: 12 + model.index
                             onIncrementValue: modelData.brightness = Math.min(modelData.max_brightness, modelData.brightness + 1)
                             onDecrementValue: modelData.brightness = Math.max(0, modelData.brightness - 1)
 
@@ -431,14 +458,6 @@ ZUI.ScreenPage {
                                 }
                             }
                         }
-                    }
-
-                    EntryDelegate {
-                        visible: zynqtgui.ui_settings.debugMode // Hide QML Testing loader when debugMode is off
-                        text: qsTr("QML Testing Loader")
-                        infoText:  "Load"
-                        index: 10
-                        onClicked: _stackLayout.currentIndex = 1
                     }
                 }
             }

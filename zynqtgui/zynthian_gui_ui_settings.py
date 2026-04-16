@@ -123,6 +123,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
         self.__displays = [DisplaySettings(d.name, self) for d in Path("/sys/class/backlight").iterdir() if d.is_dir()]
+        self.__ledBrightness = int(self.zynqtgui.global_settings.value("UI/ledBrightness", 20))
 
         self.__qmlFileWatcher = QFileSystemWatcher()
         self.__qmlFileWatcher.addPath("/ZB_QML_TEST_FILE")
@@ -392,6 +393,21 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     qmlTestFileModified = Signal()
 
     qmlTestFile = Property(str, get_qmlTestFile, notify=qmlTestFileChanged)
-    ### END Property showCursor
+    ### END Property qmlTestFIle
+
+    ### BEGIN Property ledBrightness
+    def get_ledBrightness(self):
+        return self.__ledBrightness
+
+    def set_ledBrightness(self, value):
+        if value != self.__ledBrightness:
+            self.__ledBrightness = value
+            self.zynqtgui.global_settings.setValue("UI/ledBrightness", self.__ledBrightness)
+            self.ledBrightnessChanged.emit()
+
+    ledBrightnessChanged = Signal()
+
+    ledBrightness = Property(int, get_ledBrightness, set_ledBrightness, notify=ledBrightnessChanged)
+    ### END Property ledBrightness
 
 # ------------------------------------------------------------------------------

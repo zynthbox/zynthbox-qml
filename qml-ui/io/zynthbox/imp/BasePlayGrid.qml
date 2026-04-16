@@ -290,7 +290,6 @@ Zynthbox.PlayGrid {
     }
 
     Component.onCompleted: {
-        zynqtgui.playgrid.zynquickPgmanager = Zynthbox.PlayGridManager;
         _private.loadSettings();
         initialisationTimer.restart();
     }

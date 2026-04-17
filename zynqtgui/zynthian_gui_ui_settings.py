@@ -123,7 +123,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__vncserverEnabled = True if self.zynqtgui.global_settings.value("UI/vncserverEnabled", "false") == "true" else False
         self.__fontSize = self.zynqtgui.global_settings.value("UI/fontSize", None)
         self.__displays = [DisplaySettings(d.name, self) for d in Path("/sys/class/backlight").iterdir() if d.is_dir()]
-        self.__ledBrightness = int(self.zynqtgui.global_settings.value("UI/ledBrightness", 20))
+        self.__ledBrightness = int(self.zynqtgui.global_settings.value("UI/ledBrightness", 15))
 
         self.__qmlFileWatcher = QFileSystemWatcher()
         self.__qmlFileWatcher.addPath("/ZB_QML_TEST_FILE")

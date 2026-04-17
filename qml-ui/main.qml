@@ -34,6 +34,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
+import io.zynthbox.xtask 1.0 as X
 import "pages" as Pages
 import "pages/Sketchpad" as Sketchpad
 
@@ -2522,6 +2523,38 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    ZUI.Drawer {
+        id: tasksDrawer
+        width: Kirigami.Units.gridUnit * 24
+        height: root.height
+        edge: Qt.RightEdge
+        dragMargin: Kirigami.Units.gridUnit * 0.9
+        modal: true
+        contentItem: QQC2.Pane {
+
+            contentItem : ListView {
+                model:  X.XTask.windowsModel
+                spacing: ZUI.Theme.spacing
+                delegate: QQC2.ItemDelegate {
+                    width: ListView.view.width
+                    height: Kirigami.Units.gridUnit * 2.5
+                    text: model.windowTitle + " << " + model.windowIcon 
+                    icon.name: model.windowIcon
+                    onClicked: {
+                        X.XTask.show(model.windowId);
+                    }
+                }
+             }
+
+        }
+
+        Text {
+            anchors.centerIn: parent
+            color: "orange"
+            text: "Number of windows: " + X.XTask.windowsModel.count
+        }
+    }
+
     Window {
         id: panel
         width: screen.width
@@ -2572,7 +2605,8 @@ Kirigami.AbstractApplicationWindow {
                     text: qsTr("CLOSE")
                     onClicked: {
                         clipPickerMenu.visible = false;
-                        zynqtgui.close_current_window();
+                        // zynqtgui.close_current_window();
+                        X.XTask.closeActiveWindow();
                     }
                 }
 
@@ -2583,7 +2617,8 @@ Kirigami.AbstractApplicationWindow {
                     text: qsTr("HIDE")
                     onClicked: {
                         clipPickerMenu.visible = false;
-                        zynqtgui.minimize_current_window();
+                        // zynqtgui.minimize_current_window();
+                        X.XTask.minimizeActiveWindow();
                     }
                 }
 

@@ -2932,11 +2932,9 @@ Item {
             mostRecentlyInteractedStep = 0;
             updateSlotPassthroughClients();
             handlePatternDataChange();
+            resetHeardNotes();
         }
         function handlePatternDataChange() {
-            let keyNote = Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey);
-            heardNotes = [Zynthbox.PlayGridManager.getNote(keyNote, pattern.sketchpadTrack)];
-            heardVelocities = [pattern.defaultVelocity];
             // Build out 16 steps based on the pattern's grid model
             let newStepKeyNotes = [];
             let firstStepKeyNote = pattern.gridModelStartNote;
@@ -2950,6 +2948,11 @@ Item {
             }
             stepKeyNotes = newStepKeyNotes;
             updateLedColors();
+        }
+        function resetHeardNotes() {
+            let keyNote = Zynthbox.KeyScales.midiPitchValue(pattern.pitchKey, pattern.octaveKey);
+            heardNotes = [Zynthbox.PlayGridManager.getNote(keyNote, pattern.sketchpadTrack)];
+            heardVelocities = [pattern.defaultVelocity];
         }
 
         property bool dimLEDs: false

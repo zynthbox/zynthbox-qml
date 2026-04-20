@@ -150,7 +150,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     def setButtonBlink(self, buttonId, baseColor, enableBlinking):
         if enableBlinking:
             self.__blinkingButtons[buttonId] = baseColor
-        else:
+        elif buttonId in self.__blinkingButtons:
             del self.__blinkingButtons[buttonId]
 
     @Slot()

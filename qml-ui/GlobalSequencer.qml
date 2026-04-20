@@ -2991,11 +2991,8 @@ Item {
         property color musicalKeysModeColor: ZUI.Theme.musicalKeysModeColor
         property color velocityKeysModeColor: ZUI.Theme.velocityKeysModeColor
         property color slotModeColor: ZUI.Theme.slotModeColor
+        property color inactiveColor: ZUI.Theme.buttonInactiveColor
 
-        // TODO: Remove this and its usages
-        property color negetiveColor: Qt.rgba(1, 0, 0)
-        property color activeColor: Qt.rgba(0, 1, 1)
-        property color inactiveColor: Qt.rgba(0, 0, 1)
         readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
         property int stepDuration: pattern ? (pattern.stepLength / patternSubbeatToTickMultiplier) : 0
 

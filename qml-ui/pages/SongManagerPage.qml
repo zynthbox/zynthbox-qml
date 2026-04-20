@@ -41,6 +41,8 @@ ZUI.ScreenPage {
     title: qsTr("Song")
     property bool isVisible:zynqtgui.current_screen_id === "song_manager"
 
+    Zynthbox.LedManager.buttonGlobalColor: Qt.rgba(0.5, 0, 0.5, 1)
+
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {

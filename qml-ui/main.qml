@@ -41,6 +41,12 @@ import "pages/Sketchpad" as Sketchpad
 Kirigami.AbstractApplicationWindow {
     id: root
 
+    /**
+     * \briefThe GlobalSequencer and the ScreenPages should notify mainwindow whenever led colors changes
+     * Emit the notifyLedColorsChanged signal to trigger the update of led colors in main.qml, which will apply the colors based on priority (GlobalSequencer > current page > default)
+     */
+    signal notifyLedColorsChanged();
+
     readonly property Item currentPage: pageStack.currentItem
     readonly property Item playGrids: playGridsRepeater
     readonly property QtObject virtualKeyboard: virtualKeyboardLoader.item
@@ -429,6 +435,195 @@ Kirigami.AbstractApplicationWindow {
         }
 
         return result
+    }
+
+    /**
+     * LED Manager attached property stores the current led colors for all the buttons.
+     * Whenever there's a change in the led colors, the respective page should emit notifyLedColorsChanged signal to trigger the update of led colors.
+     * main.qml handles the notifyLedColorsChanged signal and applies the led colors based on priority (GlobalSequencer > current page > default).
+     *
+     * main.qml(Lowest priority): Sets the default fallback led colors for all buttons.
+     * ScreenPage.qml(Medium Priority): Each ScreenPage can set led colors for buttons that are relevant to them.
+     * GlobalSequencer.qml(Highest Priority): GlobalSequencer can set led colors for buttons related to the hardware sequencer, which will override any other colors set for those buttons.
+     *
+     * To set a button's led color from any page, set the color in Zynthbox.LedManager.button<Name>Color. The button name follows the enum names which can be found in ZynthboxBasics::Button
+     * For example, to set the record button's color to red, set Zynthbox.LedManager.buttonRecordColor = Qt.rgba(1, 0, 0, 1);
+     * The colors will finally be adjusted based on the led brightness set in the UI settings.
+     * To reset a button's led color to the default fallback color, set it to Qt.rgba(0, 0, 0, 0) (transparent), and the main.qml will apply the default color for that button if no other page has set a color for it.
+     * To start or stop blinking a button with metronome, use zynqtgui.led_config.setButtonBlink. For example, to blink the metronome button: `zynqtgui.led_config.setButtonBlink(Zynthbox.ZynthboxBasics.buttonId(Zynthbox.ZynthboxBasics.ButtonMetronome), inactiveColor, true);`
+     * Finally, the respective page shoould notify main window by emitting the notifyLedColorsChanged signal whenever it changes any led color, so that the changes can be applied to the LEDs.
+     */
+    Zynthbox.LedManager.onLedColorChanged: {
+        applicationWindow().notifyLedColorsChanged()
+    }
+    Connections {
+        target: root
+        onNotifyLedColorsChanged: {
+            ledColorUpdateThrottle.restart();
+        }
+    }
+    Timer {
+        id: ledColorUpdateThrottle
+        interval: 0
+        running: false
+        repeat: false
+        onTriggered: {
+            // Apply led colors as per priority
+            // Global Sequencer has the highest priority. It can override any led color
+            // Current page has the next priority. It can override any default colors
+            // Lastly, default colors have the lowest priority.
+            let globalSequencerLedColors = root.globalSequencer.Zynthbox.LedManager.ledColors();
+            let currentPageLedColors;
+            try {
+                if (root.currentPage != null) {
+                    currentPageLedColors = root.currentPage.Zynthbox.LedManager.ledColors();
+                }
+            } catch(e) {
+                console.exception(e);
+                currentPageLedColors = {};
+            }
+            let defaultLedColors = root.Zynthbox.LedManager.ledColors();
+            const ledColors = Object.assign(defaultLedColors, currentPageLedColors, globalSequencerLedColors);
+            zynqtgui.led_config.updateLedColors(ledColors);
+        }
+    }
+    Connections {
+        target: root
+        onSelectedChannelChanged: updateLedColors()
+    }
+    Connections {
+        target: zynqtgui
+        onCurrent_screen_idChanged: updateLedColors()
+        onCurrent_modal_screen_idChanged: updateLedColors()
+        onIsExternalAppActiveChanged: updateLedColors()
+        onLeftSidebarActiveChanged: updateLedColors()
+        onGlobalPopupOpenedChanged: updateLedColors()
+        onIsBootingCompleteChanged: updateLedColors()
+    }
+    Connections {
+        target: zynqtgui.ui_settings
+        onLedBrightnessChanged: {
+            // Reset all colors for updateLedColors to force set color when brightness changes
+            root.Zynthbox.LedManager.clearAllLedColors();
+            updateLedColors();
+        }
+    }
+    Connections {
+        target: zynqtgui.sketchpad
+        onIsRecordingChanged: updateLedColors()
+        onMetronome_running_changed: updateLedColors()
+        onMetronomeEnabledChanged: updateLedColors()
+    }
+    /**
+      * Sets the default led colors for the application
+      * This set of colors has the lowest priority and can be overridden by current page or GlobalSequencer
+      */
+    function updateLedColors() {
+        let menuPageActive = false;
+        let sketchpadPageActive = false;
+        let playgridPageActive = false;
+        let songManagerPageActive = false;
+        let libraryPageActive = false;
+        let editPageActive = false;
+        let clipEnabled = [];
+        let selectedTrackIndex = 0;
+        const inactiveColor = ZUI.Theme.buttonInactiveColor;
+        const activeColor = ZUI.Theme.buttonActiveColor;
+        const negetiveColor = ZUI.Theme.buttonNegetiveColor;
+        const disabledColor = ZUI.Theme.buttonOffColor;
+        const totalLedCount = 36;
+
+        // Do not continue if channel is not yet instantiated
+        if (root.selectedChannel != null) {
+            menuPageActive = ["main", "admin", "about", "audio_settings", "midicontroller_settings", "test_knobs", "synth_behaviour",  "network", "network_info", "wifi_settings", "hardware", "ui_settings", "led_config", "bluetooth_config", "theme_chooser", "theme_downloader", "apps_downloader"].includes(zynqtgui.current_screen_id);
+            sketchpadPageActive = zynqtgui.current_screen_id == "sketchpad";
+            playgridPageActive = zynqtgui.current_screen_id == "playgrid";
+            songManagerPageActive = zynqtgui.current_screen_id == "song_manager";
+            libraryPageActive = ["layers_for_channel", "bank", "preset", "fixed_effects", "effect_preset", "sketch_effect_preset", "sample_library", "effects_for_channel", "sketch_effects_for_channel", "sound_categories"].includes(zynqtgui.current_screen_id);
+            editPageActive = ["control", "channel_wave_editor", "channel_external_setup"].includes(zynqtgui.current_screen_id);
+
+            if (zynqtgui.isExternalAppActive) {
+                root.Zynthbox.LedManager.buttonMenuColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonNum1Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonNum2Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonNum3Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonNum4Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonNum5Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStarColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonModeColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep1Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep2Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep3Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep4Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep5Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep6Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep7Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep8Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep9Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep10Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep11Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep12Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep13Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep14Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep15Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep16Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonAltColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonRecordColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonPlayColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonMetronomeColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonStopColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonBackColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonUpColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonSelectColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonLeftColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonDownColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonRightColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonGlobalColor = inactiveColor;
+            } else {
+                root.Zynthbox.LedManager.buttonMenuColor = menuPageActive ? activeColor : inactiveColor;
+                root.Zynthbox.LedManager.buttonNum1Color = sketchpadPageActive ? activeColor : inactiveColor;
+                root.Zynthbox.LedManager.buttonNum2Color = libraryPageActive ? activeColor : inactiveColor;
+                root.Zynthbox.LedManager.buttonNum3Color = editPageActive ? activeColor : inactiveColor;
+                root.Zynthbox.LedManager.buttonNum4Color = playgridPageActive ? activeColor : inactiveColor;
+                root.Zynthbox.LedManager.buttonNum5Color = songManagerPageActive ? activeColor : inactiveColor;
+                root.Zynthbox.LedManager.buttonStarColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonModeColor = zynqtgui.leftSidebarActive ? root.selectedChannel.color : inactiveColor;
+                root.Zynthbox.LedManager.buttonStep1Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep2Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep3Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep4Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep5Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep6Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep7Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep8Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep9Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep10Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep11Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep12Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep13Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep14Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep15Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonStep16Color = inactiveColor;
+                root.Zynthbox.LedManager.buttonAltColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonRecordColor = zynqtgui.sketchpad.isRecording ? negetiveColor : inactiveColor;
+                root.Zynthbox.LedManager.buttonPlayColor = zynqtgui.sketchpad.isMetronomeRunning ? activeColor : inactiveColor;
+                if (zynqtgui.sketchpad.metronomeEnabled) {
+                    root.Zynthbox.LedManager.buttonMetronomeColor = inactiveColor;
+                    zynqtgui.led_config.setButtonBlink(Zynthbox.ZynthboxBasics.buttonId(Zynthbox.ZynthboxBasics.ButtonMetronome), inactiveColor, true);
+                } else {
+                    root.Zynthbox.LedManager.buttonMetronomeColor = disabledColor;
+                    zynqtgui.led_config.setButtonBlink(Zynthbox.ZynthboxBasics.buttonId(Zynthbox.ZynthboxBasics.ButtonMetronome), disabledColor, false);
+                }
+                root.Zynthbox.LedManager.buttonStopColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonBackColor = negetiveColor;
+                root.Zynthbox.LedManager.buttonUpColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonSelectColor = activeColor;
+                root.Zynthbox.LedManager.buttonLeftColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonDownColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonRightColor = inactiveColor;
+                root.Zynthbox.LedManager.buttonGlobalColor = zynqtgui.globalPopupOpened ? activeColor : inactiveColor;
+            }
+        }
     }
 
     property QtObject sequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)

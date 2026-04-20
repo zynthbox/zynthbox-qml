@@ -2905,6 +2905,9 @@ Item {
         return returnValue;
     }
 
+    Zynthbox.LedManager.onLedColorChanged: {
+        applicationWindow().notifyLedColorsChanged();
+    }
     QtObject {
         id: _private
         property int mostRecentlyInteractedStep: 0
@@ -2955,29 +2958,44 @@ Item {
             heardVelocities = [pattern.defaultVelocity];
         }
 
+        property var actionBlockButtons: [
+            Zynthbox.ZynthboxBasics.ButtonRecord,
+            Zynthbox.ZynthboxBasics.ButtonPlay,
+            Zynthbox.ZynthboxBasics.ButtonBack,
+            Zynthbox.ZynthboxBasics.ButtonUp,
+            Zynthbox.ZynthboxBasics.ButtonSelect,
+            Zynthbox.ZynthboxBasics.ButtonMetronome,
+            Zynthbox.ZynthboxBasics.ButtonStop,
+            Zynthbox.ZynthboxBasics.ButtonLeft,
+            Zynthbox.ZynthboxBasics.ButtonDown,
+            Zynthbox.ZynthboxBasics.ButtonRight
+        ]
+
         property bool dimLEDs: false
         readonly property double baseButtonBrightness: dimLEDs ? 1 : 0.8
         onBaseButtonBrightnessChanged: updateLedColors()
+        // Set any button color to resetColor for the default led color to take over
+        readonly property color resetColor: Qt.rgba(0, 0, 0, 0)
         readonly property var noteColors: zynqtgui.theme_chooser.noteColors
 
-        property color stepEmpty: Qt.rgba(0.1, 0.1, 0.1)
-        property color stepWithNotesDimmed: Qt.rgba(0, 0, 0.7)
-        property color stepWithNotes: Qt.rgba(0.5, 0.5, 1)
-        property color stepHighlighted: Qt.rgba(0.5, 1, 1)
-        property color stepMuted: Qt.rgba(0.5, 0, 0)
-        property color stepCurrent: Qt.rgba(1, 1, 0)
-        property color stepRecording: Qt.rgba(1, 0, 0)
+        property color stepEmpty: ZUI.Theme.stepEmptyColor
+        property color stepWithNotesDimmed: ZUI.Theme.stepWithNotesDimmedColor
+        property color stepWithNotes: ZUI.Theme.stepWithNotesColor
+        property color stepHighlighted: ZUI.Theme.stepHighlightedColor
+        property color stepMuted: ZUI.Theme.stepMutedColor
+        property color stepCurrent: ZUI.Theme.stepCurrentColor
+        property color stepRecording: ZUI.Theme.stepRecordingColor
 
-        property color sequencerModeColor: Qt.rgba(1, 0, 0)
-        property color trackClipModeColor: Qt.rgba(1, 1, 0)
-        property color musicalKeysModeColor: Qt.rgba(0, 0, 1)
-        property color velocityKeysModeColor: Qt.rgba(0, 0, 1)
-        property color slotModeColor: Qt.rgba(0, 1, 0)
+        property color sequencerModeColor: ZUI.Theme.sequencerModeColor
+        property color trackClipModeColor: ZUI.Theme.trackClipModeColor
+        property color musicalKeysModeColor: ZUI.Theme.musicalKeysModeColor
+        property color velocityKeysModeColor: ZUI.Theme.velocityKeysModeColor
+        property color slotModeColor: ZUI.Theme.slotModeColor
 
-        property color redColor: Qt.rgba(1, 0, 0)
-        property color greenColor: Qt.rgba(0, 1, 1)
-        property color blueColor: Qt.rgba(0, 0, 1)
-
+        // TODO: Remove this and its usages
+        property color negetiveColor: Qt.rgba(1, 0, 0)
+        property color activeColor: Qt.rgba(0, 1, 1)
+        property color inactiveColor: Qt.rgba(0, 0, 1)
         readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
         property int stepDuration: pattern ? (pattern.stepLength / patternSubbeatToTickMultiplier) : 0
 
@@ -3129,7 +3147,7 @@ Item {
                             stepColor = _private.noteColors[(stepNote.midiNote % 12) + 108];
                             brightness = stepNote.isPlaying ? 1.0 : 0.8;
                         }
-                        zynqtgui.led_config.setActionBlockButtonColor(stepIndex, stepColor, brightness);
+                        component.Zynthbox.LedManager.setButtonColor(_private.actionBlockButtons[stepIndex], Qt.rgba(stepColor.r * brightness, stepColor.g * brightness, stepColor.b * brightness));
                     }
                 } else {
                     // When the mode button is pressed, the action block functionally ends up displaying the ten sound slots (lit when filled, otherwise only the lightest grey)
@@ -3153,28 +3171,27 @@ Item {
                             }
                         }
                         if (slotFilled === false) {
-                            zynqtgui.led_config.setActionBlockButtonColor(stepIndex, _private.stepEmpty, 1.0);
+                            component.Zynthbox.LedManager.setButtonColor(_private.actionBlockButtons[stepIndex], _private.stepEmpty);
                         } else if (slotMuted) {
-                            zynqtgui.led_config.setActionBlockButtonColor(stepIndex, _private.stepMuted, 1.0);
+                            component.Zynthbox.LedManager.setButtonColor(_private.actionBlockButtons[stepIndex], _private.stepMuted);
                         } else {
                             if (stepIndex < 15) {
-                                zynqtgui.led_config.setActionBlockButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + slotGain, 0.01), 1.0);
+                                component.Zynthbox.LedManager.setButtonColor(_private.actionBlockButtons[stepIndex], Qt.rgba(0.01, 0.01 + slotGain, 0.01));
                             } else {
-                                zynqtgui.led_config.setActionBlockButtonColor(stepIndex, _private.musicalKeysModeColor, 1.0);
+                                component.Zynthbox.LedManager.setButtonColor(_private.actionBlockButtons[stepIndex], _private.musicalKeysModeColor);
                             }
                         }
                     }
                 }
              } else {
                 // Just unset the colours and let the python code take over the LEDs
-                 let anyColor = Qt.rgba(0, 0, 0, 0);
-                 for (let buttonId = 0; buttonId < 10; ++buttonId) {
-                    zynqtgui.led_config.setActionBlockButtonColor(buttonId, anyColor, -1);
+                 for (let stepIndex = 0; stepIndex < 10; ++stepIndex) {
+                    component.Zynthbox.LedManager.setButtonColor(_private.actionBlockButtons[stepIndex], _private.resetColor);
                  }
             }
         }
         function updateLedsForStepSequencer() {
-            zynqtgui.led_config.setModeButtonColor(_private.sequencerModeColor, _private.baseButtonBrightness);
+            component.Zynthbox.LedManager.buttonModeColor = Qt.rgba(_private.sequencerModeColor.r * _private.baseButtonBrightness, _private.sequencerModeColor.g * _private.baseButtonBrightness, _private.sequencerModeColor.b * _private.baseButtonBrightness);
             let workingModel = _private.pattern.workingModel;
             if (zynqtgui.altButtonPressed) {
                 // First the currently selected bar (steps are filled if they are less or equal to the available bars, and current is marked as current step, so tapping sets the current bar)
@@ -3186,7 +3203,7 @@ Item {
                     if (stepIndex == workingModel.activeBar) {
                         stepColor = Qt.tint(stepColor, _private.stepCurrent);
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);
+                    component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = stepColor;
                 }
                 // Second is the available bar length (steps are filled if they are less or equal to the available bars, and not filled otherwise, and tapping sets the pattern length in 16 step increments)
                 for (let stepIndex = 0; stepIndex < 8; ++stepIndex) {
@@ -3194,7 +3211,7 @@ Item {
                     if (stepIndex < workingModel.availableBars) {
                         stepColor = _private.stepWithNotes;
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex + 8, stepColor, 1.0);
+                    component.Zynthbox.LedManager[`buttonStep${stepIndex + 9}Color`] = stepColor;
                 }
             } else {
                 let heardNoteValues = [];
@@ -3233,12 +3250,12 @@ Item {
                             }
                         }
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);
+                    component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = stepColor;
                 }
             }
         }
         function updateLedsForTrackClipSelector() {
-            zynqtgui.led_config.setModeButtonColor(_private.trackClipModeColor, _private.baseButtonBrightness);
+            component.Zynthbox.LedManager.buttonModeColor = Qt.rgba(_private.trackClipModeColor.r * _private.baseButtonBrightness, _private.trackClipModeColor.g * _private.baseButtonBrightness, _private.trackClipModeColor.b * _private.baseButtonBrightness);
             for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
                 let stepColor = _private.stepEmpty;
                 let theTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
@@ -3249,10 +3266,10 @@ Item {
                     stepColor = Qt.tint(stepColor, _private.stepCurrent);
                 }
                 // Maybe mark red when muted?
-                zynqtgui.led_config.setStepButtonColor(trackIndex, stepColor, 1.0);
+                component.Zynthbox.LedManager[`buttonStep${trackIndex + 1}Color`] = stepColor;
             }
             // Last button's not really a thing for now, grey it out...
-            zynqtgui.led_config.setStepButtonColor(10, _private.stepEmpty, 1.0);
+            component.Zynthbox.LedManager[`buttonStep11Color`] = _private.stepEmpty;
             for (let clipIndex = 0; clipIndex < 5; ++clipIndex) {
                 let stepColor = _private.stepEmpty;
                 let clipPattern = _private.sequence.getByClipId(component.selectedChannel.id, clipIndex);
@@ -3262,11 +3279,11 @@ Item {
                 if (component.selectedChannel.selectedClip === clipIndex) {
                     stepColor = Qt.tint(stepColor, _private.stepCurrent);
                 }
-                zynqtgui.led_config.setStepButtonColor(clipIndex + 11, stepColor, 1.0);
+                component.Zynthbox.LedManager[`buttonStep${clipIndex + 12}Color`] = stepColor;
             }
         }
         function updateLedsForMusicalButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.musicalKeysModeColor, _private.baseButtonBrightness);
+            component.Zynthbox.LedManager.buttonModeColor = Qt.rgba(_private.musicalKeysModeColor.r * _private.baseButtonBrightness, _private.musicalKeysModeColor.g * _private.baseButtonBrightness, _private.musicalKeysModeColor.b * _private.baseButtonBrightness);
             if (zynqtgui.altButtonPressed) {
                 let patternTonic = Zynthbox.PlayGridManager.getNote(Zynthbox.KeyScales.midiPitchValue(_private.pattern.pitchKey, _private.pattern.octaveKey), _private.pattern.sketchpadTrack);
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
@@ -3290,7 +3307,7 @@ Item {
                             stepColor = _private.stepWithNotes;
                         }
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, 1.0);
+                    component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = stepColor;
                 }
             } else {
                 for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
@@ -3302,19 +3319,20 @@ Item {
                         stepColor = _private.noteColors[(stepNote.midiNote % 12) + 108];
                         brightness = stepNote.isPlaying ? 1.0 : 0.8;
                     }
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, stepColor, brightness);
+                    component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = stepColor;
                 }
             }
         }
         readonly property var velocityKeysVelocities: [1/16, 2/16, 3/16, 4/16, 5/16, 6/16, 7/16, 8/16, 9/16, 10/16, 11/16, 12/16, 13/16, 14/16, 15/16, 1]
         function updateLedsForVelocityButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.velocityKeysModeColor, _private.baseButtonBrightness);
+            component.Zynthbox.LedManager.buttonModeColor = Qt.rgba(_private.slotModeColor.r * _private.baseButtonBrightness, _private.slotModeColor.g * _private.baseButtonBrightness, _private.slotModeColor.b * _private.baseButtonBrightness);
+
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
-                zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0, 0, velocityKeysVelocities[stepIndex] * 0.5), 1.0);
+                component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = Qt.rgba(0, 0, velocityKeysVelocities[stepIndex] * 0.5);
             }
         }
         function updateLedsForSlotButtons() {
-            zynqtgui.led_config.setModeButtonColor(_private.slotModeColor, _private.baseButtonBrightness);
+            component.Zynthbox.LedManager.buttonModeColor = Qt.rgba(_private.slotModeColor.r * _private.baseButtonBrightness, _private.slotModeColor.g * _private.baseButtonBrightness, _private.slotModeColor.b * _private.baseButtonBrightness);
             for (let stepIndex = 0; stepIndex < 16; ++stepIndex) {
                 let slotMuted = false;
                 let slotGain = 0.0;
@@ -3344,14 +3362,14 @@ Item {
                     slotFilled = _private.testEnabledForSlots;
                 }
                 if (slotFilled === false) {
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepEmpty, 1.0);
+                    component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = _private.stepEmpty;
                 } else if (slotMuted) {
-                    zynqtgui.led_config.setStepButtonColor(stepIndex, _private.stepMuted, 1.0);
+                    component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = _private.stepMuted;
                 } else {
                     if (stepIndex < 15) {
-                        zynqtgui.led_config.setStepButtonColor(stepIndex, Qt.rgba(0.01, 0.01 + slotGain, 0.01), 1.0);
+                        component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = Qt.rgba(0.01, 0.01 + slotGain, 0.01);
                     } else {
-                        zynqtgui.led_config.setStepButtonColor(stepIndex, _private.musicalKeysModeColor, 1.0);
+                        component.Zynthbox.LedManager[`buttonStep${stepIndex + 1}Color`] = _private.musicalKeysModeColor;
                     }
                 }
             }
@@ -3360,17 +3378,18 @@ Item {
         readonly property var editPages: ["control", "channel_wave_editor", "channel_external_setup"]
         function updateNumberButtonColors() {
             if (zynqtgui.anyStepButtonPressed && _private.effectiveInteractionMode == _private.interactionModeSequencer && zynqtgui.altButtonPressed == false) {
-                zynqtgui.led_config.setNumberButtonColor(0, _private.parameterPage === 0 ? _private.stepHighlighted : _private.stepWithNotes, 1);
-                zynqtgui.led_config.setNumberButtonColor(1, _private.parameterPage === 1 ? _private.stepHighlighted : _private.stepWithNotes, 1);
-                zynqtgui.led_config.setNumberButtonColor(2, _private.parameterPage === 2 ? _private.stepHighlighted : _private.stepWithNotes, 1);
-                zynqtgui.led_config.setNumberButtonColor(3, _private.stepEmpty, 1);
-                zynqtgui.led_config.setNumberButtonColor(4, _private.stepEmpty, 1);
+                // Override number button led color
+                component.Zynthbox.LedManager.buttonNum1Color = _private.parameterPage === 0 ? _private.stepHighlighted : _private.stepWithNotes;
+                component.Zynthbox.LedManager.buttonNum2Color = _private.parameterPage === 1 ? _private.stepHighlighted : _private.stepWithNotes;
+                component.Zynthbox.LedManager.buttonNum3Color = _private.parameterPage === 2 ? _private.stepHighlighted : _private.stepWithNotes;
+                component.Zynthbox.LedManager.buttonNum4Color = _private.stepEmpty;
+                component.Zynthbox.LedManager.buttonNum5Color = _private.stepEmpty;
             } else {
-                zynqtgui.led_config.setNumberButtonColor(0, zynqtgui.current_screen_id == "sketchpad" ? _private.greenColor : _private.blueColor, 1);
-                zynqtgui.led_config.setNumberButtonColor(1, libraryPages.includes(zynqtgui.current_screen_id) ? _private.greenColor : _private.blueColor, 1);
-                zynqtgui.led_config.setNumberButtonColor(2, editPages.includes(zynqtgui.current_screen_id) ? _private.greenColor : _private.blueColor, 1);
-                zynqtgui.led_config.setNumberButtonColor(3, zynqtgui.current_screen_id == "playgrid" ? _private.greenColor : _private.blueColor, 1);
-                zynqtgui.led_config.setNumberButtonColor(4, zynqtgui.current_screen_id == "song_manager" ? _private.greenColor : _private.blueColor, 1);
+                component.Zynthbox.LedManager.buttonNum1Color = _private.resetColor;
+                component.Zynthbox.LedManager.buttonNum2Color = _private.resetColor;
+                component.Zynthbox.LedManager.buttonNum3Color = _private.resetColor;
+                component.Zynthbox.LedManager.buttonNum4Color = _private.resetColor;
+                component.Zynthbox.LedManager.buttonNum5Color = _private.resetColor;
             }
         }
         function updateLedColors() {
@@ -3405,14 +3424,14 @@ Item {
             _private.updateNumberButtonColors();
             // the star note is a thing when the star button itself is pressed, otherwise we have to test that the pattern's root key is pressed
             if ((_private.starNote && _private.starNote.isPlaying) || (_private.patternKeyNote && _private.patternKeyNote.isPlaying)) {
-                zynqtgui.led_config.setStarButtonColor(_private.noteColors[((_private.starNote ? _private.starNote.midiNote : _private.patternKeyNote.midiNote) % 12) + 108]);
+                component.Zynthbox.LedManager.buttonStarColor = _private.noteColors[((_private.starNote ? _private.starNote.midiNote : _private.patternKeyNote.midiNote) % 12) + 108];
             } else {
-                zynqtgui.led_config.setStarButtonColor(_private.stepWithNotesDimmed);
+                component.Zynthbox.LedManager.buttonStarColor = _private.stepWithNotesDimmed;
             }
             if (_private.temporaryAltModeLocked) {
-                zynqtgui.led_config.setAltButtonColor(_private.blueColor, _private.baseButtonBrightness);
+                component.Zynthbox.LedManager.buttonAltColor = Qt.rgba(_private.inactiveColor.r * _private.baseButtonBrightness, _private.inactiveColor.g * _private.baseButtonBrightness, _private.inactiveColor.b * _private.baseButtonBrightness);
             } else {
-                zynqtgui.led_config.setAltButtonColor(_private.blueColor, 1.0);
+                component.Zynthbox.LedManager.buttonAltColor = _private.inactiveColor;
             }
             _private.updateActionBlockLedsForTemporaryMode();
         }

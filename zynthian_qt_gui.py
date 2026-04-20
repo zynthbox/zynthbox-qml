@@ -4125,7 +4125,6 @@ class zynthian_gui(QObject):
             channel.update_jack_port(run_in_thread=False)
             # Cache back/preset of all selected synths of all channel
             channel.cache_bank_preset_lists()
-        self.led_config.init()
         boot_end = timer()
         logging.debug("---p Completing stop_splash procedure")
         logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")

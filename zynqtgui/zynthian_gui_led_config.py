@@ -23,32 +23,26 @@
 #
 # ******************************************************************************
 
-import logging
-import os
-from neopixel_spi import NeoPixel_SPI, GRB
 import board
 import sys
 import time
-import Zynthbox
+import logging
+from neopixel_spi import NeoPixel_SPI, GRB
+from configparser import ConfigParser
 
-from PySide2.QtCore import Property, QTimer, Signal, Slot
+from PySide2.QtCore import Slot
 from PySide2.QtGui import QColor
 
 
-darkening_factor=800
-
-color_red = QColor.fromRgb(255, 0, 0).darker(darkening_factor)
-color_green = QColor.fromRgb(0, 255, 0).darker(darkening_factor)
-color_blue = QColor.fromRgb(0, 50, 200).darker(darkening_factor)
-
+# Try reading ledBrightness from config and set a fallback value
+try:
+    config = ConfigParser()
+    config.read("/root/.config/zynthbox/zynthbox-qml.conf")
+    ledBrightness = config["UI"]["ledBrightness"] / 100
+except:
+    ledBrightness = 15 / 100
 led_color_off = (0, 0, 0)
-led_color_red = (color_red.red(), color_red.green(), color_red.blue())
-led_color_green = (color_green.red(), color_green.green(), color_green.blue())
-led_color_blue = (color_blue.red(), color_blue.green(), color_blue.blue())
-led_color_grey = (5, 5, 5)
-
-led_color_inactive = led_color_blue
-led_color_active = led_color_green
+led_color_inactive = (0, 0, 1 * ledBrightness)
 
 num_leds = 36
 spi_freq = 6400000
@@ -87,8 +81,8 @@ if __name__ == "__main__":
         rainbow_led_counter = 0
         while True:
             for i in range(num_leds):
-                color = QColor.fromHsl((rainbow_led_counter + i * 10) % 359, 242, 127, 127).darker(darkening_factor)
-                wsleds[i] = (color.red(), color.green(), color.blue())
+                color = QColor.fromHsl((rainbow_led_counter + i * 10) % 359, 242, 127, 127)
+                wsleds[i] = (int(color.red() * ledBrightness), int(color.green() * ledBrightness), int(color.blue() * ledBrightness))
             wsleds.show()
             rainbow_led_counter += 3
             rainbow_led_counter = rainbow_led_counter % 359
@@ -116,207 +110,19 @@ if __name__ == "__main__":
 
 
 from . import zynthian_qt_gui_base
-
+from . import zynthian_gui_config
+from PySide2.QtGui import QColor
+import Zynthbox
 
 class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
-    """
-    A Helper class that sets correct led color per button as per current state
-
-    To set a led color to a button :
-    self.button_color_map[0] = {
-        'color': <One of the led_color_*>,
-        'blink': <True or False> # Setting to True will make the led blink as per the blinkMode
-        'blinkMode': <'toggleOnBeat'(default) or 'onOffOnBeat'> # toggleOnBeat will toggle on/off state on every beat
-                                                                # onOffOnBeat will blink the button color on=off on every beat
-    }
-    """
     def __init__(self, parent=None):
         super(zynthian_gui_led_config, self).__init__(parent)
-
-        from . import zynthian_gui_config
-        zynqtgui = zynthian_gui_config.zynqtgui
-
+        self.__blinkingButtons = {}
+        # self.zynqtgui.ui_settings.ledBrightness ranges from 1-100. Normalize value to be in range 0.0-1.0
+        self.__ledBrightness = self.zynqtgui.ui_settings.ledBrightness / 100
         init_wsleds()
-
-        channelTypeSynthColorDarkened = zynqtgui.sketchpad.channelTypeSynthColor.darker(darkening_factor)
-        channelTypeSketchesColorDarkened = zynqtgui.sketchpad.channelTypeSketchesColor.darker(darkening_factor)
-        channelTypeSamplesColorDarkened = zynqtgui.sketchpad.channelTypeSamplesColor.darker(darkening_factor)
-        channelTypeExternalColorDarkened = zynqtgui.sketchpad.channelTypeExternalColor.darker(darkening_factor)
-
-        self.led_color_channel_synth = (channelTypeSynthColorDarkened.red(), channelTypeSynthColorDarkened.green(), channelTypeSynthColorDarkened.blue())
-        self.led_color_channel_loop = (channelTypeSketchesColorDarkened.red(), channelTypeSketchesColorDarkened.green(), channelTypeSketchesColorDarkened.blue())
-        self.led_color_channel_sample = (channelTypeSamplesColorDarkened.red(), channelTypeSamplesColorDarkened.green(), channelTypeSamplesColorDarkened.blue())
-        self.led_color_channel_external = (channelTypeExternalColorDarkened.red(), channelTypeExternalColorDarkened.green(), channelTypeExternalColorDarkened.blue())
-
-        self.number_button_colors = [led_color_inactive] * 5
-        self.step_button_colors = [led_color_inactive] * 16
-        self.star_button_color = led_color_inactive
-        self.mode_button_color = led_color_blue
-        self.alt_button_color = led_color_inactive
-        # The order of the action block is linear, meaning record, play, back/no, up, select/yes, metronome, stop, left, down, right
-        self.action_block_color = [None] * 10
-
-        self.channel = None
-        self.channelColor = (0, 0, 0)
-        self.button_config = {}
-        self.update_botton_colors_timer = QTimer()
-        self.update_botton_colors_timer.setInterval(0)
-        self.update_botton_colors_timer.setSingleShot(True)
-        self.update_botton_colors_timer.timeout.connect(self.update_button_colors_actual)
-
-        wiring_layout = os.getenv("ZYNTHIAN_WIRING_LAYOUT")
-
-        if wiring_layout == "Z2_V4" or wiring_layout == "Z1_V1":
-            self.button_menu = 0
-            self.button_1 = 1
-            self.button_2 = 2
-            self.button_3 = 3
-            self.button_4 = 4
-            self.button_5 = 5
-            self.button_star = 6
-            self.button_mode = 7
-            self.button_under_screen_1 = 8
-            self.button_under_screen_2 = 9
-            self.button_under_screen_3 = 10
-            self.button_under_screen_4 = 11
-            self.button_under_screen_5 = 12
-            self.button_under_screen_6 = -1
-            self.button_under_screen_7 = -1
-            self.button_under_screen_8 = -1
-            self.button_under_screen_9 = -1
-            self.button_under_screen_10 = -1
-            self.button_under_screen_11 = -1
-            self.button_under_screen_12 = -1
-            self.button_under_screen_13 = -1
-            self.button_under_screen_14 = -1
-            self.button_under_screen_15 = -1
-            self.button_under_screen_16 = -1
-            self.button_alt = 13
-            self.button_record = 14
-            self.button_play = 15
-            self.button_metronome = 16
-            self.button_stop = 17
-            self.button_back = 18
-            self.button_up = 19
-            self.button_select = 20
-            self.button_left = 21
-            self.button_down = 22
-            self.button_right = 23
-            self.button_global = 24
-        else:
-            self.button_menu = 0
-            self.button_1 = 1
-            self.button_2 = 2
-            self.button_3 = 3
-            self.button_4 = 4
-            self.button_5 = 5
-            self.button_star = 6
-            self.button_mode = 7
-            self.button_under_screen_1 = 8
-            self.button_under_screen_2 = 9
-            self.button_under_screen_3 = 10
-            self.button_under_screen_4 = 11
-            self.button_under_screen_5 = 12
-            self.button_under_screen_6 = 13
-            self.button_under_screen_7 = 14
-            self.button_under_screen_8 = 15
-            self.button_under_screen_9 = 16
-            self.button_under_screen_10 = 17
-            self.button_under_screen_11 = 18
-            self.button_under_screen_12 = 19
-            self.button_under_screen_13 = 20
-            self.button_under_screen_14 = 21
-            self.button_under_screen_15 = 22
-            self.button_under_screen_16 = 23
-            self.button_alt = 24
-            self.button_record = 25
-            self.button_play = 26
-            self.button_metronome = 27
-            self.button_stop = 28
-            self.button_back = 29
-            self.button_up = 30
-            self.button_select = 31
-            self.button_left = 32
-            self.button_down = 33
-            self.button_right = 34
-            self.button_global = 35
-        self.action_block_id = [self.button_record, self.button_play, self.button_back, self.button_up, self.button_select, self.button_metronome, self.button_stop, self.button_left, self.button_down, self.button_right]
-
         Zynthbox.PlayGridManager.instance().metronomeBeat128thChanged.connect(self.metronomeBeatUpdate128thHandler)
-
-        # Initialise all button with inactive color and not blinking
-        for i in range(num_leds):
-            self.set_button_color(i, led_color_inactive)
-
-    @Slot()
-    def metronomeBeatUpdate128thHandler(self, beat):
-        if self.zynqtgui.sketchpad.isMetronomeRunning:
-            if beat % 32 == 0:
-                self.blinkOff()
-            elif (beat - 8) % 32 == 0:
-                self.blinkOn()
-        else:
-            self.blinkOn()
-
-    @Slot()
-    def blinkOff(self):
-        for button_id, config in self.button_config.items():
-            if config["blink"] is True:
-                wsleds[button_id] = config['blinkColor']
-
-        if self.zynqtgui.isBootingComplete:
-            wsleds.show()
-
-    @Slot()
-    def blinkOn(self):
-        for button_id, config in self.button_config.items():
-            if config["blink"] is True:
-                wsleds[button_id] = config['color']
-
-        if self.zynqtgui.isBootingComplete:
-            wsleds.show()
-
-    @Slot(int, 'QColor', float)
-    def setStepButtonColor(self, stepIndex, stepColor, brightness):
-        if -1 < stepIndex and stepIndex < 16:
-            tempColor = stepColor.darker(darkening_factor)
-            self.step_button_colors[stepIndex] = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
-            self.update_button_colors()
-
-    @Slot(int, 'QColor', float)
-    def setNumberButtonColor(self, buttonIndex, buttonColor, brightness):
-        if (-1 < buttonIndex and buttonIndex < 5):
-            tempColor = buttonColor.darker(darkening_factor)
-            self.number_button_colors[buttonIndex] = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
-            self.update_button_colors()
-
-    @Slot('QColor')
-    def setStarButtonColor(self, buttonColor):
-        tempColor = buttonColor.darker(darkening_factor)
-        self.star_button_color = (tempColor.red(), tempColor.green(), tempColor.blue())
-        self.update_button_colors()
-
-    @Slot('QColor', float)
-    def setModeButtonColor(self, buttonColor, brightness):
-        tempColor = buttonColor.darker(darkening_factor)
-        self.mode_button_color = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
-        self.update_button_colors()
-
-    @Slot('QColor', float)
-    def setAltButtonColor(self, buttonColor, brightness):
-        tempColor = buttonColor.darker(darkening_factor)
-        self.alt_button_color = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
-        self.update_button_colors()
-
-    @Slot(int, 'QColor', float)
-    # Pass in -1 for brightness to unset this and let the legacy logic take over
-    def setActionBlockButtonColor(self, buttonIndex, buttonColor, brightness):
-        if brightness > -1:
-            tempColor = buttonColor.darker(darkening_factor)
-            self.action_block_color[buttonIndex] = (tempColor.red() * brightness, tempColor.green() * brightness, tempColor.blue() * brightness)
-        else:
-            self.action_block_color[buttonIndex] = None
-        self.update_button_colors()
+        self.zynqtgui.ui_settings.ledBrightnessChanged.connect(self.updateLedBrightness)
 
     def show(self):
         pass
@@ -327,197 +133,50 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     def refresh_loading(self):
         pass
 
-    def set_button_color(self, buttonId, color, setChannelColor=False, blink=False):
-        buttonColor = None
+    @Slot()
+    def updateLedBrightness(self):
+        self.__ledBrightness = self.zynqtgui.ui_settings.ledBrightness / 100
 
-        if setChannelColor:
-            buttonColor = self.channelColor
-            # if self.channel.trackType == "external" or self.channel.occupiedSlotsCount > 0:
-            #     buttonColor = self.channelColor
-            # else:
-            #     buttonColor = led_color_grey
+    """
+    A method to set a button to blink with a base color..
+    The button will blink on every beat when the metronome is running.
+    The base color will be used when the button is not blinking.
+
+    @param buttonId: The ID of the button to set blinking. See ZynthboxBasics.buttonId for reference.
+    @param baseColor: The base color of the button when it is not blinking
+    @param enableBlinking: A boolean value to enable or disable blinking
+    """
+    @Slot(int, QColor, bool)
+    def setButtonBlink(self, buttonId, baseColor, enableBlinking):
+        if enableBlinking:
+            self.__blinkingButtons[buttonId] = baseColor
         else:
-            assert color is not None, "color cannot be None when setChannelColor is False"
-
-            buttonColor = color
-
-        blinkColor = QColor(buttonColor[0], buttonColor[1], buttonColor[2]).lighter(darkening_factor)
-
-        self.button_config[buttonId] = {
-            'color': buttonColor,
-            'blink': blink,
-            'blinkColor': (blinkColor.red(), blinkColor.green(), blinkColor.blue())
-        }
-
-        wsleds[buttonId] = buttonColor
-
-    def init(self):
-        self.connect_dependent_property_signals()
+            del self.__blinkingButtons[buttonId]
 
     @Slot()
-    def connect_dependent_property_signals(self):
-        logging.debug("### Connecting dependant property signals")
+    def metronomeBeatUpdate128thHandler(self, subBeat):
+        if self.zynqtgui.sketchpad.isMetronomeRunning:
+            if (subBeat % 32) == 0:
+                # Blinkon on every beat
+                for buttonId, _ in self.__blinkingButtons.items():
+                    wsleds[buttonId] = (255 * self.__ledBrightness, 255 * self.__ledBrightness, 255 * self.__ledBrightness)
+            elif (subBeat % 32) == 4:
+                # Blink off after every 4 subBeats
+                for buttonId, color in self.__blinkingButtons.items():
+                    wsleds[buttonId] = (int(color.red() * self.__ledBrightness), int(color.green() * self.__ledBrightness), int(color.blue() * self.__ledBrightness))
+            wsleds.show()
 
-        # Connect to required signals for updating led
-        self.zynqtgui.isExternalAppActiveChanged.connect(self.update_button_colors)
-        self.zynqtgui.sketchpad.song_changed.connect(self.connect_dependent_property_signals)
-        self.zynqtgui.sketchpad.selected_track_id_changed.connect(self.selected_track_id_changed_handler)
-        self.zynqtgui.current_screen_id_changed.connect(self.update_button_colors)
-        self.zynqtgui.current_modal_screen_id_changed.connect(self.update_button_colors)
-        self.zynqtgui.leftSidebarActiveChanged.connect(self.update_button_colors)
-        self.zynqtgui.tracksModActiveChanged.connect(self.update_button_colors)
-        self.zynqtgui.sketchpad.isRecordingChanged.connect(self.update_button_colors)
-        self.zynqtgui.sketchpad.isRecordingChanged.connect(self.update_button_colors)
-        self.zynqtgui.sketchpad.metronome_running_changed.connect(self.update_button_colors)
-        self.zynqtgui.sketchpad.metronomeEnabledChanged.connect(self.update_button_colors)
-        self.zynqtgui.globalPopupOpenedChanged.connect(self.update_button_colors)
-        self.zynqtgui.ui_settings.hardwareSequencerChanged.connect(self.update_button_colors)
-        self.zynqtgui.anyStepButtonPressedChanged.connect(self.update_button_colors)
-        self.zynqtgui.isBootingCompleteChanged.connect(self.update_button_colors)
-
-        for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
-            self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).track_type_changed.connect(
-                self.update_button_colors)
-
-        # Reset channel as it would change when song changes
-        if self.zynqtgui.sketchpad.song is not None:
-            self.selected_track_id_changed_handler()
-
-    @Slot()
-    def selected_track_id_changed_handler(self):
-        if self.channel is not None:
-            try:
-                self.channel.selectedClipNamesChanged.disconnect(self.update_button_colors)
-                self.channel.colorChanged.disconnect(self.update_track_color)
-            except: pass
-        self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-        # Connect to clips changed when channel changes
-        self.channel.selectedClipNamesChanged.connect(self.update_button_colors)
-        self.channel.colorChanged.connect(self.update_track_color)
-        self.update_track_color()
-
-    @Slot()
-    def update_track_color(self):
-        if self.channel is not None:
-            darkerChannelColor = self.channel.color.darker(darkening_factor);
-            self.channelColor = (darkerChannelColor.red(), darkerChannelColor.green(), darkerChannelColor.blue())
-        self.update_button_colors()
-
-    @Slot()
-    def update_button_colors(self):
-        self.update_botton_colors_timer.start()
-
-    @Slot()
-    def update_button_colors_actual(self):
-        # logging.debug("Updating LEDs")
-
-        if self.zynqtgui.sketchpad.song is not None and (self.channel is None or (self.channel is not None and self.channel.id != self.zynqtgui.sketchpad.selectedTrackId)):
-            self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-
-        if self.channel is None:
-            # Do not continue if channel is not yet instantiated
-            return
-
-        menu_page_active = self.zynqtgui.current_screen_id in ["main", "admin", "about", "audio_settings", "midicontroller_settings", "test_knobs", "synth_behaviour",  "network", "network_info", "wifi_settings", "hardware", "ui_settings", "led_config", "bluetooth_config", "theme_chooser", "theme_downloader", "apps_downloader"]
-        sketchpad_page_active = self.zynqtgui.current_screen_id == "sketchpad"
-        playgrid_page_active = self.zynqtgui.current_screen_id == "playgrid"
-        song_manager_page_active = self.zynqtgui.current_screen_id == "song_manager"
-        library_page_active = self.zynqtgui.current_screen_id in ["layers_for_channel", "bank", "preset", "fixed_effects", "effect_preset", "sketch_effect_preset", "sample_library", "effects_for_channel", "sketch_effects_for_channel", "sound_categories"]
-        edit_page_active = self.zynqtgui.current_screen_id in ["control", "channel_wave_editor", "channel_external_setup"]
-
-        if self.zynqtgui.ui_settings.hardwareSequencer:
-            pass
-        else:
-            # Light up 1-5 buttons when respective clip is enabled when leftSidebar is active
-            clipEnabled = [
-                self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 0).enabled,
-                self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 1).enabled,
-                self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 2).enabled,
-                self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 3).enabled,
-                self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 4).enabled,
-            ]
-            # Light up 1-5 buttons when respective channel is selected when leftSidebar is not active
-            trackDelta = 5 if self.zynqtgui.tracksModActive else 0
-            selectedTrackIndex = self.zynqtgui.sketchpad.selectedTrackId - trackDelta
-
-        if self.zynqtgui.isExternalAppActive:
-            for button_id in range(num_leds):
-                self.set_button_color(button_id, led_color_inactive)
-        else:
-            self.set_button_color(self.button_menu, led_color_active if menu_page_active else led_color_inactive)
-            if self.zynqtgui.ui_settings.hardwareSequencer:
-                if self.zynqtgui.anyStepButtonPressed:
-                    self.set_button_color(self.button_1, self.number_button_colors[0])
-                    self.set_button_color(self.button_2, self.number_button_colors[1])
-                    self.set_button_color(self.button_3, self.number_button_colors[2])
-                    self.set_button_color(self.button_4, self.number_button_colors[3])
-                    self.set_button_color(self.button_5, self.number_button_colors[4])
-                else:
-                    self.set_button_color(self.button_1, led_color_active if sketchpad_page_active else led_color_inactive)
-                    self.set_button_color(self.button_2, led_color_active if library_page_active else led_color_inactive)
-                    self.set_button_color(self.button_3, led_color_active if edit_page_active else led_color_inactive)
-                    self.set_button_color(self.button_4, led_color_active if playgrid_page_active else led_color_inactive)
-                    self.set_button_color(self.button_5, led_color_active if song_manager_page_active else led_color_inactive)
-                self.set_button_color(self.button_star, self.star_button_color)
-                self.set_button_color(self.button_mode, self.mode_button_color, setChannelColor=self.zynqtgui.leftSidebarActive)
-                self.set_button_color(self.button_under_screen_1, self.step_button_colors[0])
-                self.set_button_color(self.button_under_screen_2, self.step_button_colors[1])
-                self.set_button_color(self.button_under_screen_3, self.step_button_colors[2])
-                self.set_button_color(self.button_under_screen_4, self.step_button_colors[3])
-                self.set_button_color(self.button_under_screen_5, self.step_button_colors[4])
-                self.set_button_color(self.button_under_screen_6, self.step_button_colors[5])
-                self.set_button_color(self.button_under_screen_7, self.step_button_colors[6])
-                self.set_button_color(self.button_under_screen_8, self.step_button_colors[7])
-                self.set_button_color(self.button_under_screen_9, self.step_button_colors[8])
-                self.set_button_color(self.button_under_screen_10, self.step_button_colors[9])
-                self.set_button_color(self.button_under_screen_11, self.step_button_colors[10])
-                self.set_button_color(self.button_under_screen_12, self.step_button_colors[11])
-                self.set_button_color(self.button_under_screen_13, self.step_button_colors[12])
-                self.set_button_color(self.button_under_screen_14, self.step_button_colors[13])
-                self.set_button_color(self.button_under_screen_15, self.step_button_colors[14])
-                self.set_button_color(self.button_under_screen_16, self.step_button_colors[15])
-            else:
-                self.set_button_color(self.button_1, led_color_inactive, setChannelColor=clipEnabled[0] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 0)
-                self.set_button_color(self.button_2, led_color_inactive, setChannelColor=clipEnabled[1] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 1)
-                self.set_button_color(self.button_3, led_color_inactive, setChannelColor=clipEnabled[2] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 2)
-                self.set_button_color(self.button_4, led_color_inactive, setChannelColor=clipEnabled[3] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 3)
-                self.set_button_color(self.button_5, led_color_inactive, setChannelColor=clipEnabled[4] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 4)
-                self.set_button_color(self.button_star, led_color_inactive, setChannelColor=not self.zynqtgui.leftSidebarActive and self.zynqtgui.tracksModActive)
-                self.set_button_color(self.button_mode, led_color_inactive, setChannelColor=self.zynqtgui.leftSidebarActive)
-                self.set_button_color(self.button_under_screen_1, led_color_active if sketchpad_page_active else led_color_inactive)
-                self.set_button_color(self.button_under_screen_2, led_color_active if library_page_active else led_color_inactive)
-                self.set_button_color(self.button_under_screen_3, led_color_active if edit_page_active else led_color_inactive)
-                self.set_button_color(self.button_under_screen_4, led_color_active if playgrid_page_active else led_color_inactive)
-                self.set_button_color(self.button_under_screen_5, led_color_active if song_manager_page_active else led_color_inactive)
-                self.set_button_color(self.button_under_screen_6, led_color_inactive)
-                self.set_button_color(self.button_under_screen_7, led_color_inactive)
-                self.set_button_color(self.button_under_screen_8, led_color_inactive)
-                self.set_button_color(self.button_under_screen_9, led_color_inactive)
-                self.set_button_color(self.button_under_screen_10, led_color_inactive)
-                self.set_button_color(self.button_under_screen_11, led_color_inactive)
-                self.set_button_color(self.button_under_screen_12, led_color_inactive)
-                self.set_button_color(self.button_under_screen_13, led_color_inactive)
-                self.set_button_color(self.button_under_screen_14, led_color_inactive)
-                self.set_button_color(self.button_under_screen_15, led_color_inactive)
-                self.set_button_color(self.button_under_screen_16, led_color_inactive)
-            self.set_button_color(self.button_alt, self.alt_button_color)
-            self.set_button_color(self.button_global, led_color_active if self.zynqtgui.globalPopupOpened else led_color_inactive)
-            for buttonIndex, buttonId in enumerate(self.action_block_id):
-                if self.action_block_color[buttonIndex] == None:
-                    if buttonId == self.button_record:
-                        self.set_button_color(self.button_record, led_color_red if self.zynqtgui.sketchpad.isRecording else led_color_inactive)
-                    elif buttonId == self.button_play:
-                        self.set_button_color(self.button_play, led_color_active if self.zynqtgui.sketchpad.isMetronomeRunning else led_color_inactive)
-                    elif buttonId == self.button_metronome:
-                        self.set_button_color(self.button_metronome, led_color_inactive if self.zynqtgui.sketchpad.metronomeEnabled else led_color_off, blink=self.zynqtgui.sketchpad.metronomeEnabled)
-                    elif buttonId == self.button_back:
-                        self.set_button_color(self.button_back, led_color_red)
-                    elif buttonId == self.button_select:
-                        self.set_button_color(self.button_select, led_color_active)
-                    else:
-                        self.set_button_color(buttonId, led_color_inactive)
-                else:
-                    self.set_button_color(buttonId, self.action_block_color[buttonIndex])
+    """
+    Slot to update led colors based on the provided ledColors map and brightness value.
+    The ledColors map should have button IDs as keys and QColor objects as values.
+    """
+    @Slot("QVariantMap")
+    def updateLedColors(self, ledColors = {}):
+        for buttonId, color in ledColors.items():
+            id = int(buttonId)
+            if not self.zynqtgui.sketchpad.isMetronomeRunning or (self.zynqtgui.sketchpad.isMetronomeRunning and id not in self.__blinkingButtons):
+                # Blinking buttons will be managed by the metronomeBeatUpdate128thHandler when metronome is running. Do not override the blinking button colors
+                wsleds[id] = (int(color.red() * self.__ledBrightness), int(color.green() * self.__ledBrightness), int(color.blue() * self.__ledBrightness))
 
         if self.zynqtgui.isBootingComplete:
             wsleds.show()

@@ -2732,11 +2732,17 @@ Kirigami.AbstractApplicationWindow {
                 spacing: ZUI.Theme.spacing
                 delegate: QQC2.ItemDelegate {
                     width: ListView.view.width
-                    height: Kirigami.Units.gridUnit * 2.5
+                    height: Kirigami.Units.gridUnit * 5
                     text: model.windowTitle + " << " + model.windowIcon 
                     icon.name: model.windowIcon
                     onClicked: {
                         X.XTask.show(model.windowId);
+                    }
+
+                    PlasmaCore.WindowThumbnail {
+                        anchors.fill: parent
+                        // 'winId' is the native window handle (WId) of the window you want to preview
+                        winId: model.windowId 
                     }
                 }
              }

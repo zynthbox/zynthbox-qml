@@ -225,10 +225,35 @@ ZUI.ScreenPage {
                     }
 
                     EntryDelegate {
+                        text: qsTr("Record Button Interaction Style")
+                        infoText: zynqtgui.ui_settings.recordButtonInteractionStyle === 0
+                            ? qsTr("Dialog")
+                            : zynqtgui.ui_settings.recordButtonInteractionStyle === 1
+                                ? qsTr("Immediate")
+                                : qsTr("Unknown")
+                        index: 1
+                        onIncrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.min(1, zynqtgui.ui_settings.recordButtonInteractionStyle + 1)
+                        onDecrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.max(0, zynqtgui.ui_settings.recordButtonInteractionStyle - 1)
+
+                        QQC2.Slider {
+                            width: Kirigami.Units.gridUnit * 20
+                            from: 0
+                            to: 1
+                            stepSize: 1
+                            value: zynqtgui.ui_settings.recordButtonInteractionStyle
+                            onPressedChanged: {
+                                // Set the value on release to save the value only when needed
+                                if (!pressed)
+                                    zynqtgui.ui_settings.recordButtonInteractionStyle = value;
+                            }
+                        }
+                    }
+
+                    EntryDelegate {
                         text: qsTr("Hardware Sequencer Interaction")
                         infoText: zynqtgui.ui_settings.hardwareSequencer ? qsTr("Enabled") : qsTr("Disabled")
                         onClicked: zynqtgui.ui_settings.hardwareSequencer = !zynqtgui.ui_settings.hardwareSequencer
-                        index: 1
+                        index: 2
                         onIncrementValue: zynqtgui.ui_settings.hardwareSequencer = true
                         onDecrementValue: zynqtgui.ui_settings.hardwareSequencer = false
 
@@ -252,7 +277,7 @@ ZUI.ScreenPage {
                                 : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 2
                                     ? qsTr("Never")
                                     : qsTr("Step Release")
-                        index: 2
+                        index: 3
                         onIncrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.min(3, zynqtgui.ui_settings.hardwareSequencerPreviewStyle + 1)
                         onDecrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.max(0, zynqtgui.ui_settings.hardwareSequencerPreviewStyle - 1)
 
@@ -275,7 +300,7 @@ ZUI.ScreenPage {
                         infoText: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 0
                             ? qsTr("Selection")
                             : qsTr("All Entries")
-                        index: 3
+                        index: 4
                         onIncrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.min(1, zynqtgui.ui_settings.hardwareSequencerEditInclusions + 1)
                         onDecrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.max(0, zynqtgui.ui_settings.hardwareSequencerEditInclusions - 1)
 
@@ -308,7 +333,7 @@ ZUI.ScreenPage {
                                 : zynqtgui.ui_settings.temporaryLiveRecordStyle === 2
                                     ? qsTr("Sticky")
                                     : qsTr("Unknown")
-                        index: 4
+                        index: 5
                         onIncrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.min(2, zynqtgui.ui_settings.temporaryLiveRecordStyle + 1)
                         onDecrementValue: zynqtgui.ui_settings.temporaryLiveRecordStyle = Math.max(0, zynqtgui.ui_settings.temporaryLiveRecordStyle - 1)
 
@@ -330,7 +355,7 @@ ZUI.ScreenPage {
                         text: qsTr("Debug Mode")
                         infoText: zynqtgui.ui_settings.debugMode ? qsTr("Enabled") : qsTr("Disabled")
                         onClicked: zynqtgui.ui_settings.debugMode = !zynqtgui.ui_settings.debugMode
-                        index: 5
+                        index: 6
                         onIncrementValue: zynqtgui.ui_settings.debugMode = true
                         onDecrementValue: zynqtgui.ui_settings.debugMode = false
 
@@ -347,7 +372,7 @@ ZUI.ScreenPage {
                         text: qsTr("Show Experimental Features")
                         infoText: zynqtgui.ui_settings.showExperimentalFeatures ? qsTr("Enabled") : qsTr("Disabled")
                         onClicked: zynqtgui.ui_settings.showExperimentalFeatures = !zynqtgui.ui_settings.showExperimentalFeatures
-                        index: 6
+                        index: 7
                         onIncrementValue: zynqtgui.ui_settings.showExperimentalFeatures = true
                         onDecrementValue: zynqtgui.ui_settings.showExperimentalFeatures = false
 
@@ -364,7 +389,7 @@ ZUI.ScreenPage {
                         text: qsTr("Show Cursor")
                         infoText: zynqtgui.ui_settings.showCursor ? qsTr("Enabled") : qsTr("Disabled")
                         onClicked: zynqtgui.ui_settings.showCursor = !zynqtgui.ui_settings.showCursor
-                        index: 7
+                        index: 8
                         onIncrementValue: zynqtgui.ui_settings.showCursor = true
                         onDecrementValue: zynqtgui.ui_settings.showCursor = false
 
@@ -381,7 +406,7 @@ ZUI.ScreenPage {
                         text: qsTr("Encoder Touch Response")
                         infoText: zynqtgui.ui_settings.touchEncoders ? qsTr("Enabled") : qsTr("Disabled")
                         onClicked: zynqtgui.ui_settings.touchEncoders = !zynqtgui.ui_settings.touchEncoders
-                        index: 8
+                        index: 9
                         onIncrementValue: zynqtgui.ui_settings.touchEncoders = true
                         onDecrementValue: zynqtgui.ui_settings.touchEncoders = false
 
@@ -399,7 +424,7 @@ ZUI.ScreenPage {
                         text: qsTr("VNC Server")
                         infoText: zynqtgui.ui_settings.vncserverEnabled ? qsTr("Enabled") : qsTr("Disabled")
                         onClicked: zynqtgui.ui_settings.vncserverEnabled = !zynqtgui.ui_settings.vncserverEnabled
-                        index: 9
+                        index: 10
                         onIncrementValue: zynqtgui.ui_settings.vncserverEnabled = true
                         onDecrementValue: zynqtgui.ui_settings.vncserverEnabled = false
 
@@ -415,14 +440,14 @@ ZUI.ScreenPage {
                         visible: zynqtgui.ui_settings.debugMode // Hide QML Testing loader when debugMode is off
                         text: qsTr("QML Testing Loader")
                         infoText:  "Load"
-                        index: 10
+                        index: 11
                         onClicked: _stackLayout.currentIndex = 1
                     }
 
                     EntryDelegate {
                         text: qsTr("LED Brightness")
                         infoText: qsTr("%1% ").arg(zynqtgui.ui_settings.ledBrightness)
-                        index: 11
+                        index: 12
                         onIncrementValue: zynqtgui.ui_settings.ledBrightness = Math.min(100, zynqtgui.ui_settings.ledBrightness + 1)
                         onDecrementValue: zynqtgui.ui_settings.ledBrightness = Math.max(0, zynqtgui.ui_settings.ledBrightness - 1)
 
@@ -443,7 +468,7 @@ ZUI.ScreenPage {
                         EntryDelegate {
                             text: qsTr("Display '%1' Brightness").arg(modelData.name)
                             infoText: qsTr("%1 / %2").arg(modelData.brightness).arg(modelData.max_brightness)
-                            index: 12 + model.index
+                            index: 13 + model.index
                             onIncrementValue: modelData.brightness = Math.min(modelData.max_brightness, modelData.brightness + 1)
                             onDecrementValue: modelData.brightness = Math.max(0, modelData.brightness - 1)
 

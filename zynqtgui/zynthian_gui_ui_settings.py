@@ -173,8 +173,6 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     ### END Property doubleClickThreshhold
 
     ### BEGIN Property recordButtonInteractionStyle
-    # 0: press record button to open the recording dialogue, hold alt then press record button to immediately start recording. If recording is running, press record to open recording dialogue.
-    # 1: press record button to immediately start recording, hold alt then press record button to open recording dialogue. If recording is running, press record to open recording dialogue.
     def get_recordButtonInteractionStyle(self):
         return self.__recordButtonInteractionStyle
 

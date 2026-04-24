@@ -3645,20 +3645,23 @@ Item {
             // Temporary live recording style 1 is to live record when holding down the record button, and style 2 is to also leave live recording on when released if at least one note was recorded (so don't disable live recording in that case)
             if (Zynthbox.SyncTimer.timerRunning) {
                 if (zynqtgui.startRecordButtonPressed) {
-                    // Temporary live recording style 1 is to live record when holding down the record button, and style 2 is to also leave live recording on when released if at least one note was recorded
-                    if (zynqtgui.ui_settings.temporaryLiveRecordStyle == 1 || zynqtgui.ui_settings.temporaryLiveRecordStyle == 2) {
-                        // Start live recording with the current settings
-                        if (_private.temporaryLiveRecordPattern) {
-                            // This should really never happen, but in case it does, let's just handle that real quick
-                            _private.temporaryLiveRecordPattern.recordLive = false;
-                            _private.temporaryLiveRecordPattern = null;
+                    // Don't temporary live record if we're already recording (as that makes toggling on and off kind of awkward)
+                    if (zynqtgui.sketchpad.isRecording === false) {
+                        // Temporary live recording style 1 is to live record when holding down the record button, and style 2 is to also leave live recording on when released if at least one note was recorded
+                        if (zynqtgui.ui_settings.temporaryLiveRecordStyle == 1 || zynqtgui.ui_settings.temporaryLiveRecordStyle == 2) {
+                            // Start live recording with the current settings
+                            if (_private.temporaryLiveRecordPattern) {
+                                // This should really never happen, but in case it does, let's just handle that real quick
+                                _private.temporaryLiveRecordPattern.recordLive = false;
+                                _private.temporaryLiveRecordPattern = null;
+                            }
+                            _private.temporaryLiveRecordPattern = _private.pattern;
+                            _private.temporaryRecordedNotes = 0;
+                            _private.temporaryLiveRecordPattern.liveRecordingSource = "";
+                            _private.temporaryLiveRecordPattern.recordLive = true;
+                            zynqtgui.sketchpad.recordingType = "midi";
+                            zynqtgui.sketchpad.isRecording = true;
                         }
-                        _private.temporaryLiveRecordPattern = _private.pattern;
-                        _private.temporaryRecordedNotes = 0;
-                        _private.temporaryLiveRecordPattern.liveRecordingSource = "";
-                        _private.temporaryLiveRecordPattern.recordLive = true;
-                        zynqtgui.sketchpad.recordingType = "midi";
-                        zynqtgui.sketchpad.isRecording = true;
                     }
                 } else {
                     // Temporary live recording style 1 is to live record when holding down the record button,

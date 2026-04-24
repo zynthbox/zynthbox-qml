@@ -115,6 +115,7 @@ ZUI.ScreenPage {
 
         default property alias content: _controlContainer.data
         property alias infoText: _label2.text
+        property alias description: _descriptionLabel.text
         property int index: -1
 
         signal incrementValue()
@@ -131,38 +132,49 @@ ZUI.ScreenPage {
             visible: delegate.highlighted
         }
 
-        contentItem: RowLayout {
+        contentItem: ColumnLayout {
             id: _layout
 
             spacing: ZUI.Theme.spacing
 
-            QQC2.Label {
+            RowLayout {
+                spacing: ZUI.Theme.spacing
                 Layout.fillWidth: true
-                text: _delegate.text
-            }
 
-            Row {
-                id: _controlContainer
-
-                Layout.alignment: Qt.AlignRight
-            }
-
-            QQC2.Label {
-                id: _label2
-
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                horizontalAlignment: Qt.AlignHCenter
-
-                background: Rectangle {
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    color: Kirigami.Theme.backgroundColor
-                    border.color: "#ff999999"
-                    border.width: 2
-                    radius: ZUI.Theme.radius
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    text: _delegate.text
                 }
 
+                Row {
+                    id: _controlContainer
+
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                QQC2.Label {
+                    id: _label2
+
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                    horizontalAlignment: Qt.AlignHCenter
+
+                    background: Rectangle {
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.backgroundColor
+                        border.color: "#ff999999"
+                        border.width: 2
+                        radius: ZUI.Theme.radius
+                    }
+                }
+            }
+            QQC2.Label {
+                id: _descriptionLabel
+                Layout.fillWidth: true
+                font.pointSize: 9
+                wrapMode: Text.Wrap
+                visible: text !== ""
             }
 
         }
@@ -225,35 +237,10 @@ ZUI.ScreenPage {
                     }
 
                     EntryDelegate {
-                        text: qsTr("Record Button Interaction Style")
-                        infoText: zynqtgui.ui_settings.recordButtonInteractionStyle === 0
-                            ? qsTr("Dialog")
-                            : zynqtgui.ui_settings.recordButtonInteractionStyle === 1
-                                ? qsTr("Immediate")
-                                : qsTr("Unknown")
-                        index: 1
-                        onIncrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.min(1, zynqtgui.ui_settings.recordButtonInteractionStyle + 1)
-                        onDecrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.max(0, zynqtgui.ui_settings.recordButtonInteractionStyle - 1)
-
-                        QQC2.Slider {
-                            width: Kirigami.Units.gridUnit * 20
-                            from: 0
-                            to: 1
-                            stepSize: 1
-                            value: zynqtgui.ui_settings.recordButtonInteractionStyle
-                            onPressedChanged: {
-                                // Set the value on release to save the value only when needed
-                                if (!pressed)
-                                    zynqtgui.ui_settings.recordButtonInteractionStyle = value;
-                            }
-                        }
-                    }
-
-                    EntryDelegate {
                         text: qsTr("Hardware Sequencer Interaction")
                         infoText: zynqtgui.ui_settings.hardwareSequencer ? qsTr("Enabled") : qsTr("Disabled")
                         onClicked: zynqtgui.ui_settings.hardwareSequencer = !zynqtgui.ui_settings.hardwareSequencer
-                        index: 2
+                        index: 1
                         onIncrementValue: zynqtgui.ui_settings.hardwareSequencer = true
                         onDecrementValue: zynqtgui.ui_settings.hardwareSequencer = false
 
@@ -277,7 +264,7 @@ ZUI.ScreenPage {
                                 : zynqtgui.ui_settings.hardwareSequencerPreviewStyle === 2
                                     ? qsTr("Never")
                                     : qsTr("Step Release")
-                        index: 3
+                        index: 2
                         onIncrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.min(3, zynqtgui.ui_settings.hardwareSequencerPreviewStyle + 1)
                         onDecrementValue: zynqtgui.ui_settings.hardwareSequencerPreviewStyle = Math.max(0, zynqtgui.ui_settings.hardwareSequencerPreviewStyle - 1)
 
@@ -300,7 +287,7 @@ ZUI.ScreenPage {
                         infoText: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 0
                             ? qsTr("Selection")
                             : qsTr("All Entries")
-                        index: 4
+                        index: 3
                         onIncrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.min(1, zynqtgui.ui_settings.hardwareSequencerEditInclusions + 1)
                         onDecrementValue: zynqtgui.ui_settings.hardwareSequencerEditInclusions = Math.max(0, zynqtgui.ui_settings.hardwareSequencerEditInclusions - 1)
 
@@ -322,6 +309,40 @@ ZUI.ScreenPage {
                         //             zynqtgui.ui_settings.hardwareSequencerEditInclusions = value;
                         //     }
                         // }
+                    }
+
+                    EntryDelegate {
+                        text: qsTr("Record Button Interaction Style")
+                        infoText: zynqtgui.ui_settings.recordButtonInteractionStyle === 0
+                            ? qsTr("Dialog")
+                            : zynqtgui.ui_settings.recordButtonInteractionStyle === 1
+                                ? qsTr("Immediate")
+                                : zynqtgui.ui_settings.recordButtonInteractionStyle === 2
+                                    ? qsTr("Toggle")
+                                    : qsTr("Unknown")
+                        description: zynqtgui.ui_settings.recordButtonInteractionStyle === 0
+                            ? qsTr("When not recording, record shows popup, alt+record starts and stops recording (honouring the count-in settings if not already in playback). While recording, record shows popup, alt+record stops recording.")
+                            : zynqtgui.ui_settings.recordButtonInteractionStyle === 1
+                                ? qsTr("When not recording, record starts recording (honouring the count-in settings if not already in playback), alt+record shows popup. While recording, record shows popup, alt+record stops recording.")
+                                : zynqtgui.ui_settings.recordButtonInteractionStyle === 2
+                                    ? qsTr("Record toggles recording on and off (honouring the count-in settings if not already in playback), alt+record shows and hides popup.")
+                                    : qsTr("Unknown")
+                        index: 4
+                        onIncrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.min(2, zynqtgui.ui_settings.recordButtonInteractionStyle + 1)
+                        onDecrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.max(0, zynqtgui.ui_settings.recordButtonInteractionStyle - 1)
+
+                        QQC2.Slider {
+                            width: Kirigami.Units.gridUnit * 20
+                            from: 0
+                            to: 2
+                            stepSize: 1
+                            value: zynqtgui.ui_settings.recordButtonInteractionStyle
+                            onPressedChanged: {
+                                // Set the value on release to save the value only when needed
+                                if (!pressed)
+                                    zynqtgui.ui_settings.recordButtonInteractionStyle = value;
+                            }
+                        }
                     }
 
                     EntryDelegate {

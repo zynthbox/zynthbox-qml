@@ -590,6 +590,7 @@ Item {
                     _private.heardNotes = [Zynthbox.PlayGridManager.getNote(sliceObject.rootNote, _private.pattern.sketchpadTrack)];
                     _private.heardVelocities = [_private.starVelocity];
                     // console.log("Testing the current slice of sample at index", slotIndex, "using its root note", sliceObject.rootNote, "aka", Zynthbox.KeyScales.midiNoteName(sliceObject.rootNote));
+                    // TODO When testing these, and we're in record mode, also register these with the appropriate pattern for recording purposes... and then in the below one as well on release
                 }
             } else if (slotIndex < 15) {
                 // Select the appropriate fx slot (no test fire here, doesn't really make much sense)

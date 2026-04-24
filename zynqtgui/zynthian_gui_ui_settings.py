@@ -111,6 +111,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_ui_settings, self).__init__(parent)
         self.__doubleClickThreshold = int(self.zynqtgui.global_settings.value("UI/doubleClickThreshhold", 200))
+        self.__recordButtonInteractionStyle = int(self.zynqtgui.global_settings.value("UI/recordButtonInteractionStyle", 0))
         self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "true") == "true" else False
         self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
@@ -170,6 +171,23 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     doubleClickThreshold = Property(int, get_doubleClickThreshhold, set_doubleClickThreshhold, notify=doubleClickThresholdChanged)
     ### END Property doubleClickThreshhold
+
+    ### BEGIN Property recordButtonInteractionStyle
+    # 0: press record button to open the recording dialogue, hold alt then press record button to immediately start recording. If recording is running, press record to open recording dialogue.
+    # 1: press record button to immediately start recording, hold alt then press record button to open recording dialogue. If recording is running, press record to open recording dialogue.
+    def get_recordButtonInteractionStyle(self):
+        return self.__recordButtonInteractionStyle
+
+    def set_recordButtonInteractionStyle(self, value):
+        if value != self.__recordButtonInteractionStyle:
+            self.__recordButtonInteractionStyle = value
+            self.zynqtgui.global_settings.setValue("UI/recordButtonInteractionStyle", self.__recordButtonInteractionStyle)
+            self.recordButtonInteractionStyleChanged.emit()
+
+    recordButtonInteractionStyleChanged = Signal()
+
+    recordButtonInteractionStyle = Property(int, get_recordButtonInteractionStyle, set_recordButtonInteractionStyle, notify=recordButtonInteractionStyleChanged)
+    ### END Property recordButtonInteractionStyle
 
     ### BEGIN Property hardwareSequencer
     def get_hardwareSequencer(self):

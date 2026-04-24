@@ -2410,7 +2410,8 @@ Kirigami.AbstractApplicationWindow {
     ZUI.Drawer {
         id: slotSelectionDrawer
         width: Kirigami.Units.gridUnit * 24
-        height: root.height
+        // Leave margins at top and bottom to allow hamburger menu button click events
+        height: root.height - Kirigami.Units.largeSpacing * 2
         edge: Qt.LeftEdge
         dragMargin: Kirigami.Units.gridUnit * 0.9
         modal: true

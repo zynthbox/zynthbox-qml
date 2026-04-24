@@ -50,7 +50,7 @@ ZUI.Popup {
 
     readonly property var acceptedButtonsWhenClosed: ["STOP_RECORD", "SWITCH_STOP_PRESSED", "SWITCH_STOP_RELEASED", "SWITCH_RECORD_PRESSED", "SWITCH_RECORD_RELEASED"]
     property var cuiaCallback: function(cuia) {
-        var returnValue = false;
+        let returnValue = false;
         // This gets called from main when the dialog is not opened, so let's be explicit about what we want in that case
         if (root.opened || acceptedButtonsWhenClosed.indexOf(cuia) > -1) {
             switch (cuia) {
@@ -143,65 +143,213 @@ ZUI.Popup {
                     // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
                     break;
                 case "SWITCH_RECORD_RELEASED":
-                    if (zynqtgui.sketchpad.isRecording === true && (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed)) {
-                        // If user does alt+record or metronome+record, and we're already recording, stop recording
-                        zynqtgui.callable_ui_action_simple("SWITCH_STOP_RELEASED");
-                        if (zynqtgui.metronomeButtonPressed) {
-                            zynqtgui.ignoreNextMetronomeButtonPress = true
-                        }
-                        returnValue = true;
-                    } else if (zynqtgui.sketchpad.isRecording === false && (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed)) {
-                        // If user does alt+record, recording should be started immediately, and metronome+record to do so with default countin (if done while stopped, otherwise just start recording immediately)
-                        let doCountin = false;
-                        if (zynqtgui.metronomeButtonPressed) {
-                            doCountin = true;
-                            zynqtgui.ignoreNextMetronomeButtonPress = true
-                        }
-                        let currentTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-                        // Take a snapshot of our current state, so we can keep that stable when changing settings
-                        root.selectedChannel = currentTrack;
-                        root.selectedSlotIndex = root.selectedChannel.selectedSlot.value;
-                        root.selectedSlotType = root.selectedChannel.selectedSlot.className;
-                        root.selectedClip = root.selectedChannel.selectedClip;
-                        // Take a snapshot of our lastSelectedObj, so we can keep that stable when changing settings
-                        root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
-                        root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value ? zynqtgui.sketchpad.lastSelectedObj.value : null
-                        root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
-                        root.lastSelectedTrack = zynqtgui.sketchpad.lastSelectedObj.track
-                        // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
-                        _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
-                        _private.updateSoloState();
-                        // Start the recording
-                        root.beginMidiRecording(doCountin);
-                        // And finally, say we consumed the event
-                        returnValue = true;
-                    } else if (zynqtgui.sketchpad.recordingType === "midi") {
-                        // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
-                        if (zynqtgui.sketchpad.isRecording) {
+                    let closeTheDialog = false;
+                    let openTheDialog = false;
+                    let startRecordingImmediately = false;
+                    // The startRecordingWithCountinImmediately variable is used to determine whether we *honour* the countin settings
+                    // That is to say, set this to true to start with the current settings, meaning that if set to zero countin, we will will still start without countin
+                    let startRecordingWithCountinImmediately = false;
+                    let stopRecordingImmediately = false;
+                    switch (zynqtgui.ui_settings.recordButtonInteractionStyle) {
+                        case 2:
+                            // console.log("Toggle style");
+                            // Opened dialog:
+                            // - When recording, press record to stop recording
+                            // - When not recording, press record to start recording with current settings
+                            // - hold alt and press record to close the dialogue
+                            // Closed dialog:
+                            // - Press record button to immediately start recording
+                            //   Hold alt then press record button to open recording dialogue
+                            // - If recording is running
+                            //   press record to stop recording
+                            //   press alt+record to open recording dialogue
                             if (root.opened) {
-                                // If the dialog is already open, and we push the record button again, stop recording
-                                _private.selectedPattern.recordLive = false;
-                                zynqtgui.sketchpad.isRecording = false;
-                                // Enable clip after recording
-                                _private.selectedClip.enabled = true;
+                                if (zynqtgui.metronomeButtonPressed) {
+                                    zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                }
+                                if (zynqtgui.altButtonPressed) {
+                                    closeTheDialog = true;
+                                } else {
+                                    if (zynqtgui.sketchpad.isRecording) {
+                                        stopRecordingImmediately = true;
+                                    } else {
+                                        startRecordingWithCountinImmediately = true;
+                                    }
+                                }
                             } else {
-                                // If we are recording and press the record button again, just open the dialog
-                                root.open();
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    if (zynqtgui.altButtonPressed) {
+                                        if (zynqtgui.metronomeButtonPressed) {
+                                            zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                            startRecordingWithCountinImmediately = true;
+                                        } else {
+                                            openTheDialog = true;
+                                        }
+                                    } else {
+                                        if (zynqtgui.metronomeButtonPressed) {
+                                            zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                        }
+                                        stopRecordingImmediately = true;
+                                    }
+                                } else {
+                                    if (zynqtgui.altButtonPressed) {
+                                        openTheDialog = true;
+                                    } else {
+                                        if (zynqtgui.metronomeButtonPressed) {
+                                            zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                            startRecordingWithCountinImmediately = true;
+                                        } else if (Zynthbox.SyncTimer.timerRunning) {
+                                            // If we're already doing playback, don't honour the countin settings
+                                            startRecordingImmediately = true;
+                                        } else {
+                                            startRecordingWithCountinImmediately = true;
+                                        }
+                                    }
+                                }
                             }
-                        } else if (root.opened == false) {
-                            // If we are not open, and also not recording, open the dialog
-                            root.open();
-                        } else {
-                            root.beginMidiRecording(true);
-                        }
+                            break;
+                        case 1:
+                            // console.log("Immediate style");
+                            // Opened dialog:
+                            // - When recording, press record to stop recording
+                            // - When not recording, press record to start recording with current settings
+                            // Closed dialog:
+                            // - Press record button to immediately start recording
+                            //   Hold alt then press record button to open recording dialogue
+                            // - If recording is running:
+                            //   press alt+record to stop recording
+                            //   press record to open recording dialogue
+                            if (root.opened) {
+                                if (zynqtgui.metronomeButtonPressed) {
+                                    zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                }
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    stopRecordingImmediately = true;
+                                } else {
+                                    startRecordingWithCountinImmediately = true;
+                                }
+                            } else {
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    if (zynqtgui.altButtonPressed == true || zynqtgui.metronomeButtonPressed == true) {
+                                        if (zynqtgui.metronomeButtonPressed) {
+                                            zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                        }
+                                        stopRecordingImmediately = true;
+                                    } else {
+                                        openTheDialog = true;
+                                    }
+                                } else {
+                                    if (zynqtgui.altButtonPressed == false) {
+                                        if (zynqtgui.metronomeButtonPressed) {
+                                            zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                            startRecordingWithCountinImmediately = true;
+                                        } else if (Zynthbox.SyncTimer.timerRunning) {
+                                            // If we're already doing playback, don't honour the countin settings
+                                            startRecordingImmediately = true;
+                                        } else {
+                                            startRecordingWithCountinImmediately = true;
+                                        }
+                                    } else {
+                                        openTheDialog = true;
+                                    }
+                                }
+                            }
+                            break;
+                        case 0:
+                        default:
+                            // console.log("Dialog style");
+                            // Opened dialog:
+                            // - When recording, press record to stop recording
+                            // - When not recording, press record to start recording with current settings
+                            // Closed dialog:
+                            // - Press record button to open the recording dialogue
+                            //   Hold alt then press record button to immediately start recording
+                            // - If recording is running:
+                            //   press alt+record to stop recording
+                            //   press record to open recording dialogue
+                            if (root.opened) {
+                                if (zynqtgui.metronomeButtonPressed) {
+                                    zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                }
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    stopRecordingImmediately = true;
+                                } else {
+                                    startRecordingWithCountinImmediately = true;
+                                }
+                            } else {
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    if (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed) {
+                                        if (zynqtgui.metronomeButtonPressed) {
+                                            zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                        }
+                                        stopRecordingImmediately = true;
+                                    } else {
+                                        openTheDialog = true;
+                                    }
+                                } else {
+                                    if (zynqtgui.altButtonPressed || zynqtgui.metronomeButtonPressed) {
+                                        if (zynqtgui.metronomeButtonPressed) {
+                                            zynqtgui.ignoreNextMetronomeButtonPress = true;
+                                            startRecordingWithCountinImmediately = true;
+                                        } else if (Zynthbox.SyncTimer.timerRunning) {
+                                            // If we're already doing playback, don't honour the countin settings
+                                            startRecordingImmediately = true;
+                                        } else {
+                                            startRecordingWithCountinImmediately = true;
+                                        }
+                                    } else {
+                                        openTheDialog = true;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                    // console.log("Handling recording button: Style setting is", zynqtgui.ui_settings.recordButtonInteractionStyle, "openTheDialog", openTheDialog, "closeTheDialog", closeTheDialog, "startRecordingImmediately", startRecordingImmediately, "startRecordingWithCountinImmediately", startRecordingWithCountinImmediately, "stopRecordingImmediately", stopRecordingImmediately, "recording type", zynqtgui.sketchpad.recordingType, "and isRecording", zynqtgui.sketchpad.isRecording);
+                    if (openTheDialog) {
+                        root.open();
                         returnValue = true;
-                    } else if (zynqtgui.sketchpad.recordingType === "audio") {
-                        // We want to make sure we set the recording clip to the one for our selected slot, otherwise we'll be recording to the wrong place
-                        if (zynqtgui.sketchpad.isRecording === false) {
-                            zynqtgui.clipToRecord = _private.selectedClip;
+                    } else if (closeTheDialog) {
+                        root.close();
+                        returnValue = true;
+                    }
+                    if (startRecordingImmediately || startRecordingWithCountinImmediately) {
+                        // BEGIN HACK
+                        // We're forcing the recording type to midi here, because... well, otherwise things get weird, and it really *is* going to be midi for now anyway, until we handle audio recording again
+                        zynqtgui.sketchpad.recordingType = "midi";
+                        // END HACK
+                        if (zynqtgui.sketchpad.recordingType === "midi") {
+                            if (root.opened === false) {
+                                let currentTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+                                // Take a snapshot of our current state, so we can keep that stable when changing settings
+                                root.selectedChannel = currentTrack;
+                                root.selectedSlotIndex = root.selectedChannel.selectedSlot.value;
+                                root.selectedSlotType = root.selectedChannel.selectedSlot.className;
+                                root.selectedClip = root.selectedChannel.selectedClip;
+                                // Take a snapshot of our lastSelectedObj, so we can keep that stable when changing settings
+                                root.lastSelectedClassName = zynqtgui.sketchpad.lastSelectedObj.className
+                                root.lastSelectedValue = zynqtgui.sketchpad.lastSelectedObj.value ? zynqtgui.sketchpad.lastSelectedObj.value : null
+                                root.lastSelectedComponent = zynqtgui.sketchpad.lastSelectedObj.component
+                                root.lastSelectedTrack = zynqtgui.sketchpad.lastSelectedObj.track
+                                // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
+                                _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
+                                _private.updateSoloState();
+                            }
+                            // Start the recording
+                            root.beginMidiRecording(startRecordingWithCountinImmediately);
+                            // And finally, say we consumed the event
+                            returnValue = true;
+                        } else if (zynqtgui.sketchpad.recordingType === "audio") {
+                            // We want to make sure we set the recording clip to the one for our selected slot, otherwise we'll be recording to the wrong place
+                            if (zynqtgui.sketchpad.isRecording === false) {
+                                zynqtgui.clipToRecord = _private.selectedClip;
+                            }
+                            // But *don't* return true, because we still want this handled by the core event handler
+                            // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
                         }
-                        // But *don't* return true, because we still want this handled by the core event handler
-                        // TODO 1.1 For audio recording, move the logic in here as well, instead of the core cuia handler - either that, or the opposite direction, but we should have it in one place, instead of split up
+                    }
+                    if (stopRecordingImmediately) {
+                        zynqtgui.callable_ui_action_simple("SWITCH_STOP_RELEASED");
+                        returnValue = true;
                     }
                     break;
             }

@@ -2720,7 +2720,7 @@ Kirigami.AbstractApplicationWindow {
 
     ZUI.Drawer {
         id: tasksDrawer
-        width: Kirigami.Units.gridUnit * 24
+        width: Kirigami.Units.gridUnit * 20
         height: root.height
         edge: Qt.RightEdge
         dragMargin: Kirigami.Units.gridUnit * 0.9
@@ -2731,28 +2731,37 @@ Kirigami.AbstractApplicationWindow {
                 model:  X.XTask.windowsModel
                 spacing: ZUI.Theme.spacing
                 delegate: QQC2.ItemDelegate {
+                    visible: model.windowIcon !== "zynthian_qt_gui.py" // Don't show the main window in the list of windows, as it doesn't make sense to show it there and it can cause confusion
                     width: ListView.view.width
-                    height: Kirigami.Units.gridUnit * 5
-                    text: model.windowTitle + " << " + model.windowIcon 
-                    icon.name: model.windowIcon
+                    height: visible ? Kirigami.Units.gridUnit * 2 : 0
+
                     onClicked: {
                         X.XTask.show(model.windowId);
                     }
 
-                    PlasmaCore.WindowThumbnail {
-                        anchors.fill: parent
-                        // 'winId' is the native window handle (WId) of the window you want to preview
-                        winId: model.windowId 
+                    contentItem: RowLayout {
+                        
+                        spacing: ZUI.Theme.spacing
+                        PlasmaCore.WindowThumbnail {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: height
+                            winId: model.windowId 
+                        }
+
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            text: model.windowTitle
+                            
+                        }
                     }
                 }
-             }
+            }
 
-        }
-
-        Text {
-            anchors.centerIn: parent
-            color: "orange"
-            text: "Number of windows: " + X.XTask.windowsModel.count
+            // Text {
+            //     anchors.centerIn: parent
+            //     text: X.XTask.activeWindow
+            // }
         }
     }
 
@@ -2795,43 +2804,53 @@ Kirigami.AbstractApplicationWindow {
             }
         }
 
-        QQC2.ToolBar {
+        ZUI.ActionBar {
             anchors.fill: parent
             position: QQC2.ToolBar.Footer
-            contentItem: RowLayout {
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitWidth: 1
-                    text: qsTr("CLOSE")
-                    onClicked: {
-                        clipPickerMenu.visible = false;
-                        // zynqtgui.close_current_window();
-                        X.XTask.closeActiveWindow();
-                    }
-                }
 
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitWidth: 1
-                    text: qsTr("HIDE")
-                    onClicked: {
-                        clipPickerMenu.visible = false;
-                        // zynqtgui.minimize_current_window();
-                        X.XTask.minimizeActiveWindow();
-                    }
-                }
+            contentItem: ZUI.SectionGroup {
 
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    implicitWidth: 1
-                    text: qsTr("LIST")
-                    onClicked: {
-                        zynqtgui.get_windows_name();
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: ZUI.Theme.spacing
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitWidth: 1
+                        text: qsTr("CLOSE")
+                        onClicked: {
+                            clipPickerMenu.visible = false;
+                            // zynqtgui.close_current_window();
+                            X.XTask.closeActiveWindow();
+                        }
+                    }
+
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitWidth: 1
+                        text: qsTr("GO BACK")
+                        onClicked: {
+                            clipPickerMenu.visible = false;
+                            // zynqtgui.minimize_current_window();
+                            X.XTask.minimizeActiveWindow();
+                        }
                     }
                 }
+            }
+
+       
+                
+
+                // QQC2.Button {
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     implicitWidth: 1
+                //     text: qsTr("LIST")
+                //     onClicked: {
+                //         zynqtgui.get_windows_name();
+                //     }
+                // }
                 // TODO Return for 1.1, but also probably with more and better functionality (this is ooooold code, doesn't really match current setup)
                 // QQC2.Button {
                 //     Layout.fillWidth: true
@@ -2878,7 +2897,7 @@ Kirigami.AbstractApplicationWindow {
                 //         }
                 //     }
                 // }
-            }
+            
         }
         onVisibleChanged: {
             if (visible) {

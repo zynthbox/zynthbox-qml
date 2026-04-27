@@ -614,7 +614,15 @@ Kirigami.AbstractApplicationWindow {
                     root.Zynthbox.LedManager.buttonMetronomeColor = disabledColor;
                     zynqtgui.led_config.setButtonBlink(Zynthbox.ZynthboxBasics.buttonId(Zynthbox.ZynthboxBasics.ButtonMetronome), disabledColor, false);
                 }
-                root.Zynthbox.LedManager.buttonStopColor = inactiveColor;
+                // Default recording button colours are:
+                // - The recording button colour if we're recording
+                // - The play button colour if we're playing
+                // - Simple button colour if we're not playing or recording
+                root.Zynthbox.LedManager.buttonStopColor = zynqtgui.sketchpad.isMetronomeRunning
+                    ? zynqtgui.sketchpad.isRecording
+                        ? negetiveColor
+                        : activeColor
+                    : inactiveColor;
                 root.Zynthbox.LedManager.buttonBackColor = negetiveColor;
                 root.Zynthbox.LedManager.buttonUpColor = inactiveColor;
                 root.Zynthbox.LedManager.buttonSelectColor = activeColor;

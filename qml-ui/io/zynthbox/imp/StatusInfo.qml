@@ -38,6 +38,7 @@ ZUI.SectionGroup
     id: root
 
     property bool highlighted : false
+    signal registerMetronomeTap();
 
     Layout.minimumWidth: Kirigami.Units.gridUnit * 10
     Layout.maximumWidth: Kirigami.Units.gridUnit * 10
@@ -581,6 +582,10 @@ ZUI.SectionGroup
                                                     bpmDial.bpm = 60000 / average;
                                                     Zynthbox.SyncTimer.setBpm(bpmDial.bpm)
                                                 }
+                                            }
+                                            Connections {
+                                                target: root
+                                                onRegisterMetronomeTap: bpmDial.registerTap()
                                             }
                                         }
                                     }

@@ -90,6 +90,14 @@ Kirigami.AbstractApplicationWindow {
 
         if (result === false) {
             switch (cuia) {
+            case "SWITCH_METRONOME_PRESSED":
+                if (zynqtgui.altButtonPressed) {
+                    // Perform tap stuff when the button is pressed, not on release
+                    zynqtgui.ignoreNextMetronomeButtonPress = true;
+                    let actualHeader = ZUI.Theme.altPanels ? root.footer : root.header;
+                    actualHeader.item.globalPopup.registerMetronomeTap();
+                }
+                break;
             case "SWITCH_METRONOME_RELEASED":
                 zynqtgui.sketchpad.metronomeEnabled = !zynqtgui.sketchpad.metronomeEnabled
                 result = true;
@@ -1873,6 +1881,7 @@ Kirigami.AbstractApplicationWindow {
     Component {
         id: _headerComponent
         ZUI.SectionPanel {
+            readonly property QtObject globalPopup: _globalPopup
 
             implicitHeight: Kirigami.Units.gridUnit*2 + topPadding + bottomPadding
             leftPadding: ZUI.Theme.useBreadcrumb ? 0 : rightPadding
@@ -1985,7 +1994,9 @@ Kirigami.AbstractApplicationWindow {
                     }
                 }
 
-                IMP.StatusInfo {}
+                IMP.StatusInfo {
+                    id: _globalPopup
+                }
             }
         }
     }

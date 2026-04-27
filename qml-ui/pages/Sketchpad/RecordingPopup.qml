@@ -151,6 +151,42 @@ ZUI.Popup {
                     let startRecordingWithCountinImmediately = false;
                     let stopRecordingImmediately = false;
                     switch (zynqtgui.ui_settings.recordButtonInteractionStyle) {
+                        case 3:
+                            // console.log("Adaptive style");
+                            // Opened dialog:
+                            // - When recording, press record to stop recording
+                            // - When not recording, press record to start recording with current settings
+                            // - Hold alt and press record to close the dialogue
+                            // Closed dialog:
+                            // - When recording, press record to open recording dialog
+                            // - During playback, press record to start recording immediately
+                            // - When stopped, press alt+record to start recording immediately
+                            // - When stopped, press record to open recording dialog
+                            if (zynqtgui.metronomeButtonPressed) {
+                                zynqtgui.ignoreNextMetronomeButtonPress = true;
+                            }
+                            if (root.opened) {
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    stopRecordingImmediately = true;
+                                } else {
+                                    if (zynqtgui.altButtonPressed) {
+                                        startRecordingImmediately = true;
+                                    } else {
+                                        startRecordingWithCountinImmediately = true;
+                                    }
+                                }
+                            } else {
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    openTheDialog = true;
+                                } else if (Zynthbox.SyncTimer.timerRunning) {
+                                    startRecordingImmediately = true;
+                                } else if (zynqtgui.altButtonPressed) {
+                                    startRecordingImmediately = true;
+                                } else {
+                                    openTheDialog = true;
+                                }
+                            }
+                            break;
                         case 2:
                             // console.log("Toggle style");
                             // Opened dialog:

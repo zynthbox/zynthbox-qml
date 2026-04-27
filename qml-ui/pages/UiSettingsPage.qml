@@ -319,22 +319,26 @@ ZUI.ScreenPage {
                                 ? qsTr("Immediate")
                                 : zynqtgui.ui_settings.recordButtonInteractionStyle === 2
                                     ? qsTr("Toggle")
-                                    : qsTr("Unknown")
+                                    : zynqtgui.ui_settings.recordButtonInteractionStyle === 3
+                                        ? qsTr("Adaptive")
+                                        : qsTr("Unknown")
                         description: zynqtgui.ui_settings.recordButtonInteractionStyle === 0
                             ? qsTr("When not recording, record shows popup, alt+record starts and stops recording (honouring the count-in settings if not already in playback). While recording, record shows popup, alt+record stops recording.")
                             : zynqtgui.ui_settings.recordButtonInteractionStyle === 1
                                 ? qsTr("When not recording, record starts recording (honouring the count-in settings if not already in playback), alt+record shows popup. While recording, record shows popup, alt+record stops recording.")
                                 : zynqtgui.ui_settings.recordButtonInteractionStyle === 2
                                     ? qsTr("Record toggles recording on and off (honouring the count-in settings if not already in playback), alt+record shows and hides popup.")
-                                    : qsTr("Unknown")
+                                    : zynqtgui.ui_settings.recordButtonInteractionStyle === 3
+                                        ? qsTr("During playback, record starts recording immediately. When stopped, record opens popup. When recording, record opens popup, alt+record starts recording immediately. In dialog, record start recording with current settings, alt+record starts recording immediately.")
+                                        : qsTr("Unknown")
                         index: 4
-                        onIncrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.min(2, zynqtgui.ui_settings.recordButtonInteractionStyle + 1)
+                        onIncrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.min(3, zynqtgui.ui_settings.recordButtonInteractionStyle + 1)
                         onDecrementValue: zynqtgui.ui_settings.recordButtonInteractionStyle = Math.max(0, zynqtgui.ui_settings.recordButtonInteractionStyle - 1)
 
                         QQC2.Slider {
                             width: Kirigami.Units.gridUnit * 20
                             from: 0
-                            to: 2
+                            to: 3
                             stepSize: 1
                             value: zynqtgui.ui_settings.recordButtonInteractionStyle
                             onPressedChanged: {

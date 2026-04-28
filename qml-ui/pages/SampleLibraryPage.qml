@@ -770,8 +770,8 @@ ZUI.ScreenPage {
                                     // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
                                     _private.filePropertiesHelper.stopPreview();
                                 }
-                                if (_private.selectedColumn == 2 && filesListView.currentItem && filesListView.currentItem.isAudio && zynqtgui.ui_settings.sampleAutoPreview) {
-                                    // Only do auto-preview things if the files column is selected
+                                if (_private.selectedColumn == 2 && filesListView.currentItem && filesListView.currentItem.isAudio && zynqtgui.ui_settings.sampleAutoPreview && component.isVisible) {
+                                    // Only do auto-preview things if the files column is selected, and the page is actually visible
                                     _private.filePropertiesHelper.filePath = filesListView.currentItem.filePath;
                                     _private.filePropertiesHelper.playPreview();
                                 }

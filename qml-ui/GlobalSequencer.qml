@@ -584,14 +584,14 @@ Item {
                     let sampleObject = Zynthbox.PlayGridManager.getClipById(sampleClip.cppObjId);
                     let sliceObject = sampleObject.selectedSliceObject;
                     // Use the slice's root note, so we play back the sample at even pitch (so *not* the pattern's pitch), and then also set that as the currently heard note, with the star velocity
-                    let sampleTestNoteInfo = {"sliceObject": sliceObject, "midiNote": sliceObject.rootNote};
+                    let sampleTestNoteInfo = {"sliceObject": sliceObject, "midiNote": sliceObject.rootNote, "pattern": _private.pattern};
                     _private.testSamplesSlicesActive[slotIndex] = sampleTestNoteInfo;
                     sliceObject.play(sampleTestNoteInfo.midiNote, _private.starVelocity);
                     _private.heardNotes = [Zynthbox.PlayGridManager.getNote(sliceObject.rootNote, _private.pattern.sketchpadTrack)];
                     _private.heardVelocities = [_private.starVelocity];
                     // console.log("Testing the current slice of sample at index", slotIndex, "using its root note", sliceObject.rootNote, "aka", Zynthbox.KeyScales.midiNoteName(sliceObject.rootNote));
                     // When testing these, also register these with the appropriate pattern for recording purposes...
-                    _private.pattern.handleMidiMessage(Zynthbox.MidiRouter.InternalControllerPassthroughPort, Zynthbox.SyncTimer.jackPlayheadFrames(), 144, sampleTestNoteInfo.midiNote, _private.starVelocity, _private.pattern.sketchpadTrack, "");
+                    sampleTestNoteInfo.pattern.handleMidiMessage(Zynthbox.MidiRouter.InternalControllerPassthroughPort, Zynthbox.SyncTimer.jackPlayheadFrames(), 144, sampleTestNoteInfo.midiNote, _private.starVelocity, sampleTestNoteInfo.pattern.sketchpadTrack, "");
                 }
             } else if (slotIndex < 15) {
                 // Select the appropriate fx slot (no test fire here, doesn't really make much sense)
@@ -621,7 +621,7 @@ Item {
                         sliceObject.stop(sampleTestNoteInfo.midiNote);
                     }
                     // When testing these, also register these with the appropriate pattern for recording purposes... (the pattern handles internally whether they're interesting)
-                    _private.pattern.handleMidiMessage(Zynthbox.MidiRouter.InternalControllerPassthroughPort, Zynthbox.SyncTimer.jackPlayheadFrames(), 128, sampleTestNoteInfo.midiNote, 0, _private.pattern.sketchpadTrack, "");
+                    sampleTestNoteInfo.pattern.handleMidiMessage(Zynthbox.MidiRouter.InternalControllerPassthroughPort, Zynthbox.SyncTimer.jackPlayheadFrames(), 128, sampleTestNoteInfo.midiNote, 0, sampleTestNoteInfo.pattern.sketchpadTrack, "");
                 }
             }
             if (slotIndex == 14) {

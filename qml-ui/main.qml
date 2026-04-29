@@ -2092,6 +2092,11 @@ Kirigami.AbstractApplicationWindow {
     GlobalSequencer {
         id: globalSequencerObject
         selectedChannel: root.selectedChannel
+        z: 9999999
+        anchors {
+            topMargin: -header.height
+            bottomMargin: -footer.height
+        }
     }
 
     PageManager {

@@ -4110,7 +4110,7 @@ Item {
         Item {
             id: modePopup
             anchors.fill: parent
-            visible: _private.interactionModeRecentlyChanged || lockOpen
+            visible: _private.interactionModeRecentlyChanged || zynqtgui.modeButtonPressed || lockOpen
             property bool lockOpen: false
             Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
             Rectangle {
@@ -4199,7 +4199,9 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignRight
                         opacity: 0.6
-                        text: "► %1".arg(interactionModeContainer.interactionModeLabel(nextInteractionMode))
+                        text: zynqtgui.ignoreNextModeButtonPress === true
+                            ? "► %1 (staying)".arg(interactionModeContainer.interactionModeLabel(_private.interactionMode))
+                            : "► %1".arg(interactionModeContainer.interactionModeLabel(nextInteractionMode))
                         readonly property int nextInteractionMode: {
                             if (zynqtgui.altButtonPressed) {
                                 if (_private.interactionMode === _private.interactionModeMusicalKeys) {
@@ -4215,6 +4217,29 @@ Item {
                                 } else {
                                     return _private.interactionModeSequencer;
                                 }
+                            }
+                        }
+                    }
+                    Item {
+                        anchors {
+                            top: parent.top
+                            left: parent.right
+                            bottom: parent.bottom
+                            leftMargin: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 7
+                        QQC2.Button {
+                            anchors.fill: parent
+                            text: qsTr("Don't Switch")
+                            checked: zynqtgui.ignoreNextModeButtonPress === true
+                        }
+                        MouseArea {
+                            anchors {
+                                fill: parent
+                                margins: -Kirigami.Units.gridUnit
+                            }
+                            onClicked: {
+                                zynqtgui.ignoreNextModeButtonPress = !zynqtgui.ignoreNextModeButtonPress;
                             }
                         }
                     }

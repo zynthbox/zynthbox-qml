@@ -24,7 +24,9 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.15
-
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.12 as Kirigami
 
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
@@ -2917,18 +2919,6 @@ Item {
         property int mostRecentlyInteractedStep: 0
         property int parameterPage: 0
         onParameterPageChanged: {
-            switch(parameterPage) {
-                case 2:
-                    applicationWindow().showPassiveNotification(qsTr("Parameter Page: Ratchet (style, count, probability)"));
-                    break;
-                case 1:
-                    applicationWindow().showPassiveNotification(qsTr("Parameter Page: Probability (probability, blank, next step)"));
-                    break;
-                case 0:
-                default:
-                    applicationWindow().showPassiveNotification(qsTr("Parameter Page: General (velocity, length, position)"));
-                    break;
-            }
             updateLedColors();
         }
         property QtObject sequence: component.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
@@ -3113,26 +3103,16 @@ Item {
         readonly property int interactionModeVelocityKeys: 3
         readonly property int interactionModeSlots: 4
         readonly property int effectiveInteractionMode: zynqtgui.modeButtonPressed || temporaryModeLocked ? temporaryInteractionMode : interactionMode
+        // This is set whenever the interaction mode changed, or when one of the settings for the interaction mode changed
+        // Call registerInteractionModeChange whenever such a change happens to ensure we display the popup as desired
+        property bool interactionModeRecentlyChanged: false
         onInteractionModeChanged: {
             updateLedColors();
-            switch (interactionMode) {
-                case interactionModeSlots:
-                    applicationWindow().showPassiveNotification("Slots", 1500);
-                    break;
-                case interactionModeVelocityKeys:
-                    applicationWindow().showPassiveNotification("Velocity Keys", 1500);
-                    break;
-                case interactionModeMusicalKeys:
-                    applicationWindow().showPassiveNotification("Musical Keys", 1500);
-                    break;
-                case interactionModeTrackClip:
-                    applicationWindow().showPassiveNotification("Track and Clip", 1500);
-                    break;
-                case interactionModeSequencer:
-                default:
-                    applicationWindow().showPassiveNotification("Sequencer", 1500);
-                    break;
-            }
+        }
+        onEffectiveInteractionModeChanged: registerInteractionModeChange()
+        function registerInteractionModeChange() {
+            interactionModeRecentlyChanged = true;
+            interactionModeChangedWaiter.restart();
         }
         function updateActionBlockLedsForTemporaryMode() {
             if (zynqtgui.modeButtonPressed || _private.temporaryModeLocked) {
@@ -3435,6 +3415,13 @@ Item {
                 component.Zynthbox.LedManager.buttonAltColor = _private.inactiveColor;
             }
             _private.updateActionBlockLedsForTemporaryMode();
+        }
+    }
+    Timer {
+        id: interactionModeChangedWaiter
+        interval: 2500; running: false; repeat: false;
+        onTriggered: {
+            _private.interactionModeRecentlyChanged = false;
         }
     }
     Repeater {
@@ -3788,4 +3775,451 @@ Item {
         value: zynqtgui.sketchpad.song.channelsModel
         delayed: true
     }
+
+    anchors.fill: parent
+    /// BEGIN Core visualisation component for the global sequencer
+    Item {
+        anchors.fill: parent
+        visible: zynqtgui.ui_settings.hardwareSequencer
+        Item {
+            id: parameterPageVisualiser
+            anchors.fill: parent
+            visible: _private.effectiveInteractionMode === _private.interactionModeSequencer && zynqtgui.anyStepButtonPressed
+            Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+            Rectangle {
+                anchors.fill: parent
+                color: Kirigami.Theme.backgroundColor
+                opacity: 0.5
+            }
+            ColumnLayout {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    bottom: parent.bottom
+                }
+                width: parent.width / 5
+                spacing: 0
+                Item {
+                    // MENU button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    opacity: 0
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 5
+                        height: Kirigami.Units.gridUnit * 3
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: "Menu"
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                        }
+                    }
+                }
+                Item {
+                    // 1 button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 15
+                        height: Kirigami.Units.gridUnit * 1.5
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: qsTr("General (velocity, length, position)")
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: _private.parameterPage === 0 ? Kirigami.Theme.highlightColor : Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: _private.parameterPage === 0 ? 1.0 : 0.8
+                        }
+                    }
+                }
+                Item {
+                    // 2 button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 15
+                        height: Kirigami.Units.gridUnit * 1.5
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: qsTr("Probability (probability, blank, next step)")
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: _private.parameterPage === 1 ? Kirigami.Theme.highlightColor : Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: _private.parameterPage === 1 ? 1.0 : 0.8
+                        }
+                    }
+                }
+                Item {
+                    // 3 button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 15
+                        height: Kirigami.Units.gridUnit * 1.5
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: qsTr("Ratchet (style, count, probability)")
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: _private.parameterPage === 2 ? Kirigami.Theme.highlightColor : Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: _private.parameterPage === 2 ? 1.0 : 0.8
+                        }
+                    }
+                }
+                Item {
+                    // 4 button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 5
+                        height: Kirigami.Units.gridUnit * 1.5
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        opacity: 0
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: "4 button"
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: _private.parameterPage === 3 ? 1.0 : 0.8
+                        }
+                    }
+                }
+                Item {
+                    // 5 button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 5
+                        height: Kirigami.Units.gridUnit * 1.5
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        opacity: 0
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: "5 button"
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                            opacity: _private.parameterPage === 4 ? 1.0 : 0.8
+                        }
+                    }
+                }
+                Item {
+                    // * button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 5
+                        height: Kirigami.Units.gridUnit * 1.5
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        opacity: 0
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: "* button"
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                        }
+                    }
+                }
+                Item {
+                    // MODE button
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                    QQC2.Control {
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        width: Kirigami.Units.gridUnit * 5
+                        height: Kirigami.Units.gridUnit * 2
+                        leftPadding: Kirigami.Units.largeSpacing
+                        rightPadding: Kirigami.Units.largeSpacing
+                        topPadding: Kirigami.Units.largeSpacing
+                        bottomPadding: Kirigami.Units.largeSpacing
+                        opacity: 0
+                        contentItem: QQC2.Label {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            text: "Mode"
+                        }
+                        background: Kirigami.ShadowedRectangle {
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                        }
+                    }
+                }
+            }
+        }
+        Item {
+            id: modePopup
+            anchors.fill: parent
+            visible: _private.interactionModeRecentlyChanged || lockOpen
+            property bool lockOpen: false
+            Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+            Rectangle {
+                anchors.fill: parent
+                color: Kirigami.Theme.backgroundColor
+                opacity: 0.5
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    interactionModeChangedWaiter.stop();
+                    _private.interactionModeRecentlyChanged = false;
+                    modePopup.lockOpen = false;
+                }
+            }
+            Item {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                    margins: Kirigami.Units.largeSpacing
+                }
+                height: Kirigami.Units.gridUnit * 5
+                Kirigami.ShadowedRectangle {
+                    anchors.fill: parent
+                    shadow {
+                        size: Kirigami.Units.gridUnit/2
+                        color: Qt.rgba(0, 0, 0, 0.4)
+                        yOffset: 2
+                    }
+                    radius: Kirigami.Units.smallSpacing * 2
+                    color: Kirigami.Theme.backgroundColor
+                }
+                Item {
+                    id: interactionModeContainer
+                    anchors {
+                        left: parent.left
+                        bottom: parent.top
+                        margins: Kirigami.Units.largeSpacing
+                    }
+                    width: Kirigami.Units.gridUnit * 20
+                    height: Kirigami.Units.gridUnit * 1.5
+                    Kirigami.ShadowedRectangle {
+                        anchors.fill: parent
+                        shadow {
+                            size: Kirigami.Units.gridUnit/2
+                            color: Qt.rgba(0, 0, 0, 0.4)
+                            yOffset: 2
+                        }
+                        radius: Kirigami.Units.smallSpacing * 2
+                        color: Kirigami.Theme.backgroundColor
+                    }
+                    function interactionModeLabel(interactionMode) {
+                        switch (interactionMode) {
+                            case _private.interactionModeSlots:
+                                return qsTr("Slots");
+                                break;
+                            case _private.interactionModeVelocityKeys:
+                                return qsTr("Velocity Keys");
+                                break;
+                            case _private.interactionModeMusicalKeys:
+                                return qsTr("Musical Keys");
+                                break;
+                            case _private.interactionModeTrackClip:
+                                return qsTr("Track and Clip");
+                                break;
+                            case _private.interactionModeSequencer:
+                            default:
+                                return qsTr("Sequencer");
+                                break;
+                        }
+                    }
+                    QQC2.Label {
+                        anchors {
+                            fill: parent
+                            margins: Kirigami.Units.smallSpacing * 2
+                        }
+                        verticalAlignment: Text.AlignVCenter
+                        text: interactionModeContainer.interactionModeLabel(_private.effectiveInteractionMode)
+                    }
+                    QQC2.Label {
+                        anchors {
+                            fill: parent
+                            margins: Kirigami.Units.smallSpacing * 2
+                        }
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignRight
+                        opacity: 0.6
+                        text: "► %1".arg(interactionModeContainer.interactionModeLabel(nextInteractionMode))
+                        readonly property int nextInteractionMode: {
+                            if (zynqtgui.altButtonPressed) {
+                                if (_private.interactionMode === _private.interactionModeMusicalKeys) {
+                                    return _private.interactionModeVelocityKeys;
+                                } else {
+                                    return _private.interactionModeMusicalKeys;
+                                }
+                            } else {
+                                if (_private.interactionMode === _private.interactionModeSequencer) {
+                                    return _private.interactionModeTrackClip;
+                                } else if (_private.interactionMode === _private.interactionModeTrackClip) {
+                                    return _private.interactionModeSlots;
+                                } else {
+                                    return _private.interactionModeSequencer;
+                                }
+                            }
+                        }
+                    }
+                }
+                RowLayout {
+                    anchors.fill: parent
+                    Item {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                    }
+                    Item {
+                        Layout.fillHeight: true
+                        Layout.minimumWidth: height
+                        Layout.maximumWidth: height
+                        QQC2.Button {
+                            text: "Keep\nOpen"
+                            anchors.fill: parent
+                            checked: modePopup.lockOpen
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                modePopup.lockOpen = !modePopup.lockOpen;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /// END Core visualisation component for the global sequencer
 }

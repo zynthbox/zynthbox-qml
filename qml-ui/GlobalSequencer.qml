@@ -3811,14 +3811,17 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 5
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 3
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
                         topPadding: Kirigami.Units.largeSpacing
                         bottomPadding: Kirigami.Units.largeSpacing
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: "Menu"
                         }
@@ -3845,14 +3848,17 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 15
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
                         topPadding: Kirigami.Units.largeSpacing
                         bottomPadding: Kirigami.Units.largeSpacing
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: qsTr("General (velocity, length, position)")
                         }
@@ -3880,14 +3886,17 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 15
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
                         topPadding: Kirigami.Units.largeSpacing
                         bottomPadding: Kirigami.Units.largeSpacing
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: qsTr("Probability (probability, blank, next step)")
                         }
@@ -3915,14 +3924,17 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 15
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
                         topPadding: Kirigami.Units.largeSpacing
                         bottomPadding: Kirigami.Units.largeSpacing
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: qsTr("Ratchet (style, count, probability)")
                         }
@@ -3950,7 +3962,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 5
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -3958,7 +3970,10 @@ Item {
                         bottomPadding: Kirigami.Units.largeSpacing
                         opacity: 0
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: "4 button"
                         }
@@ -3986,7 +4001,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 5
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -3994,7 +4009,10 @@ Item {
                         bottomPadding: Kirigami.Units.largeSpacing
                         opacity: 0
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: "5 button"
                         }
@@ -4022,7 +4040,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 5
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -4030,7 +4048,10 @@ Item {
                         bottomPadding: Kirigami.Units.largeSpacing
                         opacity: 0
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: "* button"
                         }
@@ -4057,7 +4078,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 5
+                        width: Kirigami.Units.gridUnit * 16
                         height: Kirigami.Units.gridUnit * 2
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -4065,7 +4086,10 @@ Item {
                         bottomPadding: Kirigami.Units.largeSpacing
                         opacity: 0
                         contentItem: QQC2.Label {
-                            anchors.fill: parent
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing * 2
+                            }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
                             text: "Mode"
                         }

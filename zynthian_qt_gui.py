@@ -4580,7 +4580,7 @@ class zynthian_gui(QObject):
             self.__any_step_button_pressed__ = anyButtonPressed
             self.anyStepButtonPressedChanged.emit()
     anyStepButtonPressedChanged = Signal()
-    anyStepButtonPressed = Property(bool, get_anyStepButtonPressed, anyStepButtonPressedChanged)
+    anyStepButtonPressed = Property(bool, get_anyStepButtonPressed, notify=anyStepButtonPressedChanged)
     ### END Property anyStepButtonPressed
     ### BEGIN Property step1ButtonPressed
     def get_step1_button_pressed(self):

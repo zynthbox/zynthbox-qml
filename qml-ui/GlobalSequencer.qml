@@ -47,6 +47,7 @@ Item {
         if (_private.mostRecentlyInteractedStep !== newStep) {
             _private.mostRecentlyInteractedStep = newStep;
         }
+        _private.mostRecentlyInteractedStepCounter = _private.mostRecentlyInteractedStepCounter + 1;
     }
 
     property QtObject selectedChannel: null
@@ -2929,6 +2930,7 @@ Item {
     QtObject {
         id: _private
         property int mostRecentlyInteractedStep: 0
+        property int mostRecentlyInteractedStepCounter: -1
         property int mostRecentlyAttemptedToggleStep: -1 // This is to allow for the "select without toggle" logic to work
         property int parameterPage: 0
         onParameterPageChanged: {
@@ -2940,6 +2942,7 @@ Item {
         // property QtObject clip: component.selectedChannel ? component.selectedChannel.getClipsModelById(component.selectedClip).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
         onPatternChanged: {
             mostRecentlyInteractedStep = 0;
+            mostRecentlyInteractedStepCounter = -1;
             mostRecentlyAttemptedToggleStep = -1;
             updateSlotPassthroughClients();
             handlePatternDataChange();
@@ -3802,7 +3805,7 @@ Item {
         Item {
             id: parameterPageVisualiser
             anchors.fill: parent
-            visible: _private.effectiveInteractionMode === _private.interactionModeSequencer && zynqtgui.anyStepButtonPressed
+            visible: _private.effectiveInteractionMode === _private.interactionModeSequencer && zynqtgui.anyStepButtonPressed && ["playgrid"].indexOf(zynqtgui.current_screen_id) == -1
             Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
             Rectangle {
                 anchors.fill: parent
@@ -4120,6 +4123,179 @@ Item {
                             }
                             radius: Kirigami.Units.smallSpacing * 2
                             color: Kirigami.Theme.backgroundColor
+                        }
+                    }
+                }
+            }
+            ColumnLayout {
+                anchors {
+                    top: parent.top
+                    right: parent.right
+                    bottom: parent.bottom
+                    rightMargin: Kirigami.Units.largeSpacing
+                }
+                width: parent.width / 2
+                spacing: 0
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                    Item {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+                        height: Kirigami.Units.gridUnit * 3
+                        Kirigami.Heading {
+                            anchors {
+                                top: parent.top
+                                left: parent.left
+                                right: parent.right
+                            }
+                            horizontalAlignment: Text.AlignRight
+                            level: 1
+                            function getHeldSteps() {
+                                let theHeldSteps = [];
+                                for (let i = 0; i < 16; ++i) {
+                                    if (_private.heldStepButtons[i] !== false) {
+                                        theHeldSteps.push(i);
+                                    }
+                                }
+                                return theHeldSteps;
+                            }
+                            readonly property var heldSteps: zynqtgui.anyStepButtonPressed && _private.mostRecentlyInteractedStepCounter > -1 && _private.heldStepButtons.length > 0 ? getHeldSteps() : []
+                            function getStepList() {
+                                let theString = "";
+                                let separator = "";
+                                let stepOffset = (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width;
+                                if (heldSteps.length === 1) {
+                                    theString = qsTr("Step %1").arg(stepOffset + heldSteps[0] + 1);
+                                } else {
+                                    theString = qsTr("Steps ");
+                                    for (let i = 0; i < heldSteps.length; ++i) {
+                                        if (i + 1 == heldSteps.length) {
+                                            theString = theString + ", and " + (stepOffset + heldSteps[i] + 1);
+                                        } else {
+                                            theString = theString + separator + (stepOffset + heldSteps[i] + 1);
+                                        }
+                                        separator = ", ";
+                                    }
+                                }
+                                return theString;
+                            }
+                            readonly property string stepList: zynqtgui.anyStepButtonPressed && _private.mostRecentlyInteractedStepCounter > -1 && heldSteps.length > 0 ? getStepList() : ""
+                            text: zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1
+                                ? qsTr("All Notes on %1").arg(stepList)
+                                : qsTr("Selected Notes on %1").arg(stepList)
+                        }
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Item {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+                        height: Kirigami.Units.gridUnit * 3
+                        Kirigami.Heading {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.top
+                            }
+                            horizontalAlignment: Text.AlignRight
+                            level: 2
+                            text: {
+                                switch(_private.parameterPage) {
+                                    case 2:
+                                        return qsTr("Style");
+                                        break;
+                                    case 1:
+                                        return qsTr("Probability");
+                                        break;
+                                    case 0:
+                                    default:
+                                        return qsTr("Velocity");
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 7
+                    Item {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+                        height: Kirigami.Units.gridUnit * 3
+                        Kirigami.Heading {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.top
+                            }
+                            horizontalAlignment: Text.AlignRight
+                            level: 2
+                            text: {
+                                switch(_private.parameterPage) {
+                                    case 2:
+                                        return qsTr("Count");
+                                        break;
+                                    case 1:
+                                        return qsTr("");
+                                        break;
+                                    case 0:
+                                    default:
+                                        return qsTr("Length");
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Item {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+                        height: Kirigami.Units.gridUnit * 3
+                        Kirigami.Heading {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.top
+                            }
+                            horizontalAlignment: Text.AlignRight
+                            level: 2
+                            text: {
+                                switch(_private.parameterPage) {
+                                    case 2:
+                                        return qsTr("Probability");
+                                        break;
+                                    case 1:
+                                        return qsTr("Next Step");
+                                        break;
+                                    case 0:
+                                    default:
+                                        return qsTr("Position");
+                                        break;
+                                }
+                            }
                         }
                     }
                 }

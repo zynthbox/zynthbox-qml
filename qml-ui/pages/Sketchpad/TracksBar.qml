@@ -41,6 +41,7 @@ import io.zynthbox.rec 1.0 as Rec
 
 
 import io.zynthbox.components 1.0 as Zynthbox
+import io.zynthbox.imp 1.0 as IMP
 
 AbstractSketchpadPage {
     id: root
@@ -1482,12 +1483,12 @@ AbstractSketchpadPage {
                                                 font.pointSize: 9
                                                 visible: waveformContainer.showWaveform
                                                 text: waveformContainer.clip
-                                                    ? progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false
+                                                    ? waveformItem.audioSource && waveformItem.audioSource.sourceExists === false
                                                         ? qsTr("Missing Wave: %1").arg(waveformContainer.clip.filename)
                                                         : qsTr("Wave : %1").arg(waveformContainer.clip.filename)
                                                 : ""
                                                 elide: Text.ElideMiddle
-                                                color: progressDots.cppClipObject && progressDots.cppClipObject.sourceExists === false ? "red" : Kirigami.Theme.textColor
+                                                color: waveformItem.audioSource && waveformItem.audioSource.sourceExists === false ? "red" : Kirigami.Theme.textColor
                                             }
                                             Item {
                                                 Layout.fillWidth: true
@@ -1782,156 +1783,21 @@ AbstractSketchpadPage {
                                                             zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
                                                         }
                                                     }
-                                                }                                                    
+                                                }
                                             }
                                         }
 
-                                        Zynthbox.WaveFormItem {
+                                        IMP.SampleVisualiser {
                                             id: waveformItem
                                             anchors.fill: parent
-                                            clip: true
-                                            opacity: waveformContainer.showWaveform ? 1 : 0
-                                            color: Kirigami.Theme.textColor
-                                            source: progressDots.cppClipObject ? "clip:/%1".arg(progressDots.cppClipObject.id) : ""
                                             visible: waveformContainer.clip && !waveformContainer.clip.isEmpty
-                                            // Calculate amount of pixels represented by 1 second
-                                            property real pixelToSecs: (waveformItem.end - waveformItem.start) / waveformItem.width
-                                            // Calculate amount of pixels represented by 1 beat
-                                            property real pixelsPerBeat: progressDots.cppClipObject ? (60/Zynthbox.SyncTimer.bpm*progressDots.cppClipObject.speedRatio) / waveformItem.pixelToSecs : 1
-                                            start: progressDots.cppClipObject != null && progressDots.cppClipObject.rootSlice.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? progressDots.cppClipObject.rootSlice.startPositionSeconds : 0
-                                            end: progressDots.cppClipObject != null ? (progressDots.cppClipObject.rootSlice.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? progressDots.cppClipObject.rootSlice.startPositionSeconds + progressDots.cppClipObject.rootSlice.lengthSeconds : length) : 0
-                                            readonly property real relativeStart: waveformItem.start / waveformItem.length
-                                            readonly property real relativeEnd: waveformItem.end / waveformItem.length
-
-                                            // Mask for wave part before start
-                                            Rectangle {
-                                                anchors {
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                    left: parent.left
-                                                    right: startLoopLine.left
-                                                }
-                                                color: "#99000000"
-                                            }
-
-                                            // Mask for wave part after
-                                            Rectangle {
-                                                anchors {
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                    left: endLoopLine.right
-                                                    right: parent.right
-                                                }
-                                                color: "#99000000"
-                                            }
-
-                                            // Start loop line
-                                            Rectangle {
-                                                id: startLoopLine
-                                                anchors {
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                }
-                                                color: Kirigami.Theme.positiveTextColor
-                                                opacity: 0.8
-                                                width: 1
-                                                property real startPositionRelative: progressDots.cppClipObject
-                                                                                    ? progressDots.cppClipObject.rootSlice.startPositionSamples / progressDots.cppClipObject.durationSamples
-                                                                                    : 1
-                                                x: progressDots.cppClipObject != null ? ZUI.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
-                                            }
-
-                                            // Loop line
-                                            Rectangle {
-                                                id: loopLine
-                                                anchors {
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                }
-                                                color: Kirigami.Theme.highlightColor
-                                                opacity: 0.8
-                                                width: 1
-                                                property real loopDeltaRelative: progressDots.cppClipObject
-                                                                                ? progressDots.cppClipObject.rootSlice.loopDeltaSamples / progressDots.cppClipObject.durationSamples
-                                                                                : 0
-                                                x: progressDots.cppClipObject
-                                                ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
-                                                : 0
-                                            }
-
-                                            // End loop line
-                                            Rectangle {
-                                                id: endLoopLine
-                                                anchors {
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                }
-                                                color: Kirigami.Theme.neutralTextColor
-                                                opacity: 0.8
-                                                width: 1
-                                                x: progressDots.cppClipObject
-                                                ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.rootSlice.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
-                                                : 0
-                                            }
-
-                                            // Progress line
-                                            Rectangle {
-                                                anchors {
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                }
-                                                visible: root.visible && root.selectedChannel != null && root.selectedChannel.trackType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
-                                                color: Kirigami.Theme.highlightColor
-                                                width: Kirigami.Units.smallSpacing
-                                                x: visible ? ZUI.CommonUtils.fitInWindow(progressDots.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
-                                            }
-
-                                            // SamplerSynth progress dots
-                                            Timer {
-                                                id: dotFetcher
-                                                interval: 1; repeat: false; running: false;
-                                                onTriggered: {
-                                                    progressDots.playbackPositions = root.visible && ["synth", "sample-trig"].includes(root.selectedChannel.trackType) && progressDots.cppClipObject
-                                                            ? progressDots.cppClipObject.playbackPositions
-                                                            : null
-                                                }
-                                            }
-                                            Connections {
-                                                target: root
-                                                onVisibleChanged: dotFetcher.restart();
-                                            }
-                                            Connections {
-                                                target: root.selectedChannel
-                                                onTrack_type_changed: dotFetcher.restart();
-                                            }
-                                            Repeater {
-                                                id: progressDots
-                                                property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null;
-                                                model: Zynthbox.Plugin.clipMaximumPositionCount
-                                                property QtObject playbackPositions: null
-                                                onCppClipObjectChanged: dotFetcher.restart();
-                                                delegate: Item {
-                                                    property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
-                                                    visible: progressEntry && progressEntry.id > -1
-                                                    Rectangle {
-                                                        anchors.centerIn: parent
-                                                        rotation: 45
-                                                        color: Kirigami.Theme.highlightColor
-                                                        width: Kirigami.Units.largeSpacing
-                                                        height:  Kirigami.Units.largeSpacing
-                                                        scale: progressEntry ? 0.5 + progressEntry.gain : 1
-                                                    }
-                                                    anchors {
-                                                        top: parent.verticalCenter
-                                                        topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
-                                                    }
-                                                    x: visible ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
-                                                }
-                                            }
+                                            audioSource: visible ? Zynthbox.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null
+                                            clipToSlice: false
+                                            trackType: root.selectedChannel ? root.selectedChannel.trackType : ""
                                         }
                                     }
                                 }
-                            }                            
+                            }
                         }
 
                         // Take remaining available width

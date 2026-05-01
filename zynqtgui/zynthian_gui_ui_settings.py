@@ -115,6 +115,7 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
         self.__hardwareSequencer = True if self.zynqtgui.global_settings.value("UI/hardwareSequencer", "true") == "true" else False
         self.__hardwareSequencerPreviewStyle = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerPreviewStyle", 0))
         self.__hardwareSequencerEditInclusions = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerEditInclusions", 0))
+        self.__hardwareSequencerToggleOnSelect = int(self.zynqtgui.global_settings.value("UI/hardwareSequencerToggleOnSelect", 1))
         self.__temporaryLiveRecordStyle = int(self.zynqtgui.global_settings.value("UI/temporaryLiveRecordStyle", 1))
         self.__sampleAutoPreview = True if self.zynqtgui.global_settings.value("UI/sampleAutoPreview", "true") == "true" else False
         self.__debugMode = True if self.zynqtgui.global_settings.value("UI/debugMode", "false") == "true" else False
@@ -231,6 +232,21 @@ class zynthian_gui_ui_settings(zynthian_qt_gui_base.zynqtgui):
 
     hardwareSequencerEditInclusions = Property(int, get_hardwareSequencerEditInclusions, set_hardwareSequencerEditInclusions, notify=hardwareSequencerEditInclusionsChanged)
     ### END Property hardwareSequencerEditInclusions
+
+    ### BEGIN Property hardwareSequencerToggleOnSelect
+    def get_hardwareSequencerToggleOnSelect(self):
+        return self.__hardwareSequencerToggleOnSelect
+
+    def set_hardwareSequencerToggleOnSelect(self, value):
+        if value != self.__hardwareSequencerToggleOnSelect:
+            self.__hardwareSequencerToggleOnSelect = value
+            self.zynqtgui.global_settings.setValue("UI/hardwareSequencerToggleOnSelect", self.__hardwareSequencerToggleOnSelect)
+            self.hardwareSequencerToggleOnSelectChanged.emit()
+
+    hardwareSequencerToggleOnSelectChanged = Signal()
+
+    hardwareSequencerToggleOnSelect = Property(int, get_hardwareSequencerToggleOnSelect, set_hardwareSequencerToggleOnSelect, notify=hardwareSequencerToggleOnSelectChanged)
+    ### END Property hardwareSequencerToggleOnSelect
 
     ### BEGIN Property temporaryLiveRecordStyle
     # 0 is no temporary live recording

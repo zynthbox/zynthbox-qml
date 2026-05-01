@@ -22,6 +22,10 @@ Item {
      */
     property QtObject audioSource: null
     /**
+     * Set to false to display the entire sample area (that is, not only the window defined by the current slice)
+     */
+    property bool clipToSlice: true
+    /**
      * This should be set to the channel audio type string for the channel appropriate for the given sample.
      * If you don't set this, you will have no progress reporting
      * If you are visualising an orphaned sample (for example when previewing one for loading), set this to "sample-loop" to have a single progress line, or "synth" for multiple progress dots
@@ -72,10 +76,18 @@ Item {
         anchors.fill: parent
         color: Kirigami.Theme.textColor
         source: progressDots.cppClipObject ? "clip:/%1".arg(progressDots.cppClipObject.id) : ""
-        start: progressDots.cppClipObject != null ? progressDots.cppClipObject.selectedSliceObject.startPositionSeconds : 0
-        end: progressDots.cppClipObject != null ? progressDots.cppClipObject.selectedSliceObject.startPositionSeconds + progressDots.cppClipObject.selectedSliceObject.lengthSeconds : 0
-        readonly property real relativeStart: waveformItem.start / waveformItem.length
-        readonly property real relativeEnd: waveformItem.end / waveformItem.length
+        start: progressDots.cppClipObject != null
+            ? component.clipToSlice
+                ? progressDots.cppClipObject.selectedSliceObject.startPositionSeconds
+                : 0
+            : 0
+        end: progressDots.cppClipObject != null
+            ? component.clipToSlice
+                ? progressDots.cppClipObject.selectedSliceObject.startPositionSeconds + progressDots.cppClipObject.selectedSliceObject.lengthSeconds
+                : -1
+            : -1
+        readonly property real relativeStart: component.clipToSlice ? waveformItem.start / waveformItem.length : 0
+        readonly property real relativeEnd: component.clipToSlice ? waveformItem.end / waveformItem.length : waveformItem.length
 
         visible: component.visible && (_private.audioSource || (_private.sample && !_private.sample.isEmpty_))
 
@@ -114,7 +126,11 @@ Item {
             property real startPositionRelative: progressDots.cppClipObject
                 ? progressDots.cppClipObject.selectedSliceObject.startPositionSamples / progressDots.cppClipObject.durationSamples
                 : 1
-            x: progressDots.cppClipObject != null ? ZUI.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
+            x: progressDots.cppClipObject != null
+                ? component.clipToSlice
+                    ? ZUI.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                    : startPositionRelative * parent.width
+                : 0
         }
 
         // Loop line
@@ -129,8 +145,10 @@ Item {
             property real loopDeltaRelative: progressDots.cppClipObject
                 ? progressDots.cppClipObject.selectedSliceObject.loopDeltaSamples / progressDots.cppClipObject.durationSamples
                 : 0
-            x: progressDots.cppClipObject
-                ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+            x: progressDots.cppClipObject != null
+                ? component.clipToSlice
+                    ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                    : (startLoopLine.startPositionRelative + loopDeltaRelative) * parent.width
                 : 0
         }
 
@@ -144,8 +162,10 @@ Item {
             color: Kirigami.Theme.neutralTextColor
             opacity: 0.8
             width: 1
-            x: progressDots.cppClipObject
-                ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.selectedSliceObject.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+            x: progressDots.cppClipObject != null
+                ? component.clipToSlice
+                    ? ZUI.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.selectedSliceObject.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                    : (startLoopLine.startPositionRelative + (progressDots.cppClipObject.selectedSliceObject.lengthSamples / progressDots.cppClipObject.durationSamples)) * parent.width
                 : 0
         }
 
@@ -189,7 +209,7 @@ Item {
                 ? _private.audioSource
                     ? _private.audioSource
                     : Zynthbox.PlayGridManager.getClipById(_private.sample.cppObjId)
-                : null;
+                : null
             model: Zynthbox.Plugin.clipMaximumPositionCount
             property QtObject playbackPositions: null
             delegate: Item {
@@ -207,7 +227,11 @@ Item {
                     top: parent.verticalCenter
                     topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                 }
-                x: visible ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                x: visible
+                    ? component.clipToSlice
+                        ? Math.floor(ZUI.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width)
+                        : Math.floor(progressEntry.progress * parent.width)
+                    : 0
             }
         }
     }

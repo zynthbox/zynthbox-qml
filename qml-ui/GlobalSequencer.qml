@@ -24,6 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.15
+import QtQml 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.12 as Kirigami
@@ -1344,20 +1345,56 @@ Item {
     /// BEGIN Track/Clip mode cuia handling
     function handleTrackClipStepButton(stepButtonIndex, buttonDown) {
         if (buttonDown) {
-            // No down action for track/clip
-        } else {
-            if (zynqtgui.backButtonPressed) {
-                zynqtgui.ignoreNextBackButtonPress = true;
-                // Clear the track/clip contents when holding down the back button and pressing a step
+            if (zynqtgui.altButtonPressed) {
+                // For scenes, visualise what's about to happen maybe?
             } else {
+                // No down action for track/clip
+            }
+        } else {
+            if (zynqtgui.altButtonPressed) {
+                // Scene things
                 if (stepButtonIndex < 10) {
-                    // The track buttons
-                    zynqtgui.sketchpad.selectedTrackId = stepButtonIndex;
+                    // Scenes A through J
+                    if (zynqtgui.backButtonPressed) {
+                        zynqtgui.ignoreNextBackButtonPress = true;
+                        // Clear the scene of all settings (because that's just kind of how we generally clean stuff out)
+                    } else if (zynqtgui.startRecordButtonPressed) {
+                        zynqtgui.ignoreNextRecordButtonPress = true;
+                        // Store the current state, whatever it might be (morphed or whatever) into the scene
+                    } else {
+                    }
                 } else if (stepButtonIndex < 11) {
-                    // The greyed out button in the middle that we need to work out what to do with
+                    // A greyed out button that just spaces things out a bit
+                } else if (stepButtonIndex < 12) {
+                    // Quick toggles for save/load on tap/hold
+                    _private.saveSceneOnTap = !_private.saveSceneOnTap;
+                } else if (stepButtonIndex < 13) {
+                    // Quick toggle for track/global load/save
+                    _private.limitSceneLoadToTrack = !_private.limitSceneLoadToTrack;
+                } else if (stepButtonIndex < 14) {
+                    // A greyed out button that just spaces things out a bit
+                } else if (stepButtonIndex < 15) {
+                    // The Live State A button
+                    _private.activeLiveState = 0;
                 } else if (stepButtonIndex < 16) {
-                    // The clip buttons
-                    component.selectedChannel.selectedClip = stepButtonIndex - 11;
+                    // The Live State B buttons
+                    _private.activeLiveState = 1;
+                }
+            } else {
+                // Tracks and clips things
+                if (zynqtgui.backButtonPressed) {
+                    zynqtgui.ignoreNextBackButtonPress = true;
+                    // Clear the track/clip contents when holding down the back button and pressing a step
+                } else {
+                    if (stepButtonIndex < 10) {
+                        // The track buttons
+                        zynqtgui.sketchpad.selectedTrackId = stepButtonIndex;
+                    } else if (stepButtonIndex < 11) {
+                        // The greyed out button in the middle that we need to work out what to do with
+                    } else if (stepButtonIndex < 16) {
+                        // The clip buttons
+                        component.selectedChannel.selectedClip = stepButtonIndex - 11;
+                    }
                 }
             }
         }
@@ -3031,6 +3068,13 @@ Item {
         property int modulationValue: 0
         onModulationValueChanged: Zynthbox.PlayGridManager.modulation = modulationValue;
 
+        property bool saveSceneOnTap: false
+        property bool limitSceneLoadToTrack: false
+        property int activeLiveState: 0
+        onSaveSceneOnTapChanged: updateLedColors()
+        onLimitSceneLoadToTrackChanged: updateLedColors()
+        onActiveLiveStateChanged: updateLedColors()
+
         property var velocityKeyNotesActive: []
 
         property var slotPassthroughClients: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
@@ -3124,15 +3168,12 @@ Item {
         readonly property int interactionModeVelocityKeys: 3
         readonly property int interactionModeSlots: 4
         readonly property int effectiveInteractionMode: zynqtgui.modeButtonPressed || temporaryModeLocked ? temporaryInteractionMode : interactionMode
-        // This is set whenever the interaction mode changed, or when one of the settings for the interaction mode changed
-        // Call registerInteractionModeChange whenever such a change happens to ensure we display the popup as desired
-        property bool interactionModeRecentlyChanged: false
         onInteractionModeChanged: {
             updateLedColors();
         }
         onEffectiveInteractionModeChanged: registerInteractionModeChange()
+        // Call registerInteractionModeChange whenever such a change happens to ensure we display the popup as desired
         function registerInteractionModeChange() {
-            interactionModeRecentlyChanged = true;
             interactionModeChangedWaiter.restart();
         }
         function updateActionBlockLedsForTemporaryMode() {
@@ -3258,30 +3299,49 @@ Item {
         }
         function updateLedsForTrackClipSelector() {
             component.Zynthbox.LedManager.buttonModeColor = Qt.rgba(_private.trackClipModeColor.r * _private.baseButtonBrightness, _private.trackClipModeColor.g * _private.baseButtonBrightness, _private.trackClipModeColor.b * _private.baseButtonBrightness);
-            for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
-                let stepColor = _private.stepEmpty;
-                let theTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
-                if (theTrack.occupiedSlotsCount > 0 || theTrack.occupiedSampleSlotsCount > 0) {
-                    stepColor = _private.stepWithNotes;
+            if (zynqtgui.altButtonPressed) {
+                for (let sceneIndex = 0; sceneIndex < 16; ++sceneIndex) {
+                    // Scenes A through J
+                    // If scene has something stored in it, the button is brighter
+                    let sceneHasThings = (sceneIndex % 2 === 0); // temp thing while we work things out proper like
+                    component.Zynthbox.LedManager[`buttonStep${sceneIndex + 1}Color`] = sceneHasThings ? _private.stepWithNotes : _private.stepWithNotesDimmed;
                 }
-                if (zynqtgui.sketchpad.selectedTrackId == trackIndex) {
-                    stepColor = Qt.tint(stepColor, _private.stepCurrent);
+                // A greyed out button that just spaces things out a bit
+                component.Zynthbox.LedManager[`buttonStep11Color`] = _private.stepEmpty;
+                // Quick toggles for save/load on tap/hold and for track/global load/save, so they can be accessed readily even in transient mode
+                component.Zynthbox.LedManager[`buttonStep12Color`] = _private.saveSceneOnTap ? _private.stepCurrent : _private.stepWithNotesDimmed;
+                component.Zynthbox.LedManager[`buttonStep13Color`] = _private.limitSceneLoadToTrack ? _private.stepCurrent : _private.stepWithNotesDimmed;
+                // A greyed out button that just spaces things out a bit
+                component.Zynthbox.LedManager[`buttonStep14Color`] = _private.stepEmpty;
+                // The Live State A and B buttons
+                component.Zynthbox.LedManager[`buttonStep15Color`] = (_private.activeLiveState === 0) ? _private.stepCurrent : _private.stepWithNotes;
+                component.Zynthbox.LedManager[`buttonStep16Color`] = (_private.activeLiveState === 1) ? _private.stepCurrent : _private.stepWithNotes;
+            } else {
+                for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
+                    let stepColor = _private.stepEmpty;
+                    let theTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
+                    if (theTrack.occupiedSlotsCount > 0 || theTrack.occupiedSampleSlotsCount > 0) {
+                        stepColor = _private.stepWithNotes;
+                    }
+                    if (zynqtgui.sketchpad.selectedTrackId == trackIndex) {
+                        stepColor = Qt.tint(stepColor, _private.stepCurrent);
+                    }
+                    // Maybe mark red when muted?
+                    component.Zynthbox.LedManager[`buttonStep${trackIndex + 1}Color`] = stepColor;
                 }
-                // Maybe mark red when muted?
-                component.Zynthbox.LedManager[`buttonStep${trackIndex + 1}Color`] = stepColor;
-            }
-            // Last button's not really a thing for now, grey it out...
-            component.Zynthbox.LedManager[`buttonStep11Color`] = _private.stepEmpty;
-            for (let clipIndex = 0; clipIndex < 5; ++clipIndex) {
-                let stepColor = _private.stepEmpty;
-                let clipPattern = _private.sequence.getByClipId(component.selectedChannel.id, clipIndex);
-                if (clipPattern.currentBankHasNotes) {
-                    stepColor = _private.stepWithNotes;
+                // Last button's not really a thing for now, grey it out...
+                component.Zynthbox.LedManager[`buttonStep11Color`] = _private.stepEmpty;
+                for (let clipIndex = 0; clipIndex < 5; ++clipIndex) {
+                    let stepColor = _private.stepEmpty;
+                    let clipPattern = _private.sequence.getByClipId(component.selectedChannel.id, clipIndex);
+                    if (clipPattern.currentBankHasNotes) {
+                        stepColor = _private.stepWithNotes;
+                    }
+                    if (component.selectedChannel.selectedClip === clipIndex) {
+                        stepColor = Qt.tint(stepColor, _private.stepCurrent);
+                    }
+                    component.Zynthbox.LedManager[`buttonStep${clipIndex + 12}Color`] = stepColor;
                 }
-                if (component.selectedChannel.selectedClip === clipIndex) {
-                    stepColor = Qt.tint(stepColor, _private.stepCurrent);
-                }
-                component.Zynthbox.LedManager[`buttonStep${clipIndex + 12}Color`] = stepColor;
             }
         }
         function updateLedsForMusicalButtons() {
@@ -3442,7 +3502,6 @@ Item {
         id: interactionModeChangedWaiter
         interval: 2500; running: false; repeat: false;
         onTriggered: {
-            _private.interactionModeRecentlyChanged = false;
         }
     }
     Repeater {
@@ -4304,7 +4363,7 @@ Item {
         Item {
             id: modePopup
             anchors.fill: parent
-            visible: _private.interactionModeRecentlyChanged || zynqtgui.modeButtonPressed || lockOpen
+            visible: interactionModeChangedWaiter.running || zynqtgui.modeButtonPressed || lockOpen
             property bool lockOpen: false
             Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
             Rectangle {
@@ -4316,7 +4375,6 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     interactionModeChangedWaiter.stop();
-                    _private.interactionModeRecentlyChanged = false;
                     modePopup.lockOpen = false;
                 }
             }
@@ -4345,7 +4403,7 @@ Item {
                         bottom: parent.top
                         margins: Kirigami.Units.largeSpacing
                     }
-                    width: Kirigami.Units.gridUnit * 25
+                    width: Kirigami.Units.gridUnit * 35
                     height: Kirigami.Units.gridUnit * 1.5
                     Kirigami.ShadowedRectangle {
                         anchors.fill: parent
@@ -4369,7 +4427,7 @@ Item {
                                 return qsTr("Musical Keys");
                                 break;
                             case _private.interactionModeTrackClip:
-                                return qsTr("Track and Clip");
+                                return qsTr("Tracks, Clips, and Scenes");
                                 break;
                             case _private.interactionModeSequencer:
                             default:
@@ -4384,9 +4442,9 @@ Item {
                         }
                         verticalAlignment: Text.AlignVCenter
                         text: _private.temporaryAltModeActive
-                            ? qsTr("%1 + Action Block Slots").arg(interactionModeContainer.interactionModeLabel(_private.effectiveInteractionMode))
+                            ? qsTr("%1 + Action Block Notes").arg(interactionModeContainer.interactionModeLabel(_private.effectiveInteractionMode))
                             : _private.temporaryModeActive
-                                ? qsTr("%1 + Action Block Notes").arg(interactionModeContainer.interactionModeLabel(_private.effectiveInteractionMode))
+                                ? qsTr("%1 + Action Block Slots").arg(interactionModeContainer.interactionModeLabel(_private.effectiveInteractionMode))
                                 : interactionModeContainer.interactionModeLabel(_private.effectiveInteractionMode)
                     }
                     QQC2.Label {
@@ -4577,8 +4635,101 @@ Item {
                     RowLayout {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        visible: _private.temporaryAltModeActive === false && _private.effectiveInteractionMode === _private.interactionModeTrackClip
+                        visible: _private.temporaryAltModeActive === false && _private.effectiveInteractionMode === _private.interactionModeTrackClip && zynqtgui.altButtonPressed === false
                         spacing: Kirigami.Units.largeSpacing
+                    }
+                    RowLayout {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        visible: _private.temporaryAltModeActive === false && _private.effectiveInteractionMode === _private.interactionModeTrackClip && zynqtgui.altButtonPressed === true
+                        spacing: Kirigami.Units.largeSpacing
+                        ColumnLayout {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                            Kirigami.Heading {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                level: 3
+                                text: qsTr("Scene Tap Action:")
+                            }
+                            QQC2.Button {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                text: _private.saveSceneOnTap ? qsTr("Save") : qsTr("Load")
+                                onClicked: {
+                                    _private.saveSceneOnTap = !_private.saveSceneOnTap;
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                            Kirigami.Heading {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                level: 3
+                                text: qsTr("Load Scene For...")
+                            }
+                            QQC2.Button {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                text: _private.limitSceneLoadToTrack ? qsTr("Current Track Only") : qsTr("All Tracks")
+                                onClicked: {
+                                    _private.limitSceneLoadToTrack = !_private.limitSceneLoadToTrack;
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                            Kirigami.Heading {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1
+                                level: 3
+                                text: qsTr("Live State:")
+                            }
+                            RowLayout {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                QQC2.Button {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                                    text: "A"
+                                    checked: _private.activeLiveState === 0
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            _private.registerInteractionModeChange();
+                                            _private.activeLiveState = 0;
+                                        }
+                                    }
+                                }
+                                QQC2.Button {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                                    text: "B"
+                                    checked: _private.activeLiveState === 1
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            _private.registerInteractionModeChange();
+                                            _private.activeLiveState = 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     RowLayout {
                         Layout.fillHeight: true

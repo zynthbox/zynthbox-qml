@@ -37,6 +37,7 @@ import QtQuick.Controls.Styles 1.4
 
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.mpris 1.0 as MPRIS
+import io.zynthbox.rec 1.0 as Rec
 
 
 import io.zynthbox.components 1.0 as Zynthbox
@@ -3114,6 +3115,17 @@ AbstractSketchpadPage {
 
                     MPRIS.PlayersView {
                         anchors.fill: parent
+
+                        Rec.Recorder {
+                            id: _recorder
+
+                        }
+
+                        QQC2.Button {
+                            text: "Record"
+                            onClicked: console.log(_recorder.getPipeWireClientsJson())
+                            onDoubleClicked: console.log(_recorder.getDefaultAudioOutputSinkId())
+                        }
                     }
 
                 }

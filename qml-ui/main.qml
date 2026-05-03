@@ -35,6 +35,8 @@ import io.zynthbox.imp 1.0 as IMP
 import io.zynthbox.ui 1.0 as ZUI
 import io.zynthbox.components 1.0 as Zynthbox
 import io.zynthbox.xtask 1.0 as X
+import io.zynthbox.rec 1.0 as Rec
+
 import "pages" as Pages
 import "pages/Sketchpad" as Sketchpad
 
@@ -2847,6 +2849,71 @@ Kirigami.AbstractApplicationWindow {
                             clipPickerMenu.visible = false;
                             // zynqtgui.close_current_window();
                             X.XTask.closeActiveWindow();
+                        }
+                    }
+
+                    // Text {
+                    //     Layout.fillWidth: false
+                    //     Layout.fillHeight: true
+                    //     horizontalAlignment: Text.AlignHCenter
+                    //     verticalAlignment: Text.AlignVCenter
+                    //     text: X.XTask.activeWindowPid
+                    //     elide: Text.ElideRight
+                    // }
+
+                    ZUI.SectionButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        implicitWidth: 1
+                        text: _recorder.recording ? qsTr("STOP") : qsTr("RECORD")
+                        onClicked: {
+                            if (_recorder.recording) {
+                                _recorder.stop();
+                            } else {
+                                _recorder.start();
+                            }
+                        }
+
+                        Rectangle {
+                            width: Kirigami.Units.gridUnit * 2
+                            height: width
+                            radius: width / 2
+                            color: Qt.rgba(1, 0, 0, 0.7)
+                            
+                            SequentialAnimation {
+                                running: _recorder.recording
+                                loops: Animation.Infinite
+                                
+                                PropertyAnimation {
+                                    target: recordingIndicator
+                                    property: "scale"
+                                    from: 1.0
+                                    to: 1.5
+                                    duration: 1000
+                                    easing.type: Easing.InOutQuad
+                                }
+                                PropertyAnimation {
+                                    target: recordingIndicator
+                                    property: "scale"
+                                    from: 1.5
+                                    to: 1.0
+                                    duration: 1000
+                                    easing.type: Easing.InOutQuad
+                                }
+                            }
+                            
+                            transform: Scale {
+                                id: recordingIndicator
+                                origin.x: width / 2
+                                origin.y: height / 2
+                            }
+                        }
+
+                        Rec.Recorder {
+                            id: _recorder
+                            outputDirectory: "/root/recs"
+                            pid: X.XTask.activeWindowPid
+
                         }
                     }
 

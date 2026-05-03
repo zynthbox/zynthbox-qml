@@ -2980,16 +2980,35 @@ AbstractSketchpadPage {
                 Item {
 
                     MPRIS.PlayersView {
+                        id: _playersView
                         anchors.fill: parent
 
                         Rec.Recorder {
                             id: _recorder
+                            outputDirectory: "/root/recs"
 
                         }
+                        
 
                         QQC2.Button {
-                            text: "Record"
-                            onClicked: console.log(_recorder.getPipeWireClientsJson())
+                            text: _recorder.recording ? "Stop" : "Record"
+                            onClicked: {
+                                var serial = _recorder.getPipeWireClientSerialForPid(_playersView.currentPlayer().pid)
+
+                                console.log("Serial for PID", _playersView.currentPlayer().pid, "is", serial)
+                                
+                                if(_recorder.recording){
+                                    _recorder.stop()
+                                 }else {
+                                    // if(_recorder.isPipeWireClientPid(serial)){
+                                        _recorder.pid = serial
+                                        _recorder.start()
+                                    // }else {
+                                    //     console.warn("Selected player is not a PipeWire client or its PID could not be found. Cannot start recording.")
+                                    // }
+                                    
+                                }
+                            }
                             onDoubleClicked: console.log(_recorder.getDefaultAudioOutputSinkId())
                         }
                     }

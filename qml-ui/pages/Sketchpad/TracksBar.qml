@@ -2985,23 +2985,24 @@ AbstractSketchpadPage {
 
                         Rec.Recorder {
                             id: _recorder
-                            outputDirectory: "/root/recs"
+                            pid: _playersView.currentPlayer ? _playersView.currentPlayer.pid : -1
 
                         }
                         
 
                         QQC2.Button {
-                            text: _recorder.recording ? "Stop" : "Record"
+                            // enabled: _recorder.isValid && _playersView.count > 0
+                            text: _recorder.recording ? "Stop" : "Record " + _recorder.pid
                             onClicked: {
-                                var serial = _recorder.getPipeWireClientSerialForPid(_playersView.currentPlayer().pid)
+                                // var serial = _recorder.getPipeWireClientSerialForPid(_playersView.currentPlayer().pid)
 
-                                console.log("Serial for PID", _playersView.currentPlayer().pid, "is", serial)
+                                // console.log("Serial for PID", _playersView.currentPlayer().pid, "is", serial)
                                 
                                 if(_recorder.recording){
                                     _recorder.stop()
                                  }else {
                                     // if(_recorder.isPipeWireClientPid(serial)){
-                                        _recorder.pid = serial
+                                        // _recorder.pid = serial
                                         _recorder.start()
                                     // }else {
                                     //     console.warn("Selected player is not a PipeWire client or its PID could not be found. Cannot start recording.")

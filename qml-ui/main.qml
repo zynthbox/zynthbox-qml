@@ -2866,6 +2866,7 @@ Kirigami.AbstractApplicationWindow {
                         Layout.fillHeight: true
                         implicitWidth: 1
                         text: _recorder.recording ? qsTr("STOP") : qsTr("RECORD")
+                        // enabled: _recorder.isValid
                         onClicked: {
                             if (_recorder.recording) {
                                 _recorder.stop();
@@ -2874,44 +2875,10 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
 
-                        Rectangle {
-                            width: Kirigami.Units.gridUnit * 2
-                            height: width
-                            radius: width / 2
-                            color: Qt.rgba(1, 0, 0, 0.7)
-                            
-                            SequentialAnimation {
-                                running: _recorder.recording
-                                loops: Animation.Infinite
-                                
-                                PropertyAnimation {
-                                    target: recordingIndicator
-                                    property: "scale"
-                                    from: 1.0
-                                    to: 1.5
-                                    duration: 1000
-                                    easing.type: Easing.InOutQuad
-                                }
-                                PropertyAnimation {
-                                    target: recordingIndicator
-                                    property: "scale"
-                                    from: 1.5
-                                    to: 1.0
-                                    duration: 1000
-                                    easing.type: Easing.InOutQuad
-                                }
-                            }
-                            
-                            transform: Scale {
-                                id: recordingIndicator
-                                origin.x: width / 2
-                                origin.y: height / 2
-                            }
-                        }
+                        
 
                         Rec.Recorder {
                             id: _recorder
-                            outputDirectory: "/root/recs"
                             pid: X.XTask.activeWindowPid
 
                         }

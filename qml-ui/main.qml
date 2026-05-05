@@ -2862,6 +2862,8 @@ Kirigami.AbstractApplicationWindow {
                     // }
 
                     ZUI.SectionButton {
+                        clip: true
+                        id:_recButton
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         implicitWidth: 1
@@ -2875,7 +2877,56 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
 
-                        
+                        Rectangle {
+                            id: redRect
+                            visible: _recorder.recording
+                            anchors.centerIn: parent
+                            height: parent.height * 0.8
+                            width: height
+                            color: "red"
+                            opacity: 0.4
+                            radius: height / 2
+                            SequentialAnimation {
+                                running: _recorder.recording
+                                loops: Animation.Infinite
+                                ParallelAnimation {
+                                    PropertyAnimation {
+                                        target: redRect
+                                        property: "scale"
+                                        from: 0.4
+                                        to: 10
+                                        duration: 1000
+                                        easing.type: Easing.InOutQuad
+                                    }
+                                    PropertyAnimation {
+                                        target: redRect
+                                        property: "opacity"
+                                        from: 0.4
+                                        to: 1.0
+                                        duration: 1000
+                                        easing.type: Easing.InOutQuad
+                                    }
+                                }
+                                ParallelAnimation {
+                                    PropertyAnimation {
+                                        target: redRect
+                                        property: "scale"
+                                        from: 10
+                                        to: 0.4
+                                        duration: 1000
+                                        easing.type: Easing.InOutQuad
+                                    }
+                                    PropertyAnimation {
+                                        target: redRect
+                                        property: "opacity"
+                                        from: 1.0
+                                        to: 0.4
+                                        duration: 1000
+                                        easing.type: Easing.InOutQuad
+                                    }
+                                }
+                            }
+                        }
 
                         Rec.Recorder {
                             id: _recorder

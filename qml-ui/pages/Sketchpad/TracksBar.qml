@@ -2982,6 +2982,22 @@ AbstractSketchpadPage {
                     MPRIS.PlayersView {
                         id: _playersView
                         anchors.fill: parent
+                        isRecording: _recorder.recording
+
+                        onRecordClicked: {
+
+                            if(_recorder.recording){
+                                    _recorder.stop()
+                            }else {
+                                // if(_recorder.isPipeWireClientPid(serial)){
+                                    // _recorder.pid = serial
+                                    _recorder.start()
+                                // }else {
+                                //     console.warn("Selected player is not a PipeWire client or its PID could not be found. Cannot start recording.")
+                                // }
+                                
+                            }
+                        }
 
                         Rec.Recorder {
                             id: _recorder
@@ -2989,29 +3005,6 @@ AbstractSketchpadPage {
 
                         }
                         
-
-                        QQC2.Button {
-                            // enabled: _recorder.isValid && _playersView.count > 0
-                            text: _recorder.recording ? "Stop" : "Record " + _recorder.pid
-                            onClicked: {
-                                // var serial = _recorder.getPipeWireClientSerialForPid(_playersView.currentPlayer().pid)
-
-                                // console.log("Serial for PID", _playersView.currentPlayer().pid, "is", serial)
-                                
-                                if(_recorder.recording){
-                                    _recorder.stop()
-                                 }else {
-                                    // if(_recorder.isPipeWireClientPid(serial)){
-                                        // _recorder.pid = serial
-                                        _recorder.start()
-                                    // }else {
-                                    //     console.warn("Selected player is not a PipeWire client or its PID could not be found. Cannot start recording.")
-                                    // }
-                                    
-                                }
-                            }
-                            onDoubleClicked: console.log(_recorder.getDefaultAudioOutputSinkId())
-                        }
                     }
 
                 }

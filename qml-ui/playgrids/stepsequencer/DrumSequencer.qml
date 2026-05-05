@@ -205,7 +205,11 @@ Item {
                                 } else {
                                     stepDelegate.subnoteIndex = -1;
                                 }
-                                stepDelegate.velocity = stepDelegate.subnoteIndex > -1 ? component.patternModel.workingModel.subnoteMetadata(_private.currentRow, stepDelegate.delegateIndex, stepDelegate.subnoteIndex, "velocity") : 0;
+                                let noteVelocity = stepDelegate.subnoteIndex > -1 ? component.patternModel.workingModel.subnoteMetadata(_private.currentRow, stepDelegate.delegateIndex, stepDelegate.subnoteIndex, "velocity") : 0;
+                                if (!noteVelocity) {
+                                    noteVelocity = 0;
+                                }
+                                stepDelegate.velocity = noteVelocity;
                                 let noteDuration = stepDelegate.subnoteIndex > -1 ? component.patternModel.workingModel.subnoteMetadata(_private.currentRow, stepDelegate.delegateIndex, stepDelegate.subnoteIndex, "duration") : 0;
                                 if (!noteDuration) {
                                     noteDuration = 0;

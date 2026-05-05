@@ -133,6 +133,14 @@ Item {
         updateStepProperty(sign, stepButtonIndex, "delay");
     }
     /**
+     * Update the play-when setting of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the play-when setting for
+     */
+    function updateStepPlayWhen(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "play-when");
+    }
+    /**
      * Update the probability of all matching subnotes on the given step
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
      * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the probability for
@@ -322,6 +330,24 @@ Item {
                     } else {
                         theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
                     }
+                } else if (propertyName == "play-when") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Play When for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Play When for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Play When").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = workingModel.playWhenMax() - 1;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "play-when");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    theCurrentValueLabel = workingModel.playWhenName(theCurrentValue);
                 } else if (propertyName == "probability") {
                     if (subnoteIndices.length === totalSubnoteCount) {
                         theDescripton = qsTr("Step %1 Entry Probability for all entries").arg(stepIndex + 1);
@@ -1068,7 +1094,7 @@ Item {
                                         component.updateStepRatchetStyle(0, stepButtonIndex);
                                         break;
                                     case 1:
-                                        component.updateStepProbability(0, stepButtonIndex);
+                                        component.updateStepPlayWhen(0, stepButtonIndex);
                                         break;
                                     case 0:
                                     default:
@@ -1092,7 +1118,7 @@ Item {
                                         component.updateStepRatchetStyle(1, stepButtonIndex);
                                         break;
                                     case 1:
-                                        component.updateStepProbability(1, stepButtonIndex);
+                                        component.updateStepPlayWhen(1, stepButtonIndex);
                                         break;
                                     case 0:
                                     default:
@@ -1114,7 +1140,7 @@ Item {
                                         component.updateStepRatchetStyle(-1, stepButtonIndex);
                                         break;
                                     case 1:
-                                        component.updateStepProbability(-1, stepButtonIndex);
+                                        component.updateStepPlayWhen(-1, stepButtonIndex);
                                         break;
                                     case 0:
                                     default:
@@ -1137,6 +1163,7 @@ Item {
                                     component.updateStepRatchetCount(0, stepButtonIndex);
                                     break;
                                 case 1:
+                                    component.updateStepProbability(0, stepButtonIndex);
                                     break;
                                 case 0:
                                 default:
@@ -1158,6 +1185,7 @@ Item {
                                     component.updateStepRatchetCount(1, stepButtonIndex);
                                     break;
                                 case 1:
+                                    component.updateStepProbability(1, stepButtonIndex);
                                     break;
                                 case 0:
                                 default:
@@ -1177,6 +1205,7 @@ Item {
                                     component.updateStepRatchetCount(-1, stepButtonIndex);
                                     break;
                                 case 1:
+                                    component.updateStepProbability(-1, stepButtonIndex);
                                     break;
                                 case 0:
                                 default:
@@ -3978,7 +4007,7 @@ Item {
                                 margins: Kirigami.Units.smallSpacing * 2
                             }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
-                            text: qsTr("Probability (probability, blank, next step)")
+                            text: qsTr("Conditions (play when, probability, next step)")
                         }
                         background: Kirigami.ShadowedRectangle {
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
@@ -4275,7 +4304,7 @@ Item {
                                         return qsTr("Style");
                                         break;
                                     case 1:
-                                        return qsTr("Probability");
+                                        return qsTr("Play When");
                                         break;
                                     case 0:
                                     default:
@@ -4311,7 +4340,7 @@ Item {
                                         return qsTr("Count");
                                         break;
                                     case 1:
-                                        return qsTr("");
+                                        return qsTr("Probability");
                                         break;
                                     case 0:
                                     default:

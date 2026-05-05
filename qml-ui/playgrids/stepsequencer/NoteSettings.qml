@@ -427,7 +427,7 @@ ColumnLayout {
             text: component.currentParameterPageIndex === 0
                 ? "Velocity"
                 : component.currentParameterPageIndex === 1
-                    ? "Probability"
+                    ? "Play When"
                     : "Ratchet Style"
             ZUI.KnobIndicator {
                 anchors {
@@ -450,7 +450,7 @@ ColumnLayout {
             text: component.currentParameterPageIndex === 0
                 ? "Length"
                 : component.currentParameterPageIndex === 1
-                    ? ""
+                    ? "Probability"
                     : "Ratchet Count"
             ZUI.KnobIndicator {
                 anchors {
@@ -759,7 +759,38 @@ ColumnLayout {
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 // END Page 1 (Velocity, Length, Position)
-                // BEGIN Page 2 (Probability, ???, Next Step)
+                // BEGIN Page 2 (Play When, Probability, Next Step)
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currentParameterPageIndex === 1
+                }
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currentParameterPageIndex === 1
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "play-when"
+                    paramDefaultString: "Always"
+                    paramValueSuffix: "%"
+                    paramDefault: 0
+                    paramMin: 0
+                    paramMax: 6
+                    scrollWidth: 7
+                    knobId: 0
+                    currentlySelected: subnoteDelegate.isCurrent
+                    paramList: [0, 1, 2, 3, 4, 5, 6]
+                    paramNames: {
+                        0: "Always",
+                        1: "When Stopping",
+                        2: "When Not Stopping",
+                        3: "When Starting",
+                        4: "When Not Starting",
+                        5: "When Stopping Or Starting",
+                        6: "When Not Stopping Or Starting",
+                    }
+                }
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
@@ -773,7 +804,7 @@ ColumnLayout {
                     paramMin: 0
                     paramMax: 45
                     scrollWidth: 46
-                    knobId: 0
+                    knobId: 1
                     currentlySelected: subnoteDelegate.isCurrent
                     paramList: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45]
                     paramNames: {
@@ -824,11 +855,6 @@ ColumnLayout {
                         44: "Play 6, Skip 1",
                         45: "Play 7, Skip 1",
                     }
-                }
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currentParameterPageIndex === 1
                 }
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true

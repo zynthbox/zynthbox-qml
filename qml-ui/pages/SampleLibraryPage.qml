@@ -220,6 +220,16 @@ ZUI.ScreenPage {
                     }
                     returnValue = true;
                     break;
+                case "KNOB1_UP":
+                    if (_private.selectedColumn === 2) {
+                        zynqtgui.sample_library.testingVelocity = Math.min(127, zynqtgui.sample_library.testingVelocity + 1);
+                    }
+                    break;
+                case "KNOB1_DOWN":
+                    if (_private.selectedColumn === 2) {
+                        zynqtgui.sample_library.testingVelocity = Math.max(1, zynqtgui.sample_library.testingVelocity - 1);
+                    }
+                    break;
                 case "SWITCH_ARROW_LEFT_RELEASED":
                     _private.selectedColumn = Math.max(0, _private.selectedColumn - 1);
                     returnValue = true;
@@ -699,12 +709,12 @@ ZUI.ScreenPage {
                         }
                         Item {
                             Layout.fillWidth: true
+                            Layout.fillHeight: true
                         }
                         Item {
                             Layout.fillHeight: true
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
-                            visible: zynqtgui.ui_settings.sampleAutoPreview
                             QQC2.Dial {
                                 anchors {
                                     top: parent.top
@@ -714,12 +724,14 @@ ZUI.ScreenPage {
                                 width: height
                                 inputMode: QQC2.Dial.Vertical
                                 handle: null
-                                value: zynqtgui.sample_library.testingVelocity
+                                value: component.isVisible ? zynqtgui.sample_library.testingVelocity : 1
                                 from: 1
                                 to: 127
                                 stepSize: 1
                                 onValueChanged: {
-                                    zynqtgui.sample_library.testingVelocity = value;
+                                    if (component.isVisible) {
+                                        zynqtgui.sample_library.testingVelocity = value;
+                                    }
                                 }
                             }
                             QQC2.Label {
@@ -729,9 +741,21 @@ ZUI.ScreenPage {
                                 text: "%1%".arg(Math.round((zynqtgui.sample_library.testingVelocity / 127) * 100))
                                 font.pointSize: 8
                             }
+                            ZUI.KnobIndicator {
+                                id: knobIndicator
+                                anchors {
+                                    verticalCenter: parent.top
+                                    horizontalCenter: parent.left
+                                }
+                                width: Kirigami.Units.iconSizes.small
+                                height: width
+                                knobId: 1
+                                visible: _private.selectedColumn === 2
+                            }
                         }
                         ZUI.SectionButton {
                             Layout.fillHeight: true
+                            Layout.fillWidth: false
                             text: qsTr("Auto Preview")
                             checked: zynqtgui.ui_settings.sampleAutoPreview
                             onClicked: {

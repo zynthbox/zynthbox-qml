@@ -37,7 +37,7 @@ from PySide2.QtCore import Qt, Property, Signal, Slot, QObject
 from . import zynthian_qt_gui_base
 
 #------------------------------------------------------------------------------
-# UI class for helping with store access
+# UI class for handling the sample library and its settings
 #------------------------------------------------------------------------------
 
 class zynthian_gui_sample_library(zynthian_qt_gui_base.zynqtgui):
@@ -45,6 +45,7 @@ class zynthian_gui_sample_library(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent = None):
         super(zynthian_gui_sample_library, self).__init__(parent)
         self.__show_only_favorites = False
+        self.__testingVelocity = int(self.zynqtgui.global_settings.value("SampleLibrary/testingVelocity", 64))
 
     def show(self):
         pass
@@ -62,4 +63,19 @@ class zynthian_gui_sample_library(zynthian_qt_gui_base.zynqtgui):
     show_only_favorites_changed = Signal()
     show_only_favorites = Property(bool, get_show_only_favorites, set_show_only_favorites, notify=show_only_favorites_changed)
     # END Property show_only_favorites
+
+    ### BEGIN Property testingVelocity
+    def get_testingVelocity(self):
+        return self.__testingVelocity
+
+    def set_testingVelocity(self, value):
+        if value != self.__testingVelocity:
+            self.__testingVelocity = value
+            self.zynqtgui.global_settings.setValue("SampleLibrary/testingVelocity", self.__testingVelocity)
+            self.testingVelocityChanged.emit()
+
+    testingVelocityChanged = Signal()
+
+    testingVelocity = Property(int, get_testingVelocity, set_testingVelocity, notify=testingVelocityChanged)
+    ### END Property testingVelocity
 #------------------------------------------------------------------------------

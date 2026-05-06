@@ -272,8 +272,8 @@ class file_properties_helper(QObject):
         except:
             return []
 
-    @Slot(None)
-    def playPreview(self):
+    @Slot(int)
+    def playPreview(self, velocity):
         if self.file_metadata is not None and self.file_metadata["isAudio"]:
             if self.preview_clip is not None:
                 self.preview_clip.stop()
@@ -285,7 +285,7 @@ class file_properties_helper(QObject):
                 self.preview_clip.setLaneAffinity(0)
                 self.preview_clip_changed.emit()
 
-            self.preview_clip.play(False)
+            self.preview_clip.play(False, -1, velocity)
             self.is_preview_playing = True
             self.is_preview_playing_changed.emit()
 

@@ -700,6 +700,36 @@ ZUI.ScreenPage {
                         Item {
                             Layout.fillWidth: true
                         }
+                        Item {
+                            Layout.fillHeight: true
+                            Layout.minimumWidth: height
+                            Layout.maximumWidth: height
+                            visible: zynqtgui.ui_settings.sampleAutoPreview
+                            QQC2.Dial {
+                                anchors {
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                    horizontalCenter: parent.horizontalCenter
+                                }
+                                width: height
+                                inputMode: QQC2.Dial.Vertical
+                                handle: null
+                                value: zynqtgui.sample_library.testingVelocity
+                                from: 1
+                                to: 127
+                                stepSize: 1
+                                onValueChanged: {
+                                    zynqtgui.sample_library.testingVelocity = value;
+                                }
+                            }
+                            QQC2.Label {
+                                anchors.fill: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                text: "%1%".arg(Math.round((zynqtgui.sample_library.testingVelocity / 127) * 100))
+                                font.pointSize: 8
+                            }
+                        }
                         ZUI.SectionButton {
                             Layout.fillHeight: true
                             text: qsTr("Auto Preview")
@@ -773,7 +803,7 @@ ZUI.ScreenPage {
                                 if (_private.selectedColumn == 2 && filesListView.currentItem && filesListView.currentItem.isAudio && zynqtgui.ui_settings.sampleAutoPreview && component.isVisible) {
                                     // Only do auto-preview things if the files column is selected, and the page is actually visible
                                     _private.filePropertiesHelper.filePath = filesListView.currentItem.filePath;
-                                    _private.filePropertiesHelper.playPreview();
+                                    _private.filePropertiesHelper.playPreview(zynqtgui.sample_library.testingVelocity);
                                 }
                             }
                         }
@@ -826,7 +856,7 @@ ZUI.ScreenPage {
                                 }
                                 if (filesListView.currentItem && filesListView.currentItem.isAudio) {
                                     _private.filePropertiesHelper.filePath = filesListView.currentItem.filePath;
-                                    _private.filePropertiesHelper.playPreview();
+                                    _private.filePropertiesHelper.playPreview(zynqtgui.sample_library.testingVelocity);
                                 }
                             }
                         }

@@ -308,7 +308,7 @@ ColumnLayout {
         ZUI.PlayGridButton {
             Layout.fillWidth: false
             Layout.fillHeight: true
-            text: qsTr("Probability")
+            text: qsTr("Conditionals")
             checked: component.currentParameterPageIndex === 1
             onClicked: {
                 applicationWindow().globalSequencer.setParameterPage(1);
@@ -884,7 +884,7 @@ ColumnLayout {
                     knobId: 2
                     currentlySelected: subnoteDelegate.isCurrent
                 }
-                // END Page 2 (Probability, ???, Swing)
+                // END Page 2 (Play When, Probability, Swing)
                 // BEGIN Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true

@@ -815,7 +815,7 @@ ZUI.Dialog {
                                 if (filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying) {
                                     filePropertiesColumn.filePropertiesHelperObj.stopPreview();
                                 } else {
-                                    filePropertiesColumn.filePropertiesHelperObj.playPreview();
+                                    filePropertiesColumn.filePropertiesHelperObj.playPreview(zynqtgui.sample_library.testingVelocity);
                                 }
                             }
                         }

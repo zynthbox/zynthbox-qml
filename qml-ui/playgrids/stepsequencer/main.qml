@@ -1071,7 +1071,7 @@ IMP.BasePlayGrid {
                                         drumPadRepeater.ratchetStyleUp(); 
                                         break;
                                     case 1:
-                                        drumPadRepeater.probabilityUp();
+                                        drumPadRepeater.playWhenUp();
                                         break;
                                     case 0:
                                     default:
@@ -1089,7 +1089,7 @@ IMP.BasePlayGrid {
                                         drumPadRepeater.ratchetStyleDown();
                                         break;
                                     case 1:
-                                        drumPadRepeater.probabilityDown();
+                                        drumPadRepeater.playWhenDown();
                                         break;
                                     case 0:
                                     default:
@@ -1107,7 +1107,7 @@ IMP.BasePlayGrid {
                                         drumPadRepeater.ratchetCountUp();
                                         break;
                                     case 1:
-                                        // drumPadRepeater.
+                                        drumPadRepeater.probabilityUp();
                                         break;
                                     case 0:
                                     default:
@@ -1125,7 +1125,7 @@ IMP.BasePlayGrid {
                                         drumPadRepeater.ratchetCountDown();
                                         break;
                                     case 1:
-                                        // drumPadRepeater.
+                                        drumPadRepeater.probabilityDown();
                                         break;
                                     case 0:
                                     default:
@@ -1613,6 +1613,12 @@ IMP.BasePlayGrid {
                                         changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
+                            }
+                            function playWhenUp() {
+                                changeValue("play-when", 1, 0, 6, 0);
+                            }
+                            function playWhenDown() {
+                                changeValue("play-when", -1, 0, 6, 0);
                             }
                             function probabilityUp() {
                                 changeValue("probability", 1, 0, 45, 0);

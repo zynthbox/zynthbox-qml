@@ -133,6 +133,14 @@ Item {
         updateStepProperty(sign, stepButtonIndex, "delay");
     }
     /**
+     * Update the play-when setting of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the play-when setting for
+     */
+    function updateStepPlayWhen(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "play-when");
+    }
+    /**
      * Update the probability of all matching subnotes on the given step
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
      * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the probability for
@@ -242,6 +250,7 @@ Item {
                             // If we're setting to the property's default value, then we really should be *unsetting* it instead
                             newValue = theDefaultValue;
                         }
+                        console.log("Setting", propertyName, "value to", newValue, "for bar step subnote", padNoteRow, stepButtonIndex, subnoteIndices[i], "based on", subnoteDifferences[i], subnoteDifferences, "and value", value);
                         workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, newValue);
                     }
                     component.handleStepDataChanged(stepIndex);
@@ -322,6 +331,24 @@ Item {
                     } else {
                         theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
                     }
+                } else if (propertyName == "play-when") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Play When for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Play When for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Play When").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = workingModel.playWhenMax() - 1;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "play-when");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    theCurrentValueLabel = workingModel.playWhenName(theCurrentValue);
                 } else if (propertyName == "probability") {
                     if (subnoteIndices.length === totalSubnoteCount) {
                         theDescripton = qsTr("Step %1 Entry Probability for all entries").arg(stepIndex + 1);
@@ -1068,7 +1095,7 @@ Item {
                                         component.updateStepRatchetStyle(0, stepButtonIndex);
                                         break;
                                     case 1:
-                                        component.updateStepProbability(0, stepButtonIndex);
+                                        component.updateStepPlayWhen(0, stepButtonIndex);
                                         break;
                                     case 0:
                                     default:
@@ -1092,7 +1119,7 @@ Item {
                                         component.updateStepRatchetStyle(1, stepButtonIndex);
                                         break;
                                     case 1:
-                                        component.updateStepProbability(1, stepButtonIndex);
+                                        component.updateStepPlayWhen(1, stepButtonIndex);
                                         break;
                                     case 0:
                                     default:
@@ -1114,7 +1141,7 @@ Item {
                                         component.updateStepRatchetStyle(-1, stepButtonIndex);
                                         break;
                                     case 1:
-                                        component.updateStepProbability(-1, stepButtonIndex);
+                                        component.updateStepPlayWhen(-1, stepButtonIndex);
                                         break;
                                     case 0:
                                     default:
@@ -1137,6 +1164,7 @@ Item {
                                     component.updateStepRatchetCount(0, stepButtonIndex);
                                     break;
                                 case 1:
+                                    component.updateStepProbability(0, stepButtonIndex);
                                     break;
                                 case 0:
                                 default:
@@ -1158,6 +1186,7 @@ Item {
                                     component.updateStepRatchetCount(1, stepButtonIndex);
                                     break;
                                 case 1:
+                                    component.updateStepProbability(1, stepButtonIndex);
                                     break;
                                 case 0:
                                 default:
@@ -1177,6 +1206,7 @@ Item {
                                     component.updateStepRatchetCount(-1, stepButtonIndex);
                                     break;
                                 case 1:
+                                    component.updateStepProbability(-1, stepButtonIndex);
                                     break;
                                 case 0:
                                 default:
@@ -3869,7 +3899,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 color: Kirigami.Theme.backgroundColor
-                opacity: 0.5
+                opacity: 0.7
             }
             ColumnLayout {
                 anchors {
@@ -3891,7 +3921,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 3
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -3928,7 +3958,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -3940,7 +3970,7 @@ Item {
                                 margins: Kirigami.Units.smallSpacing * 2
                             }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
-                            text: qsTr("General (velocity, length, position)")
+                            text: qsTr("General")
                         }
                         background: Kirigami.ShadowedRectangle {
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
@@ -3966,7 +3996,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -3978,7 +4008,7 @@ Item {
                                 margins: Kirigami.Units.smallSpacing * 2
                             }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
-                            text: qsTr("Probability (probability, blank, next step)")
+                            text: qsTr("Conditions")
                         }
                         background: Kirigami.ShadowedRectangle {
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
@@ -4004,7 +4034,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -4016,7 +4046,7 @@ Item {
                                 margins: Kirigami.Units.smallSpacing * 2
                             }
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
-                            text: qsTr("Ratchet (style, count, probability)")
+                            text: qsTr("Ratchet")
                         }
                         background: Kirigami.ShadowedRectangle {
                             Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
@@ -4042,7 +4072,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -4081,7 +4111,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -4120,7 +4150,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 1.5
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -4158,7 +4188,7 @@ Item {
                             verticalCenter: parent.verticalCenter
                             margins: Kirigami.Units.largeSpacing
                         }
-                        width: Kirigami.Units.gridUnit * 16
+                        width: Kirigami.Units.gridUnit * 10
                         height: Kirigami.Units.gridUnit * 2
                         leftPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing
@@ -4187,13 +4217,209 @@ Item {
                 }
             }
             ColumnLayout {
+                id: stepVisualiser
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                    margins: Kirigami.Units.largeSpacing
+                }
+                width: parent.width / 3
+                spacing: 0
+                readonly property int stepOffset: _private.pattern ? (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width : 0
+                readonly property var noteColors: zynqtgui.theme_chooser.noteColors
+                Repeater {
+                    model: 16
+                    delegate: ColumnLayout {
+                        id: stepVisualiserDelegate
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        spacing: 0
+                        property bool stepContainsHeld: false
+                        property QtObject stepNote: null
+                        readonly property int stepColumn: model.index
+                        property bool doUpdate: false
+                        function updateStepNote() {
+                            stepVisualiserDelegate.stepNote = null;
+                            if (_private.pattern) {
+                                let newStepNote = _private.pattern.workingModel.getNote(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, model.index);
+                                stepVisualiserDelegate.stepNote = newStepNote;
+                                let newStepContainsHeld = false;
+                                if (newStepNote) {
+                                    for (let subNoteIndex = 0; subNoteIndex < newStepNote.subnotes.length; ++subNoteIndex) {
+                                        let subnote = newStepNote.subnotes[subNoteIndex];
+                                        if (component.heardNotes.includes(subnote)) {
+                                            newStepContainsHeld = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                stepVisualiserDelegate.stepContainsHeld = newStepContainsHeld;
+                                stepVisualiserDelegate.doUpdate = false;
+                            } else {
+                                stepVisualiserDelegate.doUpdate = true;
+                                noteFetcher.restart();
+                            }
+                        }
+                        Timer {
+                            id: noteFetcher
+                            repeat: false; running: false; interval: 1
+                            onTriggered: {
+                                if (stepVisualiser.visible) {
+                                    stepVisualiserDelegate.updateStepNote();
+                                } else {
+                                    stepVisualiserDelegate.doUpdate = true;
+                                }
+                            }
+                        }
+                        onVisibleChanged: {
+                            if (stepVisualiserDelegate.doUpdate) {
+                                stepVisualiserDelegate.updateStepNote();
+                                stepVisualiserDelegate.doUpdate = false;
+                            }
+                        }
+                        Connections {
+                            target: _private
+                            onPatternChanged: {
+                                if (stepVisualiser.visible) {
+                                    stepVisualiserDelegate.doUpdate = true;
+                                    noteFetcher.restart();
+                                }
+                            }
+                        }
+                        Connections {
+                            target: _private.pattern ? _private.pattern.sequence : null
+                            onModelReset: noteFetcher.restart();
+                            onIsLoadingChanged: noteFetcher.restart();
+                        }
+                        Connections {
+                            target: _private.pattern
+                            onLastModifiedChanged: noteFetcher.restart();
+                        }
+                        Connections {
+                            target: Zynthbox.PlayGridManager
+                            onCurrentSketchpadTrackChanged: noteFetcher.restart();
+                        }
+                        Connections {
+                            target: zynqtgui.sketchpad
+                            onSongChanged: noteFetcher.restart();
+                        }
+                        Component.onCompleted: noteFetcher.restart();
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                            Kirigami.Heading {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                level: 4
+                                text: _private.pattern ? qsTr("Step %1").arg(stepVisualiser.stepOffset + index + 1) : ""
+                            }
+                            QQC2.Button {
+                                Layout.fillHeight: true
+                                visible: stepParameterHeading.heldSteps.includes(index)
+                                text: releaseIgnored
+                                        ? stepVisualiserDelegate.stepContainsHeld ? qsTr("(not removing %1)").arg(heldNotesLabel.text) : qsTr("(not adding %1)").arg(heldNotesLabel.text)
+                                        : stepVisualiserDelegate.stepContainsHeld ? qsTr("Release To Remove %1").arg(heldNotesLabel.text) : qsTr("Release To Add %1").arg(heldNotesLabel.text)
+                                readonly property bool releaseIgnored: switch (index) {
+                                    case 0: return zynqtgui.ignoreNextStep1ButtonPress; break;
+                                    case 1: return zynqtgui.ignoreNextStep2ButtonPress; break;
+                                    case 2: return zynqtgui.ignoreNextStep3ButtonPress; break;
+                                    case 3: return zynqtgui.ignoreNextStep4ButtonPress; break;
+                                    case 4: return zynqtgui.ignoreNextStep5ButtonPress; break;
+                                    case 5: return zynqtgui.ignoreNextStep6ButtonPress; break;
+                                    case 6: return zynqtgui.ignoreNextStep7ButtonPress; break;
+                                    case 7: return zynqtgui.ignoreNextStep8ButtonPress; break;
+                                    case 8: return zynqtgui.ignoreNextStep9ButtonPress; break;
+                                    case 9: return zynqtgui.ignoreNextStep10ButtonPress; break;
+                                    case 10: return zynqtgui.ignoreNextStep11ButtonPress; break;
+                                    case 11: return zynqtgui.ignoreNextStep12ButtonPress; break;
+                                    case 12: return zynqtgui.ignoreNextStep13ButtonPress; break;
+                                    case 13: return zynqtgui.ignoreNextStep14ButtonPress; break;
+                                    case 14: return zynqtgui.ignoreNextStep15ButtonPress; break;
+                                    case 15: return zynqtgui.ignoreNextStep16ButtonPress; break;
+                                }
+                                onClicked: {
+                                    switch (index) {
+                                        case 0: zynqtgui.ignoreNextStep1ButtonPress = true; break;
+                                        case 1: zynqtgui.ignoreNextStep2ButtonPress = true; break;
+                                        case 2: zynqtgui.ignoreNextStep3ButtonPress = true; break;
+                                        case 3: zynqtgui.ignoreNextStep4ButtonPress = true; break;
+                                        case 4: zynqtgui.ignoreNextStep5ButtonPress = true; break;
+                                        case 5: zynqtgui.ignoreNextStep6ButtonPress = true; break;
+                                        case 6: zynqtgui.ignoreNextStep7ButtonPress = true; break;
+                                        case 7: zynqtgui.ignoreNextStep8ButtonPress = true; break;
+                                        case 8: zynqtgui.ignoreNextStep9ButtonPress = true; break;
+                                        case 9: zynqtgui.ignoreNextStep10ButtonPress = true; break;
+                                        case 10: zynqtgui.ignoreNextStep11ButtonPress = true; break;
+                                        case 11: zynqtgui.ignoreNextStep12ButtonPress = true; break;
+                                        case 12: zynqtgui.ignoreNextStep13ButtonPress = true; break;
+                                        case 13: zynqtgui.ignoreNextStep14ButtonPress = true; break;
+                                        case 14: zynqtgui.ignoreNextStep15ButtonPress = true; break;
+                                        case 15: zynqtgui.ignoreNextStep16ButtonPress = true; break;
+                                    }
+                                }
+                            }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                            Item {
+                                Layout.fillHeight: true
+                                Layout.minimumWidth: Kirigami.Units.smallSpacing
+                                Layout.maximumWidth: Kirigami.Units.smallSpacing
+                            }
+                            Repeater {
+                                model: stepVisualiserDelegate.stepNote ? stepVisualiserDelegate.stepNote.subnotes : 0
+                                Item {
+                                    id: padSubNoteRect
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    readonly property var subNote: modelData
+                                    readonly property var subNoteVelocity: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "velocity");
+                                    readonly property bool subnoteIsRelevant: stepParameterHeading.heldSteps.includes(stepVisualiserDelegate.stepColumn) && (zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1 || _private.heardNotes.includes(subNote))
+                                    readonly property double actualSubnoteVelocity: subNoteVelocity == undefined
+                                        ? _private.pattern.defaultVelocity
+                                        : subNoteVelocity == -1
+                                            ? 0
+                                            : subNoteVelocity == 0
+                                                ? _private.pattern.defaultVelocity
+                                                : subNoteVelocity
+                                    opacity: subnoteIsRelevant ? 1.0 : 0.5
+                                    Rectangle {
+                                        anchors.fill: parent;
+                                        color: stepVisualiser.noteColors[subNote.midiNote]
+                                        opacity: 0.3
+                                    }
+                                    Rectangle {
+                                        anchors {
+                                            left: parent.left
+                                            right: parent.right
+                                            bottom: parent.bottom
+                                        }
+                                        height: padSubNoteRect.height * (actualSubnoteVelocity / 127)
+                                        color: stepVisualiser.noteColors[subNote.midiNote]
+                                    }
+                                    QQC2.Label {
+                                        anchors.fill: parent
+                                        text: Zynthbox.KeyScales.midiNoteName(padSubNoteRect.subNote.midiNote)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            ColumnLayout {
                 anchors {
                     top: parent.top
                     right: parent.right
                     bottom: parent.bottom
                     rightMargin: Kirigami.Units.largeSpacing
                 }
-                width: parent.width / 2
+                width: parent.width / 3
                 spacing: 0
                 Item {
                     Layout.fillWidth: true
@@ -4207,6 +4433,7 @@ Item {
                         }
                         height: Kirigami.Units.gridUnit * 3
                         Kirigami.Heading {
+                            id: stepParameterHeading
                             anchors {
                                 top: parent.top
                                 left: parent.left
@@ -4275,7 +4502,7 @@ Item {
                                         return qsTr("Style");
                                         break;
                                     case 1:
-                                        return qsTr("Probability");
+                                        return qsTr("Play When");
                                         break;
                                     case 0:
                                     default:
@@ -4311,7 +4538,7 @@ Item {
                                         return qsTr("Count");
                                         break;
                                     case 1:
-                                        return qsTr("");
+                                        return qsTr("Probability");
                                         break;
                                     case 0:
                                     default:
@@ -4525,6 +4752,7 @@ Item {
                                 text: qsTr("Selected Notes:")
                             }
                             QQC2.Label {
+                                id: heldNotesLabel
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2

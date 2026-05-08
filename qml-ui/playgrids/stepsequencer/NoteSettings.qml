@@ -885,7 +885,23 @@ ColumnLayout {
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 // END Page 2 (Play When, Probability, Swing)
-                // BEGIN Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
+                // BEGIN Page 3 (Ratchet Count, Ratchet Style, Ratchet Probability)
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currentParameterPageIndex === 2
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "ratchet-count"
+                    paramDefaultString: "0"
+                    paramValueSuffix: ""
+                    paramDefault: 0
+                    paramMin: 0
+                    paramMax: 12
+                    scrollWidth: 13
+                    knobId: 0
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
                 StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
@@ -906,22 +922,6 @@ ColumnLayout {
                         2: "Split Length, Overlap",
                         3: "Split Length, Choke",
                     }
-                    knobId: 0
-                    currentlySelected: subnoteDelegate.isCurrent
-                }
-                StepSettingsParamDelegate {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                    visible: component.currentParameterPageIndex === 2
-                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
-                    paramIndex: subnoteDelegate.subnoteIndex
-                    paramName: "ratchet-count"
-                    paramDefaultString: "0"
-                    paramValueSuffix: ""
-                    paramDefault: 0
-                    paramMin: 0
-                    paramMax: 12
-                    scrollWidth: 13
                     knobId: 1
                     currentlySelected: subnoteDelegate.isCurrent
                 }

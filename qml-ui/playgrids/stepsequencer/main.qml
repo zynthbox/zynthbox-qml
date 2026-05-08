@@ -1068,7 +1068,7 @@ IMP.BasePlayGrid {
                             } else {
                                 switch (drumPad.parameterPageIndex) {
                                     case 2:
-                                        drumPadRepeater.ratchetStyleUp(); 
+                                        drumPadRepeater.ratchetCountUp(); 
                                         break;
                                     case 1:
                                         drumPadRepeater.playWhenUp();
@@ -1086,7 +1086,7 @@ IMP.BasePlayGrid {
                             } else {
                                 switch (drumPad.parameterPageIndex) {
                                     case 2:
-                                        drumPadRepeater.ratchetStyleDown();
+                                        drumPadRepeater.ratchetCountDown();
                                         break;
                                     case 1:
                                         drumPadRepeater.playWhenDown();
@@ -1104,7 +1104,7 @@ IMP.BasePlayGrid {
                             } else {
                                 switch (drumPad.parameterPageIndex) {
                                     case 2:
-                                        drumPadRepeater.ratchetCountUp();
+                                        drumPadRepeater.ratchetStyleUp();
                                         break;
                                     case 1:
                                         drumPadRepeater.probabilityUp();
@@ -1122,7 +1122,7 @@ IMP.BasePlayGrid {
                             } else {
                                 switch (drumPad.parameterPageIndex) {
                                     case 2:
-                                        drumPadRepeater.ratchetCountDown();
+                                        drumPadRepeater.ratchetStyleDown();
                                         break;
                                     case 1:
                                         drumPadRepeater.probabilityDown();

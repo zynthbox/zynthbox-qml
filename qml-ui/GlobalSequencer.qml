@@ -52,6 +52,7 @@ Item {
     }
 
     property QtObject selectedChannel: null
+    readonly property string mostRecentlyInteractedParameter: _private.mostRecentlyInteractedParameter
     readonly property alias parameterPage: _private.parameterPage
     function setParameterPage(parameterPage) {
         _private.parameterPage = Math.max(0, Math.min(parameterPage, 2));
@@ -157,20 +158,20 @@ Item {
         updateStepProperty(sign, stepButtonIndex, "next-step");
     }
     /**
-     * Update the ratchet style of all matching subnotes on the given step
-     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
-     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the ratchet style for
-     */
-    function updateStepRatchetStyle(sign, stepButtonIndex) {
-        updateStepProperty(sign, stepButtonIndex, "ratchet-style");
-    }
-    /**
      * Update the ratchet count of all matching subnotes on the given step
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
      * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the ratchet count for
      */
     function updateStepRatchetCount(sign, stepButtonIndex) {
         updateStepProperty(sign, stepButtonIndex, "ratchet-count");
+    }
+    /**
+     * Update the ratchet style of all matching subnotes on the given step
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size, and 0 to simply display the current value
+     * @param stepButtonIndex The index of the step inside the currently active bar you wish to adjust/display the ratchet style for
+     */
+    function updateStepRatchetStyle(sign, stepButtonIndex) {
+        updateStepProperty(sign, stepButtonIndex, "ratchet-style");
     }
     /**
      * Update the ratchet probability of all matching subnotes on the given step
@@ -187,6 +188,7 @@ Item {
      * @param propertyName The name of the property you wish to adjust (currently supported: velocity, duration, delay)
      */
     function updateStepProperty(sign, stepButtonIndex, propertyName) {
+        _private.mostRecentlyInteractedParameter = propertyName;
         let workingModel = _private.pattern.workingModel;
         let padNoteRow = workingModel.activeBar + workingModel.bankOffset;
         let stepIndex = padNoteRow * workingModel.width + stepButtonIndex;
@@ -391,32 +393,6 @@ Item {
                     } else {
                         theCurrentValueLabel = qsTr("Step %1").arg(theCurrentValue);
                     }
-                } else if (propertyName == "ratchet-style") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Style for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Style for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Style").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = 0;
-                    theStopValue = 4;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-style");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("Split Step, Overlap (default)");
-                    } else if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("Split Step, Choke");
-                    } else if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("Split Length, Overlap");
-                    } else {
-                        theCurrentValueLabel = qsTr("Split Length, Choke");
-                    }
                 } else if (propertyName == "ratchet-count") {
                     if (subnoteIndices.length === totalSubnoteCount) {
                         theDescripton = qsTr("Step %1 Entry Ratchet Count for all entries").arg(stepIndex + 1);
@@ -438,6 +414,32 @@ Item {
                         theCurrentValueLabel = qsTr("No Ratchet (default)");
                     } else {
                         theCurrentValueLabel = qsTr("Repeat %1 times").arg(theCurrentValue);
+                    }
+                } else if (propertyName == "ratchet-style") {
+                    if (subnoteIndices.length === totalSubnoteCount) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Style for all entries").arg(stepIndex + 1);
+                    } else if (subnoteIndices.length > 1) {
+                        theDescripton = qsTr("Step %1 Entry Ratchet Style for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
+                    } else {
+                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Style").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
+                    }
+                    theStartValue = 0;
+                    theStopValue = 3;
+                    if (valueAdjustment != 0) {
+                        setValue(subnoteValues[0] + valueAdjustment);
+                    }
+                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-style");
+                    if (theCurrentValue == undefined) {
+                        theCurrentValue = initialValue;
+                    }
+                    if (theCurrentValue == 0) {
+                        theCurrentValueLabel = qsTr("Split Step, Overlap (default)");
+                    } else if (theCurrentValue == 1) {
+                        theCurrentValueLabel = qsTr("Split Step, Choke");
+                    } else if (theCurrentValue == 2) {
+                        theCurrentValueLabel = qsTr("Split Length, Overlap");
+                    } else {
+                        theCurrentValueLabel = qsTr("Split Length, Choke");
                     }
                 } else if (propertyName == "ratchet-probability") {
                     if (subnoteIndices.length === totalSubnoteCount) {
@@ -1092,7 +1094,7 @@ Item {
                             if (_private.heldStepButtons[stepButtonIndex] !== false) {
                                 switch (_private.parameterPage) {
                                     case 2:
-                                        component.updateStepRatchetStyle(0, stepButtonIndex);
+                                        component.updateStepRatchetCount(0, stepButtonIndex);
                                         break;
                                     case 1:
                                         component.updateStepPlayWhen(0, stepButtonIndex);
@@ -1116,7 +1118,7 @@ Item {
                             if (_private.heldStepButtons[stepButtonIndex] !== false) {
                                 switch (_private.parameterPage) {
                                     case 2:
-                                        component.updateStepRatchetStyle(1, stepButtonIndex);
+                                        component.updateStepRatchetCount(1, stepButtonIndex);
                                         break;
                                     case 1:
                                         component.updateStepPlayWhen(1, stepButtonIndex);
@@ -1138,7 +1140,7 @@ Item {
                             if (_private.heldStepButtons[stepButtonIndex] !== false) {
                                 switch (_private.parameterPage) {
                                     case 2:
-                                        component.updateStepRatchetStyle(-1, stepButtonIndex);
+                                        component.updateStepRatchetCount(-1, stepButtonIndex);
                                         break;
                                     case 1:
                                         component.updateStepPlayWhen(-1, stepButtonIndex);
@@ -1161,7 +1163,7 @@ Item {
                         if (_private.heldStepButtons[stepButtonIndex] !== false) {
                             switch (_private.parameterPage) {
                                 case 2:
-                                    component.updateStepRatchetCount(0, stepButtonIndex);
+                                    component.updateStepRatchetStyle(0, stepButtonIndex);
                                     break;
                                 case 1:
                                     component.updateStepProbability(0, stepButtonIndex);
@@ -1183,7 +1185,7 @@ Item {
                         if (_private.heldStepButtons[stepButtonIndex] !== false) {
                             switch (_private.parameterPage) {
                                 case 2:
-                                    component.updateStepRatchetCount(1, stepButtonIndex);
+                                    component.updateStepRatchetStyle(1, stepButtonIndex);
                                     break;
                                 case 1:
                                     component.updateStepProbability(1, stepButtonIndex);
@@ -1203,7 +1205,7 @@ Item {
                         if (_private.heldStepButtons[stepButtonIndex] !== false) {
                             switch (_private.parameterPage) {
                                 case 2:
-                                    component.updateStepRatchetCount(-1, stepButtonIndex);
+                                    component.updateStepRatchetStyle(-1, stepButtonIndex);
                                     break;
                                 case 1:
                                     component.updateStepProbability(-1, stepButtonIndex);
@@ -2999,9 +3001,23 @@ Item {
         property int mostRecentlyInteractedStep: 0
         property int mostRecentlyInteractedStepCounter: -1
         property int mostRecentlyAttemptedToggleStep: -1 // This is to allow for the "select without toggle" logic to work
+        property string mostRecentlyInteractedParameter: "velocity"
         property int parameterPage: 0
         onParameterPageChanged: {
             updateLedColors();
+            // Switch most recently interacted parameter to the first on the page
+            switch(parameterPage) {
+                case 2:
+                    _private.mostRecentlyInteractedParameter = "ratchet-count";
+                    break;
+                case 1:
+                    _private.mostRecentlyInteractedParameter = "play-when";
+                    break;
+                case 0:
+                default:
+                    _private.mostRecentlyInteractedParameter = "velocity";
+                    break;
+            }
         }
         property QtObject sequence: component.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
         property QtObject pattern: sequence && component.selectedChannel ? sequence.getByClipId(component.selectedChannel.id, component.selectedChannel.selectedClip) : null
@@ -3901,6 +3917,10 @@ Item {
                 color: Kirigami.Theme.backgroundColor
                 opacity: 0.7
             }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: { /* Just eat events, avoid clicking through to the background */ }
+            }
             ColumnLayout {
                 anchors {
                     top: parent.top
@@ -4224,17 +4244,57 @@ Item {
                     horizontalCenter: parent.horizontalCenter
                     margins: Kirigami.Units.largeSpacing
                 }
-                width: parent.width / 3
+                width: parent.width / 2
                 spacing: 0
                 readonly property int stepOffset: _private.pattern ? (_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset) * _private.pattern.workingModel.width : 0
                 readonly property var noteColors: zynqtgui.theme_chooser.noteColors
+                readonly property string stepDurationName: _private.pattern
+                    ? _private.pattern.stepLengthName(_private.pattern.stepLength)
+                    : ""
+                readonly property string defaultDurationName: _private.pattern
+                    ? _private.pattern.defaultNoteDuration === 0
+                        ? _private.pattern.stepLengthName(_private.pattern.stepLength)
+                        : _private.pattern.stepLengthName(_private.pattern.defaultNoteDuration)
+                : ""
+                readonly property var nextStepValues: [0, 1, 17, 33, 49, 65, 81, 97, 113]
+                readonly property var nextStepLabels: {
+                    0: "Next",
+                    1: "Bar 1",
+                    17: "Bar 2",
+                    33: "Bar 3",
+                    49: "Bar 4",
+                    65: "Bar 5",
+                    81: "Bar 6",
+                    97: "Bar 7",
+                    113: "Bar 8",
+                }
+                readonly property var ratchetStyleNames: ["Split Step, Overlap", "Split Step, Choke", "Split Length, Overlap", "Split Length, Choke"]
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    Kirigami.Heading {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        level: 3
+                        text: qsTr("Step")
+                    }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        text: qsTr("Don't Add/Remove")
+                        onClicked: {
+                            zynqtgui.callable_ui_action_simple("SWITCH_BACK_RELEASED");
+                        }
+                    }
+                }
                 Repeater {
                     model: 16
-                    delegate: ColumnLayout {
+                    delegate: RowLayout {
                         id: stepVisualiserDelegate
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
                         spacing: 0
                         property bool stepContainsHeld: false
                         property QtObject stepNote: null
@@ -4306,22 +4366,237 @@ Item {
                             onSongChanged: noteFetcher.restart();
                         }
                         Component.onCompleted: noteFetcher.restart();
+                        Kirigami.Heading {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit
+                            level: 4
+                            text: _private.pattern ? qsTr("%1").arg(stepVisualiser.stepOffset + index + 1) : ""
+                        }
                         RowLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            Kirigami.Heading {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                level: 4
-                                text: _private.pattern ? qsTr("Step %1").arg(stepVisualiser.stepOffset + index + 1) : ""
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                            Repeater {
+                                model: stepVisualiserDelegate.stepNote ? stepVisualiserDelegate.stepNote.subnotes : 0
+                                Item {
+                                    id: padSubNoteRect
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                                    readonly property var subNote: modelData
+                                    readonly property bool subnoteIsRelevant: stepParameterHeading.heldSteps.includes(stepVisualiserDelegate.stepColumn) && (zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1 || _private.heardNotes.includes(subNote))
+                                    readonly property string subNoteMidiNoteName: Zynthbox.KeyScales.midiNoteName(padSubNoteRect.subNote.midiNote)
+                                    opacity: subnoteIsRelevant ? 1.0 : 0.5
+
+                                    readonly property var subNoteVelocity: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "velocity");
+                                    readonly property int actualSubnoteVelocity: subNoteVelocity == undefined
+                                        ? _private.pattern.defaultVelocity
+                                        : subNoteVelocity == -1
+                                            ? 0
+                                            : subNoteVelocity == 0
+                                                ? _private.pattern.defaultVelocity
+                                                : subNoteVelocity
+                                    readonly property string subNoteVelocityLabel: {
+                                        switch (padSubNoteRect.subNoteVelocity) {
+                                            case -1:
+                                                return qsTr("%1: Untriggered").arg(padSubNoteRect.subNoteMidiNoteName);
+                                                break;
+                                            case undefined:
+                                            case 0:
+                                                return qsTr("%1: Default (%2)").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.defaultVelocity);
+                                                break;
+                                            default:
+                                                return qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteVelocity);
+                                                break;
+                                        }
+                                    }
+
+                                    readonly property var subNoteDuration: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "duration");
+                                    readonly property int actualSubnoteDuration: subNoteDuration == undefined
+                                        ? _private.pattern.stepLength
+                                        : subNoteDuration == 0
+                                            ? _private.pattern.stepLength
+                                            : subNoteDuration == -1
+                                                ? _private.pattern.defaultNoteDuration
+                                                : subNoteDuration
+                                    readonly property string subNoteDurationLabel: {
+                                        switch (padSubNoteRect.subNoteDuration) {
+                                            case -1:
+                                                return qsTr("%1: Auto (%2)").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.defaultDurationName);
+                                                break;
+                                            case undefined:
+                                            case 0:
+                                                return qsTr("%1: Default (%2)").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.stepDurationName);
+                                                break;
+                                            default:
+                                                return qsTr("%1: %2/128").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteDuration);
+                                                break;
+                                        }
+                                    }
+
+                                    readonly property var subNoteDelay: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "delay");
+                                    readonly property int actualSubnoteDelay: subNoteDelay == undefined
+                                        ? 0
+                                        : subNoteDelay
+                                    readonly property string subNoteDelayLabel: {
+                                        switch (padSubNoteRect.subNoteDelay) {
+                                            case undefined:
+                                            case 0:
+                                                return qsTr("%1: None").arg(padSubNoteRect.subNoteMidiNoteName);
+                                                break;
+                                            default:
+                                                return qsTr("%1: %2/128").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteDelay);
+                                                break;
+                                        }
+                                    }
+
+                                    readonly property var subNotePlayWhen: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "play-when");
+                                    readonly property int actualSubnotePlayWhen: subNotePlayWhen == undefined
+                                        ? 0
+                                        : subNotePlayWhen
+                                    readonly property string subNotePlayWhenLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.probabilityName(padSubNoteRect.actualSubnotePlayWhen))
+
+                                    readonly property var subNoteProbability: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "probability");
+                                    readonly property int actualSubnoteProbability : subNoteProbability == undefined
+                                        ? 0
+                                        : subNoteProbability
+                                    readonly property string subNoteProbabilityLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.probabilityName(padSubNoteRect.actualSubnoteProbability))
+
+                                    readonly property var subNoteNextStep: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "next-step");
+                                    readonly property int actualSubnoteNextStep: subNoteNextStep == undefined
+                                        ? 0
+                                        : subNoteNextStep
+                                    readonly property string subNoteNextStepLabel: {
+                                        if (stepVisualiser.nextStepValues.includes(padSubNoteRect.actualSubnoteNextStep)) {
+                                            return qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.nextStepLabels[padSubNoteRect.actualSubnoteNextStep])
+                                        } else {
+                                            return qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.actualSubnoteNextStep);
+                                        }
+                                    }
+
+                                    readonly property var subNoteRatchetCount: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "ratchet-count");
+                                    readonly property int actualSubnoteRatchetCount: subNoteRatchetCount == undefined
+                                        ? 0
+                                        : subNoteRatchetCount
+                                    readonly property string subNoteRatchetCountLabel: qsTr("%1: %2 repeats").arg(padSubNoteRect.subNoteMidiNoteName).arg(actualSubnoteRatchetCount)
+
+                                    readonly property var subNoteRatchetStyle: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "ratchet-style");
+                                    readonly property int actualSubnoteRatchetStyle: subNoteRatchetStyle == undefined
+                                        ? 0
+                                        : subNoteRatchetStyle
+                                    readonly property string subNoteRatchetStyleLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.ratchetStyleNames[actualSubnoteRatchetStyle])
+
+                                    readonly property var subNoteRatchetProbability: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "ratchet-probability");
+                                    readonly property int actualSubnoteRatchetProbability: subNoteRatchetProbability == undefined
+                                        ? 0
+                                        : subNoteRatchetProbability
+                                    readonly property string subNoteRatchetProbabilityLabel: {
+                                        switch (padSubNoteRect.subNoteRatchetProbability) {
+                                            case undefined:
+                                            case 0:
+                                                return qsTr("%1: 100%").arg(padSubNoteRect.subNoteMidiNoteName);
+                                                break;
+                                            default:
+                                                return qsTr("%1: %2%").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteRatchetProbability);
+                                                break;
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        anchors.fill: parent;
+                                        color: stepVisualiser.noteColors[subNote.midiNote]
+                                        opacity: 0.3
+                                    }
+                                    Rectangle {
+                                        anchors {
+                                            top: parent.top
+                                            left: parent.left
+                                            bottom: parent.bottom
+                                        }
+                                        width: {
+                                            switch (_private.mostRecentlyInteractedParameter) {
+                                                case "velocity":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteVelocity / 127);
+                                                    break;
+                                                case "duration":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteDuration / 1024);
+                                                    break;
+                                                case "delay":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteDelay / 1024);
+                                                    break;
+                                                case "play-when":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnotePlayWhen / _private.pattern.playWhenMax());
+                                                    break;
+                                                case "probability":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteProbability / _private.pattern.probabilityMax());
+                                                    break;
+                                                case "next-step":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteNextStep / 128);
+                                                    break;
+                                                case "ratchet-count":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteRatchetCount / 12);
+                                                    break;
+                                                case "ratchet-style":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteRatchetStyle / 4);
+                                                    break;
+                                                case "ratchet-probability":
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteRatchetProbability / 100);
+                                                    break;
+                                            }
+                                        }
+                                        color: stepVisualiser.noteColors[subNote.midiNote]
+                                    }
+                                    QQC2.Label {
+                                        anchors.fill: parent
+                                        text: {
+                                            switch (_private.mostRecentlyInteractedParameter) {
+                                                case "velocity":
+                                                    return padSubNoteRect.subNoteVelocityLabel;
+                                                    break;
+                                                case "duration":
+                                                    return padSubNoteRect.subNoteDurationLabel;
+                                                    break;
+                                                case "delay":
+                                                    return padSubNoteRect.subNoteDelayLabel;
+                                                    break;
+                                                case "play-when":
+                                                    return padSubNoteRect.subNotePlayWhenLabel;
+                                                    break;
+                                                case "probability":
+                                                    return padSubNoteRect.subNoteProbabilityLabel;
+                                                    break;
+                                                case "next-step":
+                                                    return padSubNoteRect.subNoteNextStepLabel;
+                                                    break;
+                                                case "ratchet-count":
+                                                    return padSubNoteRect.subNoteRatchetCountLabel;
+                                                    break;
+                                                case "ratchet-style":
+                                                    return padSubNoteRect.subNoteRatchetStyleLabel;
+                                                    break;
+                                                case "ratchet-probability":
+                                                    return padSubNoteRect.subNoteRatchetProbabilityLabel;
+                                                    break;
+                                                default:
+                                                    return "missing handler for: %1".arg(_private.mostRecentlyInteractedParameter);
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
                             }
+                        }
+                        Item {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                             QQC2.Button {
-                                Layout.fillHeight: true
+                                anchors.fill: parent
                                 visible: stepParameterHeading.heldSteps.includes(index)
                                 text: releaseIgnored
                                         ? stepVisualiserDelegate.stepContainsHeld ? qsTr("(not removing %1)").arg(heldNotesLabel.text) : qsTr("(not adding %1)").arg(heldNotesLabel.text)
-                                        : stepVisualiserDelegate.stepContainsHeld ? qsTr("Release To Remove %1").arg(heldNotesLabel.text) : qsTr("Release To Add %1").arg(heldNotesLabel.text)
+                                        : stepVisualiserDelegate.stepContainsHeld ? qsTr("Removing %1").arg(heldNotesLabel.text) : qsTr("Adding %1").arg(heldNotesLabel.text)
                                 readonly property bool releaseIgnored: switch (index) {
                                     case 0: return zynqtgui.ignoreNextStep1ButtonPress; break;
                                     case 1: return zynqtgui.ignoreNextStep2ButtonPress; break;
@@ -4362,53 +4637,6 @@ Item {
                                 }
                             }
                         }
-                        RowLayout {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            Item {
-                                Layout.fillHeight: true
-                                Layout.minimumWidth: Kirigami.Units.smallSpacing
-                                Layout.maximumWidth: Kirigami.Units.smallSpacing
-                            }
-                            Repeater {
-                                model: stepVisualiserDelegate.stepNote ? stepVisualiserDelegate.stepNote.subnotes : 0
-                                Item {
-                                    id: padSubNoteRect
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    readonly property var subNote: modelData
-                                    readonly property var subNoteVelocity: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "velocity");
-                                    readonly property bool subnoteIsRelevant: stepParameterHeading.heldSteps.includes(stepVisualiserDelegate.stepColumn) && (zynqtgui.ui_settings.hardwareSequencerEditInclusions === 1 || _private.heardNotes.includes(subNote))
-                                    readonly property double actualSubnoteVelocity: subNoteVelocity == undefined
-                                        ? _private.pattern.defaultVelocity
-                                        : subNoteVelocity == -1
-                                            ? 0
-                                            : subNoteVelocity == 0
-                                                ? _private.pattern.defaultVelocity
-                                                : subNoteVelocity
-                                    opacity: subnoteIsRelevant ? 1.0 : 0.5
-                                    Rectangle {
-                                        anchors.fill: parent;
-                                        color: stepVisualiser.noteColors[subNote.midiNote]
-                                        opacity: 0.3
-                                    }
-                                    Rectangle {
-                                        anchors {
-                                            left: parent.left
-                                            right: parent.right
-                                            bottom: parent.bottom
-                                        }
-                                        height: padSubNoteRect.height * (actualSubnoteVelocity / 127)
-                                        color: stepVisualiser.noteColors[subNote.midiNote]
-                                    }
-                                    QQC2.Label {
-                                        anchors.fill: parent
-                                        text: Zynthbox.KeyScales.midiNoteName(padSubNoteRect.subNote.midiNote)
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -4419,7 +4647,7 @@ Item {
                     bottom: parent.bottom
                     rightMargin: Kirigami.Units.largeSpacing
                 }
-                width: parent.width / 3
+                width: parent.width / 5
                 spacing: 0
                 Item {
                     Layout.fillWidth: true
@@ -4440,6 +4668,7 @@ Item {
                                 right: parent.right
                             }
                             horizontalAlignment: Text.AlignRight
+                            verticalAlignment: Text.AlignTop
                             level: 1
                             function getHeldSteps() {
                                 let theHeldSteps = [];
@@ -4488,18 +4717,29 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
                         height: Kirigami.Units.gridUnit * 3
+                        Kirigami.ShadowedRectangle {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: ["velocity", "play-when", "ratchet-count"].includes(_private.mostRecentlyInteractedParameter) ? Kirigami.Theme.highlightColor : Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                        }
                         Kirigami.Heading {
                             anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.top
+                                fill: parent
+                                margins: Kirigami.Units.largeSpacing
                             }
                             horizontalAlignment: Text.AlignRight
+                            verticalAlignment: Text.AlignVCenter
                             level: 2
                             text: {
                                 switch(_private.parameterPage) {
                                     case 2:
-                                        return qsTr("Style");
+                                        return qsTr("Count");
                                         break;
                                     case 1:
                                         return qsTr("Play When");
@@ -4509,6 +4749,23 @@ Item {
                                         return qsTr("Velocity");
                                         break;
                                 }
+                            }
+                        }
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            switch(_private.parameterPage) {
+                                case 2:
+                                    _private.mostRecentlyInteractedParameter = "ratchet-count";
+                                    break;
+                                case 1:
+                                    _private.mostRecentlyInteractedParameter = "play-when";
+                                    break;
+                                case 0:
+                                default:
+                                    _private.mostRecentlyInteractedParameter = "velocity";
+                                    break;
                             }
                         }
                     }
@@ -4524,18 +4781,29 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
                         height: Kirigami.Units.gridUnit * 3
+                        Kirigami.ShadowedRectangle {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: ["duration", "probability", "ratchet-style"].includes(_private.mostRecentlyInteractedParameter) ? Kirigami.Theme.highlightColor : Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                        }
                         Kirigami.Heading {
                             anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.top
+                                fill: parent
+                                margins: Kirigami.Units.largeSpacing
                             }
                             horizontalAlignment: Text.AlignRight
+                            verticalAlignment: Text.AlignVCenter
                             level: 2
                             text: {
                                 switch(_private.parameterPage) {
                                     case 2:
-                                        return qsTr("Count");
+                                        return qsTr("Style");
                                         break;
                                     case 1:
                                         return qsTr("Probability");
@@ -4543,6 +4811,23 @@ Item {
                                     case 0:
                                     default:
                                         return qsTr("Length");
+                                        break;
+                                }
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                switch(_private.parameterPage) {
+                                    case 2:
+                                        _private.mostRecentlyInteractedParameter = "ratchet-style";
+                                        break;
+                                    case 1:
+                                        _private.mostRecentlyInteractedParameter = "probability";
+                                        break;
+                                    case 0:
+                                    default:
+                                        _private.mostRecentlyInteractedParameter = "duration";
                                         break;
                                 }
                             }
@@ -4560,13 +4845,24 @@ Item {
                             verticalCenter: parent.verticalCenter
                         }
                         height: Kirigami.Units.gridUnit * 3
+                        Kirigami.ShadowedRectangle {
+                            anchors.fill: parent
+                            Kirigami.Theme.colorSet: parameterPageVisualiser.Kirigami.Theme.colorSet
+                            shadow {
+                                size: Kirigami.Units.gridUnit/2
+                                color: ["delay", "next-step", "ratchet-probability"].includes(_private.mostRecentlyInteractedParameter) ? Kirigami.Theme.highlightColor : Qt.rgba(0, 0, 0, 0.4)
+                                yOffset: 2
+                            }
+                            radius: Kirigami.Units.smallSpacing * 2
+                            color: Kirigami.Theme.backgroundColor
+                        }
                         Kirigami.Heading {
                             anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.top
+                                fill: parent
+                                margins: Kirigami.Units.largeSpacing
                             }
                             horizontalAlignment: Text.AlignRight
+                            verticalAlignment: Text.AlignVCenter
                             level: 2
                             text: {
                                 switch(_private.parameterPage) {
@@ -4581,6 +4877,23 @@ Item {
                                         return qsTr("Position");
                                         break;
                                 }
+                            }
+                        }
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            switch(_private.parameterPage) {
+                                case 2:
+                                    _private.mostRecentlyInteractedParameter = "ratchet-probability";
+                                    break;
+                                case 1:
+                                    _private.mostRecentlyInteractedParameter = "next-step";
+                                    break;
+                                case 0:
+                                default:
+                                    _private.mostRecentlyInteractedParameter = "delay";
+                                    break;
                             }
                         }
                     }

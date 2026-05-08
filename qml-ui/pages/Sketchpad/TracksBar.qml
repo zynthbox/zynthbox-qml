@@ -32,7 +32,7 @@ import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtGraphicalEffects 1.0
 import org.kde.plasma.core 2.0 as PlasmaCore
-
+import QtWebEngine 1.10
 import QtQuick.Controls.Styles 1.4
 
 import io.zynthbox.ui 1.0 as ZUI
@@ -45,6 +45,9 @@ import io.zynthbox.imp 1.0 as IMP
 
 AbstractSketchpadPage {
     id: root
+
+    //This hack is needed to be able to use the WebView in another views
+    WebEngineView {}
     
     Timer {
         id: selectedChannelThrottle
@@ -3008,7 +3011,10 @@ AbstractSketchpadPage {
                     }
 
                 }
-                Item {}
+                Item 
+                {
+                    
+                }
             }
         }      
     }

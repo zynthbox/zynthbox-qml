@@ -57,6 +57,7 @@ from datetime import timedelta
 # Qt modules
 from PySide2.QtCore import QProcess, Qt, QObject, QMetaObject, SIGNAL, Slot, Signal, Property, QTimer, QEventLoop, QSettings
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap, QFont
+from PySide2.QtWebEngine import QtWebEngine
 from PySide2.QtQml import QQmlApplicationEngine, QQmlDebuggingEnabler, qmlRegisterType
 
 sys.path.insert(1, "/zynthian/zynthbox-qml/")
@@ -6143,6 +6144,10 @@ if __name__ == "__main__":
         logging.error(f"Error updating libzynthbox Settings.xml : {str(e)}")
 
     ###
+
+    
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--no-sandbox --enable-web-midi --disable-web-security --allow-running-insecure-content --disable-features=IsolateOrigins,site-per-process"
+    QtWebEngine.initialize()
 
     QGuiApplication.setOrganizationName("zynthbox")
     QGuiApplication.setApplicationName("zynthbox-qml")

@@ -195,7 +195,6 @@ Item {
         let subnoteIndices = [];
         let subnoteValues = [];
         let subnoteDifferences = [];
-        let valueAdjustment = 0;
         let initialValue = 0;
         if (propertyName == "velocity") {
             initialValue = workingModel.defaultVelocity;
@@ -235,254 +234,58 @@ Item {
         }
         // console.log(subnoteIndices, subnoteValues);
         if (subnoteIndices.length > 0) {
-            function valueSetter(value) {
-                valueAdjustment = value;
-                // console.log("Adjusting", propertyName, "by", valueAdjustment);
-                let theDescripton = "";
-                let theDefaultValue = undefined;
-                let theCurrentValue = 0;
-                let theStartValue = 0;
-                let theStopValue = 0;
-                let theCurrentValueLabel = "";
-                let doPreview = false;
-                function setValue(value) {
-                    for (let i = 0; i < subnoteIndices.length; ++i) {
-                        let newValue = ZUI.CommonUtils.clamp(value + subnoteDifferences[i], theStartValue, theStopValue);
-                        if (newValue == initialValue) {
-                            // If we're setting to the property's default value, then we really should be *unsetting* it instead
-                            newValue = theDefaultValue;
-                        }
-                        console.log("Setting", propertyName, "value to", newValue, "for bar step subnote", padNoteRow, stepButtonIndex, subnoteIndices[i], "based on", subnoteDifferences[i], subnoteDifferences, "and value", value);
-                        workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, newValue);
+            // console.log("Adjusting", propertyName, "by", sign);
+            let theCurrentValue = 0;
+            let theStartValue = 0;
+            let theStopValue = 0;
+            let doPreview = false;
+            function setValue(adjustmentAmount) {
+                for (let i = 0; i < subnoteIndices.length; ++i) {
+                    let currentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName);
+                    if (currentValue === undefined || currentValue === initialValue || isNaN(currentValue)) {
+                        currentValue = initialValue;
                     }
-                    component.handleStepDataChanged(stepIndex);
+                    let newValue = ZUI.CommonUtils.clamp(currentValue + adjustmentAmount, theStartValue, theStopValue);
+                    if (newValue == initialValue) {
+                        // If we're setting to the property's default value, then we really should be *unsetting* it instead
+                        newValue = undefined;
+                    }
+                    // console.log("Changing", propertyName, "value from", currentValue, "to", newValue, "for bar step subnote", padNoteRow, stepButtonIndex, subnoteIndices[i], "with adjustment amount", adjustmentAmount);
+                    workingModel.setSubnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[i], propertyName, newValue);
                 }
-                if (propertyName == "velocity") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Velocity for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Velocity for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Velocity").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = -1;
-                    theStopValue = 127;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], propertyName);
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == -1) {
-                        theCurrentValueLabel = qsTr("Untriggered");
-                    } else if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("%1 (auto, clip default)").arg(workingModel.defaultVelocity);
-                    } else {
-                        theCurrentValueLabel = qsTr("%1").arg(theCurrentValue);
-                    }
-                } else if (propertyName == "duration") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Length for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Length for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Length").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = -1;
-                    theStopValue = 1024;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], propertyName);
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == -1) {
-                        if (workingModel.defaultNoteDuration === 0) {
-                            theCurrentValueLabel = qsTr("Use default note length (currently step length: %1)").arg(workingModel.stepLengthName(workingModel.stepLength));
-                        } else {
-                            theCurrentValueLabel = qsTr("Use default note length (currently %1)").arg(workingModel.stepLengthName(workingModel.defaultNoteDuration));
-                        }
-                    } else if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("Use step length (currently %1)").arg(workingModel.stepLengthName(workingModel.stepLength));
-                    } else {
-                        theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
-                    }
-                } else if (propertyName == "delay" || propertyName == "position") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Position for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Position for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Position").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = -workingModel.stepLength;
-                    theStopValue = workingModel.stepLength;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "delay");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("On-grid (no adjustment)");
-                    } else if (theCurrentValue < 0) {
-                        theCurrentValueLabel = qsTr("-%1").arg(workingModel.stepLengthName(theCurrentValue));
-                    } else {
-                        theCurrentValueLabel = workingModel.stepLengthName(theCurrentValue);
-                    }
-                } else if (propertyName == "play-when") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Play When for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Play When for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Play When").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = 0;
-                    theStopValue = workingModel.playWhenMax() - 1;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "play-when");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    theCurrentValueLabel = workingModel.playWhenName(theCurrentValue);
-                } else if (propertyName == "probability") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Probability for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Probability for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Probability").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = 0;
-                    theStopValue = workingModel.probabilityMax() - 1;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "probability");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    theCurrentValueLabel = workingModel.probabilityName(theCurrentValue);
-                } else if (propertyName == "next-step") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Next Step for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Next Step for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Next Step").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = 0;
-                    theStopValue = workingModel.width * workingModel.bankLength;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "next-step");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("Next Step (default)");
-                    } else if ((theCurrentValue - 1)% workingModel.width == 0) {
-                        theCurrentValueLabel = qsTr("Bar %1").arg((theCurrentValue - 1) % 12 + 1);
-                    } else {
-                        theCurrentValueLabel = qsTr("Step %1").arg(theCurrentValue);
-                    }
-                } else if (propertyName == "ratchet-count") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Count for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Count for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Count").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = 0;
-                    theStopValue = 12;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-count");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("No Ratchet (default)");
-                    } else {
-                        theCurrentValueLabel = qsTr("Repeat %1 times").arg(theCurrentValue);
-                    }
-                } else if (propertyName == "ratchet-style") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Style for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Style for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Style").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = 0;
-                    theStopValue = 3;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-style");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("Split Step, Overlap (default)");
-                    } else if (theCurrentValue == 1) {
-                        theCurrentValueLabel = qsTr("Split Step, Choke");
-                    } else if (theCurrentValue == 2) {
-                        theCurrentValueLabel = qsTr("Split Length, Overlap");
-                    } else {
-                        theCurrentValueLabel = qsTr("Split Length, Choke");
-                    }
-                } else if (propertyName == "ratchet-probability") {
-                    if (subnoteIndices.length === totalSubnoteCount) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Probability for all entries").arg(stepIndex + 1);
-                    } else if (subnoteIndices.length > 1) {
-                        theDescripton = qsTr("Step %1 Entry Ratchet Probability for %2 entries").arg(stepIndex + 1).arg(subnoteIndices.length);
-                    } else {
-                        theDescripton = qsTr("Step %1 Entry %2 Ratchet Probability").arg(stepIndex + 1).arg(subnoteIndices[0] + 1);
-                    }
-                    theStartValue = 0;
-                    theStopValue = 100;
-                    if (valueAdjustment != 0) {
-                        setValue(subnoteValues[0] + valueAdjustment);
-                    }
-                    theCurrentValue = workingModel.subnoteMetadata(padNoteRow, stepButtonIndex, subnoteIndices[0], "ratchet-probability");
-                    if (theCurrentValue == undefined) {
-                        theCurrentValue = initialValue;
-                    }
-                    if (theCurrentValue == 0) {
-                        theCurrentValueLabel = qsTr("All Repeats Always Play (default)");
-                    } else {
-                        theCurrentValueLabel = qsTr("%1% Per Repeat").arg(theCurrentValue);
-                    }
-                }
-                // console.log("The first entry's", propertyName, "is", theCurrentValue);
-                applicationWindow().showOsd({
-                                                parameterName: "subnote_value",
-                                                description: theDescripton,
-                                                start: theStartValue,
-                                                stop: theStopValue,
-                                                step: 1,
-                                                defaultValue: initialValue,
-                                                currentValue: parseFloat(theCurrentValue),
-                                                startLabel: qsTr("%1").arg(theStartValue),
-                                                stopLabel: qsTr("%1").arg(theStopValue),
-                                                valueLabel: theCurrentValueLabel,
-                                                setValueFunction: setValue,
-                                                showValueLabel: true,
-                                                showResetToDefault: true,
-                                                showVisualZero: false
-                                            });
+                component.handleStepDataChanged(stepIndex);
             }
-            valueSetter(valueAdjustment + sign);
+            if (propertyName == "velocity") {
+                theStartValue = -1;
+                theStopValue = 127;
+            } else if (propertyName == "duration") {
+                theStartValue = -1;
+                theStopValue = 1024;
+            } else if (propertyName == "delay" || propertyName == "position") {
+                theStartValue = -workingModel.stepLength;
+                theStopValue = workingModel.stepLength;
+            } else if (propertyName == "play-when") {
+                theStartValue = 0;
+                theStopValue = workingModel.playWhenMax();
+            } else if (propertyName == "probability") {
+                theStartValue = 0;
+                theStopValue = workingModel.probabilityMax();
+            } else if (propertyName == "next-step") {
+                theStartValue = 0;
+                theStopValue = workingModel.width * workingModel.bankLength;
+            } else if (propertyName == "ratchet-count") {
+                theStartValue = 0;
+                theStopValue = 12;
+            } else if (propertyName == "ratchet-style") {
+                theStartValue = 0;
+                theStopValue = 3;
+            } else if (propertyName == "ratchet-probability") {
+                theStartValue = 0;
+                theStopValue = 100;
+            }
+            if (sign != 0) {
+                setValue(sign);
+            }
         } else {
             if (_private.heardNotes.length == 0) {
                 applicationWindow().showPassiveNotification(qsTr("Step %1 does not contain %2").arg(stepIndex + 1).arg(Zynthbox.Chords.shorthand(_private.heardNotes, workingModel.scaleKey, workingModel.pitchKey, workingModel.octaveKey)));
@@ -4443,7 +4246,7 @@ Item {
                                         switch (padSubNoteRect.subNoteDelay) {
                                             case undefined:
                                             case 0:
-                                                return qsTr("%1: None").arg(padSubNoteRect.subNoteMidiNoteName);
+                                                return qsTr("%1: On-grid").arg(padSubNoteRect.subNoteMidiNoteName);
                                                 break;
                                             default:
                                                 return qsTr("%1: %2/128").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteDelay);
@@ -4455,7 +4258,7 @@ Item {
                                     readonly property int actualSubnotePlayWhen: subNotePlayWhen == undefined
                                         ? 0
                                         : subNotePlayWhen
-                                    readonly property string subNotePlayWhenLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.probabilityName(padSubNoteRect.actualSubnotePlayWhen))
+                                    readonly property string subNotePlayWhenLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.playWhenName(padSubNoteRect.actualSubnotePlayWhen))
 
                                     readonly property var subNoteProbability: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "probability");
                                     readonly property int actualSubnoteProbability : subNoteProbability == undefined
@@ -4471,7 +4274,7 @@ Item {
                                         if (stepVisualiser.nextStepValues.includes(padSubNoteRect.actualSubnoteNextStep)) {
                                             return qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.nextStepLabels[padSubNoteRect.actualSubnoteNextStep])
                                         } else {
-                                            return qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.actualSubnoteNextStep);
+                                            return qsTr("%1: Step %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.actualSubnoteNextStep);
                                         }
                                     }
 
@@ -4538,7 +4341,7 @@ Item {
                                                     return padSubNoteRect.width * (padSubNoteRect.actualSubnoteRatchetCount / 12);
                                                     break;
                                                 case "ratchet-style":
-                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteRatchetStyle / 4);
+                                                    return padSubNoteRect.width * (padSubNoteRect.actualSubnoteRatchetStyle / 3);
                                                     break;
                                                 case "ratchet-probability":
                                                     return padSubNoteRect.width * (padSubNoteRect.actualSubnoteRatchetProbability / 100);
@@ -4767,6 +4570,7 @@ Item {
                                     _private.mostRecentlyInteractedParameter = "velocity";
                                     break;
                             }
+                            component.ignoreHeldStepButtonsReleases();
                         }
                     }
                 }
@@ -4815,22 +4619,23 @@ Item {
                                 }
                             }
                         }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                switch(_private.parameterPage) {
-                                    case 2:
-                                        _private.mostRecentlyInteractedParameter = "ratchet-style";
-                                        break;
-                                    case 1:
-                                        _private.mostRecentlyInteractedParameter = "probability";
-                                        break;
-                                    case 0:
-                                    default:
-                                        _private.mostRecentlyInteractedParameter = "duration";
-                                        break;
-                                }
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            switch(_private.parameterPage) {
+                                case 2:
+                                    _private.mostRecentlyInteractedParameter = "ratchet-style";
+                                    break;
+                                case 1:
+                                    _private.mostRecentlyInteractedParameter = "probability";
+                                    break;
+                                case 0:
+                                default:
+                                    _private.mostRecentlyInteractedParameter = "duration";
+                                    break;
                             }
+                            component.ignoreHeldStepButtonsReleases();
                         }
                     }
                 }
@@ -4895,6 +4700,7 @@ Item {
                                     _private.mostRecentlyInteractedParameter = "delay";
                                     break;
                             }
+                            component.ignoreHeldStepButtonsReleases();
                         }
                     }
                 }

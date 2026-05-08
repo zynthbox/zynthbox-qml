@@ -4880,7 +4880,7 @@ Item {
                                 wrapMode: Text.Wrap
                                 text: _private.pattern ? Zynthbox.Chords.shorthand(component.heardNotes, _private.pattern.scaleKey, _private.pattern.pitchKey, _private.pattern.octaveKey, " | ") : ""
                                 onTextChanged: {
-                                    if (_private.temporaryAltModeActive === false && _private.effectiveInteractionMode === _private.interactionModeSequencer) {
+                                    if (modePopup.visible && _private.temporaryAltModeActive === false && _private.effectiveInteractionMode === _private.interactionModeSequencer) {
                                         _private.registerInteractionModeChange();
                                     }
                                 }

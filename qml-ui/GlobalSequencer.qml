@@ -4085,7 +4085,7 @@ Item {
                     }
                     QQC2.Button {
                         Layout.fillHeight: true
-                        text: qsTr("Don't Add/Remove")
+                        text: qsTr("Don't Add/Remove %1").arg(heldNotesLabel.text)
                         onClicked: {
                             zynqtgui.callable_ui_action_simple("SWITCH_BACK_RELEASED");
                         }
@@ -4203,14 +4203,14 @@ Item {
                                     readonly property string subNoteVelocityLabel: {
                                         switch (padSubNoteRect.subNoteVelocity) {
                                             case -1:
-                                                return qsTr("%1: Untriggered").arg(padSubNoteRect.subNoteMidiNoteName);
+                                                return qsTr("Untriggered");
                                                 break;
                                             case undefined:
                                             case 0:
-                                                return qsTr("%1: Default (%2)").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.defaultVelocity);
+                                                return qsTr("Default (%1)").arg(_private.pattern.defaultVelocity);
                                                 break;
                                             default:
-                                                return qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteVelocity);
+                                                return qsTr("%1").arg(padSubNoteRect.subNoteVelocity);
                                                 break;
                                         }
                                     }
@@ -4226,14 +4226,14 @@ Item {
                                     readonly property string subNoteDurationLabel: {
                                         switch (padSubNoteRect.subNoteDuration) {
                                             case -1:
-                                                return qsTr("%1: Auto (%2)").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.defaultDurationName);
+                                                return qsTr("Auto (%1)").arg(stepVisualiser.defaultDurationName);
                                                 break;
                                             case undefined:
                                             case 0:
-                                                return qsTr("%1: Default (%2)").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.stepDurationName);
+                                                return qsTr("Default (%1)").arg(stepVisualiser.stepDurationName);
                                                 break;
                                             default:
-                                                return qsTr("%1: %2/128").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteDuration);
+                                                return qsTr("%1/128").arg(padSubNoteRect.subNoteDuration);
                                                 break;
                                         }
                                     }
@@ -4246,10 +4246,10 @@ Item {
                                         switch (padSubNoteRect.subNoteDelay) {
                                             case undefined:
                                             case 0:
-                                                return qsTr("%1: On-grid").arg(padSubNoteRect.subNoteMidiNoteName);
+                                                return qsTr("On-grid");
                                                 break;
                                             default:
-                                                return qsTr("%1: %2/128").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteDelay);
+                                                return qsTr("%1/128").arg(padSubNoteRect.subNoteDelay);
                                                 break;
                                         }
                                     }
@@ -4258,13 +4258,13 @@ Item {
                                     readonly property int actualSubnotePlayWhen: subNotePlayWhen == undefined
                                         ? 0
                                         : subNotePlayWhen
-                                    readonly property string subNotePlayWhenLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.playWhenName(padSubNoteRect.actualSubnotePlayWhen))
+                                    readonly property string subNotePlayWhenLabel: qsTr("%1").arg(_private.pattern.playWhenName(padSubNoteRect.actualSubnotePlayWhen))
 
                                     readonly property var subNoteProbability: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "probability");
                                     readonly property int actualSubnoteProbability : subNoteProbability == undefined
                                         ? 0
                                         : subNoteProbability
-                                    readonly property string subNoteProbabilityLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(_private.pattern.probabilityName(padSubNoteRect.actualSubnoteProbability))
+                                    readonly property string subNoteProbabilityLabel: qsTr("%1").arg(_private.pattern.probabilityName(padSubNoteRect.actualSubnoteProbability))
 
                                     readonly property var subNoteNextStep: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "next-step");
                                     readonly property int actualSubnoteNextStep: subNoteNextStep == undefined
@@ -4272,9 +4272,9 @@ Item {
                                         : subNoteNextStep
                                     readonly property string subNoteNextStepLabel: {
                                         if (stepVisualiser.nextStepValues.includes(padSubNoteRect.actualSubnoteNextStep)) {
-                                            return qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.nextStepLabels[padSubNoteRect.actualSubnoteNextStep])
+                                            return qsTr("%1").arg(stepVisualiser.nextStepLabels[padSubNoteRect.actualSubnoteNextStep])
                                         } else {
-                                            return qsTr("%1: Step %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.actualSubnoteNextStep);
+                                            return qsTr("Step %1").arg(padSubNoteRect.actualSubnoteNextStep);
                                         }
                                     }
 
@@ -4282,13 +4282,13 @@ Item {
                                     readonly property int actualSubnoteRatchetCount: subNoteRatchetCount == undefined
                                         ? 0
                                         : subNoteRatchetCount
-                                    readonly property string subNoteRatchetCountLabel: qsTr("%1: %2 repeats").arg(padSubNoteRect.subNoteMidiNoteName).arg(actualSubnoteRatchetCount)
+                                    readonly property string subNoteRatchetCountLabel: qsTr("%1 repeats").arg(actualSubnoteRatchetCount)
 
                                     readonly property var subNoteRatchetStyle: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "ratchet-style");
                                     readonly property int actualSubnoteRatchetStyle: subNoteRatchetStyle == undefined
                                         ? 0
                                         : subNoteRatchetStyle
-                                    readonly property string subNoteRatchetStyleLabel: qsTr("%1: %2").arg(padSubNoteRect.subNoteMidiNoteName).arg(stepVisualiser.ratchetStyleNames[actualSubnoteRatchetStyle])
+                                    readonly property string subNoteRatchetStyleLabel: qsTr("%1").arg(stepVisualiser.ratchetStyleNames[actualSubnoteRatchetStyle])
 
                                     readonly property var subNoteRatchetProbability: _private.pattern.workingModel.subnoteMetadata(_private.pattern.workingModel.activeBar + _private.pattern.workingModel.bankOffset, stepVisualiserDelegate.stepColumn, model.index, "ratchet-probability");
                                     readonly property int actualSubnoteRatchetProbability: subNoteRatchetProbability == undefined
@@ -4298,10 +4298,10 @@ Item {
                                         switch (padSubNoteRect.subNoteRatchetProbability) {
                                             case undefined:
                                             case 0:
-                                                return qsTr("%1: 100%").arg(padSubNoteRect.subNoteMidiNoteName);
+                                                return qsTr("100%");
                                                 break;
                                             default:
-                                                return qsTr("%1: %2%").arg(padSubNoteRect.subNoteMidiNoteName).arg(padSubNoteRect.subNoteRatchetProbability);
+                                                return qsTr("%1%").arg(padSubNoteRect.subNoteRatchetProbability);
                                                 break;
                                         }
                                     }
@@ -4309,14 +4309,15 @@ Item {
                                     Rectangle {
                                         anchors.fill: parent;
                                         color: stepVisualiser.noteColors[subNote.midiNote]
-                                        opacity: 0.3
+                                        opacity: 1
                                     }
                                     Rectangle {
                                         anchors {
-                                            top: parent.top
                                             left: parent.left
                                             bottom: parent.bottom
+                                            bottomMargin: 1
                                         }
+                                        height: 2
                                         width: {
                                             switch (_private.mostRecentlyInteractedParameter) {
                                                 case "velocity":
@@ -4348,10 +4349,35 @@ Item {
                                                     break;
                                             }
                                         }
-                                        color: stepVisualiser.noteColors[subNote.midiNote]
+                                        color: "black"
                                     }
                                     QQC2.Label {
-                                        anchors.fill: parent
+                                        anchors {
+                                            top: parent.top
+                                            left: parent.left
+                                            bottom: parent.bottom
+                                            bottomMargin: 3
+                                        }
+                                        width: height * 0.8
+                                        text: padSubNoteRect.subNoteMidiNoteName
+                                        color: "black" // to ensure contrast against the note coloured background
+                                        font.bold: true
+                                        verticalAlignment: Text.AlignVCenter
+                                        horizontalAlignment: Text.AlignHCenter
+                                    }
+                                    QQC2.Label {
+                                        anchors {
+                                            fill: parent
+                                            leftMargin: height * 0.8
+                                            bottomMargin: 3
+                                        }
+                                        verticalAlignment: Text.AlignVCenter
+                                        horizontalAlignment: Text.AlignLeft
+                                        fontSizeMode: Text.Fit
+                                        minimumPointSize: 6
+                                        maximumLineCount: 2
+                                        wrapMode: Text.Wrap
+                                        color: "black" // to ensure contrast against the note coloured background
                                         text: {
                                             switch (_private.mostRecentlyInteractedParameter) {
                                                 case "velocity":
@@ -4392,14 +4418,20 @@ Item {
                         }
                         Item {
                             Layout.fillHeight: true
-                            Layout.fillWidth: true
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                            Layout.minimumWidth: height
+                            Layout.maximumWidth: height
                             QQC2.Button {
                                 anchors.fill: parent
                                 visible: stepParameterHeading.heldSteps.includes(index)
-                                text: releaseIgnored
-                                        ? stepVisualiserDelegate.stepContainsHeld ? qsTr("(not removing %1)").arg(heldNotesLabel.text) : qsTr("(not adding %1)").arg(heldNotesLabel.text)
-                                        : stepVisualiserDelegate.stepContainsHeld ? qsTr("Removing %1").arg(heldNotesLabel.text) : qsTr("Adding %1").arg(heldNotesLabel.text)
+                                icon.name: stepVisualiserDelegate.stepContainsHeld ? "edit-clear" : "list-add"
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    height: parent.height
+                                    width: 2
+                                    rotation: 45
+                                    visible: parent.releaseIgnored
+                                    color: Kirigami.Theme.textColor
+                                }
                                 readonly property bool releaseIgnored: switch (index) {
                                     case 0: return zynqtgui.ignoreNextStep1ButtonPress; break;
                                     case 1: return zynqtgui.ignoreNextStep2ButtonPress; break;

@@ -334,6 +334,8 @@ class external_mode_settings(QObject):
         self.__captureVolume__ = 0
         self.__audioSource__ = ""
         self.__midiOutDevice__ = "" # Default is the midi 5-pin output
+        # TODO the hardware devices are going to supercede the midiOutDevice logic, and likely also eventually audioSource... but for now, leave that in place
+        self.__hardwareDevice__ = None # Our conceptual hardware instrument
         self.keyValueStoreChanged.connect(self.somethingChanged)
         self.selectedModuleChanged.connect(self.somethingChanged)
         self.midiChannelChanged.connect(self.somethingChanged)
@@ -448,6 +450,23 @@ class external_mode_settings(QObject):
     midiOutDeviceChanged = Signal()
     midiOutDevice = Property(str, get_midiOutDevice, set_midiOutDevice, notify=midiOutDeviceChanged)
     # END Property midiOutDevice
+
+    # BEGIN Property hardwareDevice
+    # TODO This wants persisting into the channel's data (that is, we need to save the uuid, and also enough information to actually reconstruct the hardware device should that uuid no longer exist...)
+    def get_hardwareDevice(self):
+        return self.__hardwareDevice__
+    def set_hardwareDevice(self, hardwareDevice):
+        if self.__hardwareDevice__ != hardwareDevice:
+            if self.__hardwareDevice__ is not None:
+                self.__hardwareDevice__.disconnect(self)
+            self.__hardwareDevice__ = hardwareDevice
+            if self.__hardwareDevice__ is not None:
+                self.__hardwareDevice__.nameChanged.connect(self.hardwareDeviceChanged.emit)
+                self.__hardwareDevice__.midiRouterDeviceHardwareIdChanged.connect(self.hardwareDeviceChanged.emit)
+            self.hardwareDeviceChanged.emit()
+    hardwareDeviceChanged = Signal()
+    hardwareDevice = Property(QObject, get_hardwareDevice, set_hardwareDevice, notify=hardwareDeviceChanged)
+    # END Property hardwareDevice
 
 class sketchpad_channel(QObject):
     # Possible Values : "audio", "video"
@@ -688,6 +707,7 @@ class sketchpad_channel(QObject):
         self.externalAudioSourceChanged.connect(self.externalSlotsDataChanged.emit)
         self.externalMidiChannelChanged.connect(self.externalSlotsDataChanged.emit)
         self.__externalSettings__.midiOutDeviceChanged.connect(self.externalSlotsDataChanged.emit)
+        self.__externalSettings__.hardwareDeviceChanged.connect(self.externalSlotsDataChanged.emit)
 
     def handlePassthroughClientSomethingChanged(self, theSender, theSomething, theValue):
         if not self.__song__.__to_be_deleted__:
@@ -3406,19 +3426,23 @@ class sketchpad_channel(QObject):
             else:
                 return clientName
 
-        midiOutDeviceName = "Midi Out Device"
-        if self.__externalSettings__.midiOutDevice == "":
-            midiOutDeviceName = "Midi 5-Pin"
-        else:
-            midiOutDeviceName = self.__externalSettings__.midiOutDevice
-            availableDevices = Zynthbox.MidiRouter.instance().model().midiOutSources()
-            for device in availableDevices:
-                if device["value"] == self.__externalSettings__.midiOutDevice:
-                    midiOutDeviceName = device["text"]
-                    break
+        midiOutDeviceName = "No Hardware Device"
+        midiOutDeviceEditLabel = ""
+        if self.__externalSettings__.__hardwareDevice__ is not None:
+            midiOutDeviceName = self.__externalSettings__.__hardwareDevice__.name()
+            midiOutDeviceEditLabel = "Edit Device"
+        # if self.__externalSettings__.midiOutDevice == "":
+        #     midiOutDeviceName = "Midi 5-Pin"
+        # else:
+        #     midiOutDeviceName = self.__externalSettings__.midiOutDevice
+        #     availableDevices = Zynthbox.MidiRouter.instance().model().midiOutSources()
+        #     for device in availableDevices:
+        #         if device["value"] == self.__externalSettings__.midiOutDevice:
+        #             midiOutDeviceName = device["text"]
+        #             break
 
         return [midiOutDeviceName,
-                f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
+                midiOutDeviceEditLabel, # f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
                 f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
                 None,
                 None]

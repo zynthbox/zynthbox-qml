@@ -261,10 +261,12 @@ AbstractSketchpadPage {
             switch (root.selectedChannel.selectedSlot.value) {
             case 0:
             default:
-                externalMidiOutPicker.pickOutput(root.selectedChannel);
+                externalHardwareDevicePicker.pickHardwareDevice(root.selectedChannel);
+                // externalMidiOutPicker.pickOutput(root.selectedChannel);
                 break;
             case 1:
-                externalMidiChannelPicker.pickChannel(root.selectedChannel);
+                externalHardwareDeviceEditor.editHardwareDevice(root.selectedChannel.externalSettings.hardwareDevice);
+                // externalMidiChannelPicker.pickChannel(root.selectedChannel);
                 break;
             case 2:
                 externalAudioSourcePicker.pickChannel(root.selectedChannel);
@@ -937,6 +939,13 @@ AbstractSketchpadPage {
     }
     ExternalMidiChannelPicker {
         id: externalMidiChannelPicker
+    }
+    ExternalHardwareDevicePicker {
+        id: externalHardwareDevicePicker
+        onRequestDeviceEdit: externalHardwareDeviceEditor.editHardwareDevice(device);
+    }
+    ExternalHardwareDeviceEditor {
+        id: externalHardwareDeviceEditor
     }
     ZUI.ComboBox {
         id: externalMidiOutPicker

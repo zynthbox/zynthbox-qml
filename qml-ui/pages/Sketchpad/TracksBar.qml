@@ -1504,24 +1504,32 @@ AbstractSketchpadPage {
                                                 Layout.minimumWidth: Kirigami.Units.gridUnit * 3
                                                 icon.name: "go-previous"
                                                 onClicked: {
-                                                    switch (root.selectedChannel.selectedSlot.className) {
-                                                        case "TracksBar_synthslot":
-                                                            root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
-                                                            break;
-                                                        case "TracksBar_fxslot":
-                                                            root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
-                                                            break;
+                                                    if (infoBar.externalHardwareDevice) {
+                                                        infoBar.externalHardwareDevice.program = infoBar.externalHardwareDevice.program - 1;
+                                                    } else {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
                                                     }
                                                 }
 
                                                 onPressAndHold: {
-                                                    switch (root.selectedChannel.selectedSlot.className) {
-                                                        case "TracksBar_synthslot":
-                                                            root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
-                                                            break;
-                                                        case "TracksBar_fxslot":
-                                                            root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
-                                                            break;
+                                                    if (infoBar.externalHardwareDevice) {
+                                                        infoBar.externalHardwareDevice.bank = infoBar.externalHardwareDevice.bank - 1;
+                                                    } else {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectPreviousSynthBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectPreviousFxBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1532,24 +1540,32 @@ AbstractSketchpadPage {
                                                 Layout.fillHeight: true
                                                 icon.name: "go-next"
                                                 onClicked: {
-                                                    switch (root.selectedChannel.selectedSlot.className) {
-                                                        case "TracksBar_synthslot":
-                                                            root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
-                                                            break;
-                                                        case "TracksBar_fxslot":
-                                                            root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
-                                                            break;
+                                                    if (infoBar.externalHardwareDevice) {
+                                                        infoBar.externalHardwareDevice.program = infoBar.externalHardwareDevice.program + 1;
+                                                    } else {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
                                                     }
                                                 }
 
                                                 onPressAndHold: {
-                                                    switch (root.selectedChannel.selectedSlot.className) {
-                                                        case "TracksBar_synthslot":
-                                                            root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
-                                                            break;
-                                                        case "TracksBar_fxslot":
-                                                            root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
-                                                            break;
+                                                    if (infoBar.externalHardwareDevice) {
+                                                        infoBar.externalHardwareDevice.bank = infoBar.externalHardwareDevice.bank + 1;
+                                                    } else {
+                                                        switch (root.selectedChannel.selectedSlot.className) {
+                                                            case "TracksBar_synthslot":
+                                                                root.selectedChannel.selectNextSynthBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                            case "TracksBar_fxslot":
+                                                                root.selectedChannel.selectNextFxBank(root.selectedChannel.selectedSlot.value);
+                                                                break;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1686,6 +1702,10 @@ AbstractSketchpadPage {
                                                 }
                                                 return layer;
                                             }
+                                            readonly property QtObject externalHardwareDevice: root.selectedChannel.trackType === "external"
+                                                ? root.selectedChannel.externalSettings.hardwareDevice
+                                                : null
+                                            readonly property int deviceValueAdjustment: infoBar.externalHardwareDevice && infoBar.externalHardwareDevice.valuesStartAtOne ? 1 : 0
 
                                             anchors.fill: parent
                                             // anchors.margins: Kirigami.Units.smallSpacing
@@ -1697,7 +1717,9 @@ AbstractSketchpadPage {
                                                 Layout.fillHeight: true
                                                 Layout.margins: 2
                                                 spacing: 1
-                                                enabled: infoBar.zynthianLayer != null
+                                                enabled: root.selectedChannel.trackType === "external"
+                                                        ? infoBar.externalHardwareDevice != null
+                                                        : infoBar.zynthianLayer != null
 
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
@@ -1705,7 +1727,9 @@ AbstractSketchpadPage {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: Kirigami.Units.gridUnit * 0.5
                                                     font.family: "Hack"
-                                                    text: qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
+                                                    text: root.selectedChannel.trackType === "external"
+                                                        ? qsTr("  Device : %1").arg(infoBar.externalHardwareDevice != null ? infoBar.externalHardwareDevice.name : "--")
+                                                        : qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
@@ -1713,7 +1737,9 @@ AbstractSketchpadPage {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: Kirigami.Units.gridUnit * 0.5
                                                     font.family: "Hack"
-                                                    text: qsTr("  Bank : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.bank : "--")
+                                                    text: root.selectedChannel.trackType === "external"
+                                                        ? qsTr("     Bank : %1/%2").arg(infoBar.externalHardwareDevice != null ? infoBar.externalHardwareDevice.bank + infoBar.deviceValueAdjustment : "--").arg(infoBar.externalHardwareDevice != null ? infoBar.externalHardwareDevice.bankMax + infoBar.deviceValueAdjustment : "--")
+                                                        : qsTr("  Bank : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.bank : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
@@ -1721,7 +1747,9 @@ AbstractSketchpadPage {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: Kirigami.Units.gridUnit * 0.5
                                                     font.family: "Hack"
-                                                    text: qsTr("Preset : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.preset : "--")
+                                                    text: root.selectedChannel.trackType === "external"
+                                                        ? qsTr("Program : %1/%2").arg(infoBar.externalHardwareDevice != null ? infoBar.externalHardwareDevice.program + infoBar.deviceValueAdjustment : "--").arg(infoBar.externalHardwareDevice != null ? infoBar.externalHardwareDevice.programMax + infoBar.deviceValueAdjustment : "--")
+                                                        : qsTr("Preset : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.preset : "--")
                                                 }
                                             }
 

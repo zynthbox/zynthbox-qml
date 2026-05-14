@@ -262,7 +262,9 @@ GridLayout {
                     isEmpty: text.trim().length == 0
                     muted: !slotMakesSound
                     dragEnabled: control.dragEnabled
-                    doubleClickEnabled: control.doubleClickEnabled
+                    // Enable double click timer only if highlighted
+                    // This makes the switching slots more responsive as it does not need to wait for the double click timer
+                    doubleClickEnabled: highlighted ? control.doubleClickEnabled : false
                     clickAndHoldEnabled: control.clickAndHoldEnabled
 
                     // opacity: slotMakesSound ? 1 : 0.3   

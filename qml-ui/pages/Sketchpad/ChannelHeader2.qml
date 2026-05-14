@@ -74,11 +74,17 @@ ZUI.CellControl {
                 root.forceActiveFocus()
             }
             onReleased: {
-                if (doublePressedTimer.running) {
-                    doublePressedTimer.stop()
-                    root.doubleClicked()
+                // Enable double click timer only if highlighted otherwise directly fire clicked() signal
+                // This makes the switching track more responsive as it does not need to wait for the double click timer
+                if (root.highlighted) {
+                    if (doublePressedTimer.running) {
+                        doublePressedTimer.stop();
+                        root.doubleClicked();
+                    } else {
+                        doublePressedTimer.restart();
+                    }
                 } else {
-                    doublePressedTimer.restart()
+                    root.clicked();
                 }
             }
         }

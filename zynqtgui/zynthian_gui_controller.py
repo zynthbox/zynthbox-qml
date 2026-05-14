@@ -286,7 +286,8 @@ class zynthian_gui_controller(QObject):
             self.val0=0
             self.ctrl_value=None
             self.n_values=127
-            self.inverted=False
+            # Do not reset inverted flag on config, as it is needed to be preserved
+            # self.inverted=False
             self.selmode = False
             self.logarithmic = zctrl.is_logarithmic
             self.scale_value=1

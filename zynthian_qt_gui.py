@@ -813,6 +813,9 @@ class zynthian_gui(QObject):
                     self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
                     self.__zselectors[knob_index].step = 1
                     self.__zselectors[knob_index].mult = 1
+                    # Knob 0, 1 and 2 are inverted in Z2_V5 kit
+                    if self.kit_version == "Z2_V5" and knob_index < 3:
+                        self.__zselectors[knob_index].inverted = True
 
                 self.__zselectors[knob_index].show()
                 self.__zselector_controllers[knob_index].set_options({"value": self.__knob_values_default[knob_index]})

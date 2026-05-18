@@ -587,7 +587,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             try:
                 self.stopAllPlayback()
-                self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
             except:
                 pass
 
@@ -701,7 +700,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         def task():
             obj = {}
             self.stopAllPlayback()
-            self.zynqtgui.screens["playgrid"].stopMetronomeRequest()            
 
             # Mark old song to be deleted to not perform any operations on it
             old_song = self.__song__

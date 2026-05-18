@@ -81,7 +81,7 @@ class zynthian_gui_about(zynthian_qt_gui_base.zynqtgui):
     zynthboxos_build_datetime = Property(str, get_zynthboxos_build_datetime, constant = True)
 
     def get_qt_version(self):
-        return self.get_version_from_apt("libqt5core5a")
+        return self.get_version_from_apt("libqt5core5t64")
     qt_version = Property(str, get_qt_version, constant = True)
 
     def get_libzynthbox_version(self):
